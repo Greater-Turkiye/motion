@@ -172,7 +172,7 @@ motion/
 | M4 | Yazı ve kart (yarısı ✅) | tam video şablonu (kanca + beş bölüm, döngü), kalıcı durum ve kaynak satırı, güvenli alan denetimi ✅; MSDF yazı sırada | Türkçe karakterler, animasyonda titreme yok |
 | M5 | Veriden sahne ✅ | `tools/scene/generate.mjs`: kayıttan sahne (kanca, beş bölüm, kamera, süre, stil), doğrulayıcı (okuma hızı, kaynak kelimeleri, yasak kelimeler), kırmızı çizgi reddi; CI her çalışmada en yeni beş kayıttan üretir | Kırmızı çizgi kaydı reddedilir ✅ |
 | M6 | Şablonlar | çağrı, sayaç, zaman çizelgesi, karşılaştırma | Her şablondan örnek video |
-| M7 | Tam otomasyon | Bölüm 10'daki hat: kayıttan videoya, insansız | Altı saatte bir runner'da üretim, sitede yayında |
+| M7 | Tam otomasyon (yarısı ✅) | Bölüm 10'daki hat: kayıttan videoya, insansız; seçici, üretici, işleyici ve GitHub sürümü olarak yayın ✅; site sayfası ve kanallar sırada | Altı saatte bir runner'da üretim, sitede yayında |
 
 ## 10. Tam otomatik hat / The fully automatic pipeline
 
@@ -182,23 +182,26 @@ Sahibin isteği: sistem kendi kendine çalışsın. Hat şöyle:
 toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici ─▶ sahne üretici ─▶ işleyici ─▶ yayın
 ```
 
-1. **Seçici.** Her çalıştırmada son altı saatin kayıtlarından video değeri en yüksek olanları
-   seçer: tür ağırlığı (kinetik, deniz, tatbikat, anlaşma önde), izleme bölgesine yakınlık,
-   birden çok kaynak, konumu olması, daha önce video yapılmamış olması. Günde en çok N video
-   (başlangıç: 4). Türk kuvvetleri ve `redline_check` her zaman dışarıda.
-2. **Sahne üretici.** Kayıttan sahne dosyasını kendisi yazar: türüne göre şablon, konumdan kamera,
-   ülkelerden vurgu, bölge kaydı sayısından istatistik, başlık ve kaynak kayıttan. Metin kaydın
-   metnidir; yeni iddia üretmez.
-3. **Doğrulayıcı.** Sahne; kaynak satırı, durum etiketi, kırmızı çizgi ve metnin taşmaması için
-   denetlenir. Geçmeyen sahne işlenmez, günlüğe yazılır.
-4. **İşleyici.** GitHub Actions runner'ında başsız Chrome + ffmpeg. GPU yok: WebGL yazılımla
-   (SwiftShader) çalışır, yavaş ama deterministik; 12 saniyelik dikey kart birkaç dakikada biter.
-   Her video üç boyutta ve bir kapak karesiyle çıkar.
-5. **Yayın.** Videolar sitenin "Videolar" sayfasına ve günlük bir sürüm sayfasına otomatik çıkar.
-   Kanallara gönderim bölüm 6'daki ayrı kararla açılır.
+1. **Seçici** ✅ (`tools/scene/select.mjs`). Son 48 saatin videosu olmayan kayıtları research/04'ün
+   haber değeri puanıyla sıralar: güncellik (12 saatte yarıya iner), tür büyüklüğü, Türkiye'ye
+   yakınlık, ayrı yayıncı sayısı, doğrulama durumu, yenilik (son videolarla aynı tür ve bölge
+   puanı düşürür), konum. Doğrulanmamış kayıt dışlanmaz, sırası düşer (ADR 0023). Çalışma başına
+   bir video, altı saatte bir: günde en çok dört.
+2. **Sahne üretici** ✅ (`tools/scene/generate.mjs`). Kayıttan sahne: kanca, bölümler, kamera, süre,
+   stil. Metin kaydın metnidir; yeni iddia üretmez. Türk kuvvetleri, geri çekilmiş ya da yanlış
+   kayıt, haritada yeri olmayan kayıt reddedilir.
+3. **Doğrulayıcı** ✅. Sahne motorun `validate()`'inden geçer (okuma hızı, kaynak kelimeleri, yasak
+   kelimeler); yazı güvenli alandan taşarsa dışa aktarım durur.
+4. **İşleyici** ✅. Runner'da başsız Chrome, WebGL SwiftShader'da, WebCodecs H.264; 24 saniyelik
+   video yaklaşık dört dakika, 8 Mbps.
+5. **Yayın** ✅ (`.github/workflows/produce.yml`). MP4 ve ilk kare, `video-<kayıt kimliği>`
+   etiketli bir GitHub sürümüne çıkar; sürüm notu başlık, durum, tarih, kaynaklar ve "otomatik
+   üretildi, kimse okumadı" beyanıdır. Sürümler defterdir: sürümü olan kayıt bir daha seçilmez.
+   Sitenin "Videolar" sayfası ve kanallara gönderim (Telegram, Bluesky, Mastodon, Instagram;
+   research/04 bölüm 4) sırada; hesaplar sahibin kararı ve kendi işidir.
 6. **Gözetim.** Sitedeki tarayıcı denetimi gibi: üretilen her videodan kareler örneklenir, boş
-   kare, taşan yazı ya da eksik kaynak satırı varsa iş kırmızıya düşer ve sağlık raporuna girer.
-   Acil durdurma: tek bir depo değişkeni (`MOTION_AUTO=off`).
+   kare, taşan yazı ya da eksik kaynak satırı varsa iş kırmızıya düşer ve sağlık raporuna girer
+   (sırada). Acil durdurma: depo değişkeni `MOTION_PRODUCE=off` ✅.
 
 ## 11. Tasarım tipleri / Design directions
 

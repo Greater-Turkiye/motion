@@ -38,6 +38,7 @@ const FRAMES_ONLY = args.has('frames-only');
 const EVERY = Number(args.get('every') || 1);
 const FORMAT = args.get('format') === 'png' ? 'png' : 'jpeg';
 const ENCODER = args.get('encoder') || 'auto'; // auto | webcodecs | ffmpeg
+const BITRATE = Number(args.get('bitrate') || 16_000_000); // WebCodecs path; 8 Mbps is plenty for a phone, 16 for masters
 const OUT = path.resolve(ROOT, args.get('out') || 'out');
 const CHROME = args.get('chrome') || process.env.CHROME || [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -128,7 +129,7 @@ for (const style of STYLES) {
     try {
       // a time limit, so a browser whose encoder stalls falls back instead of holding the job
       const limit = Math.max(120, info.frames * 1.5) * 1000;
-      const b64 = await Promise.race([evaluate(p, 'window.motion.encode()'),
+      const b64 = await Promise.race([evaluate(p, `window.motion.encode(${BITRATE})`),
         new Promise((_, rej) => setTimeout(() => rej(new Error(`WebCodecs took longer than ${limit / 1000} s`)), limit))]);
       const name = `${info.id}-${info.style}`;
       writeFileSync(path.join(OUT, `${name}.mp4`), Buffer.from(b64, 'base64'));

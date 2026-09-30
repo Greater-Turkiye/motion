@@ -90,8 +90,30 @@ const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.
 
 /** The hook: the record's own words, at most two big lines. */
 export function hookLines(title) {
-  const num = title.match(/(\d[\d.,]*)\s+([\p{L}']+)/u);
-  if (num) return { lines: [num[1], TR(num[2])], used: num[0] };
+  // matched on the Turkish lower case: JavaScript's /i does not fold "İ" into "i"
+  const low = title.toLocaleLowerCase('tr');
+  const at = (m) => title.slice(m.index, m.index + m[0].length);
+  // casualties lead when there are any, deaths before injuries: the fact a reader would put first.
+  // "48 kişinin yaralanmasının ardından" is shown as "48 / KİŞİ YARALANDI", the source's own verb
+  // in its plain past form (the scene check still finds it in the source by its stem)
+  const N = '(\\d+|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
+  for (const [re, verb] of [
+    [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
+    [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
+  ]) {
+    const m = low.match(re);
+    if (!m) continue;
+    const n = words(at(m))[0];
+    const tail = m[4] === 'ölü' || m[4] === 'yaralı' ? TR(m[4]) : `${m[2] ? 'KİŞİ ' : ''}${verb}`;
+    return { lines: [TR(n), tail], used: at(m) };
+  }
+  // a number and what it counts; a short word after it ("112 Rus İHA") belongs to the count, and a
+  // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
+  const num = title.match(/(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
+  if (num) {
+    const noun = num[2].length <= 4 && num[3] ? `${num[2]}${num[3]}` : num[2];
+    return { lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
+  }
   const cs = clauses(title);
   // a clause of two or three words that ends the title or stands alone reads as a verdict ("kaptan öldürüldü")
   const short = cs.slice(1).filter((c) => { const w = words(c); return w.length >= 2 && w.length <= 3 && c.length <= 26; }).pop();
@@ -100,9 +122,11 @@ export function hookLines(title) {
     return { lines: w.length === 2 ? w.map(TR) : [TR(w[0]), TR(w.slice(1).join(' '))], used: short };
   }
   // otherwise who, and what they did: the first word and the last two of the first clause that has them
-  const first = words(title)[0].replace(/[,:;]$/, '');
+  const first = words(title)[0].replace(/[,:;]$/, '').split("'")[0]; // "Kiev'deki" → "Kiev"
   const body = cs.find((c) => words(c).length >= 3) ?? title;
-  const tail = words(body).slice(-2).join(' ');
+  const bw = words(body);
+  // Turkish ends on its verb; "etkisiz hale getirildi" needs three words to mean anything
+  const tail = bw.slice(bw.at(-2) === 'hale' ? -3 : -2).join(' ');
   return { lines: [TR(first), TR(tail)], used: `${first} ${tail}` };
 }
 
@@ -131,7 +155,7 @@ const secs = (chars, min, pad = 0.6) => round1(Math.max(min, chars / CPS + pad))
 /** Every record in the dataset, read once. Records are filed by when they were written, not by when
  *  the event happened, so months are counted from time.start, not from folder names. */
 let all = null;
-function records(datasets) {
+export function records(datasets) {
   if (all) return all;
   all = [];
   const base = path.join(datasets, 'data', 'events');
@@ -176,8 +200,9 @@ export function generate(record, { datasets, style } = {}) {
   const kicker = `${TR(region?.name ?? loc?.place_name?.tr ?? '')} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   const news = unrubric(titleTr);
   const hook = hookLines(news);
-  const subClause = clauses(news).find((c) => !c.includes(hook.used) && !hook.used.includes(c) && words(c).length >= 3);
-  const sub = subClause ? wrapLines(subClause, 48, 1)[0] : '';
+  const subClause = clauses(news).find((c) => !c.includes(hook.used) && !hook.used.includes(c) && words(c).length >= 3 && c.length <= 72);
+  // a whole clause of at most two lines, or nothing: never a clause cut in the middle
+  const sub = subClause && subClause.length <= 72 ? subClause : '';
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
   const name = publisher(sources[0].url);
   const auto = (record.tags ?? []).includes('otomatik');
@@ -270,11 +295,30 @@ function findRecord(datasets, id) {
   throw new Error(`no record ${id} under ${base}`);
 }
 
+/** The text that goes with a published video: what it shows, how sure we are, where it came from,
+ *  and that nobody wrote or checked it (research/04: disclosure on every post). */
+export function notes(record, scene) {
+  const d = String(record.time.start).slice(0, 10);
+  return [
+    `**${record.title.tr}**`,
+    record.title.en ? `_${record.title.en}_` : '',
+    '',
+    `- Durum / status: **${scene.hook.status}**`,
+    `- Tarih / date: ${d}`,
+    `- Kayıt / record: \`${record.id}\``,
+    ...record.sources.map((s) => `- Kaynak / source: ${s.url}`),
+    '',
+    'Bu video, Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi',
+    'başlığıdır (çevirisi makine çevirisi olabilir) ve kimse okumadan yayımlandı. Seslendirme yok.',
+    "This video was generated automatically from a dataset record; the facts on screen are the source's own",
+    'headline (possibly machine-translated) and were published without human review. No voice-over.',
+  ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n') + '\n';
+}
+
 function write(scene, record, out) {
   out ??= path.join(ROOT, 'scenes', 'auto', `${scene.id}.yaml`);
   mkdirSync(path.dirname(out), { recursive: true });
-  writeFileSync(out, `# Generated from ${record.id} by tools/scene/generate.mjs; do not edit by hand.
-` + stringify(scene, { flowLevel: 3, lineWidth: 0 }));
+  writeFileSync(out, `# Generated from ${record.id} by tools/scene/generate.mjs; do not edit by hand.\n` + stringify(scene, { flowLevel: 3, lineWidth: 0 }));
   console.log(`${path.relative(ROOT, out)}: ${scene.duration} s, style ${scene.style}, ${scene.beats.length} beats`);
 }
 
@@ -296,6 +340,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   } else {
     const file = args.get('record') ?? findRecord(datasets, args.get('id'));
     const record = parse(readFileSync(file, 'utf8'));
-    try { write(generate(record, { datasets, style }), record, args.get('out')); } catch (e) { console.error(e.message); process.exit(3); }
+    try {
+      const scene = generate(record, { datasets, style });
+      write(scene, record, args.get('out'));
+      if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
+    } catch (e) { console.error(e.message); process.exit(3); }
   }
 }
