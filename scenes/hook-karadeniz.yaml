@@ -1,0 +1,26 @@
+# The hook of a video about one record. Written by hand for M1; from M5 the scene generator writes
+# these from the record itself (PLAN.md section 10).
+id: hook-karadeniz
+record: evt_01m392q7kbfcm91x3pp7301k30   # Karadeniz'de yük gemisi saldırıya uğradı, kaptan öldürüldü
+format: vertical
+fps: 60
+duration: 4
+style: A
+camera:
+  from: { center: [26, 40.5], zoom: 0.92 }
+  to: { center: [33.5, 46], zoom: 1.0 }
+  seconds: 2.6
+  ease: outCubic
+event: { at: [33.2, 43.6], precision: region }   # the record has no coordinate: a ring over the sea
+subject: { country: RUS, emblem: RUS/arms-eagle, label: RUSYA FEDERASYONU }
+labels:
+  - { text: RUSYA FEDERASYONU, at: [44, 53.8], kind: country }
+  - { text: TÜRKİYE, at: [35, 39.2], kind: home }
+  - { text: KARADENİZ, at: [30.2, 43.4], kind: sea }
+  - { text: UKRAYNA, at: [31.5, 49.3], kind: country }
+hook:
+  kicker: KARADENİZ · 23 EYLÜL
+  lines: [KAPTAN, ÖLDÜ]
+  sub: "Yük gemisi vuruldu. İstanbul Boğazı'na ~{km} km."
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"

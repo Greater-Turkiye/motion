@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Motion önizleme</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #ddd; font: 13px system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { height: 100vh; width: auto; display: block; }
+  body.export canvas { height: auto; }
+  #ui { position: fixed; left: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; background: rgba(0,0,0,.6); padding: 8px 10px; border-radius: 6px; }
+  #ui button { background: #222; color: #eee; border: 1px solid #444; padding: 4px 9px; cursor: pointer; }
+  #bar { width: 240px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui" hidden>
+  <button id="play" type="button">▶/❚❚</button>
+  <input id="bar" type="range" min="0" max="1000" value="0">
+  <button data-style="A" type="button">A</button><button data-style="B" type="button">B</button>
+  <button data-style="C" type="button">C</button><button data-style="D" type="button">D</button>
+  <span id="fps"></span>
+</div>
+<script>if (new URLSearchParams(location.search).has('export')) document.body.className = 'export';</script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

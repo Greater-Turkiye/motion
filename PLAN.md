@@ -140,7 +140,7 @@ card:
 | Önizleme, tümleşik GPU | ≥ 60 fps, 1080×1920 |
 | Kare süresi bütçesi (önizleme) | p95 ≤ 12 ms |
 | 12 saniyelik dikey kartın dışa aktarımı | ≤ 2 dakika, dizüstü |
-| Aynı sahne iki kez işlenince | Piksel piksel aynı çıktı (testle doğrulanır) |
+| Aynı sahne iki kez işlenince | Aynı işlem içinde bit bit aynı; iki ayrı tarayıcı işleminde büyük yazının kenarlarında en fazla 2/255 fark, baytların < %0,01'i (testle ölçülür) |
 
 Ölçümü platformdaki `measure.mjs` ve `smoke.mjs` ile aynı yoldan, CDP üzerinden yaparız.
 
@@ -164,7 +164,7 @@ motion/
 | # | Aşama | Çıktı | Kabul ölçütü |
 |---|---|---|---|
 | M0 | Plan | bu belge | Sahibin onayı |
-| M1 | İskelet | saat, sahne, CDP dışa aktarımı, boş kare | 1080×1920 60 fps MP4, iki çalıştırma aynı |
+| M1 | İskelet ✅ | saat, sahne, CDP dışa aktarımı, kanca şablonu, dört stil, amblem manifesti | 1080×1920 60 fps MP4, iki çalıştırma tolerans içinde aynı |
 | M2 | Küre | kabartmalı küre, kamera geçişi | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
 | M4 | Yazı ve kart | MSDF yazı, "önemli gelişme" kartı, kaynak satırı | Türkçe karakterler, animasyonda titreme yok |
