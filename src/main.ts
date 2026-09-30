@@ -17,7 +17,8 @@ const scene = loadScene(text);
 const styleParam = params.get('style') as StyleId | null;
 if (styleParam && STYLES[styleParam]) scene.style = styleParam;
 const exporting = params.has('export');
-// variants from the URL, so the same scene can be rendered several ways: ?text=pop&camera=fly&progress=1&blur=0
+// the motion language belongs to the style; the URL can still override it for experiments
+// (?text=pop&camera=fly&progress=1&blur=0), never the production pipeline
 const A = (scene.anim ||= {});
 const pick = <T extends string>(v: string | null, ok: readonly T[]) => (v && (ok as readonly string[]).includes(v) ? (v as T) : undefined);
 A.text = pick(params.get('text'), ['rise', 'wipe', 'type', 'pop'] as const) ?? A.text;
