@@ -7,7 +7,7 @@
 // capitals lowered so a model does not spell "KARADENİZ" letter by letter, "km" said as "kilometre").
 // Each segment knows its window, from its block's start to the next block's; a segment whose words
 // would not fit loses its optional parts first (tools/audio/voice.mjs places and fits the clips).
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -172,7 +172,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const sc = loadScene(process.argv[2]);
   const segs = narration(sc);
   const json = JSON.stringify({ id: sc.id, duration: sc.duration, segments: segs }, null, 1) + '\n';
-  if (process.argv[3]) writeFileSync(process.argv[3], json);
+  if (process.argv[3]) { mkdirSync(path.dirname(process.argv[3]), { recursive: true }); writeFileSync(process.argv[3], json); }
   for (const s of segs) {
     const need = s.text.length / SPEECH_CPS;
     console.log(`${s.at.toFixed(2).padStart(6)} ${(s.until - s.at).toFixed(1).padStart(4)}s ${need > s.until - s.at ? '!' : ' '} ${s.text}`);
