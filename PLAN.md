@@ -165,7 +165,7 @@ motion/
 |---|---|---|---|
 | M0 | Plan | bu belge | Sahibin onayı |
 | M1 | İskelet ✅ | saat, sahne, CDP dışa aktarımı, kanca şablonu, dört stil, amblem manifesti | 1080×1920 60 fps MP4, iki çalıştırma tolerans içinde aynı |
-| M2 | Küre | kabartmalı küre, kamera geçişi | Önizleme ≥ 60 fps, geçişte titreme yok |
+| M2 | Küre (yarısı ✅) | WebGL2 küre ve düz harita, WebCodecs dışa aktarım ✅; kabartma sırada | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
 | M4 | Yazı ve kart | MSDF yazı, "önemli gelişme" kartı, kaynak satırı | Türkçe karakterler, animasyonda titreme yok |
 | M5 | Veriden sahne | kayıt kimliğinden sahne, doğrulayıcı (kaynak, kırmızı çizgi) | Kırmızı çizgi kaydı reddedilir |

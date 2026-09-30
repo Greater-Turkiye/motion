@@ -2,7 +2,8 @@ import { geoDistance } from 'd3-geo';
 import type { Assets } from '../assets';
 import { anim, ease, lerp, rng, span } from '../engine/time';
 import type { Scene } from '../engine/scene';
-import { drawGlobe, H, projection, W } from '../render/globe';
+import { H, W } from '../render/globe';
+import type { MapRenderer } from '../render/map';
 import { drawLabels, placeLabels, type Box, type Label } from '../render/labels';
 import type { Style } from '../styles';
 
@@ -48,17 +49,16 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
  * intro), the subject country lights up, the event pulses, and the record's most concrete fact
  * arrives in two heavy lines. Every timing below is a function of `t` alone.
  */
-export function drawHook(ctx: CanvasRenderingContext2D, a: Assets, sc: Scene, s: Style, t: number, frame: number) {
+export function drawHook(ctx: CanvasRenderingContext2D, a: Assets, map: MapRenderer, sc: Scene, s: Style, t: number, frame: number) {
   const cam = sc.camera;
   const k = (ease[cam.ease] || ease.outCubic)(span(t, 0, cam.seconds));
   const drift = t * 0.35; // a slow continuous drift so the frame never freezes after the move
   const center: [number, number] = [lerp(cam.from.center[0], cam.to.center[0], k) + drift * 0.3, lerp(cam.from.center[1], cam.to.center[1], k)];
   const zoom = lerp(cam.from.zoom, cam.to.zoom, k) * (1 + 0.012 * t);
-  const proj = projection(s, { center, zoom });
   const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
 
   ctx.save();
-  drawGlobe(ctx, a, s, proj, { subject: sc.subject?.country, subjectReveal: anim(t, 0.15, 0.9, ease.outQuad), pulse });
+  const proj = map.draw(ctx, s, { center, zoom }, { subject: sc.subject?.country, subjectReveal: anim(t, 0.15, 0.9, ease.outQuad), pulse });
 
   const obstacles: Box[] = [{ x: 0, y: 1060, w: W, h: H - 1060 }]; // the text block and its wash
   // event: a region-level ring, never a pin, with shock waves every 1.1 s

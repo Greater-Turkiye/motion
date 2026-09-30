@@ -6,8 +6,9 @@ kartı. Videolar veri setindeki kaynaklı kayıtlardan **otomatik** üretilir.
 A motion engine for short geopolitical video cards — a relief globe, country and alliance
 highlights, a news card — produced **automatically** from the sourced records of the dataset.
 
-**Durum / Status:** M1 çalışıyor: deterministik saat, sahne dosyası, küre ve kanca şablonu, çakışmasız
-etiketler, Chrome'dan ffmpeg'e kare kare 60 fps dışa aktarım, dört stil. Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
+**Durum / Status:** M1 ve M2'nin çizim yarısı çalışıyor: harita WebGL2'de (ülke kimliği dokusu, tek geçişte
+dolgu, sabit kalınlıkta yumuşatılmış sınırlar), video tarayıcının kendi kodlayıcısıyla (WebCodecs) doğrudan
+MP4'e yazılıyor; desteklenmeyen yerde ffmpeg yolu devrede. Kabartma (ETOPO) sırada. Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
 [docs/mockups](docs/mockups) (`tasarimlar-hepsi.png`: her stil için kanca, NATO ve kapanış karesi).
 
 | | |
@@ -34,9 +35,16 @@ npm test                                      # iki ayrı işlemede aynı karele
 |---|---|
 | Sahneler | `scenes/*.yaml` — kayıt kimliği, kamera, olay, konu ülke ve amblemi, etiketler, kanca metni |
 | Stiller | `src/styles.ts` — A gece kırmızısı, B harekât lacivert, C editoryal, D uydu gecesi |
-| Dışa aktarım | `export/render.mjs` — kareler birbirinden bağımsız; `--workers` sekme sayısı |
+| Harita | `src/gl/globe-gl.ts` (WebGL2), yedek `src/render/globe.ts` (2B) |
+| Dışa aktarım | `export/render.mjs` — önce WebCodecs, olmazsa sekmelerde paralel kare + ffmpeg (`--encoder`, `--workers`) |
 | Amblemler | `assets/emblems/manifest.json` — Wikidata/Commons, yalnızca kamu malı ve serbest lisans; dosyalar git'te değil |
 | CI | `.github/workflows/render.yml` — tip denetimi, dört stilde video, determinizm; videolar artefakt |
 | Lisanslar | [LICENSES.md](LICENSES.md) |
 
-Bu makinede (GTX 660) dört saniyelik dikey kanca dört sekmeyle ~33 saniyede işleniyor.
+| Ölçüm (GTX 660) | M1, 2B tuval | M2, WebGL2 + WebCodecs |
+|---|---|---|
+| Kare çizimi | ~390 ms | ~1,2 ms |
+| 4 sn dikey video, dışa aktarım | 121 sn (tek sekme), 33 sn (dört sekme) | ~5 sn |
+| Önizleme | ~3 fps | 57–58 fps (başsız Chrome'un kare zamanlayıcısı sınırı) |
+
+`?renderer=canvas2d` eski 2B çiziciyi açar; WebGL2 olmayan ortamda kendiliğinden devreye girer.

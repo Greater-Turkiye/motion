@@ -7,6 +7,7 @@
 //   node export/render.mjs --format png                      # lossless frames (slower)
 //   node export/render.mjs --workers 4                       # pages drawing frames at once
 //   node export/render.mjs --save-frames                     # also write every frame to out/<name>-frames/
+//   node export/render.mjs --encoder ffmpeg                  # skip WebCodecs (auto tries it first)
 //
 // The page draws frame i when asked and hands back the finished image; nothing depends on the wall
 // clock, so the output is exactly `fps` frames per second however long each frame takes to draw.
@@ -36,6 +37,7 @@ const STYLES = args.has('all-styles') ? ['A', 'B', 'C', 'D'] : [args.get('style'
 const FRAMES_ONLY = args.has('frames-only');
 const EVERY = Number(args.get('every') || 1);
 const FORMAT = args.get('format') === 'png' ? 'png' : 'jpeg';
+const ENCODER = args.get('encoder') || 'auto'; // auto | webcodecs | ffmpeg
 const OUT = path.resolve(ROOT, args.get('out') || 'out');
 const CHROME = args.get('chrome') || process.env.CHROME || [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -65,6 +67,8 @@ const base = `http://127.0.0.1:${server.address().port}/`;
 const port = 9400 + Math.floor(Math.random() * 500);
 const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--no-default-browser-check',
   '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
+  // WebGL2 everywhere: the real GPU where there is one, SwiftShader on a runner without one
+  '--use-angle=default', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
   `--user-data-dir=${mkdtempSync(path.join(tmpdir(), 'motion-'))}`, 'about:blank'], { stdio: 'ignore' });
 let up = false;
 for (let i = 0; i < 80 && !up; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); up = true; } catch { await sleep(250); } }
@@ -112,6 +116,25 @@ async function openScene(style) {
 
 let failed = false;
 for (const style of STYLES) {
+  // WebCodecs first: the page encodes its own MP4 and hands back the file. Falls back to drawing
+  // frames in parallel tabs and piping them to ffmpeg when the browser cannot encode.
+  if (!FRAMES_ONLY && ENCODER !== 'ffmpeg') {
+    const { p, info } = await openScene(style);
+    const t0 = Date.now();
+    try {
+      const b64 = await evaluate(p, 'window.motion.encode()');
+      const name = `${info.id}-${info.style}`;
+      writeFileSync(path.join(OUT, `${name}.mp4`), Buffer.from(b64, 'base64'));
+      console.log(`${name}: ${info.frames} frames in ${((Date.now() - t0) / 1000).toFixed(1)} s with WebCodecs (${info.renderer}) -> ${path.relative(ROOT, path.join(OUT, name + '.mp4'))}`);
+      if (p.errors.length) { console.error('page errors:', p.errors); failed = true; }
+      p.ws.close();
+      continue;
+    } catch (e) {
+      if (ENCODER === 'webcodecs') throw e;
+      console.log(`WebCodecs unavailable (${String(e.message).split('\n')[0]}); falling back to ffmpeg`);
+      p.ws.close();
+    }
+  }
   const pages = await Promise.all(Array.from({ length: WORKERS }, () => openScene(style)));
   const info = pages[0].info;
   const name = `${info.id}-${info.style}`;
