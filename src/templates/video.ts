@@ -121,6 +121,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   const top = t < (sc.beats[0]?.at ?? D) ? Math.min(960, hookTop) : 960;
   const obstacles: Box[] = [{ x: 0, y: top, w: W, h: H - top }];
   if (sc.voice === 'synthetic') obstacles.push({ x: LEFT - 10, y: SAFE.top - 6, w: 400, h: 40 });
+  // the progress bar: a name drawn across it reads as a broken bar
+  if (full && (sc.anim?.progress ?? s.motion.progress)) obstacles.push({ x: 0, y: SAFE.top - 50, w: W, h: 30 });
   const labels: Label[] = [];
 
   if (sc.event) {

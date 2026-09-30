@@ -114,6 +114,8 @@ jobs:
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           python -m pip install --quiet chatterbox-tts
           python -u tools/audio/tts.py out/narration.json out/voice
+          # the picture waits for the voice: blocks lengthen until each clip fits
+          node tools/audio/retime.mjs "auto-$ID" out/voice
           # only now, with every clip made, does the scene carry the synthetic-voice note
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
           { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı)."; } >> notes.md

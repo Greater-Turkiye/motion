@@ -2,7 +2,8 @@ name: voice-sample
 
 # One narrated video on request, the way production makes it (PLAN.md section 15.7): the scene's own
 # words (tools/audio/narration.mjs), read by Chatterbox Multilingual (MIT, watermarked) on the CPU,
-# placed on the rendered video (tools/audio/voice.mjs). The video and the clips are kept as an
+# the scene retimed so each block holds its clip (tools/audio/retime.mjs), placed on the rendered
+# video (tools/audio/voice.mjs). The video and the clips are kept as an
 # artifact for a week; nothing is published. For trying a scene, a voice or a change to the mixer.
 on:
   workflow_dispatch:
@@ -48,6 +49,7 @@ jobs:
           node tools/audio/narration.mjs "$SCENE" out/narration.json
           python -u tools/audio/tts.py out/narration.json out/voice
           f="scenes/$SCENE.yaml"; [ -f "$f" ] || f="scenes/auto/$SCENE.yaml"
+          node tools/audio/retime.mjs "$f" out/voice
           echo "voice: synthetic" >> "$f"
       - name: Video with the voice
         run: |

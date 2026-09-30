@@ -375,8 +375,13 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      veri setinin sayısı. Yeni iddia eklenmez; sayılar yazıyla, büyük harfli başlıklar küçük harfle
      okunur; kancanın alt satırı olgularda tekrar edilmez. Bir blok penceresine sığmayan metin önce
      isteğe bağlı parçasını ("Henüz kimse incelemedi.") kaybeder.
-   - Yerleştirme (`tools/audio/voice.mjs`): klip bloğunun başında ya da öncekinin hemen ardından,
-     1,15 kat hızlı; bloğundan 0,4 sn'den fazla taşarsa en fazla 1,3 kata kadar hızlanır. Ses -16 LUFS.
+   - **Görüntü sesi bekler** (`tools/audio/retime.mjs`): model kısa cümleleri yavaş okuyor (ilk
+     denemede "Karadeniz. Kesin konum yok." 4 sn); ses görüntünün gerisine düşünce hata gibi duruyor.
+     Bu yüzden klipler yapıldıktan sonra her blok, klibi sığana kadar uzatılır, kamera anahtarları
+     da onunla esner; video 2–5 sn uzar (karadeniz-gemi 22 → 26,5 sn). Bloklar yalnızca uzar, okuma
+     hızı kuralları bozulmaz.
+   - Yerleştirme (`tools/audio/voice.mjs`): klip bloğunun başında, 1,15 kat hızlı; yine de taşarsa
+     en fazla 1,3 kata kadar hızlanır. Ses -16 LUFS.
    - **Beyan**: seslendirilmiş her videonun her karesinde "SESLENDİRME: YAPAY SES" yazar (sol üst,
      güvenli alanda) ve sürüm notunda model adı bulunur. TikTok, YouTube ve Meta gerçekçi yapay sesin
      etiketlenmesini istiyor; izleyici bunu açıklamada aramak zorunda kalmamalı.

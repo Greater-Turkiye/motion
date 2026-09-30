@@ -10,7 +10,7 @@
 // past the video's end fades out. With a bed, the music sits at -20 dB and ducks under the voice.
 // Prints where each clip went, so a run's log shows every fit.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, mkdtempSync } from 'node:fs';
+import { readFileSync, mkdtempSync, existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,13 +36,19 @@ export function place(clips, videoLength) {
   });
 }
 
+/** A clip without its trailing silence (reversed, leading silence stripped, reversed back), at 48 kHz,
+ *  made once next to the clip: tools/audio/retime.mjs measures the same file this mixer places. */
+export function trimmed(src) {
+  const dst = src.replace(/\.wav$/, '.trim.wav');
+  if (!existsSync(dst)) ff(['-i', src, '-af', 'areverse,silenceremove=start_periods=1:start_threshold=-42dB:start_silence=0.08,areverse,aresample=48000', dst]);
+  return dst;
+}
+
 export function voice(dir, video, out, { bed, wav } = {}) {
   const clips = JSON.parse(readFileSync(path.join(dir, 'clips.json'), 'utf8'));
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'voice-'));
-  // trailing silence off first (reverse, strip the leading silence, reverse back), then measure
   for (const c of clips) {
-    c.trimmed = path.join(tmp, c.file);
-    ff(['-i', path.join(dir, c.file), '-af', 'areverse,silenceremove=start_periods=1:start_threshold=-42dB:start_silence=0.08,areverse,aresample=48000', c.trimmed]);
+    c.trimmed = trimmed(path.join(dir, c.file));
     c.raw = duration(c.trimmed);
   }
   const D = duration(video);
