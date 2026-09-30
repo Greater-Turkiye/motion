@@ -9,6 +9,9 @@
 | `assets/data/disputed-tur-view.geojson` | Greater-Turkiye/platform, Türkiye görüşüne göre işgal altındaki topraklar (handbook ADR 0014) | CC BY 4.0 |
 | `assets/fonts/montserrat-*.woff2` | [Montserrat](https://github.com/JulietaUla/Montserrat) | SIL Open Font License 1.1 |
 | `assets/fonts/plexmono-*.woff2` | [IBM Plex Mono](https://github.com/IBM/plex) | SIL Open Font License 1.1 |
+| `assets/fonts/*.ttf` (Big Shoulders, Archivo, Newsreader, Schibsted Grotesk, Unbounded, Martian Mono, JetBrains Mono, Courier Prime, Black Ops One, Cinzel, Fraunces) | [google/fonts](https://github.com/google/fonts) @ `9710da1e` | SIL Open Font License 1.1 (`assets/fonts/licenses/*-OFL.txt`); video başlığı ve gömme serbest (OFL FAQ 1.1, 1.12) |
+| `assets/fonts/specialelite-regular.ttf` | [google/fonts](https://github.com/google/fonts/tree/main/apache/specialelite) @ `9710da1e` | Apache License 2.0 (`assets/fonts/licenses/specialelite-LICENSE.txt`) |
+| `assets/data/countries.json` | Unicode CLDR 48.2.3 `codeMappings` (ISO kodları), Natural Earth (ağırlık merkezleri), elle yazılmış başkent koordinatları; `tools/data/build_countries.mjs` | Unicode License v3; Natural Earth kamu malı |
 | `assets/emblems/**` | Wikimedia Commons, Wikidata üzerinden | Her dosyanın lisansı ve yazarı `assets/emblems/manifest.json`'da; yalnızca kamu malı, CC0, CC BY, CC BY-SA |
 | earcut (paketlenir) | [mapbox/earcut](https://github.com/mapbox/earcut) | ISC |
 | mp4-muxer (paketlenir) | [Vanilagy/mp4-muxer](https://github.com/Vanilagy/mp4-muxer) | MIT |

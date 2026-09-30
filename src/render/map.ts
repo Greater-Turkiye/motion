@@ -9,11 +9,13 @@ export interface MapOptions { subject?: string; subjectReveal: number; pulse: nu
  *  overlay (rings, emblem, labels) lands on exactly the pixels the map put things on. */
 export interface MapRenderer { kind: 'webgl2' | 'canvas2d'; draw(ctx: CanvasRenderingContext2D, s: Style, v: View, o: MapOptions): Project }
 
-export function makeMap(a: Assets, subject: string | undefined, prefer: 'webgl2' | 'canvas2d' = 'webgl2'): MapRenderer {
+/** `subjects`: ISO3 codes of the countries the story is about; the first is the one the 2D fallback shows. */
+export function makeMap(a: Assets, subjects: string[], prefer: 'webgl2' | 'canvas2d' = 'webgl2'): MapRenderer {
+  const num = (iso3: string) => a.nums.get(iso3) ?? NUM[iso3];
   if (prefer === 'webgl2') {
     try {
       const g = new GlobeGL(a.countries.map((c) => c.shape), a.disputed.features, a.borderLines, a.coastLines, a.relief);
-      g.setScene(subject ? NUM[subject] ?? null : null, NUM.TUR);
+      g.setScene(subjects.map(num).filter(Boolean), num('TUR'));
       return {
         kind: 'webgl2',
         draw(ctx, s, v, o) {
