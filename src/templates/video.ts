@@ -248,10 +248,12 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   const lift = (1 - alpha) * 40;
   ctx.font = '600 40px M';
   const subLines = wrap(ctx, sc.hook.sub.replace('{km}', sc.event ? String(kmToBosphorus(sc.event.at)) : '?'), WIDTH);
-  const px = fit(ctx, sc.hook.lines, (p) => `900 ${p}px M`, 188, 4 / 188); // sized for the loosest tracking
-  const lineH = Math.round(px * 0.915);
+  // each line as big as it can be on its own: a short word stays huge even when the next line is long
+  // (sized for the loosest tracking of the settle below)
+  const sizes = sc.hook.lines.map((l) => fit(ctx, [l], (p) => `900 ${p}px M`, 188, 4 / 188));
+  const heights = sizes.map((px) => Math.round(px * 0.915));
   const subTop = BLOCK_BOTTOM - subLines.length * 50;
-  const linesTop = subTop - 40 - sc.hook.lines.length * lineH;
+  const linesTop = subTop - 40 - heights.reduce((a, b) => a + b, 0);
   const kickerY = linesTop - 30;
   guard({ x: LEFT - 6, y: kickerY - 26, w: WIDTH, h: BLOCK_BOTTOM - kickerY + 26 }, 'hook');
 
@@ -264,7 +266,8 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
     // fully legible on frame 0, which is also the thumbnail (research/01, rule 1): the motion is the
     // tracking closing in, not the words arriving
     const p = anim(t, 0.04 * i, 0.7, ease.outExpo);
-    const base = linesTop + (i + 1) * lineH - 18;
+    const px = sizes[i];
+    const base = linesTop + heights.slice(0, i + 1).reduce((a, b) => a + b, 0) - 18 * (px / 188);
     ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${(-5 + 9 * (1 - p)) * (px / 188)}px`;
     ctx.fillStyle = i === sc.hook.lines.length - 1 ? s.accent : s.ink;
     ctx.globalAlpha = alpha;
@@ -322,7 +325,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'facts');
       ctx.font = '700 26px X'; ctx.letterSpacing = '8px'; ctx.fillStyle = s.accent; ctx.globalAlpha = alpha;
-      ctx.fillText('NE OLDU', LEFT, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.fillText(b.kicker ?? 'NE OLDU', LEFT, top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.letterSpacing = '0px'; ctx.font = `800 ${px}px M`;
       b.lines.forEach((l, k) => {
         const p = at(0.12 * k);

@@ -34,10 +34,16 @@ jobs:
       - name: Emblems (pinned by hash in the manifest)
         run: python3 tools/data/fetch_emblems.py --sync
       - run: npx tsc --noEmit
+      - name: Scenes from the newest records (datasets, auto-data branch)
+        run: |
+          git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
+          node tools/scene/generate.mjs --datasets ../datasets --latest 5
       - name: Render the hook in every style
         run: node export/render.mjs --all-styles --workers 2
       - name: Render the whole video (22 s)
         run: node export/render.mjs --no-build --scene karadeniz-gemi --style A
+      - name: Render the newest generated scene
+        run: node export/render.mjs --no-build --scene "$(ls scenes/auto/*.yaml | sort | tail -1 | xargs basename -s .yaml)"
       - name: Determinism
         run: node export/determinism.mjs A
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

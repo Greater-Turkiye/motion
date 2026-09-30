@@ -170,7 +170,7 @@ motion/
 | M2 | Küre ✅ | WebGL2 küre ve düz harita, WebCodecs dışa aktarım, ETOPO1 kabartması ✅ | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
 | M4 | Yazı ve kart (yarısı ✅) | tam video şablonu (kanca + beş bölüm, döngü), kalıcı durum ve kaynak satırı, güvenli alan denetimi ✅; MSDF yazı sırada | Türkçe karakterler, animasyonda titreme yok |
-| M5 | Veriden sahne (doğrulayıcı ✅) | kayıt kimliğinden sahne; doğrulayıcı: okuma hızı, kaynak kelimeleri, yasak kelimeler ✅, kırmızı çizgi kaydı sırada | Kırmızı çizgi kaydı reddedilir |
+| M5 | Veriden sahne ✅ | `tools/scene/generate.mjs`: kayıttan sahne (kanca, beş bölüm, kamera, süre, stil), doğrulayıcı (okuma hızı, kaynak kelimeleri, yasak kelimeler), kırmızı çizgi reddi; CI her çalışmada en yeni beş kayıttan üretir | Kırmızı çizgi kaydı reddedilir ✅ |
 | M6 | Şablonlar | çağrı, sayaç, zaman çizelgesi, karşılaştırma | Her şablondan örnek video |
 | M7 | Tam otomasyon | Bölüm 10'daki hat: kayıttan videoya, insansız | Altı saatte bir runner'da üretim, sitede yayında |
 

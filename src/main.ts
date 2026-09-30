@@ -5,11 +5,12 @@ import { STYLES } from './styles';
 import { drawVideo } from './templates/video';
 import { makeMap, type MapRenderer } from './render/map';
 
-const SCENES = import.meta.glob('../scenes/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+// hand-written scenes in scenes/, generated ones in scenes/auto/; a scene is found by its file name
+const SCENES = import.meta.glob('../scenes/**/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 const params = new URLSearchParams(location.search);
 const name = params.get('scene') || 'hook-karadeniz';
-const text = SCENES[`../scenes/${name}.yaml`];
+const text = Object.entries(SCENES).find(([k]) => k.endsWith(`/${name}.yaml`))?.[1];
 if (!text) throw new Error(`no scene ${name}`);
 const scene = loadScene(text);
 const styleParam = params.get('style') as StyleId | null;

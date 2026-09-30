@@ -10,7 +10,7 @@ export interface Key extends Camera { t: number }
 /** What follows the hook, one block of text at a time (PLAN.md section 14, research/02 beat sheet). */
 export type Beat =
   | { kind: 'place'; at: number; title: string; text?: string }
-  | { kind: 'facts'; at: number; lines: string[] }
+  | { kind: 'facts'; at: number; kicker?: string; lines: string[] }
   | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string }
   | { kind: 'status'; at: number; text?: string }
   | { kind: 'close'; at: number; kicker?: string; lines: string[] };
@@ -106,7 +106,7 @@ export function validate(s: Scene): string[] {
 export function beatText(b: Beat): string[] {
   switch (b.kind) {
     case 'place': return [b.title, b.text ?? ''];
-    case 'facts': return b.lines;
+    case 'facts': return [b.kicker ?? '', ...b.lines];
     case 'distance': return [`${b.from.label} ${b.to.label}`, b.text ?? ''];
     case 'status': return [b.text ?? ''];
     case 'close': return [b.kicker ?? '', ...b.lines];
