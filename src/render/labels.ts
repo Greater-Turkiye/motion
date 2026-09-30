@@ -10,7 +10,7 @@
  */
 export interface Box { x: number; y: number; w: number; h: number }
 export interface Label { key: string; text: string; x: number; y: number; size: number; color: string; spacing: number; weight?: number; priority: number; alpha?: number;
-  /** never faded by what covers it (TÜRKİYE): only by leaving the frame */
+  /** never faded by another label (TÜRKİYE): only by the text block, the emblem or leaving the frame */
   sticky?: boolean;
   /** screen positions of alternative anchors on the ground (null when behind the globe); x, y is the first */
   alts?: ([number, number] | null)[] }
@@ -76,9 +76,13 @@ export function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], obst
   for (const l of [...labels].sort((a, b) => a.priority - b.priority)) {
     const box = boxOf(ctx, l, plan.get(l.key) ?? 0);
     const area = box.w * box.h;
-    const covered = [...obstacles, ...placed.filter((p) => (p.label.alpha ?? 1) > 0.3).map((p) => p.box)].reduce((a, o) => Math.max(a, overlap(box, o) / area), 0);
-    // a steep fade: half-covered labels that linger read as ghosts
-    const vis = (l.sticky ? 1 : 1 - smooth(0.02, 0.12, covered)) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
+    const cover = (bs: Box[]) => bs.reduce((a, o) => Math.max(a, overlap(box, o) / area), 0);
+    const byText = cover(obstacles);
+    const covered = Math.max(byText, cover(placed.filter((p) => (p.label.alpha ?? 1) > 0.3).map((p) => p.box)));
+    // a steep fade: half-covered labels that linger read as ghosts. A sticky label (TÜRKİYE) gives way
+    // to no other label, but it does give way to the text block and the emblem: the country's own
+    // fill still says where Türkiye is, and "KİEV · 30 EYLÜLTÜRKİYE" reads as one broken line
+    const vis = (l.sticky ? 1 - smooth(0.02, 0.2, byText) : 1 - smooth(0.02, 0.12, covered)) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
     const alpha = (l.alpha ?? 1) * vis;
     if (alpha <= 0.01) continue;
     placed.push({ label: { ...l, alpha, x: box.x + 6 + (box.w - 12) / 2, y: box.y + 4 + (box.h - 8) / 2 }, box });

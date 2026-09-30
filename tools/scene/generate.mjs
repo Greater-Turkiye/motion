@@ -163,6 +163,14 @@ const words = (s) => s.split(/\s+/).filter(Boolean);
 const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 3 ? '' : m));
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
+/** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
+ *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
+ *  to "BRAİLA", not "BRĂİLA"). Turkish letters and circumflexes stay. */
+const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', Tbilisi: 'Tiflis' };
+const TURKISH = new Set('çşğöüıİÇŞĞÖÜâîûÂÎÛ');
+const FOLD = { 'ș': 'ş', 'Ș': 'Ş', 'ţ': 't', 'ț': 't', 'Ț': 'T', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'ß': 'ss' };
+export const trPlace = (s) => s.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w).replace(/./gu, (c) => (TURKISH.has(c) ? c : FOLD[c] ?? c.normalize('NFD').replace(/\p{M}/gu, '')));
+
 /** The hook: the record's own words, at most two big lines. */
 export function hookLines(title) {
   // matched on the Turkish lower case: JavaScript's /i does not fold "İ" into "i"
@@ -187,7 +195,9 @@ export function hookLines(title) {
   // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
   const num = title.match(/(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
   if (num) {
-    const noun = num[2].length <= 4 && num[3] ? `${num[2]}${num[3]}` : num[2];
+    // and without its possessive-accusative ending: "1470 askerini" is "1470 / ASKER", "5 jet dronunu" "5 / JET DRON"
+    const bare = (w) => (w.length > 6 ? w.replace(/(?<=[^aeıioöuü\s])(ını|ini|unu|ünü)$/u, '') : w);
+    const noun = bare(num[2].length <= 4 && num[3] ? `${num[2]}${num[3]}` : num[2]);
     return { kind: 'number', lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
   }
   const cs = clauses(title);
@@ -303,6 +313,7 @@ export function generate(record, { datasets, style } = {}) {
   const regionKey = record.regions?.find((g) => REGIONS[g]);
   const region = regionKey ? REGIONS[regionKey] : null;
   const loc = record.location;
+  const placeName = loc?.place_name?.tr ? trPlace(loc.place_name.tr) : null;
   const pt = loc?.geometry?.type === 'Point' ? loc.geometry.coordinates : null;
   const at = pt ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
@@ -310,12 +321,13 @@ export function generate(record, { datasets, style } = {}) {
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = pt && loc?.place_name?.tr ? loc.place_name.tr : region?.name ?? loc?.place_name?.tr ?? '';
+  const where = pt && placeName ? placeName : region?.name ?? placeName ?? '';
   const kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
   const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
-  const news = abbrev(unrubric(titleTr));
+  const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
+  const news = tidy(abbrev(unrubric(titleTr)));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
   const name = publisher(sources[0].url);
@@ -337,7 +349,7 @@ export function generate(record, { datasets, style } = {}) {
   const exName = family === 'exercise' ? exerciseName(texts) : null;
 
   // a place name without coordinates is not a place on the map: then the ring and the title are the region's
-  const placeTitle = TR((pt ? loc?.place_name?.tr : null) ?? region?.name ?? '');
+  const placeTitle = TR((pt ? placeName : null) ?? region?.name ?? '');
   const placeText = precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
@@ -366,11 +378,15 @@ export function generate(record, { datasets, style } = {}) {
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
     // no casualty, no number, no place: where it happened and what it was, never a stray word pair
-    hook = { kind: 'region', lines: [regionWord, label ?? 'GELİŞME'], used: '' };
+    hook = { kind: 'region', lines: [pt ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
   }
-  const subClause = clauses(news).find((c) => (!hook.used || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72);
+  // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
+  // noktalarını ve depolarını vurdu") gives a first piece that says nothing on its own
+  const subClause = clauses(news).find((c) => (!hook.used || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72 && verbish(c.replace(/[.!]$/, '')));
   // a whole clause of at most two lines, or nothing: never a clause cut in the middle
-  const sub = subClause ?? '';
+  const sub = subClause ? subClause[0].toLocaleUpperCase('tr') + subClause.slice(1) : '';
+  // "KARADENİZ / GELİŞME" and nothing under it tells a viewer nothing in the first two seconds
+  if (hook.lines[1] === 'GELİŞME' && !sub) refuse('nothing to say in the hook: no casualty, number, type or whole clause');
   // what the hook may say beyond the headline: the record's own fields (its type as we name it, its
   // place, the countries its headline names, the exercise's name), never a word from nowhere
   const fields = [label, placeTitle, TR(region?.name ?? ''), ...parties.map(nameOf), exName ? TR(exName) : '', 'TATBİKAT TATBİKATI AÇIKLAMA GELİŞME'].filter(Boolean).join(' · ');
@@ -417,7 +433,7 @@ export function generate(record, { datasets, style } = {}) {
     factsBeat();
     if (pt) distanceBeat(placeTitle);
     if (around && around.n >= 3) {
-      const text = `${loc.place_name.tr} çevresinde, 150 km içinde.`;
+      const text = `${placeName} çevresinde, 150 km içinde.`;
       push({ kind: 'recent', title: 'KAYITLARIMIZDA · SON 7 GÜN', points: around.points, text }, 28 + text.length, 3.6);
     }
     statusBeat();
