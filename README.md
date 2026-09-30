@@ -6,8 +6,8 @@ kartı. Videolar veri setindeki kaynaklı kayıtlardan **otomatik** üretilir.
 A motion engine for short geopolitical video cards — a relief globe, country and alliance
 highlights, a news card — produced **automatically** from the sourced records of the dataset.
 
-**Durum / Status:** plan aşaması, kod yok. Plan: [PLAN.md](PLAN.md). Dört tasarım yönü:
-[docs/mockups](docs/mockups) (`tasarimlar.png` yan yana karşılaştırma).
+**Durum / Status:** plan aşaması, kod yok. Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
+[docs/mockups](docs/mockups) (`tasarimlar-hepsi.png`: her stil için kanca, NATO ve kapanış karesi).
 
 | | |
 |---|---|
