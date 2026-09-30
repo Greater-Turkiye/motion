@@ -9,10 +9,15 @@ name: produce
 # platform's videos page reads from the same origin. Nobody writes or reviews anything on the way; the
 # status and the source are on screen in every frame and the release notes say it was automatic.
 #
+# Cadence: GitHub delays scheduled runs under load and sometimes drops them (a 12:43 run started at
+# 18:08 on 2026-09-30), so the schedule wakes every hour at an off-peak minute and the gate job ends
+# the run in seconds unless the last video is at least 5 h 30 min old. A late or lost wake-up costs
+# an hour, not six, and no secret or outside timer is needed.
+#
 # Kill switch: set the repository variable MOTION_PRODUCE to "off".
 on:
   schedule:
-    - cron: "43 0,6,12,18 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       record:
@@ -31,8 +36,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  produce:
+  gate:
     if: vars.MOTION_PRODUCE != 'off' && !inputs.pages_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.age.outputs.go }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+    steps:
+      - id: age
+        run: |
+          last=$(gh release list -R "$GITHUB_REPOSITORY" --limit 20 --json tagName,publishedAt --jq '[.[]|select(.tagName|startswith("video-"))][0].publishedAt // ""')
+          age=999999
+          if [ -n "$last" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$last" +%s)) / 60 )); fi
+          go=false
+          if [ "$EVENT" != "schedule" ] || [ "$age" -ge 330 ]; then go=true; fi
+          echo "last video: ${last:-none} (${age} min ago); go=$go" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+
+  produce:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60   # published videos keep their motion blur, which can double a software render
     outputs:

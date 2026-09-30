@@ -188,7 +188,8 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
    yaralı varsa en yüksek; olağan diplomatik temas düşük), Türkiye'ye
    yakınlık, ayrı yayıncı sayısı, doğrulama durumu, yenilik (son videolarla aynı tür ve bölge
    puanı düşürür), konum. Doğrulanmamış kayıt dışlanmaz, sırası düşer (ADR 0023). Çalışma başına
-   bir video, altı saatte bir: günde en çok dört.
+   bir video, altı saatte bir: günde en çok dört. İş akışı her saat :17'de uyanır, son video 5 sa 30 dk'dan
+   yeniyse saniyeler içinde çıkar; GitHub'ın geciktirdiği ya da düşürdüğü zamanlamalar bir saat kaybettirir, altı değil ✅.
 2. **Sahne üretici** ✅ (`tools/scene/generate.mjs`). Kayıttan sahne: kanca, bölümler, kamera, süre,
    stil. Metin kaydın metnidir; yeni iddia üretmez. Türk kuvvetleri, geri çekilmiş ya da yanlış
    kayıt, haritada yeri olmayan kayıt reddedilir.
@@ -363,4 +364,7 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    adından ya da başlıktaki "X statement" kalıbından belirlenir: "Rusya hakkında İngiltere açıklaması"
    Rusya'nın açıklaması değildir (ilk denemede tam bu hata vardı).
 5. **Stüdyo**: aynı haber tüm stillerde yan yana; varsayılan stil olay ailesine göre.
-6. **Seslendirme ve ses tasarımı**: Chatterbox (MIT) Türkçe, bölüm başına klip; stile göre efekt.
+6. **Ses tasarımı** ✅ (prosedürel, `export/score.mjs`). **Seslendirme** sırada: araştırma (07) birincil
+   aday olarak FreyaTTS-small'ı (Apache-2.0, Türkçe öncelikli, CPU'da gerçek zamandan hızlı), yedek olarak
+   Chatterbox'ı (MIT) öneriyor; sözcük zamanlaması WhisperX `align()` ile; sayılar yazıyla okunur; her
+   videoda "sentetik ses" beyanı.

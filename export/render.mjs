@@ -23,6 +23,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
 import { build } from 'vite';
+import { execFileSync } from 'node:child_process';
+import { renameSync, unlinkSync } from 'node:fs';
+import { loadScene } from '../src/engine/scene.ts';
+import { STYLES as STYLE_TABLE } from '../src/styles.ts';
+import { score, wav, sceneFile } from './score.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Map();
@@ -34,7 +39,9 @@ for (let i = 2; i < process.argv.length; i++) {
 }
 const SCENE = args.get('scene') || 'hook-karadeniz';
 const STYLES = args.has('all-styles') ? ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'K'] : [args.get('style') || null]; // src/engine/scene.ts STYLE_IDS
-const FRAMES_ONLY = args.has('frames-only');
+// --frames 48,600,1200: exactly those frames, as stills (implies --frames-only)
+const PICK = args.has('frames') ? String(args.get('frames')).split(',').map(Number).filter((x) => Number.isInteger(x) && x >= 0) : null;
+const FRAMES_ONLY = args.has('frames-only') || !!PICK;
 const EVERY = Number(args.get('every') || 1);
 const FORMAT = args.get('format') === 'png' ? 'png' : 'jpeg';
 const ENCODER = args.get('encoder') || 'auto'; // auto | webcodecs | ffmpeg
@@ -74,7 +81,8 @@ const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}
   '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
   `--user-data-dir=${mkdtempSync(path.join(tmpdir(), 'motion-'))}`, 'about:blank'], { stdio: 'ignore' });
 let up = false;
-for (let i = 0; i < 80 && !up; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); up = true; } catch { await sleep(250); } }
+// up to a minute: a busy runner has taken more than twenty seconds to bring Chrome up
+for (let i = 0; i < 240 && !up; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); up = true; } catch { await sleep(250); } }
 if (!up) { console.error('Chrome did not start'); process.exit(2); }
 
 async function page() {
@@ -119,6 +127,26 @@ async function openScene(style) {
   return { p, info };
 }
 
+/**
+ * The sound (export/score.mjs), muxed under the finished video: AAC at 192 kb/s, brought to
+ * -18 LUFS integrated and -1.5 dBTP by ffmpeg's loudnorm (a bed and cues, no voice: quieter than
+ * the -14 a voiced mix would take; platforms turn loud mixes down, never quiet ones up). --no-audio
+ * is the default for now; --audio adds it.
+ */
+function addAudio(video, sceneId, styleId) {
+  // off unless asked for: the first synthesised score sounded cheap to the owner, so no video carries
+  // sound until a curated library replaces it (PLAN.md section 15)
+  if (!args.has('audio')) return;
+  const scene = loadScene(sceneFile(ROOT, sceneId));
+  const { L, R } = score(scene, STYLE_TABLE[styleId]);
+  const w = video.replace(/\.mp4$/, '.wav'), tmp = video.replace(/\.mp4$/, '.av.mp4');
+  writeFileSync(w, wav(L, R));
+  execFileSync(ffmpegPath, ['-y', '-loglevel', 'error', '-i', video, '-i', w, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+    '-af', 'loudnorm=I=-18:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-shortest', '-movflags', '+faststart', tmp]);
+  renameSync(tmp, video);
+  unlinkSync(w);
+}
+
 let failed = false;
 for (const style of STYLES) {
   // WebCodecs first: the page encodes its own MP4 and hands back the file. Falls back to drawing
@@ -133,6 +161,7 @@ for (const style of STYLES) {
         new Promise((_, rej) => setTimeout(() => rej(new Error(`WebCodecs took longer than ${limit / 1000} s`)), limit))]);
       const name = `${info.id}-${info.style}`;
       writeFileSync(path.join(OUT, `${name}.mp4`), Buffer.from(b64, 'base64'));
+      addAudio(path.join(OUT, `${name}.mp4`), SCENE, info.style);
       console.log(`${name}: ${info.frames} frames in ${((Date.now() - t0) / 1000).toFixed(1)} s with WebCodecs (${info.renderer}) -> ${path.relative(ROOT, path.join(OUT, name + '.mp4'))}`);
       if (p.errors.length) { console.error('page errors:', p.errors); failed = true; }
       p.ws.close();
@@ -150,7 +179,8 @@ for (const style of STYLES) {
   const ff = FRAMES_ONLY ? null : spawn(ffmpegPath, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(info.fps), '-c:v', FORMAT === 'png' ? 'png' : 'mjpeg', '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', video], { stdio: ['pipe', 'inherit', 'inherit'] });
   const wanted = [];
-  for (let i = 0; i < info.frames; i += FRAMES_ONLY ? EVERY : 1) wanted.push(i);
+  if (PICK) wanted.push(...PICK.filter((i) => i < info.frames));
+  else for (let i = 0; i < info.frames; i += FRAMES_ONLY ? EVERY : 1) wanted.push(i);
   const hashes = new Array(wanted.length);
   const done = new Map();
   let next = 0, written = 0;
@@ -176,7 +206,7 @@ for (const style of STYLES) {
     }
   }));
   await flushing;
-  if (ff) { ff.stdin.end(); await new Promise((r) => ff.on('close', r)); }
+  if (ff) { ff.stdin.end(); await new Promise((r) => ff.on('close', r)); addAudio(video, SCENE, info.style); }
   const secs = (Date.now() - t0) / 1000;
   writeFileSync(path.join(OUT, `${name}.frames.json`), JSON.stringify({ scene: info.id, style: info.style, fps: info.fps, every: FRAMES_ONLY ? EVERY : 1, hashes }, null, 0));
   console.log(`\r${name}: ${hashes.length} frames in ${secs.toFixed(1)} s with ${WORKERS} workers${ff ? ' -> ' + path.relative(ROOT, video) : ''}          `);

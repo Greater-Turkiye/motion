@@ -101,16 +101,13 @@ const typeLabel = (record, texts) => {
   return t && texts.some((x) => t[1].test(x)) ? t[0] : null;
 };
 
-/** Default style by family and type, so the stream looks as varied as the news (PLAN.md section 15). */
-function styleFor(type) {
-  if (/^kinetic\.(drone-strike|missile-strike|airstrike)/.test(type)) return 'E';
-  if (/^kinetic\.(clash|shelling)/.test(type)) return 'G';
-  if (/^(kinetic|maritime|test)\./.test(type)) return 'A';
-  if (/^diplomatic\.(talks|agreement)/.test(type)) return 'K';
-  if (/^(procurement|basing)\.|^policy\.sanctions/.test(type)) return 'H';
-  if (/^exercise\./.test(type)) return 'I';
-  if (/^deployment\./.test(type)) return 'B';
-  return 'C';
+/** The style for an event type, from config/styles.yaml (the studio page shows every style on a
+ *  recent story of each family): the exact type, else the longest matching prefix, else default. */
+const STYLE_CONFIG = parse(readFileSync(path.join(ROOT, 'config', 'styles.yaml'), 'utf8'));
+export function styleFor(type) {
+  if (STYLE_CONFIG[type]) return STYLE_CONFIG[type];
+  const prefix = Object.keys(STYLE_CONFIG).filter((k) => k.endsWith('.') && type.startsWith(k)).sort((a, b) => b.length - a.length)[0];
+  return prefix ? STYLE_CONFIG[prefix] : STYLE_CONFIG.default ?? 'C';
 }
 
 /** Red lines (handbook; motion CLAUDE.md section 2): no video about Turkish forces. Matched on both
@@ -300,6 +297,8 @@ export function generate(record, { datasets, style } = {}) {
   if (!sources.length) refuse('no source');
   const texts = [...new Set([titleTr, titleEn, ...sources.map((s) => s.title ?? '')].filter(Boolean))];
   for (const re of TURKISH_FORCES) if (texts.some((t) => re.test(t))) refuse('about Turkish forces (red line)');
+  // no personal data (red line): a call sign, or a person named by first name and initial ("Kristin N.")
+  if (texts.some((t) => /\b(call ?sign|callsign)\b|çağrı işareti/i.test(t) || /\b[A-Z][a-z]{2,} [A-Z]\.(?=[\s,(]|$)/.test(t))) refuse('names a person (red line: no personal data)');
 
   const regionKey = record.regions?.find((g) => REGIONS[g]);
   const region = regionKey ? REGIONS[regionKey] : null;
@@ -354,7 +353,8 @@ export function generate(record, { datasets, style } = {}) {
   // a clause is a hook only when it ends on a verb ("kaptan öldürüldü"), not on a bare noun phrase
   const verbish = (s) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar)$/iu.test((s ?? '').split(' ').at(-1) ?? '');
   let hook = found;
-  const deal = family === 'deal' && parties.length >= 2;
+  // two countries and evidence of what joins them; a story that merely names two countries is not a deal
+  const deal = family === 'deal' && parties.length >= 2 && !!label;
   // a meeting or a statement with one named country: that country speaks (the quote card)
   // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
   const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;

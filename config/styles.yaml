@@ -1,0 +1,25 @@
+# Which style a video gets, by the type of its event (PLAN.md section 15; the studio page shows every
+# style on a recent story of each family). Change a letter and the next automatic videos use it.
+#
+# Styles: A gece kırmızısı · B harekât lacivert · C editoryal · D uydu gecesi · E ateşböceği ·
+#         G İsviçre rölyefi · H gizliliği kaldırılmış · I harekât paftası · K çini atlas
+#
+# The most specific entry wins: an exact event type, then its family prefix ("kinetic."), then default.
+default: C
+kinetic.drone-strike: E
+kinetic.missile-strike: E
+kinetic.airstrike: E
+kinetic.shelling: G
+kinetic.clash: G
+kinetic.: A
+maritime.: A
+test.: A
+diplomatic.talks: K
+diplomatic.agreement: K
+diplomatic.statement: C
+procurement.: H
+basing.: H
+policy.sanctions: H
+policy.: C
+exercise.: I
+deployment.: B
