@@ -12,7 +12,7 @@ export interface MapRenderer { kind: 'webgl2' | 'canvas2d'; draw(ctx: CanvasRend
 export function makeMap(a: Assets, subject: string | undefined, prefer: 'webgl2' | 'canvas2d' = 'webgl2'): MapRenderer {
   if (prefer === 'webgl2') {
     try {
-      const g = new GlobeGL(a.countries.map((c) => c.shape), a.disputed.features, a.borderLines, a.coastLines);
+      const g = new GlobeGL(a.countries.map((c) => c.shape), a.disputed.features, a.borderLines, a.coastLines, a.relief);
       g.setScene(subject ? NUM[subject] ?? null : null, NUM.TUR);
       return {
         kind: 'webgl2',

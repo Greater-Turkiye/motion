@@ -77,7 +77,8 @@ const vec2 P[3] = vec2[3](vec2(-1.0, -1.0), vec2(3.0, -1.0), vec2(-1.0, 3.0));
 void main() { gl_Position = vec4(P[gl_VertexID], 0.0, 1.0); }`;
 
 const FILL_FS = HEAD + PROJECT + `
-uniform sampler2D uId; uniform sampler2D uPal; uniform sampler2D uGlow;
+uniform sampler2D uId; uniform sampler2D uPal; uniform sampler2D uGlow; uniform sampler2D uRelief;
+uniform float uReliefK, uLimb, uHasRelief;
 uniform vec4 uBg0, uBg1, uSea, uGrat, uAtmo, uGlowC, uHatch;
 uniform float uReveal, uPulse, uHasAtmo, uHasGlow;
 out vec4 o;
@@ -124,15 +125,32 @@ void main() {
   ivec2 t = ivec2(clamp((ll.x + 180.0) / 360.0, 0.0, 0.99999) * ${ID_W}.0, clamp((ll.y + 90.0) / 180.0, 0.0, 0.99999) * ${ID_H}.0);
   int id = int(texelFetch(uId, t, 0).r * 255.0 + 0.5);
   vec3 c = uSea.rgb;
+  int kind = 0;
   if (id > 0) {
     vec4 p = texelFetch(uPal, ivec2(id, 0), 0);
-    int kind = int(p.a * 255.0 + 0.5); // 1 land, 2 home, 3 subject, 4 disputed
+    kind = int(p.a * 255.0 + 0.5); // 1 land, 2 home, 3 subject, 4 disputed
     c = p.rgb;
     if (kind == 3) c = mix(texelFetch(uPal, ivec2(0, 0), 0).rgb, p.rgb, uReveal);
     if (kind == 4) {
       float stripe = mod(gl_FragCoord.x + gl_FragCoord.y, 12.0);
       c = mix(c, uHatch.rgb, uHatch.a * smoothstep(2.4, 1.2, abs(stripe - 1.5)));
     }
+  }
+  // relief: the ETOPO1 normal map lit from the north-west, the cartographer's light, so ridges read
+  // the same way on every frame; brighter crests, darker valleys, flat plains unchanged
+  if (id > 0 && uHasRelief > 0.5 && uReliefK > 0.0) {
+    vec3 rn = texture(uRelief, vec2((ll.x + 180.0) / 360.0, (ll.y + 90.0) / 180.0)).rgb;
+    vec2 nxy = rn.rg * 2.0 - 1.0;
+    vec3 n = vec3(nxy, sqrt(max(0.0, 1.0 - dot(nxy, nxy))));
+    // Imhof's light: mostly north-west, a little from the west and north so every ridge shows
+    float shade = 0.6 * dot(n, normalize(vec3(-0.6, 0.6, 0.53))) / 0.53
+                + 0.25 * dot(n, normalize(vec3(-0.85, 0.0, 0.53))) / 0.53
+                + 0.15 * dot(n, normalize(vec3(0.0, 0.85, 0.53))) / 0.53;  // 1.0 on flat ground
+    float hi = rn.b;                            // 0 sea level .. 1 at 5 km
+    // plains stay quiet, mountains speak; the home and subject fills keep most of their flat colour
+    float k = uReliefK * (0.35 + 0.65 * smoothstep(0.02, 0.45, hi)) * ((kind == 2 || kind == 3) ? 0.45 : 1.0);
+    c *= mix(1.0, clamp(shade, 0.35, 1.22), k);
+    c += vec3(0.03) * k * smoothstep(0.4, 0.9, hi); // a touch of snow light on high ground
   }
   // graticule every 10 degrees, one pixel, anti-aliased
   vec2 g = abs(fract(ll / 10.0 + 0.5) - 0.5) * 10.0;
@@ -144,6 +162,7 @@ void main() {
     float gv = texture(uGlow, vec2((ll.x + 180.0) / 360.0, (ll.y + 90.0) / 180.0)).r;
     c = mix(c, uGlowC.rgb, clamp(uGlowC.a * gv * uReveal * (0.85 + 0.3 * uPulse), 0.0, 1.0));
   }
+  if (uFlat < 0.5 && uLimb > 0.0) c *= mix(1.0 - uLimb, 1.0, sqrt(max(0.0, 1.0 - r * r)));
   o = vec4(mix(col, c, edge), 1.0);
 }`;
 
@@ -175,14 +194,14 @@ export class GlobeGL {
   readonly canvas: HTMLCanvasElement;
   private gl: WebGL2RenderingContext;
   private fill; private line; private idProg;
-  private idTex: WebGLTexture; private palTex: WebGLTexture; private glowTex: WebGLTexture | null = null;
+  private idTex: WebGLTexture; private palTex: WebGLTexture; private glowTex: WebGLTexture | null = null; private reliefTex: WebGLTexture | null = null;
   private borders: LineSet; private coast: LineSet; private subjLine: LineSet | null = null; private homeLine: LineSet | null = null;
   // texture id i+1 for country i; keyed by position, because a few features (Kosovo, the TRNC,
   // Somaliland) carry no numeric id and would otherwise collide on one palette entry
   private nums: string[] = [];
   private features: Feature[];
 
-  constructor(countries: Feature[], disputed: Feature[], borders: MultiLineString, coast: MultiLineString) {
+  constructor(countries: Feature[], disputed: Feature[], borders: MultiLineString, coast: MultiLineString, relief?: HTMLImageElement | null) {
     this.canvas = document.createElement('canvas');
     this.canvas.width = W; this.canvas.height = H;
     const gl = this.canvas.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true, premultipliedAlpha: false });
@@ -202,6 +221,18 @@ export class GlobeGL {
     ]);
     this.borders = this.lines(borders.coordinates);
     this.coast = this.lines(coast.coordinates);
+    if (relief) {
+      const t = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      // PNG row 0 is the south pole and lands at v = 0, as the shader's (lat + 90) / 180 expects: no flip
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, gl.RGB, gl.UNSIGNED_BYTE, relief);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      this.reliefTex = t;
+    }
   }
 
   /** Triangulate polygons in lon/lat and draw them into an R8 target; each texel holds one id. */
@@ -316,6 +347,8 @@ export class GlobeGL {
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, this.idTex); gl.uniform1i(u('uId'), 0);
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, this.palTex); gl.uniform1i(u('uPal'), 1);
     gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, this.glowTex ?? this.palTex); gl.uniform1i(u('uGlow'), 2);
+    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.reliefTex ?? this.palTex); gl.uniform1i(u('uRelief'), 3);
+    gl.uniform1f(u('uHasRelief'), this.reliefTex ? 1 : 0); gl.uniform1f(u('uReliefK'), s.relief); gl.uniform1f(u('uLimb'), s.limb);
     gl.uniform4fv(u('uBg0'), rgba(s.bg[0])); gl.uniform4fv(u('uBg1'), rgba(s.bg[1]));
     gl.uniform4fv(u('uSea'), rgba(s.sea)); gl.uniform4fv(u('uGrat'), rgba(s.graticule));
     gl.uniform4fv(u('uAtmo'), rgba(s.atmosphere ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uHasAtmo'), s.atmosphere && !s.flat ? 1 : 0);

@@ -6,9 +6,10 @@ kartı. Videolar veri setindeki kaynaklı kayıtlardan **otomatik** üretilir.
 A motion engine for short geopolitical video cards — a relief globe, country and alliance
 highlights, a news card — produced **automatically** from the sourced records of the dataset.
 
-**Durum / Status:** M1 ve M2'nin çizim yarısı çalışıyor: harita WebGL2'de (ülke kimliği dokusu, tek geçişte
+**Durum / Status:** M1 ve M2 çalışıyor: harita WebGL2'de (ülke kimliği dokusu, tek geçişte
 dolgu, sabit kalınlıkta yumuşatılmış sınırlar), video tarayıcının kendi kodlayıcısıyla (WebCodecs) doğrudan
-MP4'e yazılıyor; desteklenmeyen yerde ffmpeg yolu devrede. Kabartma (ETOPO) sırada. Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
+MP4'e yazılıyor; desteklenmeyen yerde ffmpeg yolu devrede. Kabartma ETOPO1 normal haritasından,
+gölgelendiricide kuzeybatı ışığıyla (Imhof) hesaplanıyor; gücü her stilde ayrı (`relief`, `limb`). Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
 [docs/mockups](docs/mockups) (`tasarimlar-hepsi.png`: her stil için kanca, NATO ve kapanış karesi).
 
 | | |
@@ -26,6 +27,7 @@ Tasarım örneklerini yeniden çizmek için `docs/mockups` klasörünü bir HTTP
 ```bash
 npm ci
 python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; manifest'teki hash'lerle doğrulanır
+python tools/data/build_relief.py             # yalnızca kabartmayı yeniden üretmek için (depoda hazır: assets/data/relief.png)
 npm run dev                                   # önizleme: http://localhost:5178/?scene=hook-karadeniz&style=A
 npm run render -- --all-styles                # out/hook-karadeniz-{A,B,C,D}.mp4, 1080x1920, 60 fps
 npm test                                      # iki ayrı işlemede aynı kareler (tolerans: 2/255)

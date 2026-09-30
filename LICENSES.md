@@ -5,6 +5,7 @@
 | Motor kodu | bu depo | MIT (`LICENSE`) |
 | Üretilen videolar | bu depo | CC BY 4.0 |
 | `assets/data/countries-50m.json` | [world-atlas](https://github.com/topojson/world-atlas) 2.0.2, Natural Earth 1:50m | ISC (paket), Natural Earth kamu malı |
+| `assets/data/relief.png` | NOAA [ETOPO1](https://www.ncei.noaa.gov/products/etopo-global-relief-model) (4 yay dakikası, ERDDAP üzerinden), `tools/data/build_relief.py` ile normal haritasına çevrilir | Kamu malı (ABD federal verisi) |
 | `assets/data/disputed-tur-view.geojson` | Greater-Turkiye/platform, Türkiye görüşüne göre işgal altındaki topraklar (handbook ADR 0014) | CC BY 4.0 |
 | `assets/fonts/montserrat-*.woff2` | [Montserrat](https://github.com/JulietaUla/Montserrat) | SIL Open Font License 1.1 |
 | `assets/fonts/plexmono-*.woff2` | [IBM Plex Mono](https://github.com/IBM/plex) | SIL Open Font License 1.1 |

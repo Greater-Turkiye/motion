@@ -60,8 +60,10 @@ kontrol demek.
 ## 4. Görüntü kalitesi / Image quality
 
 **Küre:**
-- Kabartma: NASA/NOAA **ETOPO 2022** yükseklik verisinden (kamu malı) normal haritası; ışık
-  gölgelendiricide, güneş açısı sahneye göre.
+- Kabartma: NOAA **ETOPO1** yükseklik verisinden (kamu malı, 4 yay dakikası) 4096×2048 normal
+  haritası (`tools/data/build_relief.py`, 38× dikey abartı, deniz düz). Işık gölgelendiricide:
+  Imhof'un kuzeybatı ışığı, batı ve kuzeyden iki yardımcıyla; ovalar sessiz, dağlar belirgin; ana
+  ve konu ülke dolgusu kabartmanın yarısını alır ki renk okunur kalsın. ✅
 - Yüzey rengi: tek renk koyu zemin + kabartma gölgesi (örneklerdeki gibi), isteğe bağlı NASA Blue
   Marble (kamu malı).
 - Atmosfer ve kenar ışığı, çok hafif film greni, vinyet. Hepsi kapatılabilir.
@@ -165,7 +167,7 @@ motion/
 |---|---|---|---|
 | M0 | Plan | bu belge | Sahibin onayı |
 | M1 | İskelet ✅ | saat, sahne, CDP dışa aktarımı, kanca şablonu, dört stil, amblem manifesti | 1080×1920 60 fps MP4, iki çalıştırma tolerans içinde aynı |
-| M2 | Küre (yarısı ✅) | WebGL2 küre ve düz harita, WebCodecs dışa aktarım ✅; kabartma sırada | Önizleme ≥ 60 fps, geçişte titreme yok |
+| M2 | Küre ✅ | WebGL2 küre ve düz harita, WebCodecs dışa aktarım, ETOPO1 kabartması ✅ | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
 | M4 | Yazı ve kart | MSDF yazı, "önemli gelişme" kartı, kaynak satırı | Türkçe karakterler, animasyonda titreme yok |
 | M5 | Veriden sahne | kayıt kimliğinden sahne, doğrulayıcı (kaynak, kırmızı çizgi) | Kırmızı çizgi kaydı reddedilir |
@@ -283,3 +285,40 @@ Dataslayer ve Socialync, Instagram sıralama sinyalleri 2026; Reuters Institute,
 4. ~~Amblemler~~ — karar verildi: devlet armaları ve ittifak amblemleri, haber bağlamında (bölüm 6).
 5. **Ses:** kendi efektlerimiz (önerilen) mi, yoksa Türkçe seslendirme de mi (lisansı uygunsa)?
 6. **Kanallar:** hangi hesaplar açılacak (Instagram, YouTube, TikTok, Telegram, X)? Otomatik gönderim ve istatistik bunları ister.
+
+## 14. Araştırmadan motora geçen kurallar / Rules taken from the research
+
+Kaynak ve kanıt düzeyleri: [docs/research](docs/research). Rakamların çoğu uygulayıcı görüşü; A/B
+ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
+
+**Zaman ve okuma**
+- İlk karede somut özne + fiil + yer; fade-in yok, kamera 0. karede hareket halinde. ✅
+- Yazı hızı ≤ 15 karakter/sn (≈ 2 Türkçe kelime/sn); blok süresi = karakter ÷ 15, en az 1,2 sn.
+- Her 1,5–2,5 sn'de bir anlamlı görsel değişim; saniyede bir kesme yok (haber zaten uyarıcı).
+- Süre 15–25 sn; "ne anlama geliyor" satırı 8–15. saniyede, doruk son %20'de, son kare ilk karenin
+  kamera açısına döner (döngü).
+
+**Güven**
+- Durum etiketi (DOĞRULANMADI / DOĞRULANDI / GELİŞEN) her videoda, ilk 2 sn'de ve son karede. ✅ (ilk)
+- Kaynak satırı sürekli ekranda, okunur boyutta; yalnız son karede değil.
+- Hook'taki her içerik kelimesi kaynak metinde karşılık bulmalı; bulamazsa sahne reddedilir.
+- Kara liste: dış grup düşmanlığı ve ahlaki öfke kelimeleri (hain, rezil, küstah …); soru hook'u yok.
+- Kaygı yerine ölçek ve yenilik çerçevesi: mesafe ("Boğaz'a 430 km") ✅, "ilk kez" yalnızca veri
+  setinden hesaplanabiliyorsa.
+
+**Kompozisyon**
+- Güvenli alan (üç platformun kesişimi): üst %14, alt %35, sol 65 px, sağ 180 px. Hook, durum ve
+  kaynak satırı bu kutuda; alt bantta yalnızca dekor.
+- Taraf renkleri kırmızı-yeşil değil; renk her zaman amblem ya da desenle desteklenir.
+- Aynı gün aynı düzen tekrarlanmaz; en az 5–6 düzen (YouTube "inauthentic content" politikası).
+
+**Hat**
+- Seçim puanı S = 100·D·(0,30M + 0,20P + 0,20C + 0,15R + 0,15N)·(0,6 + 0,4G), kesin elemelerden
+  sonra; turda 1, günde 2–6 video (ayrıntı: research/04).
+- Metin LLM'e yazdırılmaz; kayıt alanlarından deterministik şablon cümleleri.
+- Ses: prosedürel efektler (WebAudio, kamu malı jsfxr); seslendirme adayı Chatterbox (MIT), Türkçe
+  kalitesi ölçülmeden açılmaz. Ticari olmayan lisanslı sesler (Piper dfki, XTTS, MMS) kullanılmaz.
+- Yayın: Telegram, Bluesky, Mastodon, Instagram Reels otomatik; YouTube denetim onayına kadar
+  private; TikTok ve X otomatik değil. `published.json` defteri tekrar gönderimi engeller.
+- CI'da GPU yok: Chrome `--use-angle=swiftshader-webgl --enable-unsafe-swiftshader`; WebCodecs
+  H.264 yalnızca Baseline (`avc1.42E0xx`) güvenilir; çıktı ffprobe ve blackdetect kapısından geçer.
