@@ -34,7 +34,7 @@ jobs:
   produce:
     if: vars.MOTION_PRODUCE != 'off' && !inputs.pages_only
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60   # published videos keep their motion blur, which can double a software render
     outputs:
       id: ${{ steps.pick.outputs.id }}
     env:
