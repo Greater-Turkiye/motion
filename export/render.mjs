@@ -23,6 +23,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
 import { build } from 'vite';
+import { execFileSync } from 'node:child_process';
+import { renameSync, unlinkSync } from 'node:fs';
+import { loadScene } from '../src/engine/scene.ts';
+import { STYLES as STYLE_TABLE } from '../src/styles.ts';
+import { score, wav, sceneFile } from './score.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Map();
@@ -119,6 +124,24 @@ async function openScene(style) {
   return { p, info };
 }
 
+/**
+ * The sound (export/score.mjs), muxed under the finished video: AAC at 192 kb/s, brought to
+ * -18 LUFS integrated and -1.5 dBTP by ffmpeg's loudnorm (a bed and cues, no voice: quieter than
+ * the -14 a voiced mix would take; platforms turn loud mixes down, never quiet ones up). --no-audio
+ * leaves the video silent.
+ */
+function addAudio(video, sceneId, styleId) {
+  if (args.has('no-audio')) return;
+  const scene = loadScene(sceneFile(ROOT, sceneId));
+  const { L, R } = score(scene, STYLE_TABLE[styleId]);
+  const w = video.replace(/\.mp4$/, '.wav'), tmp = video.replace(/\.mp4$/, '.av.mp4');
+  writeFileSync(w, wav(L, R));
+  execFileSync(ffmpegPath, ['-y', '-loglevel', 'error', '-i', video, '-i', w, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+    '-af', 'loudnorm=I=-18:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-shortest', '-movflags', '+faststart', tmp]);
+  renameSync(tmp, video);
+  unlinkSync(w);
+}
+
 let failed = false;
 for (const style of STYLES) {
   // WebCodecs first: the page encodes its own MP4 and hands back the file. Falls back to drawing
@@ -133,6 +156,7 @@ for (const style of STYLES) {
         new Promise((_, rej) => setTimeout(() => rej(new Error(`WebCodecs took longer than ${limit / 1000} s`)), limit))]);
       const name = `${info.id}-${info.style}`;
       writeFileSync(path.join(OUT, `${name}.mp4`), Buffer.from(b64, 'base64'));
+      addAudio(path.join(OUT, `${name}.mp4`), SCENE, info.style);
       console.log(`${name}: ${info.frames} frames in ${((Date.now() - t0) / 1000).toFixed(1)} s with WebCodecs (${info.renderer}) -> ${path.relative(ROOT, path.join(OUT, name + '.mp4'))}`);
       if (p.errors.length) { console.error('page errors:', p.errors); failed = true; }
       p.ws.close();
@@ -176,7 +200,7 @@ for (const style of STYLES) {
     }
   }));
   await flushing;
-  if (ff) { ff.stdin.end(); await new Promise((r) => ff.on('close', r)); }
+  if (ff) { ff.stdin.end(); await new Promise((r) => ff.on('close', r)); addAudio(video, SCENE, info.style); }
   const secs = (Date.now() - t0) / 1000;
   writeFileSync(path.join(OUT, `${name}.frames.json`), JSON.stringify({ scene: info.id, style: info.style, fps: info.fps, every: FRAMES_ONLY ? EVERY : 1, hashes }, null, 0));
   console.log(`\r${name}: ${hashes.length} frames in ${secs.toFixed(1)} s with ${WORKERS} workers${ff ? ' -> ' + path.relative(ROOT, video) : ''}          `);

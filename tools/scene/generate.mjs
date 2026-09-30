@@ -517,9 +517,11 @@ export function notes(record, scene) {
     ...record.sources.map((s) => `- Kaynak / source: ${s.url}`),
     '',
     'Bu video, Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi',
-    'başlığıdır (çevirisi makine çevirisi olabilir) ve kimse okumadan yayımlandı. Seslendirme yok.',
+    'başlığıdır (çevirisi makine çevirisi olabilir) ve kimse okumadan yayımlandı. Seslendirme yok; ses efektleri',
+    've yatak motor tarafından üretilir, hazır ses dosyası kullanılmaz.',
     "This video was generated automatically from a dataset record; the facts on screen are the source's own",
-    'headline (possibly machine-translated) and were published without human review. No voice-over.',
+    'headline (possibly machine-translated) and were published without human review. No voice-over; the sound',
+    'is synthesised by the engine, no stock audio.',
   ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n') + '\n';
 }
 
