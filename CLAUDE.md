@@ -11,6 +11,8 @@ The handbook is the authority; this file is the short operational version. Read 
 - No targeting language, no aimpoint views, no "criticality" scores, no personal data.
 - Every video carries its source line and the record's verification status on screen.
 - Hooks are the record's own facts: no claim the source does not make.
+- Emblems (state arms, alliance marks) only in news context, over their subject on the map, never
+  beside our mark or implying endorsement; every emblem's source and licence in SOURCES.md.
 
 ## 3. Git and pull requests
 - Never commit to `main` after the initial commit; branch, open a pull request, squash-merge.

@@ -118,9 +118,12 @@ card:
 - **Türk kuvvetleri kırmızı çizgisi aynen.** Türk kuvvetlerine ait konum, hareket ya da
   konuşlanma içeren kayıttan video üretilmez; doğrulayıcı bunu sahne aşamasında reddeder.
 - **Hedef dili yok.** Tesis vurgusu, "kritiklik puanı", nişan noktası görünümü yok.
-- **Amblemler:** Resmî devlet armaları ve NATO amblemi korumalı işaretlerdir; örneklerdeki gibi
-  birebir kullanmak yerine **kendi çizdiğimiz jenerik işaretleri** kullanırız (panelde yaptığımız
-  gibi: pusula gülü, genel kartal silueti). Bayraklar kamu malıdır ve kullanılabilir.
+- **Amblemler (sahibin kararı, 2026-09-30):** devlet armaları ve ittifak amblemleri kullanılır,
+  yalnızca **haber bağlamında**: kaydın konusu olan devletin ya da kuruluşun üstünde, haritada;
+  logomuzun yanında değil, onay ya da bağ izlenimi vermeden. Rusya arması kamu malıdır (Rus Medeni
+  Kanunu md. 1259); NATO amblemi Paris Sözleşmesi md. 6ter kapsamında korunur, haberde tanıtıcı
+  kullanım bu sınırda kalır. Her amblemin kaynağı ve lisansı `assets/emblems/SOURCES.md`'de durur.
+  Koyu stillerde amblem beyaz tek renk, açık stilde asıl renkleriyle çizilir.
 - **Tahmin piyasası yok.** Örneklerdeki "Polymarket %24" gibi bahis oranları kullanılmaz:
   sponsorlu ve kaynaklanamayan bir sayı. Onun yerine kendi verimizden sayı gösterilir
   (ör. "Bu hafta Karadeniz'de 54 kayıt").
@@ -206,7 +209,14 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 | C | **Editoryal** | Gazete sayfası: açık zemin, düz harita, Türkiye kırmızı, siyah ağır başlık |
 | D | **Uydu gecesi** | Uzaydan küre, soğuk ışık, buzlu cam kart, sade |
 
-Motor dört yönü de aynı sahne dosyasından üretebilir; seçilen yön varsayılan olur.
+**Sahibin kararı (2026-09-30): dördü de kalır, sahne dosyasında `style: A|B|C|D` ile seçilir.**
+Otomatik hatta seçici, olayın türüne göre varsayılan bir stil atar (ör. kinetik ve deniz olayları
+A, diplomasi ve anlaşmalar C) ve istenirse günlük dönüşümlü kullanır.
+
+Her stil için üç kare çizildi (`docs/mockups/tasarimlar-hepsi.png`): **kanca** (videonun ilk 1,5
+saniyesi: dev olgu yazısı, Türkiye'ye mesafe), **NATO karesi** (ittifak mavisi, pusula amblemi) ve
+**kapanış kartı** (başlık, özet, sayı, kaynak). Karelerde kalan etiket çakışmalarını motor otomatik
+etiket yerleşimiyle çözer (M3).
 
 ## 12. Viral olmak: kanca, tempo, döngü / Going viral: hook, pace, loop
 
@@ -267,9 +277,9 @@ Dataslayer ve Socialync, Instagram sıralama sinyalleri 2026; Reuters Institute,
 
 ## 13. Karar bekleyenler / Open decisions for the owner
 
-1. **Tasarım yönü:** A, B, C ya da D (bölüm 11); ya da ikisinin karışımı.
+1. ~~Tasarım yönü~~ — karar verildi: dördü de, seçilebilir (bölüm 11).
 2. **Repo adı:** `motion`. (Alternatif: `studio`.)
 3. **İlk format:** önce dikey 1080×1920 mi, yoksa üçü birden mi?
-4. **Amblemler:** jenerik işaretler (önerilen) mi, yoksa yalnızca bayraklar mı?
+4. ~~Amblemler~~ — karar verildi: devlet armaları ve ittifak amblemleri, haber bağlamında (bölüm 6).
 5. **Ses:** kendi efektlerimiz (önerilen) mi, yoksa Türkçe seslendirme de mi (lisansı uygunsa)?
 6. **Kanallar:** hangi hesaplar açılacak (Instagram, YouTube, TikTok, Telegram, X)? Otomatik gönderim ve istatistik bunları ister.

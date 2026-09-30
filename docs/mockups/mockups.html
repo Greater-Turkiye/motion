@@ -110,6 +110,10 @@ const THEMES = {
        ukr: '#26303d', grat: 'rgba(255,255,255,.04)', glow: 'rgba(120,170,255,.25)', relief: true, center: [33, 45], scale: 900, cy: 600, atmo: 'rgba(120,170,255,.35)', night: true },
 };
 const T = THEMES[V];
+const FRAME = new URLSearchParams(location.search).get('frame') || 'card';
+const NATO = new Set(['008','056','100','124','191','203','208','233','246','250','276','300','348','352','380','428','440','442','499','528','807','578','616','620','642','703','705','724','752','792','826','840']);
+if (FRAME === 'nato') { T.center = [24, 50]; T.scale = T.flat ? 1100 : 820; T.cy = T.flat ? 640 : 700; }
+if (FRAME === 'hook') { T.scale *= T.flat ? 1.1 : 1.2; T.cy -= 60; }
 
 (async function () {
   const [topo, disputed] = await Promise.all([fetch('data/countries-50m.json').then((r) => r.json()), fetch('data/disputed-tur-view.geojson').then((r) => r.json())]);
@@ -147,7 +151,10 @@ const T = THEMES[V];
   svg.append('path').attr('d', path(sphere)).attr('fill', T.sea);
   svg.append('path').attr('d', path(d3.geoGraticule10())).attr('fill', 'none').attr('stroke', T.grat).attr('stroke-width', 1);
   const id = (f) => String(f.id).padStart(3, '0');
-  const fill = (f) => (id(f) === '792' ? T.tur : id(f) === '643' ? T.rus : id(f) === '804' ? T.ukr : T.land);
+  const NATO_FILL = T.flat ? '#bcd0e6' : V === 'B' ? '#12507a' : '#163e6e';
+  const fill = (f) => FRAME === 'nato'
+    ? (['792', '642', '100'].includes(id(f)) ? (T.flat ? '#1f5fa8' : '#2f7fd6') : NATO.has(id(f)) ? NATO_FILL : id(f) === '643' ? T.rus : T.land)
+    : (id(f) === '792' ? T.tur : id(f) === '643' ? T.rus : id(f) === '804' ? T.ukr : T.land);
   svg.append('g').selectAll('path').data(countries).join('path').attr('d', path).attr('fill', fill);
   if (T.relief) svg.append('g').attr('filter', 'url(#relief)').style('mix-blend-mode', 'soft-light').attr('opacity', 0.55)
     .selectAll('path').data(countries).join('path').attr('d', path).attr('fill', '#888');
@@ -162,19 +169,39 @@ const T = THEMES[V];
   svg.append('path').attr('d', path(rus)).attr('fill', 'none').attr('stroke', T.rusStroke).attr('stroke-width', 2.2);
   svg.append('path').attr('d', path(tur)).attr('fill', 'none').attr('stroke', T.turStroke).attr('stroke-width', 2.4);
 
+  const lab = (x, y, t, size, color, ls) => svg.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle').attr('class', 'label')
+    .style('font', `500 ${size}px X`).style('letter-spacing', ls || '.4em').attr('fill', color).text(t);
+  const lc = T.flat ? '#141414' : 'rgba(255,255,255,.75)';
+  if (FRAME !== 'nato') {
   // the event: region level only (the record has no coordinate), so a ring over the sea, not a pin
   const [ex, ey] = proj([33.2, 43.6]);
   const ringC = V === 'C' ? '#c8002a' : V === 'B' ? '#ffb020' : V === 'D' ? '#ffd166' : '#f4e14a';
   for (const r of [70, 46]) svg.append('circle').attr('cx', ex).attr('cy', ey).attr('r', r).attr('fill', 'none').attr('stroke', ringC)
     .attr('stroke-width', r === 70 ? 1.5 : 3).attr('stroke-dasharray', r === 70 ? '6 8' : null).attr('opacity', r === 70 ? 0.7 : 1);
   svg.append('circle').attr('cx', ex).attr('cy', ey).attr('r', 9).attr('fill', ringC);
-  const lab = (x, y, t, size, color, ls) => svg.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle').attr('class', 'label')
-    .style('font', `500 ${size}px X`).style('letter-spacing', ls || '.4em').attr('fill', color).text(t);
-  const lc = T.flat ? '#141414' : 'rgba(255,255,255,.75)';
   lab(ex + 150, ey - 70, 'KARADENİZ', 24, lc);
   const [rx, ry] = proj([40, 53]); lab(rx, ry, 'RUSYA FEDERASYONU', 30, T.flat ? '#141414' : 'rgba(255,255,255,.85)');
   const [tx, ty] = proj([35, 39]); lab(tx, ty, 'TÜRKİYE', 34, T.flat ? '#ffffff' : '#fff');
   const [ux, uy] = proj([31.5, 49.3]); lab(ux, uy, 'UKRAYNA', 24, lc);
+  }
+  // emblems (docs/mockups/emblems/SOURCES.md): over the subject on the map, never beside our mark
+  const emblem = (href, lonlat, w, h, label, lcol) => {
+    const [x, y] = proj(lonlat);
+    if (!T.flat) svg.append('circle').attr('cx', x).attr('cy', y).attr('r', w * 0.62).attr('fill', 'rgba(0,0,0,.35)').attr('filter', 'url(#glow)');
+    svg.append('image').attr('href', href).attr('x', x - w / 2).attr('y', y - h / 2).attr('width', w).attr('height', h);
+    if (label) lab(x, y + h / 2 + 44, label, 26, lcol || (T.flat ? '#141414' : 'rgba(255,255,255,.9)'), '.5em');
+  };
+  if (FRAME === 'nato') {
+    const [nx, ny] = proj([12, 57]);
+    svg.append('circle').attr('cx', nx).attr('cy', ny).attr('r', 120).attr('fill', 'none').attr('stroke', T.flat ? '#1f5fa8' : 'rgba(255,255,255,.7)').attr('stroke-width', 2).attr('stroke-dasharray', '5 7');
+    emblem('emblems/nato-compass.svg', [12, 57], 200, 142, null);
+    if (T.flat) svg.select('image:last-of-type').style('filter', 'invert(28%) sepia(60%) saturate(1500%) hue-rotate(195deg)');
+    lab(nx, ny + 160, 'NATO', 26, T.flat ? '#1f5fa8' : 'rgba(255,255,255,.9)', '.6em');
+  } else {
+    svg.selectAll('text').filter(function () { return this.textContent === 'RUSYA FEDERASYONU'; }).remove();
+    emblem('emblems/Coat_of_Arms_of_the_Russian_Federation_2.svg', T.flat ? [45, 50.5] : [46, 56], T.flat ? 150 : 190, T.flat ? 150 : 190, 'RUSYA FEDERASYONU');
+    if (!T.flat) svg.select('image:last-of-type').style('filter', 'grayscale(1) brightness(2.2) contrast(1.1)').attr('opacity', 0.92);
+  }
 
   const wash = defs.append('linearGradient').attr('id', 'wash').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 1);
   const wc = T.flat ? '242,237,228' : V === 'B' ? '4,16,28' : V === 'D' ? '5,7,12' : '5,4,5';
@@ -183,6 +210,25 @@ const T = THEMES[V];
   wash.append('stop').attr('offset', '100%').attr('stop-color', `rgba(${wc},1)`);
   svg.append('rect').attr('x', 0).attr('y', 980).attr('width', W).attr('height', H - 980).attr('fill', 'url(#wash)');
   const add = (html) => { const d = document.createElement('div'); d.innerHTML = html; while (d.firstChild) frame.append(d.firstChild); };
+  const accent = V === 'C' ? '#c8002a' : V === 'B' ? '#4fd0ff' : V === 'D' ? '#ffd166' : '#f4e14a';
+  const ink = T.flat ? '#141414' : '#fff';
+  if (FRAME === 'hook') {
+    const km = Math.round(d3.geoDistance([33.2, 43.6], [29.05, 41.2]) * 6371 / 10) * 10;
+    add(`<div style="position:absolute;left:80px;right:80px;bottom:300px;color:${ink}">
+      <div style="font:700 26px/1 X;letter-spacing:.3em;color:${accent}">KARADENİZ · 23 EYLÜL</div>
+      <div style="font:900 190px/.92 M;letter-spacing:-.03em;margin:26px 0 30px">KAPTAN<br><span style="color:${accent}">ÖLDÜ</span></div>
+      <div style="font:600 40px/1.25 M">Yük gemisi vuruldu. İstanbul Boğazı'na ~${km} km.</div></div>
+      <div style="position:absolute;left:80px;bottom:230px;font:700 22px/1 X;letter-spacing:.12em;color:${T.flat ? '#555' : '#ff8a98'}">DOĞRULANMADI · KAYNAK: UKRINFORM</div>`);
+    document.body.dataset.ready = '1'; return;
+  }
+  if (FRAME === 'nato') {
+    add(`<div style="position:absolute;left:80px;right:80px;bottom:430px;color:${ink}">
+      <div style="font:700 26px/1 X;letter-spacing:.3em;color:${accent}">KARADENİZ</div>
+      <div style="font:800 96px/1.02 M;letter-spacing:-.02em;margin:24px 0 26px">Kıyısı olan<br><span style="color:${accent}">3 NATO ülkesi</span></div>
+      <div style="font:500 36px/1.35 M;opacity:.9">Türkiye, Romanya, Bulgaristan. Boğazlar'dan geçiş Montrö Sözleşmesi'yle Türkiye'nin denetiminde.</div></div>
+      <div style="position:absolute;left:80px;bottom:360px;font:500 22px/1 X;letter-spacing:.08em;color:${T.flat ? '#666' : '#8a93a0'}">KAYNAK: MONTRÖ SÖZLEŞMESİ 1936 · NATO ÜYE LİSTESİ</div>`);
+    document.body.dataset.ready = '1'; return;
+  }
   if (V === 'A') {
     add(`<div class="brand">GREATER TÜRKİYE<small>OSINT</small></div>
       <span class="badge">${REC.status}</span>
