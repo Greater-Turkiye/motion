@@ -84,6 +84,7 @@ async function page() {
     if (d.id && pend.has(d.id)) { pend.get(d.id)(d); pend.delete(d.id); return; }
     if (d.method === 'Runtime.exceptionThrown') errors.push(d.params.exceptionDetails.exception?.description || d.params.exceptionDetails.text);
     if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') errors.push(d.params.args.map((a) => a.value ?? a.description).join(' '));
+    if (d.method === 'Runtime.consoleAPICalled' && (d.params.type === 'info' || d.params.type === 'warning')) console.log('  page: ' + d.params.args.map((a) => a.value ?? a.description).join(' '));
   });
   const send = (method, params = {}) => new Promise((r) => { const i = ++id; pend.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
   await send('Runtime.enable');
@@ -122,7 +123,10 @@ for (const style of STYLES) {
     const { p, info } = await openScene(style);
     const t0 = Date.now();
     try {
-      const b64 = await evaluate(p, 'window.motion.encode()');
+      // a time limit, so a browser whose encoder stalls falls back instead of holding the job
+      const limit = Math.max(120, info.frames * 1.5) * 1000;
+      const b64 = await Promise.race([evaluate(p, 'window.motion.encode()'),
+        new Promise((_, rej) => setTimeout(() => rej(new Error(`WebCodecs took longer than ${limit / 1000} s`)), limit))]);
       const name = `${info.id}-${info.style}`;
       writeFileSync(path.join(OUT, `${name}.mp4`), Buffer.from(b64, 'base64'));
       console.log(`${name}: ${info.frames} frames in ${((Date.now() - t0) / 1000).toFixed(1)} s with WebCodecs (${info.renderer}) -> ${path.relative(ROOT, path.join(OUT, name + '.mp4'))}`);

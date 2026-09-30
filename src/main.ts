@@ -69,13 +69,16 @@ async function encode(bitrate = 16_000_000): Promise<string> {
   const encoder = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { failure = e as Error; } });
   encoder.configure(config);
   const us = 1e6 / scene.fps;
+  const started = performance.now();
   for (let i = 0; i < frames; i++) {
     if (failure) throw failure;
     draw(i / scene.fps, i, assetsLoaded);
     const vf = new VideoFrame(canvas, { timestamp: Math.round(i * us), duration: Math.round(us) });
     encoder.encode(vf, { keyFrame: i % (scene.fps * 2) === 0 });
     vf.close();
-    while (encoder.encodeQueueSize > 6) await new Promise((r) => encoder.addEventListener('dequeue', r, { once: true }));
+    // wait for the encoder to catch up, but never forever: a dequeue event that does not come must not hang an export
+    while (encoder.encodeQueueSize > 6) await new Promise((r) => { encoder.addEventListener('dequeue', r, { once: true }); setTimeout(r, 50); });
+    if (i % 60 === 0) console.info(`encode ${i}/${frames} ${Math.round(performance.now() - started)} ms`);
   }
   await encoder.flush();
   if (failure) throw failure;
