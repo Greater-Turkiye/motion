@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Motion mockups</title>
+<style>
+@font-face { font-family: M; font-weight: 100 900; src: url(fonts/montserrat-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212; }
+@font-face { font-family: M; font-weight: 100 900; src: url(fonts/montserrat-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20C0; }
+@font-face { font-family: X; font-weight: 400; src: url(fonts/plexmono-400-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+2000-206F; }
+@font-face { font-family: X; font-weight: 400; src: url(fonts/plexmono-400-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+1E00-1E9F; }
+@font-face { font-family: X; font-weight: 500; src: url(fonts/plexmono-500-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+2000-206F; }
+@font-face { font-family: X; font-weight: 500; src: url(fonts/plexmono-500-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+1E00-1E9F; }
+html, body { margin: 0; background: #000; }
+.frame { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: M, sans-serif; }
+svg.map { position: absolute; inset: 0; }
+.card { position: absolute; left: 80px; right: 80px; bottom: 150px; }
+.src { font-family: X, monospace; }
+
+/* ---------- A · Gece kırmızısı ---------- */
+.A { background: radial-gradient(120% 70% at 50% 25%, #1a0f10 0%, #070506 60%, #030303 100%); color: #fff; }
+.A .card { }
+.A .kicker { display: inline-block; background: #f4e14a; color: #0b0b0b; font: 800 34px/1 M; padding: 12px 16px; letter-spacing: .01em; }
+.A h1 { font: 800 74px/1.08 M; margin: 30px 0 26px; letter-spacing: -.01em; }
+.A h1 em { font-style: normal; color: #f4e14a; font-weight: 500; }
+.A h1 span { font-weight: 400; }
+.A p { font: 500 32px/1.38 M; color: #e6e1da; margin: 0 0 40px; }
+.A p b { color: #f4e14a; font-weight: 800; }
+.A .stat { display: flex; align-items: center; gap: 36px; border-top: 2px solid rgba(255,255,255,.12); padding-top: 32px; }
+.A .stat .n { font: 800 100px/1 M; color: #f4e14a; }
+.A .stat .l { font: 600 32px/1.25 M; color: #fff; }
+.A .src { position: absolute; left: 80px; right: 80px; bottom: 70px; font-size: 24px; color: #9a948c; }
+.A .badge { position: absolute; right: 80px; top: 90px; top: 190px; font: 700 26px/1 X; color: #ff5a6e; border: 2px solid #ff5a6e; padding: 10px 14px; letter-spacing: .08em; }
+.A .brand { position: absolute; right: 80px; top: 90px; font: 800 44px/1 M; letter-spacing: .02em; color: #fff; text-align: right; }
+.A .brand small { display: block; font: 500 20px/1.6 X; letter-spacing: .5em; color: #b7b0a8; }
+
+/* ---------- B · Harekât lacivert ---------- */
+.B { background: #04101c; color: #dff4ff; }
+.B .hud { position: absolute; inset: 60px; border: 1px solid rgba(90, 200, 255, .18); }
+.B .hud::before, .B .hud::after { content: ''; position: absolute; width: 60px; height: 60px; border: 3px solid #4fd0ff; }
+.B .hud::before { left: -3px; top: -3px; border-right: 0; border-bottom: 0; }
+.B .hud::after { right: -3px; bottom: -3px; border-left: 0; border-top: 0; }
+.B .top { position: absolute; left: 100px; right: 100px; top: 100px; display: flex; justify-content: space-between; font: 500 24px/1.5 X; color: #7fc9ec; letter-spacing: .12em; }
+.B .card { bottom: 170px; }
+.B .kicker { font: 500 28px/1 X; color: #4fd0ff; letter-spacing: .3em; }
+.B .kicker::before { content: '▌'; color: #ffb020; margin-right: 12px; }
+.B h1 { font: 700 68px/1.1 M; margin: 28px 0 26px; color: #fff; }
+.B p { font: 400 31px/1.42 M; color: #b9d4e3; margin: 0 0 36px; }
+.B .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.B .cell { border: 1px solid rgba(79,208,255,.35); padding: 20px; }
+.B .cell b { display: block; font: 700 54px/1 M; color: #fff; }
+.B .cell span { font: 500 20px/1.4 X; color: #7fc9ec; letter-spacing: .12em; }
+.B .src { position: absolute; left: 100px; right: 100px; bottom: 90px; font-size: 22px; color: #6d93a8; }
+.B .badge { color: #ffb020; }
+
+/* ---------- C · Editoryal ---------- */
+.C { background: #f2ede4; color: #141414; }
+.C .mast { position: absolute; left: 80px; right: 80px; top: 80px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #141414; padding-bottom: 20px; }
+.C .mast b { font: 800 40px/1 M; letter-spacing: .04em; }
+.C .mast span { font: 500 24px/1 X; color: #555; }
+.C .card { }
+.C .kicker { font: 800 30px/1 M; color: #c8002a; letter-spacing: .14em; border-top: 6px solid #c8002a; padding-top: 18px; display: inline-block; }
+.C h1 { font: 800 80px/1.04 M; margin: 26px 0 30px; letter-spacing: -.02em; }
+.C p { font: 500 32px/1.42 M; color: #333; margin: 0 0 34px; columns: 1; }
+.C .stat { font: 500 30px/1.3 M; color: #141414; }
+.C .stat b { font: 800 60px/1 M; color: #c8002a; margin-right: 14px; }
+.C .src { position: absolute; left: 80px; right: 80px; bottom: 70px; font-size: 22px; color: #6b665f; border-top: 1px solid #c9c2b6; padding-top: 18px; }
+.C .badge { display: inline-block; font: 700 22px/1 X; background: #141414; color: #f2ede4; padding: 8px 12px; margin-left: 18px; vertical-align: 6px; letter-spacing: .08em; }
+
+/* ---------- D · Uydu ---------- */
+.D { background: radial-gradient(90% 60% at 50% 30%, #0e1726 0%, #05070c 55%, #010102 100%); color: #fff; }
+.D .card { left: 60px; right: 60px; bottom: 130px; padding: 44px 48px; background: rgba(12, 16, 24, .62); border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(22px); border-radius: 28px; }
+.D .kicker { font: 600 26px/1 X; color: #9fb4d6; letter-spacing: .24em; }
+.D h1 { font: 700 64px/1.12 M; margin: 22px 0 22px; }
+.D p { font: 400 30px/1.44 M; color: #c9d2e0; margin: 0 0 30px; }
+.D .row { display: flex; justify-content: space-between; align-items: end; }
+.D .n { font: 700 92px/1 M; background: linear-gradient(90deg, #fff, #9fb4d6); -webkit-background-clip: text; color: transparent; }
+.D .l { font: 500 26px/1.3 M; color: #9fb4d6; text-align: right; }
+.D .src { position: absolute; left: 60px; right: 60px; bottom: 50px; font-size: 22px; color: #6f7a8c; text-align: center; }
+.D .badge { font: 600 22px/1 X; color: #ffd166; letter-spacing: .1em; }
+
+.label { font-family: X, monospace; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script>
+const V = new URLSearchParams(location.search).get('v') || 'A';
+const REC = {
+  kicker: 'ÖNEMLİ GELİŞME',
+  title: "Karadeniz'de yük gemisine saldırı: kaptan öldü",
+  body: "Ukrinform'a göre Antigua ve Barbuda bayraklı bir yük gemisi 23 Eylül gecesi Karadeniz'de bir Rus insansız hava aracıyla vuruldu. Ukrayna vatandaşı kaptan öldü, 15 mürettebat Ukrayna sınır muhafızlarınca tahliye edildi.",
+  date: '23 EYL 2026', status: 'DOĞRULANMADI',
+  source: 'Kaynak: Ukrinform, 23.09.2026 · Kayıt evt_01m392q7kb… · greater-turkiye.github.io',
+  stat: { n: '146', l: 'Karadeniz kaydı, son 30 gün' },
+};
+const W = 1080, H = 1920;
+const THEMES = {
+  A: { sea: '#050608', land: '#1b1719', stroke: 'rgba(255,255,255,.10)', tur: '#7a0016', turStroke: '#ff2b4a', rus: '#5a1520', rusStroke: 'rgba(255,90,110,.55)',
+       ukr: '#262024', grat: 'rgba(255,255,255,.035)', glow: 'rgba(200,0,42,.45)', relief: true, center: [36, 46], scale: 1150, cy: 560, atmo: 'rgba(200,40,60,.35)' },
+  B: { sea: '#061a2c', land: '#0b2740', stroke: 'rgba(79,208,255,.55)', tur: '#0f3d5e', turStroke: '#4fd0ff', rus: '#2a1f14', rusStroke: '#ffb020',
+       ukr: '#0f2f4c', grat: 'rgba(79,208,255,.10)', glow: 'rgba(79,208,255,.35)', relief: false, center: [34, 45.5], scale: 1500, cy: 580, atmo: 'rgba(79,208,255,.25)' },
+  C: { sea: '#e4ddd0', land: '#fbf8f2', stroke: 'rgba(20,20,20,.55)', tur: '#c8002a', turStroke: '#8a001c', rus: '#d8cfc1', rusStroke: '#141414',
+       ukr: '#fbf8f2', grat: 'rgba(20,20,20,.07)', glow: null, relief: false, center: [34, 45.2], scale: 2300, cy: 520, flat: true },
+  D: { sea: '#0a1422', land: '#1d2530', stroke: 'rgba(255,255,255,.35)', tur: '#23303f', turStroke: '#ffffff', rus: '#1d2530', rusStroke: 'rgba(255,209,102,.8)',
+       ukr: '#26303d', grat: 'rgba(255,255,255,.04)', glow: 'rgba(120,170,255,.25)', relief: true, center: [33, 45], scale: 900, cy: 600, atmo: 'rgba(120,170,255,.35)', night: true },
+};
+const T = THEMES[V];
+
+(async function () {
+  const [topo, disputed] = await Promise.all([fetch('data/countries-50m.json').then((r) => r.json()), fetch('data/disputed-tur-view.geojson').then((r) => r.json())]);
+  const countries = topojson.feature(topo, topo.objects.countries).features;
+  const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
+  await document.fonts.load('800 40px M'); await document.fonts.load('500 20px X');
+  const root = document.getElementById('root');
+  const frame = document.createElement('div'); frame.className = 'frame ' + V; root.append(frame);
+  const svg = d3.select(frame).append('svg').attr('class', 'map').attr('width', W).attr('height', H);
+  const proj = T.flat
+    ? d3.geoMercator().center(T.center).scale(T.scale).translate([W / 2, T.cy])
+    : d3.geoOrthographic().rotate([-T.center[0], -T.center[1], 0]).scale(T.scale).translate([W / 2, T.cy]).clipAngle(90);
+  const path = d3.geoPath(proj);
+  const defs = svg.append('defs');
+  // relief: lit turbulence standing in for the ETOPO normal map the engine will use
+  const rf = defs.append('filter').attr('id', 'relief').attr('x', 0).attr('y', 0).attr('width', 1).attr('height', 1);
+  rf.append('feTurbulence').attr('type', 'fractalNoise').attr('baseFrequency', 0.018).attr('numOctaves', 5).attr('seed', 7).attr('result', 'n');
+  rf.append('feDiffuseLighting').attr('in', 'n').attr('surfaceScale', 3.2).attr('lighting-color', '#fff').attr('result', 'l')
+    .append('feDistantLight').attr('azimuth', 315).attr('elevation', 38);
+  rf.append('feComposite').attr('in', 'l').attr('in2', 'SourceGraphic').attr('operator', 'in');
+  const hatch = defs.append('pattern').attr('id', 'hatch').attr('width', 10).attr('height', 10).attr('patternUnits', 'userSpaceOnUse').attr('patternTransform', 'rotate(45)');
+  hatch.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 10).attr('stroke', T.flat ? 'rgba(20,20,20,.45)' : 'rgba(255,255,255,.35)').attr('stroke-width', 2);
+  const blur = defs.append('filter').attr('id', 'glow').attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+  blur.append('feGaussianBlur').attr('stdDeviation', 22);
+
+  const sphere = { type: 'Sphere' };
+  if (!T.flat) {
+    // atmosphere
+    const g = defs.append('radialGradient').attr('id', 'atmo');
+    g.append('stop').attr('offset', '86%').attr('stop-color', T.atmo);
+    g.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(0,0,0,0)');
+    const [cx, cy] = proj.translate();
+    svg.append('circle').attr('cx', cx).attr('cy', cy).attr('r', T.scale * 1.08).attr('fill', 'url(#atmo)');
+  }
+  svg.append('path').attr('d', path(sphere)).attr('fill', T.sea);
+  svg.append('path').attr('d', path(d3.geoGraticule10())).attr('fill', 'none').attr('stroke', T.grat).attr('stroke-width', 1);
+  const id = (f) => String(f.id).padStart(3, '0');
+  const fill = (f) => (id(f) === '792' ? T.tur : id(f) === '643' ? T.rus : id(f) === '804' ? T.ukr : T.land);
+  svg.append('g').selectAll('path').data(countries).join('path').attr('d', path).attr('fill', fill);
+  if (T.relief) svg.append('g').attr('filter', 'url(#relief)').style('mix-blend-mode', 'soft-light').attr('opacity', 0.55)
+    .selectAll('path').data(countries).join('path').attr('d', path).attr('fill', '#888');
+  // Türkiye's view of occupied territory (ADR 0014): drawn in the de jure state's colour, hatched
+  const dj = { UKR: T.ukr, SYR: T.land, PSE: T.land };
+  svg.append('g').selectAll('path').data(disputed.features).join('path').attr('d', path)
+    .attr('fill', (f) => dj[f.properties.de_jure] || T.land);
+  svg.append('g').selectAll('path').data(disputed.features).join('path').attr('d', path).attr('fill', 'url(#hatch)');
+  svg.append('path').attr('d', path(borders)).attr('fill', 'none').attr('stroke', T.stroke).attr('stroke-width', T.flat ? 1.4 : 1.1);
+  const rus = countries.find((f) => id(f) === '643'), tur = countries.find((f) => id(f) === '792');
+  if (T.glow) svg.append('path').attr('d', path(rus)).attr('fill', 'none').attr('stroke', T.glow).attr('stroke-width', 16).attr('filter', 'url(#glow)');
+  svg.append('path').attr('d', path(rus)).attr('fill', 'none').attr('stroke', T.rusStroke).attr('stroke-width', 2.2);
+  svg.append('path').attr('d', path(tur)).attr('fill', 'none').attr('stroke', T.turStroke).attr('stroke-width', 2.4);
+
+  // the event: region level only (the record has no coordinate), so a ring over the sea, not a pin
+  const [ex, ey] = proj([33.2, 43.6]);
+  const ringC = V === 'C' ? '#c8002a' : V === 'B' ? '#ffb020' : V === 'D' ? '#ffd166' : '#f4e14a';
+  for (const r of [70, 46]) svg.append('circle').attr('cx', ex).attr('cy', ey).attr('r', r).attr('fill', 'none').attr('stroke', ringC)
+    .attr('stroke-width', r === 70 ? 1.5 : 3).attr('stroke-dasharray', r === 70 ? '6 8' : null).attr('opacity', r === 70 ? 0.7 : 1);
+  svg.append('circle').attr('cx', ex).attr('cy', ey).attr('r', 9).attr('fill', ringC);
+  const lab = (x, y, t, size, color, ls) => svg.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle').attr('class', 'label')
+    .style('font', `500 ${size}px X`).style('letter-spacing', ls || '.4em').attr('fill', color).text(t);
+  const lc = T.flat ? '#141414' : 'rgba(255,255,255,.75)';
+  lab(ex + 150, ey - 70, 'KARADENİZ', 24, lc);
+  const [rx, ry] = proj([40, 53]); lab(rx, ry, 'RUSYA FEDERASYONU', 30, T.flat ? '#141414' : 'rgba(255,255,255,.85)');
+  const [tx, ty] = proj([35, 39]); lab(tx, ty, 'TÜRKİYE', 34, T.flat ? '#ffffff' : '#fff');
+  const [ux, uy] = proj([31.5, 49.3]); lab(ux, uy, 'UKRAYNA', 24, lc);
+
+  const wash = defs.append('linearGradient').attr('id', 'wash').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 1);
+  const wc = T.flat ? '242,237,228' : V === 'B' ? '4,16,28' : V === 'D' ? '5,7,12' : '5,4,5';
+  wash.append('stop').attr('offset', '0%').attr('stop-color', `rgba(${wc},0)`);
+  wash.append('stop').attr('offset', '28%').attr('stop-color', `rgba(${wc},.88)`);
+  wash.append('stop').attr('offset', '100%').attr('stop-color', `rgba(${wc},1)`);
+  svg.append('rect').attr('x', 0).attr('y', 980).attr('width', W).attr('height', H - 980).attr('fill', 'url(#wash)');
+  const add = (html) => { const d = document.createElement('div'); d.innerHTML = html; while (d.firstChild) frame.append(d.firstChild); };
+  if (V === 'A') {
+    add(`<div class="brand">GREATER TÜRKİYE<small>OSINT</small></div>
+      <span class="badge">${REC.status}</span>
+      <div class="card"><span class="kicker">${REC.kicker}</span>
+      <h1>Karadeniz'de yük gemisine <em>saldırı:</em> <span>kaptan öldü</span></h1>
+      <p><b>NE OLDU:</b> ${REC.body}</p>
+      <div class="stat"><span class="n">${REC.stat.n}</span><span class="l">${REC.stat.l}</span></div></div>
+      <div class="src">${REC.source}</div>`);
+  } else if (V === 'B') {
+    add(`<div class="hud"></div><div class="top"><span>GT · DENİZ OLAYI</span><span>${REC.date} · 43.6°K 33.2°D (BÖLGE)</span></div>
+      <div class="card"><div class="kicker">${REC.kicker} <span class="badge">· ${REC.status}</span></div>
+      <h1>${REC.title}</h1><p>${REC.body}</p>
+      <div class="grid"><div class="cell"><b>146</b><span>KARADENİZ<br>30 GÜN</span></div><div class="cell"><b>15</b><span>TAHLİYE<br>EDİLEN</span></div><div class="cell"><b>1</b><span>KAYNAK<br>TEK</span></div></div></div>
+      <div class="src">${REC.source}</div>`);
+  } else if (V === 'C') {
+    add(`<div class="mast"><b>GREATER TÜRKİYE</b><span>${REC.date}</span></div>
+      <div class="card"><span class="kicker">${REC.kicker}</span><span class="badge">${REC.status}</span>
+      <h1>${REC.title}</h1><p>${REC.body}</p>
+      <div class="stat"><b>${REC.stat.n}</b>${REC.stat.l}</div></div>
+      <div class="src">${REC.source}</div>`);
+  } else {
+    add(`<div class="card"><div class="kicker">${REC.kicker} · <span class="badge">${REC.status}</span></div>
+      <h1>${REC.title}</h1><p>${REC.body}</p>
+      <div class="row"><span class="n">${REC.stat.n}</span><span class="l">${REC.stat.l}<br>greater-turkiye</span></div></div>
+      <div class="src">${REC.source}</div>`);
+  }
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>
