@@ -2,7 +2,7 @@ import { loadAssets } from './assets';
 import { loadScene, type StyleId } from './engine/scene';
 import { H, W } from './render/globe';
 import { STYLES } from './styles';
-import { drawHook } from './templates/hook';
+import { drawVideo } from './templates/video';
 import { makeMap, type MapRenderer } from './render/map';
 
 const SCENES = import.meta.glob('../scenes/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
@@ -31,7 +31,7 @@ function draw(t: number, frame: number, assets: Awaited<typeof ready>) {
   map ??= makeMap(assets, scene.subject?.country, prefer);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.filter = 'none';
-  drawHook(ctx, assets, map, scene, STYLES[scene.style], t, frame);
+  drawVideo(ctx, assets, map, scene, STYLES[scene.style], t, frame);
 }
 
 declare global {

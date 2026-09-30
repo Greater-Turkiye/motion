@@ -4,13 +4,16 @@ id: hook-karadeniz
 record: evt_01m392q7kbfcm91x3pp7301k30   # Karadeniz'de yük gemisi saldırıya uğradı, kaptan öldürüldü
 format: vertical
 fps: 60
-duration: 4
+duration: 5
 style: A
 camera:
   from: { center: [26, 40.5], zoom: 0.92 }
   to: { center: [33.5, 46], zoom: 1.0 }
   seconds: 2.6
   ease: outCubic
+source_text:                  # the record's title and the headlines it cites; the hook may only use these words
+  - "Karadeniz'de yük gemisi saldırıya uğradı, kaptan öldürüldü"
+  - "Cargo ship attacked in Black Sea, captain killed"
 event: { at: [33.2, 43.6], precision: region }   # the record has no coordinate: a ring over the sea
 subject: { country: RUS, emblem: RUS/arms-eagle, label: RUSYA FEDERASYONU }
 labels:
@@ -21,6 +24,6 @@ labels:
 hook:
   kicker: KARADENİZ · 23 EYLÜL
   lines: [KAPTAN, ÖLDÜ]
-  sub: "Yük gemisi vuruldu. İstanbul Boğazı'na ~{km} km."
+  sub: "Yük gemisi saldırıya uğradı. İstanbul Boğazı'na ~{km} km."
   status: DOĞRULANMADI
   source: "KAYNAK: UKRINFORM"

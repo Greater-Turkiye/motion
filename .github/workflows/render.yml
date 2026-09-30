@@ -34,8 +34,10 @@ jobs:
       - name: Emblems (pinned by hash in the manifest)
         run: python3 tools/data/fetch_emblems.py --sync
       - run: npx tsc --noEmit
-      - name: Render every style
+      - name: Render the hook in every style
         run: node export/render.mjs --all-styles --workers 2
+      - name: Render the whole video (22 s)
+        run: node export/render.mjs --no-build --scene karadeniz-gemi --style A
       - name: Determinism
         run: node export/determinism.mjs A
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

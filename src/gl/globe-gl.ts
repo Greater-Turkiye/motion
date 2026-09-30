@@ -167,12 +167,19 @@ void main() {
 }`;
 
 const LINE_VS = HEAD + PROJECT + `
-in vec2 aA; in vec2 aB; uniform float uHalf;
+// endpoints arrive pre-projected on the CPU: unit-sphere xyz, and lon with Mercator y for the flat
+// page, so a vertex costs one matrix multiply instead of eight sines and cosines
+in vec3 aPA; in vec3 aPB; in vec2 aFA; in vec2 aFB; in float aCorner; uniform float uHalf; uniform mat3 uRot; uniform float uMercC;
 out float vD;
+vec3 project3(vec3 w, vec2 f) {
+  if (uFlat > 0.5) return vec3(uScreenC.x + uScale * (f.x - uCenter.x) * DEG, uScreenC.y - uScale * (f.y - uMercC), 1.0);
+  vec3 r = uRot * w;
+  return vec3(uScreenC.x + uScale * r.x, uScreenC.y - uScale * r.y, r.z);
+}
 void main() {
-  int corner = gl_VertexID; // 0..3 as a triangle strip
-  vec3 A = project(aA), B = project(aB);
-  if ((uFlat < 0.5 && (A.z < 0.0 || B.z < 0.0)) || (uFlat > 0.5 && abs(aA.x - aB.x) > 180.0)) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vD = 0.0; return; }
+  int corner = int(aCorner + 0.5); // 0..3, the corners of the segment's quad
+  vec3 A = project3(aPA, aFA), B = project3(aPB, aFB);
+  if ((uFlat < 0.5 && (A.z < 0.0 || B.z < 0.0)) || (uFlat > 0.5 && abs(aFA.x - aFB.x) > 180.0)) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vD = 0.0; return; }
   vec2 d = B.xy - A.xy; float len = length(d);
   vec2 n = len > 1e-4 ? vec2(-d.y, d.x) / len : vec2(0.0, 1.0);
   vec2 along = len > 1e-4 ? d / len : vec2(1.0, 0.0);
@@ -188,7 +195,27 @@ in float vD; uniform float uHalf; uniform vec4 uColor;
 out vec4 o;
 void main() { float a = clamp(uHalf + 0.5 - abs(vD), 0.0, 1.0); o = vec4(uColor.rgb, uColor.a * a); }`;
 
-interface LineSet { vao: WebGLVertexArrayObject; count: number }
+/** Line segments bucketed by the 10-degree cell their first point falls in, one VAO per cell, so a
+ *  frame only runs the vertex shader for the cells in view. On a GPU that hardly matters; in
+ *  software (SwiftShader, a CI runner) drawing every border on Earth was 70 % of a frame. */
+interface Cell { vao: WebGLVertexArrayObject; count: number; lon: number; lat: number }
+interface LineSet { cells: Cell[] }
+const CELL = 10;
+
+function endpoint(p: Position): number[] {
+  const la = p[1] * DEG, lo = p[0] * DEG;
+  return [Math.cos(la) * Math.sin(lo), Math.sin(la), Math.cos(la) * Math.cos(lo), p[0], merc(Math.max(-85, Math.min(85, p[1])))];
+}
+
+/** Whether any of a 5x5 grid of points in the cell lands on screen (with a margin for long segments). */
+function cellVisible(c: Cell, proj: Project) {
+  const m = 200;
+  for (let i = 0; i <= 4; i++) for (let j = 0; j <= 4; j++) {
+    const p = proj([c.lon + (CELL * i) / 4, Math.max(-89.9, Math.min(89.9, c.lat + (CELL * j) / 4))]);
+    if (p && p[0] > -m && p[0] < W + m && p[1] > -m && p[1] < H + m) return true;
+  }
+  return false;
+}
 
 export class GlobeGL {
   readonly canvas: HTMLCanvasElement;
@@ -269,16 +296,31 @@ export class GlobeGL {
 
   private lines(strings: Position[][]): LineSet {
     const gl = this.gl;
-    const data: number[] = [];
-    for (const s of strings) for (let i = 1; i < s.length; i++) data.push(s[i - 1][0], s[i - 1][1], s[i][0], s[i][1]);
-    const vao = gl.createVertexArray()!; gl.bindVertexArray(vao);
-    const buf = gl.createBuffer()!; gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-    const a = gl.getAttribLocation(this.line.p, 'aA'), b = gl.getAttribLocation(this.line.p, 'aB');
-    gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(a, 1);
-    gl.enableVertexAttribArray(b); gl.vertexAttribPointer(b, 2, gl.FLOAT, false, 16, 8); gl.vertexAttribDivisor(b, 1);
+    const buckets = new Map<string, number[]>();
+    for (const s of strings) for (let i = 1; i < s.length; i++) {
+      const lon = Math.floor(s[i - 1][0] / CELL) * CELL, lat = Math.floor(s[i - 1][1] / CELL) * CELL;
+      const key = `${lon},${lat}`;
+      if (!buckets.has(key)) buckets.set(key, []);
+      // two triangles per segment, plain (not instanced): SwiftShader runs an instanced draw one
+      // instance at a time, which made thin lines the most expensive thing in a software frame
+      const seg = [...endpoint(s[i - 1]), ...endpoint(s[i])];
+      const out = buckets.get(key)!;
+      for (const corner of [0, 1, 2, 2, 1, 3]) out.push(...seg, corner);
+    }
+    const loc = (n: string) => gl.getAttribLocation(this.line.p, n);
+    // per vertex: A xyz, A lon, A mercator y, the same for B, the corner (11 floats, 44 bytes)
+    const attrs: [number, number, number][] = [[loc('aPA'), 3, 0], [loc('aFA'), 2, 12], [loc('aPB'), 3, 20], [loc('aFB'), 2, 32], [loc('aCorner'), 1, 40]];
+    const cells: Cell[] = [];
+    for (const [key, data] of buckets) {
+      const [lon, lat] = key.split(',').map(Number);
+      const vao = gl.createVertexArray()!; gl.bindVertexArray(vao);
+      const buf = gl.createBuffer()!; gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+      for (const [l, n, off] of attrs) { gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, n, gl.FLOAT, false, 44, off); }
+      cells.push({ vao, count: data.length / 11, lon, lat });
+    }
     gl.bindVertexArray(null);
-    return { vao, count: data.length / 4 };
+    return { cells };
   }
 
   private outline(numId: string): LineSet | null {
@@ -360,11 +402,25 @@ export class GlobeGL {
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(this.line.p);
     common(this.line.u);
+    {
+      const l0 = v.center[0] * DEG, p0 = v.center[1] * DEG;
+      const cl = Math.cos(l0), sl = Math.sin(l0), cp = Math.cos(p0), sp = Math.sin(p0);
+      // the rotation of makeProject as a matrix, column by column
+      gl.uniformMatrix3fv(this.line.u('uRot'), false, [cl, -sp * sl, cp * sl, 0, cp, sp, -sl, -sp * cl, cp * cl]);
+      gl.uniform1f(this.line.u('uMercC'), merc(v.center[1]));
+    }
+    const proj = makeProject(s, v);
+    const seen = new Map<Cell, boolean>();
     const stroke = (ls: LineSet | null, color: string, width: number, alpha = 1) => {
       if (!ls || alpha <= 0) return;
       const c = rgba(color); c[3] *= alpha;
       gl.uniform4fv(this.line.u('uColor'), c); gl.uniform1f(this.line.u('uHalf'), width / 2);
-      gl.bindVertexArray(ls.vao); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, ls.count);
+      for (const cell of ls.cells) {
+        let vis = seen.get(cell);
+        if (vis === undefined) seen.set(cell, (vis = cellVisible(cell, proj)));
+        if (!vis) continue;
+        gl.bindVertexArray(cell.vao); gl.drawArrays(gl.TRIANGLES, 0, cell.count);
+      }
     };
     stroke(this.coast, s.border, s.flat ? 1.3 : 1.0);
     stroke(this.borders, s.border, s.flat ? 1.3 : 1.0);

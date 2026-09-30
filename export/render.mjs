@@ -69,7 +69,7 @@ const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}
   '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
   // WebGL2 everywhere: the real GPU where there is one, SwiftShader on a runner without one (since
   // Chrome 137 SwiftShader is no longer picked on its own; on Linux CI we ask for it by name)
-  ...(process.env.CI && process.platform === 'linux' ? ['--use-gl=angle', '--use-angle=swiftshader-webgl'] : ['--use-angle=default']),
+  ...(process.env.MOTION_SWIFTSHADER || (process.env.CI && process.platform === 'linux') ? ['--use-gl=angle', '--use-angle=swiftshader-webgl'] : ['--use-angle=default']),
   '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
   `--user-data-dir=${mkdtempSync(path.join(tmpdir(), 'motion-'))}`, 'about:blank'], { stdio: 'ignore' });
 let up = false;
@@ -110,6 +110,7 @@ async function openScene(style) {
   const p = await page();
   const q = new URLSearchParams({ scene: SCENE, export: '1' });
   if (style) q.set('style', style);
+  for (const [k, v] of new URLSearchParams(process.env.MOTION_QUERY || '')) q.set(k, v); // extra page parameters, e.g. MOTION_QUERY='renderer=canvas2d'
   await p.send('Page.navigate', { url: base + '?' + q });
   let info = null;
   for (let i = 0; i < 160 && !info; i++) { await sleep(250); try { info = await evaluate(p, 'window.motion && window.motion.ready'); } catch { /* not yet */ } }

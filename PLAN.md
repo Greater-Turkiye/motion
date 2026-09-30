@@ -169,8 +169,8 @@ motion/
 | M1 | İskelet ✅ | saat, sahne, CDP dışa aktarımı, kanca şablonu, dört stil, amblem manifesti | 1080×1920 60 fps MP4, iki çalıştırma tolerans içinde aynı |
 | M2 | Küre ✅ | WebGL2 küre ve düz harita, WebCodecs dışa aktarım, ETOPO1 kabartması ✅ | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
-| M4 | Yazı ve kart | MSDF yazı, "önemli gelişme" kartı, kaynak satırı | Türkçe karakterler, animasyonda titreme yok |
-| M5 | Veriden sahne | kayıt kimliğinden sahne, doğrulayıcı (kaynak, kırmızı çizgi) | Kırmızı çizgi kaydı reddedilir |
+| M4 | Yazı ve kart (yarısı ✅) | tam video şablonu (kanca + beş bölüm, döngü), kalıcı durum ve kaynak satırı, güvenli alan denetimi ✅; MSDF yazı sırada | Türkçe karakterler, animasyonda titreme yok |
+| M5 | Veriden sahne (doğrulayıcı ✅) | kayıt kimliğinden sahne; doğrulayıcı: okuma hızı, kaynak kelimeleri, yasak kelimeler ✅, kırmızı çizgi kaydı sırada | Kırmızı çizgi kaydı reddedilir |
 | M6 | Şablonlar | çağrı, sayaç, zaman çizelgesi, karşılaştırma | Her şablondan örnek video |
 | M7 | Tam otomasyon | Bölüm 10'daki hat: kayıttan videoya, insansız | Altı saatte bir runner'da üretim, sitede yayında |
 
@@ -293,22 +293,23 @@ ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
 
 **Zaman ve okuma**
 - İlk karede somut özne + fiil + yer; fade-in yok, kamera 0. karede hareket halinde. ✅
-- Yazı hızı ≤ 15 karakter/sn (≈ 2 Türkçe kelime/sn); blok süresi = karakter ÷ 15, en az 1,2 sn.
+- Yazı hızı ≤ 15 karakter/sn (≈ 2 Türkçe kelime/sn); blok süresi = karakter ÷ 15, en az 1,2 sn. ✅ (doğrulayıcı)
 - Her 1,5–2,5 sn'de bir anlamlı görsel değişim; saniyede bir kesme yok (haber zaten uyarıcı).
 - Süre 15–25 sn; "ne anlama geliyor" satırı 8–15. saniyede, doruk son %20'de, son kare ilk karenin
-  kamera açısına döner (döngü).
+  kamera açısına döner (döngü). ✅ (`karadeniz-gemi`)
 
 **Güven**
-- Durum etiketi (DOĞRULANMADI / DOĞRULANDI / GELİŞEN) her videoda, ilk 2 sn'de ve son karede. ✅ (ilk)
-- Kaynak satırı sürekli ekranda, okunur boyutta; yalnız son karede değil.
-- Hook'taki her içerik kelimesi kaynak metinde karşılık bulmalı; bulamazsa sahne reddedilir.
-- Kara liste: dış grup düşmanlığı ve ahlaki öfke kelimeleri (hain, rezil, küstah …); soru hook'u yok.
+- Durum etiketi (DOĞRULANMADI / DOĞRULANDI / GELİŞEN) her videoda, ilk 2 sn'de ve son karede. ✅
+- Kaynak satırı sürekli ekranda, okunur boyutta; yalnız son karede değil. ✅
+- Hook'taki her içerik kelimesi kaynak metinde karşılık bulmalı; bulamazsa sahne reddedilir. ✅
+- Kara liste: dış grup düşmanlığı ve ahlaki öfke kelimeleri (hain, rezil, küstah …); soru hook'u yok. ✅
 - Kaygı yerine ölçek ve yenilik çerçevesi: mesafe ("Boğaz'a 430 km") ✅, "ilk kez" yalnızca veri
   setinden hesaplanabiliyorsa.
 
 **Kompozisyon**
 - Güvenli alan (üç platformun kesişimi): üst %14, alt %35, sol 65 px, sağ 180 px. Hook, durum ve
-  kaynak satırı bu kutuda; alt bantta yalnızca dekor.
+  kaynak satırı bu kutuda; alt bantta yalnızca dekor. ✅ (alt sınır TikTok'un 400 px'i; Meta'nın %35'i
+  yazıya yalnızca 980 px bırakırdı)
 - Taraf renkleri kırmızı-yeşil değil; renk her zaman amblem ya da desenle desteklenir.
 - Aynı gün aynı düzen tekrarlanmaz; en az 5–6 düzen (YouTube "inauthentic content" politikası).
 
@@ -320,5 +321,6 @@ ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
   kalitesi ölçülmeden açılmaz. Ticari olmayan lisanslı sesler (Piper dfki, XTTS, MMS) kullanılmaz.
 - Yayın: Telegram, Bluesky, Mastodon, Instagram Reels otomatik; YouTube denetim onayına kadar
   private; TikTok ve X otomatik değil. `published.json` defteri tekrar gönderimi engeller.
-- CI'da GPU yok: Chrome `--use-angle=swiftshader-webgl --enable-unsafe-swiftshader`; WebCodecs
-  H.264 yalnızca Baseline (`avc1.42E0xx`) güvenilir; çıktı ffprobe ve blackdetect kapısından geçer.
+- CI'da GPU yok: Chrome `--use-angle=swiftshader-webgl --enable-unsafe-swiftshader` ✅; WebCodecs
+  High profil runner'da çalıştı, olmazsa Baseline (`avc1.42E033`) ✅; çıktı ffprobe ve blackdetect
+  kapısından geçer (sırada).
