@@ -110,14 +110,16 @@ const emblemOutOf = (sc: Scene) => (sc.beats.length ? sc.beats[0].at + 0.8 : sc.
  * key), what they must not cover (the text block, the event ring, the emblem, distance end points),
  * and where the emblem is. Used for every frame and, at sample moments, to plan the label spots.
  */
-function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number) {
+function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number, hookTop = 960) {
   const D = sc.duration;
   const full = sc.beats.length > 0;
   const tail = full ? 1 - span(t, D - 0.9, D - 0.05) : 1;
   const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
   const beat = sc.beats[beatIdx];
   const emblemOut = emblemOutOf(sc);
-  const obstacles: Box[] = [{ x: 0, y: 960, w: W, h: H - 960 }]; // the text block and its wash
+  // the text block and its wash; the hook's kicker can stand higher than the beats' blocks
+  const top = t < (sc.beats[0]?.at ?? D) ? Math.min(960, hookTop) : 960;
+  const obstacles: Box[] = [{ x: 0, y: top, w: W, h: H - top }];
   const labels: Label[] = [];
 
   if (sc.event) {
@@ -180,7 +182,7 @@ function labelPlan(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, emblemAr:
     const times = new Set<number>();
     for (let tt = 0.25; tt < sc.duration; tt += 0.5) times.add(tt);
     for (const k of sc.camera.keys ?? []) times.add(Math.min(sc.duration - 0.01, k.t));
-    const samples = [...times].map((tt) => layout(sc, s, makeProject(s, cameraAt(sc, s, tt)), tt, emblemAr))
+    const samples = [...times].map((tt) => layout(sc, s, makeProject(s, cameraAt(sc, s, tt)), tt, emblemAr, hookMetrics(ctx, sc, s).top))
       .map((l) => ({ labels: l.labels.filter((x) => (x.alpha ?? 1) > 0.05), obstacles: l.obstacles }));
     plan = planSpots(ctx, samples, W, H);
     plans.set(key, plan);
@@ -232,7 +234,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   const emblemImg = sc.subject?.emblem ? a.emblems.get(sc.subject.emblem) : undefined;
   const emblemAr = emblemImg ? emblemImg.naturalHeight / emblemImg.naturalWidth || 1 : 1;
-  const lay = layout(sc, s, proj, t, emblemAr);
+  const lay = layout(sc, s, proj, t, emblemAr, hookMetrics(ctx, sc, s).top);
 
   // the event: a region-level ring, never a pin, with shock waves every 1.1 s
   if (sc.event) {
@@ -364,18 +366,33 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   ctx.restore();
 }
 
+/** The hook block's measures, once per scene and style: the labels keep clear of its top line. */
+const hookMemo = new Map<string, { subLines: string[]; sizes: number[]; heights: number[]; subTop: number; linesTop: number; kickerY: number; top: number }>();
+function hookMetrics(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
+  const key = `${sc.id}|${s.id}|${sc.hook.lines.join('/')}|${sc.hook.sub}`;
+  let m = hookMemo.get(key);
+  if (!m) {
+    ctx.save();
+    ctx.font = `600 40px ${s.fonts.text}`;
+    const subLines = wrap(ctx, sc.hook.sub.replace('{km}', sc.event ? String(kmToBosphorus(sc.event.at)) : '?'), WIDTH);
+    // each line as big as it can be on its own: a short word stays huge even when the next line is long
+    // (sized for the loosest tracking of the settle below)
+    const sizes = sc.hook.lines.map((l) => fit(ctx, [l], (p) => `900 ${p}px ${s.fonts.display}`, 188, 4 / 188));
+    ctx.restore();
+    const heights = sizes.map((px) => Math.round(px * 0.915));
+    const subTop = BLOCK_BOTTOM - subLines.length * 50;
+    const linesTop = subTop - 40 - heights.reduce((a, b) => a + b, 0);
+    const kickerY = linesTop - 30;
+    m = { subLines, sizes, heights, subTop, linesTop, kickerY, top: kickerY - 40 };
+    hookMemo.set(key, m);
+  }
+  return m;
+}
+
 function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number, alpha: number) {
   if (alpha <= 0) return;
   const lift = (1 - alpha) * 40;
-  ctx.font = `600 40px ${s.fonts.text}`;
-  const subLines = wrap(ctx, sc.hook.sub.replace('{km}', sc.event ? String(kmToBosphorus(sc.event.at)) : '?'), WIDTH);
-  // each line as big as it can be on its own: a short word stays huge even when the next line is long
-  // (sized for the loosest tracking of the settle below)
-  const sizes = sc.hook.lines.map((l) => fit(ctx, [l], (p) => `900 ${p}px ${s.fonts.display}`, 188, 4 / 188));
-  const heights = sizes.map((px) => Math.round(px * 0.915));
-  const subTop = BLOCK_BOTTOM - subLines.length * 50;
-  const linesTop = subTop - 40 - heights.reduce((a, b) => a + b, 0);
-  const kickerY = linesTop - 30;
+  const { subLines, sizes, heights, subTop, linesTop, kickerY } = hookMetrics(ctx, sc, s);
   guard({ x: LEFT - 6, y: kickerY - 26, w: WIDTH, h: BLOCK_BOTTOM - kickerY + 26 }, 'hook');
 
   const kp = alpha;
