@@ -11,7 +11,7 @@ dolgu, sabit kalınlıkta yumuşatılmış sınırlar), video tarayıcının ken
 MP4'e yazılıyor; desteklenmeyen yerde ffmpeg yolu devrede. Kabartma ETOPO1 normal haritasından,
 gölgelendiricide kuzeybatı ışığıyla (Imhof) hesaplanıyor; gücü her stilde ayrı (`relief`, `limb`).
 İlk tam video hazır: `karadeniz-gemi`, 22 sn, kanca → nerede → ne oldu → ne kadar yakın → durum →
-veri setinden bağlam, son kare ilk kareye döner (döngü). Plan: [PLAN.md](PLAN.md). Dört tasarım yönü, dördü de seçilebilir:
+veri setinden bağlam, son kare ilk kareye döner (döngü). Plan: [PLAN.md](PLAN.md). Yedi stil, hepsi seçilebilir (A–D ilk dört yön, E/G/K araştırmadan):
 [docs/mockups](docs/mockups) (`tasarimlar-hepsi.png`: her stil için kanca, NATO ve kapanış karesi).
 
 | | |
@@ -32,7 +32,7 @@ python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; mani
 python tools/data/build_relief.py             # yalnızca kabartmayı yeniden üretmek için (depoda hazır: assets/data/relief.png)
 npm run dev                                   # önizleme: http://localhost:5178/?scene=hook-karadeniz&style=A
 npm run render -- --all-styles                # out/hook-karadeniz-{A,B,C,D}.mp4, 1080x1920, 60 fps
-npm run render -- --scene karadeniz-gemi --all-styles   # tam video, 22 sn
+npm run render -- --scene karadeniz-gemi --all-styles   # tam video, 22 sn, yedi stil
 npm test                                      # iki ayrı işlemede aynı kareler (tolerans: 2/255)
 ```
 
@@ -41,11 +41,11 @@ npm test                                      # iki ayrı işlemede aynı karele
 | Sahneler | `scenes/*.yaml` — kayıt kimliği, kaynak metni, kamera anahtarları, olay, konu ülke ve amblemi, etiketler, kanca, bölümler (`place`, `facts`, `distance`, `status`, `close`) |
 | Şablon | `src/templates/video.ts` — kanca ve bölümler; durum ve kaynak ilk kareden son kareye ekranda; yazı yalnızca güvenli alanda (üst 270, alt 400, sağ 180 px boş), taşarsa dışa aktarım durur |
 | Sahne denetimi | `src/engine/scene.ts` `validate()` — okuma hızı ≤ 15 karakter/sn, kancadaki ve olgulardaki her içerik kelimesi `source_text`'te, yasak öfke kelimeleri, soru kancası yok; bir sorun varsa sahne çizilmez |
-| Stiller | `src/styles.ts` — A gece kırmızısı, B harekât lacivert, C editoryal, D uydu gecesi |
+| Stiller | `src/styles.ts` — A gece kırmızısı, B harekât lacivert, C editoryal, D uydu gecesi, E ateşböceği, G İsviçre rölyefi (yükseltiye göre renk, mavi-gri gölge), K çini atlas (portolan rumb hatları, çini deseni) |
 | Harita | `src/gl/globe-gl.ts` (WebGL2), yedek `src/render/globe.ts` (2B) |
 | Dışa aktarım | `export/render.mjs` — önce WebCodecs, olmazsa sekmelerde paralel kare + ffmpeg (`--encoder`, `--workers`) |
 | Amblemler | `assets/emblems/manifest.json` — Wikidata/Commons, yalnızca kamu malı ve serbest lisans; dosyalar git'te değil |
-| CI | `.github/workflows/render.yml` — tip denetimi, dört stilde kanca, A stilinde tam video, determinizm; videolar artefakt. Runner'da GPU yok: SwiftShader, kare başına ~0,5 sn |
+| CI | `.github/workflows/render.yml` — tip denetimi, yedi stilde kanca, A stilinde tam video, determinizm; videolar artefakt. Runner'da GPU yok: SwiftShader, kare başına ~0,15 sn (22 sn video 193 sn) |
 | Lisanslar | [LICENSES.md](LICENSES.md) |
 
 | Ölçüm (GTX 660) | M1, 2B tuval | M2, WebGL2 + WebCodecs |

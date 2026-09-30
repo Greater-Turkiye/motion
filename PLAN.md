@@ -211,7 +211,15 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 | C | **Editoryal** | Gazete sayfası: açık zemin, düz harita, Türkiye kırmızı, siyah ağır başlık |
 | D | **Uydu gecesi** | Uzaydan küre, soğuk ışık, buzlu cam kart, sade |
 
-**Sahibin kararı (2026-09-30): dördü de kalır, sahne dosyasında `style: A|B|C|D` ile seçilir.**
+| E | **Ateşböceği** ✅ | Karanlık dünyada tek şey yanar: konu ülke turuncu hale, Türkiye soğuk ince çizgi; saldırı ve enerji haberleri |
+| G | **İsviçre rölyefi** ✅ | Imhof: yükseltiye göre renk (ova yeşil-gri, dağ açık), mavi-gri gölge, sıcak ışık; dağlık cepheler, su, boğazlar |
+| K | **Çini atlas** ✅ | İznik paleti, Piri Reis tarzı 32 yönlü rumb hatları, denizde çini deseni; diplomasi, Mavi Vatan |
+
+Araştırmanın (docs/research/03) diğer yönleri sırada: H gizliliği kaldırılmış dosya, I harekât paftası
+(milsymbol, MIT), sonra F saha defteri, J riso baskı, L kabartma maket. Teknikler: alt-kare hareket
+bulanıklığı, blue-noise dithering, bloom (E için), van Wijk yakınlaştırma yolu, 2× süper örnekleme.
+
+**Sahibin kararı (2026-09-30): hepsi kalır, sahne dosyasında `style:` ile seçilir.**
 Otomatik hatta seçici, olayın türüne göre varsayılan bir stil atar (ör. kinetik ve deniz olayları
 A, diplomasi ve anlaşmalar C) ve istenirse günlük dönüşümlü kullanır.
 

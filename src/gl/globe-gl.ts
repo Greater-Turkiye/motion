@@ -79,6 +79,9 @@ void main() { gl_Position = vec4(P[gl_VertexID], 0.0, 1.0); }`;
 const FILL_FS = HEAD + PROJECT + `
 uniform sampler2D uId; uniform sampler2D uPal; uniform sampler2D uGlow; uniform sampler2D uRelief;
 uniform float uReliefK, uLimb, uHasRelief;
+uniform vec3 uHyp0, uHyp1, uHyp2; uniform float uHasHyp;
+uniform vec3 uShadowT, uLightT; uniform float uHasTint;
+uniform vec4 uRhumbC, uTile; uniform vec2 uRhumbP[3]; uniform int uRhumbN;
 uniform vec4 uBg0, uBg1, uSea, uGrat, uAtmo, uGlowC, uHatch;
 uniform float uReveal, uPulse, uHasAtmo, uHasGlow;
 out vec4 o;
@@ -126,11 +129,40 @@ void main() {
   int id = int(texelFetch(uId, t, 0).r * 255.0 + 0.5);
   vec3 c = uSea.rgb;
   int kind = 0;
+  {
+    // derivatives (fwidth) need uniform control flow, so this runs everywhere and only the sea keeps it
+    float onSea = id == 0 ? 1.0 : 0.0;
+    // a flat page is Mercator, where rhumb lines are straight: 32 winds from each compass rose
+    vec2 q = vec2(ll.x, merc(clamp(ll.y, -85.0, 85.0)) / DEG);
+    for (int i = 0; i < 3; i++) {
+      if (i >= uRhumbN) break;
+      vec2 d = q - uRhumbP[i];
+      float a = atan(d.y, d.x) * 16.0 / 3.141592653589793;
+      // angular width of one pixel, worked out rather than taken from fwidth: derivatives inside a
+      // loop with a break come back as zero on some drivers (ANGLE on D3D), and the lines vanished
+      float fa = 16.0 / 3.141592653589793 / (uScale * DEG * max(length(d), 1e-3));
+      float line = 1.0 - clamp(abs(fract(a + 0.5) - 0.5) / fa - 0.5, 0.0, 1.0);
+      c = mix(c, uRhumbC.rgb, onSea * uRhumbC.a * line * smoothstep(0.3, 1.5, length(d)));
+    }
+    if (uTile.a > 0.0) {
+      // a four-petalled tile motif every 1.5 degrees, drawn as a distance field
+      vec2 cell = fract(q / 1.5) - 0.5;
+      float th = atan(cell.y, cell.x), r = length(cell);
+      float petal = r - (0.18 + 0.12 * abs(cos(2.0 * th)));
+      float fp = max(fwidth(petal), 1e-4);
+      c = mix(c, uTile.rgb, onSea * uTile.a * (1.0 - clamp(abs(petal) / fp - 0.5, 0.0, 1.0)));
+    }
+  }
   if (id > 0) {
     vec4 p = texelFetch(uPal, ivec2(id, 0), 0);
     kind = int(p.a * 255.0 + 0.5); // 1 land, 2 home, 3 subject, 4 disputed
     c = p.rgb;
-    if (kind == 3) c = mix(texelFetch(uPal, ivec2(0, 0), 0).rgb, p.rgb, uReveal);
+    if (uHasHyp > 0.5 && kind != 4) {
+      float h = texture(uRelief, vec2((ll.x + 180.0) / 360.0, (ll.y + 90.0) / 180.0)).b;
+      vec3 hyp = mix(mix(uHyp0, uHyp1, smoothstep(0.0, 0.22, h)), uHyp2, smoothstep(0.22, 0.65, h));
+      c = kind == 2 ? mix(hyp, p.rgb, 0.55) : kind == 3 ? mix(hyp, p.rgb, 0.3 * uReveal) : hyp;
+    }
+    if (uHasHyp < 0.5 && kind == 3) c = mix(texelFetch(uPal, ivec2(0, 0), 0).rgb, p.rgb, uReveal);
     if (kind == 4) {
       float stripe = mod(gl_FragCoord.x + gl_FragCoord.y, 12.0);
       c = mix(c, uHatch.rgb, uHatch.a * smoothstep(2.4, 1.2, abs(stripe - 1.5)));
@@ -149,7 +181,13 @@ void main() {
     float hi = rn.b;                            // 0 sea level .. 1 at 5 km
     // plains stay quiet, mountains speak; the home and subject fills keep most of their flat colour
     float k = uReliefK * (0.35 + 0.65 * smoothstep(0.02, 0.45, hi)) * ((kind == 2 || kind == 3) ? 0.45 : 1.0);
-    c *= mix(1.0, clamp(shade, 0.35, 1.22), k);
+    if (uHasTint > 0.5) {
+      // shadows go blue-grey and light goes warm, as on a Swiss school map, instead of black and white
+      float dsh = clamp(shade, 0.35, 1.22) - 1.0;
+      c = dsh < 0.0 ? mix(c, uShadowT, min(1.0, -dsh * k * 1.5)) : mix(c, uLightT, min(1.0, dsh * k * 2.2));
+    } else {
+      c *= mix(1.0, clamp(shade, 0.35, 1.22), k);
+    }
     c += vec3(0.03) * k * smoothstep(0.4, 0.9, hi); // a touch of snow light on high ground
   }
   // graticule every 10 degrees, one pixel, anti-aliased
@@ -391,6 +429,18 @@ export class GlobeGL {
     gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, this.glowTex ?? this.palTex); gl.uniform1i(u('uGlow'), 2);
     gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.reliefTex ?? this.palTex); gl.uniform1i(u('uRelief'), 3);
     gl.uniform1f(u('uHasRelief'), this.reliefTex ? 1 : 0); gl.uniform1f(u('uReliefK'), s.relief); gl.uniform1f(u('uLimb'), s.limb);
+    const rgb = (x: string) => rgba(x).slice(0, 3);
+    gl.uniform1f(u('uHasHyp'), s.hypso && this.reliefTex ? 1 : 0);
+    if (s.hypso) { gl.uniform3fv(u('uHyp0'), rgb(s.hypso[0])); gl.uniform3fv(u('uHyp1'), rgb(s.hypso[1])); gl.uniform3fv(u('uHyp2'), rgb(s.hypso[2])); }
+    gl.uniform1f(u('uHasTint'), s.shadeTint ? 1 : 0);
+    if (s.shadeTint) { gl.uniform3fv(u('uShadowT'), rgb(s.shadeTint[0])); gl.uniform3fv(u('uLightT'), rgb(s.shadeTint[1])); }
+    gl.uniform1i(u('uRhumbN'), s.rhumb ? Math.min(3, s.rhumb.centers.length) : 0);
+    if (s.rhumb) {
+      gl.uniform4fv(u('uRhumbC'), rgba(s.rhumb.color));
+      // compass centres in (lon, mercator y in degrees), the space the shader measures angles in
+      gl.uniform2fv(u('uRhumbP'), s.rhumb.centers.slice(0, 3).flatMap(([lo, la]) => [lo, merc(la) / DEG]));
+    }
+    gl.uniform4fv(u('uTile'), rgba(s.tile ?? 'rgba(0,0,0,0)'));
     gl.uniform4fv(u('uBg0'), rgba(s.bg[0])); gl.uniform4fv(u('uBg1'), rgba(s.bg[1]));
     gl.uniform4fv(u('uSea'), rgba(s.sea)); gl.uniform4fv(u('uGrat'), rgba(s.graticule));
     gl.uniform4fv(u('uAtmo'), rgba(s.atmosphere ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uHasAtmo'), s.atmosphere && !s.flat ? 1 : 0);

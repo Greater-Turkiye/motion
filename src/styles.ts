@@ -1,6 +1,6 @@
 import type { StyleId } from './engine/scene';
 
-/** The four design directions of PLAN.md section 11, as data. */
+/** The design directions of PLAN.md section 11 and docs/research/03, as data. */
 export interface Style {
   id: StyleId;
   name: string;
@@ -25,6 +25,10 @@ export interface Style {
   grain: number;
   relief: number;          // 0 flat colours, 1 full hill shading (ETOPO1 normal map)
   limb: number;            // how much the globe darkens towards its edge
+  hypso?: [string, string, string];   // land coloured by height: lowland, middle, high (G)
+  shadeTint?: [string, string];       // relief shadow and light colours instead of black and white (G)
+  rhumb?: { color: string; centers: [number, number][] };  // portolan rhumb lines on the sea, 32 winds (K; flat styles only)
+  tile?: string;                      // a faint tile pattern on the sea (K)
 }
 
 export const STYLES: Record<StyleId, Style> = {
@@ -44,4 +48,21 @@ export const STYLES: Record<StyleId, Style> = {
     graticule: 'rgba(255,255,255,0.04)', home: '#23303f', homeStroke: '#ffffff', subject: '#1d2530', subjectStroke: 'rgba(255,209,102,0.85)',
     glow: 'rgba(120,170,255,0.3)', atmosphere: 'rgba(120,170,255,0.35)', accent: '#ffd166', ink: '#ffffff', muted: '#9fb4d6', status: '#ffd166',
     label: 'rgba(255,255,255,0.85)', emblemMono: true, baseScale: 1100, cy: 640, grain: 0.04, relief: 1.0, limb: 0.45 },
+  // research/03 E: a dark world in which one thing is lit (John Nelson's firefly recipe)
+  E: { id: 'E', name: 'Ateşböceği', flat: false, bg: ['#0b0f16', '#030406'], sea: '#05070B', land: '#12161D', border: 'rgba(38,45,58,0.9)',
+    graticule: 'rgba(255,255,255,0.02)', home: '#101c24', homeStroke: 'rgba(127,227,255,0.75)', subject: '#2b1606', subjectStroke: '#FFF4D6',
+    glow: 'rgba(255,106,0,0.85)', atmosphere: 'rgba(255,181,71,0.10)', accent: '#FFB547', ink: '#FFF4D6', muted: '#9aa3ad', status: '#FFB547',
+    label: 'rgba(255,244,214,0.75)', emblemMono: true, baseScale: 1300, cy: 640, grain: 0.04, relief: 0.1, limb: 0.55 },
+  // research/03 G: Imhof's Swiss relief, hypsometric tint, blue-grey shadows and warm light
+  G: { id: 'G', name: 'İsviçre rölyefi', flat: true, bg: ['#eef0ea', '#e4e7df'], sea: '#A7C5D9', land: '#A9B89A', border: 'rgba(40,40,40,0.45)',
+    graticule: 'rgba(40,60,80,0.07)', home: '#E30A17', homeStroke: '#8c1420', subject: '#7A1F2B', subjectStroke: '#7A1F2B',
+    glow: null, atmosphere: null, accent: '#b3121f', ink: '#1d2326', muted: '#46525c', status: '#7A1F2B',
+    label: 'rgba(20,30,40,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 1.0, limb: 0,
+    hypso: ['#A9B89A', '#D9CFA6', '#F1EBDC'], shadeTint: ['#5B6E82', '#FFF6E0'] },
+  // research/03 K: an İznik tile atlas, Piri Reis rhumb lines on a pale sea
+  K: { id: 'K', name: 'Çini atlas', flat: true, bg: ['#F7F3EA', '#EFE8D8'], sea: '#d9ebe7', land: '#F7F3EA', border: 'rgba(27,27,27,0.75)',
+    graticule: 'rgba(0,0,0,0)', home: '#B8322A', homeStroke: '#1B1B1B', subject: '#e6e3f0', subjectStroke: '#1F3F8F',
+    glow: null, atmosphere: null, accent: '#1F3F8F', ink: '#1B1B1B', muted: '#4d4a44', status: '#B8322A',
+    label: 'rgba(27,27,27,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.3, limb: 0,
+    rhumb: { color: 'rgba(31,63,143,0.26)', centers: [[27.5, 35.2], [38.5, 42.6], [18.5, 40.5]] }, tile: 'rgba(47,167,168,0.10)' },
 };

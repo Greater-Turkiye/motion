@@ -1,7 +1,8 @@
 import { parse } from 'yaml';
 
 export type LonLat = [number, number];
-export type StyleId = 'A' | 'B' | 'C' | 'D';
+export const STYLE_IDS = ['A', 'B', 'C', 'D', 'E', 'G', 'K'] as const;
+export type StyleId = (typeof STYLE_IDS)[number];
 
 export interface Camera { center: LonLat; zoom: number }
 export interface Key extends Camera { t: number }
@@ -62,7 +63,7 @@ export function validate(s: Scene): string[] {
   need(s.format === 'vertical', 'only the vertical format exists so far');
   need(Number.isInteger(s.fps) && s.fps >= 24 && s.fps <= 120, 'fps must be 24–120');
   need(s.duration > 0 && s.duration <= 90, 'duration must be 0–90 s');
-  need(['A', 'B', 'C', 'D'].includes(s.style), 'style must be A, B, C or D');
+  need((STYLE_IDS as readonly string[]).includes(s.style), `style must be one of ${STYLE_IDS.join(', ')}`);
   need(s.hook && s.hook.lines?.length, 'the hook needs at least one line');
   if (out.length) return out;
   need(s.hook.status?.trim(), 'the verification status must be on screen');

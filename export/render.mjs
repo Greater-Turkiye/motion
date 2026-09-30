@@ -33,7 +33,7 @@ for (let i = 2; i < process.argv.length; i++) {
   if (next && !next.startsWith('--')) { args.set(a.slice(2), next); i++; } else args.set(a.slice(2), true);
 }
 const SCENE = args.get('scene') || 'hook-karadeniz';
-const STYLES = args.has('all-styles') ? ['A', 'B', 'C', 'D'] : [args.get('style') || null];
+const STYLES = args.has('all-styles') ? ['A', 'B', 'C', 'D', 'E', 'G', 'K'] : [args.get('style') || null]; // src/engine/scene.ts STYLE_IDS
 const FRAMES_ONLY = args.has('frames-only');
 const EVERY = Number(args.get('every') || 1);
 const FORMAT = args.get('format') === 'png' ? 'png' : 'jpeg';
