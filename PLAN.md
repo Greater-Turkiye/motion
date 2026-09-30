@@ -353,7 +353,7 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
 1. **Çekirdek** ✅: kararlı etiketler (yer bir kez seçilir, kapanınca solar), en yakın Türk şehrine
    mesafe ("TÜRKİYE'YE UZAKLIK" 700 km üstünde), bağlam satırı olay noktasının 150 km çevresinden
    (son 7 gün), sayı kalıplarında kelime sınırı.
-2. **Stil paketleri**: yazı animasyonu, kamera, geçiş ve ilerleme çubuğu stilin parçası; serbest
+2. **Stil paketleri** ✅ (hareket; yazı tipleri araştırma raporundan sonra): yazı animasyonu, kamera, geçiş ve ilerleme çubuğu stilin parçası; serbest
    karıştırma yalnızca denemede. Tek parametre (`style`) her şeyi birlikte değiştirir.
 3. **Olay ailesi şablonları**: saldırı (nokta + son 7 günün deseni + en yakın Türk şehri), diplomasi
    (iki ülke + başkentler arası yay + amblemler), tatbikat (katılımcılar + deniz alanı + Türkiye'ye

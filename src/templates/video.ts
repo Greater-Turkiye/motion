@@ -75,9 +75,9 @@ function guard(box: Box, what: string) {
 /** The camera at `t`: the legacy from/to move, or a path through keys; zoom moves in log space so a
  *  zoom from 1 to 3 feels as even as one from 3 to 9. A slow periodic sway keeps it alive between
  *  keys and returns to zero at the end, so the loop has no seam. */
-function cameraAt(sc: Scene, t: number): Camera {
+function cameraAt(sc: Scene, s: Style, t: number): Camera {
   const cam = sc.camera;
-  const mode = sc.anim?.camera ?? 'glide';
+  const mode = sc.anim?.camera ?? s.motion.camera;
   const sway = Math.sin((2 * Math.PI * t) / sc.duration);
   if (!cam.keys) {
     const k = (ease[cam.ease] || ease.outCubic)(span(t, 0, cam.seconds));
@@ -169,13 +169,13 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number)
 /** Label spots for this scene and style, planned once from moments along the camera path. */
 const plans = new Map<string, Map<string, number>>();
 function labelPlan(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, emblemAr: number) {
-  const key = `${sc.id}|${s.id}|${sc.anim?.camera ?? ''}|${sc.duration}`;
+  const key = `${sc.id}|${s.id}|${sc.anim?.camera ?? s.motion.camera}|${sc.duration}`;
   let plan = plans.get(key);
   if (!plan) {
     const times = new Set<number>();
     for (let tt = 0.25; tt < sc.duration; tt += 0.5) times.add(tt);
     for (const k of sc.camera.keys ?? []) times.add(Math.min(sc.duration - 0.01, k.t));
-    const samples = [...times].map((tt) => layout(sc, s, makeProject(s, cameraAt(sc, tt)), tt, emblemAr))
+    const samples = [...times].map((tt) => layout(sc, s, makeProject(s, cameraAt(sc, s, tt)), tt, emblemAr))
       .map((l) => ({ labels: l.labels.filter((x) => (x.alpha ?? 1) > 0.05), obstacles: l.obstacles }));
     plan = planSpots(ctx, samples, W, H);
     plans.set(key, plan);
@@ -201,8 +201,8 @@ function windowOf(sc: Scene, i: number, t: number) {
 /** How far a point in the middle of the picture moves on screen between t and t + dt, in pixels:
  *  the exporter uses it to decide how many sub-frames a frame needs for its motion blur. */
 export function screenMotion(sc: Scene, s: Style, t: number, dt: number) {
-  const p0 = makeProject(s, cameraAt(sc, t)), p1 = makeProject(s, cameraAt(sc, t + dt));
-  const v = cameraAt(sc, t);
+  const p0 = makeProject(s, cameraAt(sc, s, t)), p1 = makeProject(s, cameraAt(sc, s, t + dt));
+  const v = cameraAt(sc, s, t);
   let worst = 0;
   for (const [dx, dy] of [[0, 0], [4, 3], [-4, -3]]) {
     const at: LonLat = [v.center[0] + dx, v.center[1] + dy];
@@ -217,7 +217,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const full = sc.beats.length > 0;
   const tail = full ? 1 - span(t, D - 0.9, D - 0.05) : 1; // everything that was not on frame 0 leaves before the loop
   // a stop-motion style moves its camera in steps (12 a second for the photocopied dossier)
-  const view = cameraAt(sc, s.stepFps ? Math.floor(t * s.stepFps) / s.stepFps : t);
+  const view = cameraAt(sc, s, s.stepFps ? Math.floor(t * s.stepFps) / s.stepFps : t);
   const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
   const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
   const beat: Beat | undefined = sc.beats[beatIdx];
@@ -298,7 +298,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
-  if (full && sc.anim?.progress) drawProgress(ctx, sc, s, t);
+  if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
 
   // vignette and grain
   if (!s.flat) {
@@ -459,7 +459,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
   const w = windowOf(sc, i, t);
   const alpha = w.inP * w.out;
   if (alpha <= 0) return;
-  const mode: TextMode = sc.anim?.text ?? 'rise';
+  const mode: TextMode = sc.anim?.text ?? s.motion.text;
   const rise = (mode === 'rise' ? (1 - w.inP) * 36 : 0) + (1 - w.out) * 30;
   const kicker = (text: string, y: number) => {
     ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
