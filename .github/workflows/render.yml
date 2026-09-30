@@ -42,8 +42,12 @@ jobs:
       - name: Every style, one frame a second (any page error or text outside the safe area fails)
         run: node export/render.mjs --scene karadeniz-gemi --all-styles --frames-only --every 60 --workers 2
       - name: Render the whole video (22 s)
+        env:
+          MOTION_QUERY: blur=0   # CI checks that it renders; the sub-frames only cost time here
         run: node export/render.mjs --no-build --scene karadeniz-gemi --style A
       - name: Render the newest generated scene
+        env:
+          MOTION_QUERY: blur=0   # CI checks that it renders; the sub-frames only cost time here
         run: node export/render.mjs --no-build --scene "$(ls scenes/auto/*.yaml | sort | tail -1 | xargs basename -s .yaml)"
       - name: Determinism
         run: node export/determinism.mjs A
