@@ -28,7 +28,8 @@ export interface Scene {
   camera: { from: Camera; to: Camera; seconds: number; ease: string; keys?: Key[] };
   event?: { at: LonLat; precision: 'region' | 'locality' | 'exact' };
   subject?: { country: string; emblem?: string; label?: string };
-  labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home' }[];
+  /** `alts`: other points on the ground where the label may sit instead (one is chosen per video) */
+  labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home'; alts?: LonLat[] }[];
   hook: { kicker: string; lines: string[]; sub: string; status: string; source: string };
   beats: Beat[];
   /** How it moves (all optional): text entrance, camera path, a stories-style progress bar, and

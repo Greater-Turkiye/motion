@@ -343,3 +343,22 @@ ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
 - CI'da GPU yok: Chrome `--use-angle=swiftshader-webgl --enable-unsafe-swiftshader` ✅; WebCodecs
   High profil runner'da çalıştı, olmazsa Baseline (`avc1.42E033`) ✅; çıktı ffprobe ve blackdetect
   kapısından geçer (sırada).
+
+## 15. Sahibin ilk incelemesinden sonra / After the owner's first review (2026-09-30)
+
+Sahibin gözlemi: etiketler kayıyor ve zıplıyor; yazı animasyonu stille uyuşmuyor; hepsi tek bir olay
+tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay türü var. Kararlar (sahip
+"sen hallet" dedi):
+
+1. **Çekirdek** ✅: kararlı etiketler (yer bir kez seçilir, kapanınca solar), en yakın Türk şehrine
+   mesafe ("TÜRKİYE'YE UZAKLIK" 700 km üstünde), bağlam satırı olay noktasının 150 km çevresinden
+   (son 7 gün), sayı kalıplarında kelime sınırı.
+2. **Stil paketleri**: yazı animasyonu, kamera, geçiş ve ilerleme çubuğu stilin parçası; serbest
+   karıştırma yalnızca denemede. Tek parametre (`style`) her şeyi birlikte değiştirir.
+3. **Olay ailesi şablonları**: saldırı (nokta + son 7 günün deseni + en yakın Türk şehri), diplomasi
+   (iki ülke + başkentler arası yay + amblemler), tatbikat (katılımcılar + deniz alanı + Türkiye'ye
+   mesafe), açıklama (konuşan ülke + alıntı kartı), sayı iddiası (büyük sayı + kimin iddiası).
+4. **Kancalar kaydın alanlarından**: can kaybı, yer + olay türü (türün başlıkta kanıtı varsa), iki
+   ülke, tatbikat adı; başlıktan rastgele kelime seçimi kalkar.
+5. **Stüdyo**: aynı haber tüm stillerde yan yana; varsayılan stil olay ailesine göre.
+6. **Seslendirme ve ses tasarımı**: Chatterbox (MIT) Türkçe, bölüm başına klip; stile göre efekt.

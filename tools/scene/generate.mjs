@@ -19,6 +19,14 @@ import { validate, CPS } from '../../src/engine/scene.ts';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const MONTHS = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
 const BOSPHORUS = [29.05, 41.2];
+/** Turkish places a distance is measured to: the nearest one, so the number is the one that matters
+ *  (a strike in Gaza is measured to Hatay, not to the Bosphorus). */
+const TR_PLACES = [
+  ['İSTANBUL BOĞAZI', [29.05, 41.2]], ['EDİRNE', [26.56, 41.68]], ['İZMİR', [27.14, 38.42]], ['ANTALYA', [30.71, 36.9]],
+  ['MERSİN', [34.64, 36.8]], ['HATAY', [36.16, 36.2]], ['GAZİANTEP', [37.38, 37.07]], ['DİYARBAKIR', [40.23, 37.91]],
+  ['VAN', [43.38, 38.49]], ['KARS', [43.1, 40.6]], ['TRABZON', [39.72, 41.0]], ['SİNOP', [35.15, 42.02]], ['ANKARA', [32.85, 39.93]],
+];
+const nearestTr = (p) => TR_PLACES.map(([n, at]) => ({ name: n, at, km: Math.round((geoDistance(p, at) * 6371) / 10) * 10 })).sort((a, b) => a.km - b.km)[0];
 const TR = (s) => s.toLocaleUpperCase('tr');
 
 /** Watch regions (datasets vocab/regions.yaml): where the ring goes when the record has no place,
@@ -96,7 +104,8 @@ export function hookLines(title) {
   // casualties lead when there are any, deaths before injuries: the fact a reader would put first.
   // "48 kişinin yaralanmasının ardından" is shown as "48 / KİŞİ YARALANDI", the source's own verb
   // in its plain past form (the scene check still finds it in the source by its stem)
-  const N = '(\\d+|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
+  // whole words only: "on" must not match inside "Kiev'de on…" words, nor "üç" inside "üçü"
+  const N = '(?<![\\p{L}\\d])(\\d+|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
   for (const [re, verb] of [
     [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
     [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
@@ -167,6 +176,18 @@ export function records(datasets) {
   return all;
 }
 
+/** Records within 150 km of the point in the seven days up to the event (the event included). */
+function nearbyStats(datasets, record, pt) {
+  const end = Date.parse(record.time.start) + 864e5, start = end - 8 * 864e5;
+  let n = 0;
+  for (const r of records(datasets)) {
+    const p = r.location?.geometry?.type === 'Point' ? r.location.geometry.coordinates : null;
+    const t = Date.parse(r.time.start);
+    if (p && t >= start && t < end && geoDistance(p, pt) * 6371 <= 150) n++;
+  }
+  return { n };
+}
+
 /** Records of the same region in the same month, and that region's rank among all regions. */
 function regionStats(datasets, record) {
   const month = String(record.time.start).slice(0, 7);
@@ -221,8 +242,9 @@ export function generate(record, { datasets, style } = {}) {
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
   const facts = wrapLines(news).map((l) => l.replace(/(\d[\d.,]*)/g, '*$1*'));
-  const dist = pt ? km(pt, BOSPHORUS) : 0;
+  const nearest = pt ? nearestTr(pt) : null;
   const stats = datasets ? regionStats(datasets, record) : null;
+  const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
     : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : name[0] + name.slice(1).toLowerCase()}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
 
@@ -232,9 +254,15 @@ export function generate(record, { datasets, style } = {}) {
   push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
   // the source's words, not ours: the kicker says so
   push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0);
-  if (pt && dist >= 100) push({ kind: 'distance', from: { at: pt, label: placeTitle }, to: { at: BOSPHORUS, label: 'İSTANBUL BOĞAZI' }, text: 'Kuş uçuşu.' }, placeTitle.length + 26, 3.2);
+  if (nearest && nearest.km >= 100) push({ kind: 'distance', from: { at: pt, label: placeTitle }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, placeTitle.length + nearest.name.length + 34, 3.2);
   push({ kind: 'status', text: statusText }, statusText.length, 3.0);
-  if (stats && region && stats.n > 0) {
+  if (around && around.n >= 3) {
+    // context from our own records, around the place itself: a city story is not "the Black Sea"
+    const where = loc.place_name.tr;
+    const lines = [`Son 7 günde ${where} çevresinde`, `*${around.n}* kayıt.`];
+    const kick = 'VERİ SETİMİZDE';
+    push({ kind: 'close', kicker: kick, lines }, kick.length + lines.join(' ').length, 3.4, 0.9);
+  } else if (stats && region && stats.n > 0) {
     // a rank means something only with enough records behind it
     const lines = stats.n >= 10 ? [`${region.from} *${stats.n}* kayıt:`, stats.rank === 1 ? 'en yoğun bölge.' : `bölgeler arasında ${stats.rank}.`] : [`${region.from} *${stats.n}* kayıt.`];
     const kick = `VERİ SETİMİZDE · ${stats.month}`;
@@ -253,8 +281,9 @@ export function generate(record, { datasets, style } = {}) {
     if (b.kind === 'place') keys.push({ t: end, ...near(-1.0, 1.0, 2.3) });
     if (b.kind === 'facts') keys.push({ t: end, ...near(-1.8, 1.6, 2.7) });
     if (b.kind === 'distance') {
-      const mid = [(at[0] + BOSPHORUS[0]) / 2, (at[1] + BOSPHORUS[1]) / 2];
-      const d = geoDistance(at, BOSPHORUS) / (Math.PI / 180);
+      const to = b.to.at;
+      const mid = [(at[0] + to[0]) / 2, (at[1] + to[1]) / 2];
+      const d = geoDistance(at, to) / (Math.PI / 180);
       keys.push({ t: round1(end - 0.2), center: [round1(mid[0]), round1(mid[1])], zoom: round1(Math.min(3.2, Math.max(0.9, 420 / (d * 24.4)))) });
     }
     if (b.kind === 'status') keys.push({ t: end, ...near(-0.5, 0.6, 2.2) });

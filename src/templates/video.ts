@@ -4,11 +4,13 @@ import { anim, ease, lerp, rng, span } from '../engine/time';
 import type { Beat, Camera, LonLat, Scene } from '../engine/scene';
 import { H, W } from '../render/globe';
 import type { MapRenderer } from '../render/map';
-import { makeProject } from '../gl/globe-gl';
-import { drawLabels, placeLabels, type Box, type Label } from '../render/labels';
+import { makeProject, type Project } from '../gl/globe-gl';
+import { drawLabels, placeLabels, planSpots, type Box, type Label } from '../render/labels';
 import type { Style } from '../styles';
 
 const BOSPHORUS: LonLat = [29.05, 41.2];
+/** Where TÜRKİYE may be written: the centre, the Black Sea side, the west, the east, all on land. */
+const TURKIYE_ANCHORS: LonLat[] = [[33.6, 40.7], [30.6, 39.4], [38.8, 38.6], [36.5, 39.8]];
 
 /** Great-circle distance, rounded to 10 km: the scale the viewer can feel ("Boğaz'a 430 km"). */
 export const km = (a: LonLat, b: LonLat) => Math.round((geoDistance(a, b) * 6371) / 10) * 10;
@@ -100,6 +102,87 @@ function cameraAt(sc: Scene, t: number): Camera {
   };
 }
 
+/** When the subject's emblem leaves: after the opening, before the camera zooms in far enough to crop it. */
+const emblemOutOf = (sc: Scene) => (sc.beats.length ? sc.beats[0].at + 0.8 : sc.duration);
+
+/**
+ * Everything the labels must know at moment t, from geometry alone: the labels (each with a stable
+ * key), what they must not cover (the text block, the event ring, the emblem, distance end points),
+ * and where the emblem is. Used for every frame and, at sample moments, to plan the label spots.
+ */
+function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number) {
+  const D = sc.duration;
+  const full = sc.beats.length > 0;
+  const tail = full ? 1 - span(t, D - 0.9, D - 0.05) : 1;
+  const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
+  const beat = sc.beats[beatIdx];
+  const emblemOut = emblemOutOf(sc);
+  const obstacles: Box[] = [{ x: 0, y: 960, w: W, h: H - 960 }]; // the text block and its wash
+  const labels: Label[] = [];
+
+  if (sc.event) {
+    const p = proj(sc.event.at);
+    if (p) obstacles.push({ x: p[0] - 60, y: p[1] - 60, w: 120, h: 120 });
+  }
+  if (beat?.kind === 'distance') {
+    const w = windowOf(sc, beatIdx, t);
+    const draw = anim(t, beat.at + 0.2, 1.4, ease.inOutCubic);
+    ([['d-from', beat.from, 1], ['d-to', beat.to, draw >= 1 ? anim(t, beat.at + 1.6, 0.3, ease.outBack) : 0]] as const).forEach(([key, end, show]) => {
+      const q = proj(end.at);
+      if (!q || !show) return;
+      obstacles.push({ x: q[0] - 24, y: q[1] - 24, w: 48, h: 48 });
+      labels.push({ key, text: end.label, x: q[0], y: q[1] - 46, size: 28, color: s.ink, spacing: 0.3, weight: 700, priority: -1, alpha: w.out * show });
+    });
+  }
+
+  let emblem: { x: number; y: number; size: number; alpha: number } | null = null;
+  const subjectLabel = sc.labels.find((l) => l.kind === 'country' && l.text === sc.subject?.label);
+  const anchorLL: LonLat | undefined = subjectLabel?.at;
+  if (sc.subject?.emblem && anchorLL) {
+    const at = proj(anchorLL);
+    const alpha = anim(t, 0.45, 0.4) * (1 - span(t, emblemOut - 0.4, emblemOut));
+    if (at && alpha > 0) {
+      // the emblem stands above its country's label, which never moves
+      const size = 200 * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outBack));
+      const y = at[1] - (200 * emblemAr) / 2 - 30;
+      emblem = { x: at[0], y, size, alpha };
+      obstacles.push({ x: at[0] - size / 2, y: y - (size * emblemAr) / 2, w: size, h: size * emblemAr });
+    }
+  }
+  // on a flat page the TÜRKİYE label sits on the home fill: white on a dark fill, ink on a light one
+  const [hr, hg, hb] = rgbOf(s.home);
+  const homeInk = !s.flat || 0.2126 * hr + 0.7152 * hg + 0.0722 * hb < 150 ? '#ffffff' : s.ink;
+  sc.labels.forEach((l, i) => {
+    const home = l.kind === 'home';
+    const anchors: LonLat[] = [l.at, ...(l.alts ?? []), ...(home && !l.alts ? TURKIYE_ANCHORS : [])];
+    const alts = anchors.map((x) => proj(x));
+    const p = alts[0] ?? alts.find(Boolean);
+    if (!p) return;
+    const isSubject = l === subjectLabel;
+    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? 32 : isSubject ? 26 : 24, sticky: home,
+      color: home ? homeInk : s.label, spacing: isSubject ? 0.45 : 0.4, weight: home ? 700 : 500,
+      priority: isSubject ? 0 : home ? 1 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail });
+  });
+  return { labels, obstacles, emblem };
+}
+
+/** Label spots for this scene and style, planned once from moments along the camera path. */
+const plans = new Map<string, Map<string, number>>();
+function labelPlan(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, emblemAr: number) {
+  const key = `${sc.id}|${s.id}|${sc.anim?.camera ?? ''}|${sc.duration}`;
+  let plan = plans.get(key);
+  if (!plan) {
+    const times = new Set<number>();
+    for (let tt = 0.25; tt < sc.duration; tt += 0.5) times.add(tt);
+    for (const k of sc.camera.keys ?? []) times.add(Math.min(sc.duration - 0.01, k.t));
+    const samples = [...times].map((tt) => layout(sc, s, makeProject(s, cameraAt(sc, tt)), tt, emblemAr))
+      .map((l) => ({ labels: l.labels.filter((x) => (x.alpha ?? 1) > 0.05), obstacles: l.obstacles }));
+    plan = planSpots(ctx, samples, W, H);
+    plans.set(key, plan);
+  }
+  return plan;
+}
+
 /** The window a beat owns: `inP` rises over its first 0.45 s, `out` falls over its last 0.3 s. */
 function windowOf(sc: Scene, i: number, t: number) {
   const start = i < 0 ? 0 : sc.beats[i].at;
@@ -138,14 +221,13 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
   const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
   const beat: Beat | undefined = sc.beats[beatIdx];
-  // the emblem belongs to the opening: gone before the camera zooms in far enough to crop it
-  const emblemOut = full ? sc.beats[0].at + 0.8 : D;
 
   ctx.save();
   const proj = map.draw(ctx, s, view, { subject: sc.subject?.country, subjectReveal: anim(t, 0.15, 0.9, ease.outQuad) * tail, pulse });
 
-  const obstacles: Box[] = [{ x: 0, y: 960, w: W, h: H - 960 }]; // the text block and its wash
-  const labels: Label[] = [];
+  const emblemImg = sc.subject?.emblem ? a.emblems.get(sc.subject.emblem) : undefined;
+  const emblemAr = emblemImg ? emblemImg.naturalHeight / emblemImg.naturalWidth || 1 : 1;
+  const lay = layout(sc, s, proj, t, emblemAr);
 
   // the event: a region-level ring, never a pin, with shock waves every 1.1 s
   if (sc.event) {
@@ -165,7 +247,6 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       ctx.beginPath(); ctx.arc(x, y, 44, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 3; ctx.stroke();
       ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
       ctx.globalAlpha = 1;
-      obstacles.push({ x: x - 60, y: y - 60, w: 120, h: 120 });
     }
   }
 
@@ -185,46 +266,22 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       if (!q || !show) continue;
       ctx.beginPath(); ctx.arc(q[0], q[1], 11 * show, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
       ctx.beginPath(); ctx.arc(q[0], q[1], 20 * show, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 2; ctx.stroke();
-      obstacles.push({ x: q[0] - 24, y: q[1] - 24, w: 48, h: 48 });
-      labels.push({ text: end.label, x: q[0], y: q[1] - 46, size: 28, color: s.ink, spacing: 0.3, weight: 700, priority: -1, alpha: w.out * show });
     }
     ctx.globalAlpha = 1;
   }
 
   // the subject's emblem over its own territory (ADR 0026: news context, never beside our mark);
-  // it belongs to the opening and leaves when the facts arrive
-  const subjectLabel = sc.labels.find((l) => l.kind === 'country' && l.text === sc.subject?.label);
-  if (sc.subject?.emblem) {
-    const img = a.emblems.get(sc.subject.emblem);
-    const at = proj(subjectLabel?.at ?? [view.center[0] + 10, view.center[1] + 9]);
-    const alpha = anim(t, 0.45, 0.4) * (1 - span(t, emblemOut - 0.4, emblemOut));
-    if (img && at && alpha > 0) {
-      const p = anim(t, 0.45, 0.7, ease.outBack);
-      const size = 200 * (0.85 + 0.15 * p);
-      const ar = img.naturalHeight / img.naturalWidth || 1;
-      const [x, y] = at;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      if (s.emblemMono) ctx.filter = 'grayscale(1) brightness(2.2) contrast(1.1)';
-      if (!s.flat) { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 30; }
-      ctx.drawImage(img, x - size / 2, y - (size * ar) / 2, size, size * ar);
-      ctx.restore();
-      obstacles.push({ x: x - size / 2, y: y - (size * ar) / 2, w: size, h: size * ar });
-      if (sc.subject.label) labels.push({ text: sc.subject.label, x, y: y + (size * ar) / 2 + 34, size: 26, color: s.label, spacing: 0.45, priority: 0, alpha: anim(t, 0.8, 0.4) * alpha });
-    }
+  // it belongs to the opening and leaves before the camera zooms in far enough to crop it
+  if (emblemImg && lay.emblem) {
+    const { x, y, size, alpha } = lay.emblem;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    if (s.emblemMono) ctx.filter = 'grayscale(1) brightness(2.2) contrast(1.1)';
+    if (!s.flat) { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 30; }
+    ctx.drawImage(emblemImg, x - size / 2, y - (size * emblemAr) / 2, size, size * emblemAr);
+    ctx.restore();
   }
-  sc.labels.forEach((l, i) => {
-    if (l === subjectLabel && sc.subject?.emblem && t < emblemOut) return;
-    const p = proj(l.at);
-    if (!p) return;
-    const home = l.kind === 'home';
-    labels.push({ text: l.text, x: p[0], y: p[1], size: home ? 32 : 24, color: home ? '#ffffff' : s.label, spacing: 0.4, weight: home ? 700 : 500,
-      priority: home ? 1 : 2 + i, alpha: anim(t, 0.6 + 0.08 * i, 0.4) * tail });
-  });
-  // on a flat page the TÜRKİYE label sits on the home fill: white on a dark fill, ink on a light one
-  const homeDark = (() => { const [r, g, b] = rgbOf(s.home); return 0.2126 * r + 0.7152 * g + 0.0722 * b < 150; })();
-  if (s.flat) labels.forEach((l) => { if (l.text === 'TÜRKİYE') l.color = homeDark ? '#ffffff' : s.ink; });
-  drawLabels(ctx, placeLabels(ctx, labels, obstacles));
+  drawLabels(ctx, placeLabels(ctx, lay.labels, lay.obstacles, labelPlan(ctx, sc, s, emblemAr), W, H));
 
   // wash under the text block
   const wash = ctx.createLinearGradient(0, 900, 0, H);
@@ -444,7 +501,8 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const top = BLOCK_BOTTOM - text.length * 50 - 64 - px * 0.9;
       guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'distance');
-      kicker('NE KADAR YAKIN', top - 16 + rise);
+      // close is close only when it is: past 700 km the beat says distance, not nearness
+      kicker(d <= 700 ? 'TÜRKİYE\'YE NE KADAR YAKIN' : 'TÜRKİYE\'YE UZAKLIK', top - 16 + rise);
       // the counter is its own animation in every mode: a number that runs up is the point of this beat
       ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
       ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.03 * px}px`;
