@@ -1,0 +1,60 @@
+# A whole video about one record: hook, where, what, how close, how sure, and the dataset's own
+# context; the last frame is the first again, so it loops. Written by hand for M3; from M5 the scene
+# generator writes these from the record itself (PLAN.md sections 10 and 14).
+id: karadeniz-gemi
+record: evt_01m392q7kbfcm91x3pp7301k30   # Karadeniz'de yük gemisi saldırıya uğradı, kaptan öldürüldü
+format: vertical
+fps: 60
+duration: 22
+style: A
+source_text:                  # the record's title and the two Ukrinform headlines it cites
+  - "Karadeniz'de yük gemisi saldırıya uğradı, kaptan öldürüldü"
+  - "Cargo ship attacked in Black Sea, captain killed"
+  - "Russians attack warehouses in Odesa region and cargo ship in Black Sea – captain killed"
+  - "Ruslar Odesa bölgesindeki depolara ve Karadeniz'deki yük gemisine saldırdı – kaptan öldürüldü"   # the line above, translated
+camera:
+  from: { center: [26, 40.5], zoom: 0.92 }
+  to: { center: [33.5, 46], zoom: 1.0 }
+  seconds: 2.8
+  ease: outCubic
+  keys:
+    - { t: 0, center: [26, 40.5], zoom: 0.92 }
+    - { t: 2.8, center: [33.5, 46], zoom: 1.0 }
+    - { t: 6.0, center: [32.2, 44.6], zoom: 2.3 }
+    - { t: 11.2, center: [31.4, 45.2], zoom: 2.7 }
+    - { t: 14.2, center: [30.0, 43.9], zoom: 3.0 }
+    - { t: 17.2, center: [31.5, 44.2], zoom: 2.2 }
+    - { t: 22, center: [26, 40.5], zoom: 0.92 }
+event: { at: [33.2, 43.6], precision: region }   # the record has no coordinate: a ring over the sea
+subject: { country: RUS, emblem: RUS/arms-eagle, label: RUSYA FEDERASYONU }
+labels:
+  - { text: RUSYA FEDERASYONU, at: [44, 53.8], kind: country }
+  - { text: TÜRKİYE, at: [35, 39.2], kind: home }
+  - { text: KARADENİZ, at: [30.2, 43.4], kind: sea }
+  - { text: UKRAYNA, at: [31.5, 49.3], kind: country }
+hook:
+  kicker: KARADENİZ · 23 EYLÜL
+  lines: [KAPTAN, ÖLDÜ]
+  sub: "Yük gemisi saldırıya uğradı."
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: place
+    at: 2.8
+    title: KARADENİZ
+    text: "Kesin konum yok: halka bölgeyi gösterir."
+  - kind: facts
+    at: 6.2
+    lines: ["Ukrinform'a göre *Ruslar*", "Odesa'da depolara ve", "bir *yük gemisine* saldırdı."]
+  - kind: distance
+    at: 11.4
+    from: { at: [30.73, 46.48], label: ODESA }
+    to: { at: [29.05, 41.2], label: İSTANBUL BOĞAZI }
+    text: Kuş uçuşu.
+  - kind: status
+    at: 14.4
+    text: "Tek kaynak: Ukrinform. Bağımsız teyit yok."
+  - kind: close
+    at: 17.4
+    kicker: VERİ SETİMİZDE · EYLÜL
+    lines: ["Karadeniz'den *267* kayıt:", "en yoğun bölge."]   # datasets auto-data, 2026-09-30; M5 computes it

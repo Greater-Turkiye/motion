@@ -9,8 +9,11 @@ export interface Culled<T> { shape: T; center: [number, number]; radius: number 
 export interface Assets {
   countries: Culled<Feature>[];
   borders: Culled<LineString>[];
+  borderLines: MultiLineString;   // shared land borders, for the GPU
+  coastLines: MultiLineString;    // coasts: arcs that belong to one country only
   disputed: FeatureCollection;
   emblems: Map<string, HTMLImageElement>;
+  relief: HTMLImageElement | null;   // assets/data/relief.png, built by tools/data/build_relief.py
 }
 
 const LATIN = 'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212';
@@ -59,6 +62,7 @@ export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
     .map((f) => bound(f, f.geometry ? flat((f.geometry as any).coordinates) : []));
   const mls = mesh(topo, topo.objects.countries, (a, b) => a !== b) as MultiLineString;
   const borders = mls.coordinates.map((c) => bound<LineString>({ type: 'LineString', coordinates: c }, c));
+  const coastLines = mesh(topo, topo.objects.countries, (a, b) => a === b) as MultiLineString;
   const emblems = new Map<string, HTMLImageElement>();
   for (const key of emblemKeys) {
     const [who, kind] = key.split('/');
@@ -66,5 +70,6 @@ export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
     if (!it) throw new Error(`no emblem ${key} in the manifest`);
     emblems.set(key, await image('emblems/' + it.file));
   }
-  return { countries, borders, disputed, emblems };
+  const relief = await image('data/relief.png').catch(() => null); // optional: the map renders without it
+  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief };
 }

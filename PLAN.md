@@ -60,8 +60,10 @@ kontrol demek.
 ## 4. Görüntü kalitesi / Image quality
 
 **Küre:**
-- Kabartma: NASA/NOAA **ETOPO 2022** yükseklik verisinden (kamu malı) normal haritası; ışık
-  gölgelendiricide, güneş açısı sahneye göre.
+- Kabartma: NOAA **ETOPO1** yükseklik verisinden (kamu malı, 4 yay dakikası) 4096×2048 normal
+  haritası (`tools/data/build_relief.py`, 38× dikey abartı, deniz düz). Işık gölgelendiricide:
+  Imhof'un kuzeybatı ışığı, batı ve kuzeyden iki yardımcıyla; ovalar sessiz, dağlar belirgin; ana
+  ve konu ülke dolgusu kabartmanın yarısını alır ki renk okunur kalsın. ✅
 - Yüzey rengi: tek renk koyu zemin + kabartma gölgesi (örneklerdeki gibi), isteğe bağlı NASA Blue
   Marble (kamu malı).
 - Atmosfer ve kenar ışığı, çok hafif film greni, vinyet. Hepsi kapatılabilir.
@@ -165,12 +167,12 @@ motion/
 |---|---|---|---|
 | M0 | Plan | bu belge | Sahibin onayı |
 | M1 | İskelet ✅ | saat, sahne, CDP dışa aktarımı, kanca şablonu, dört stil, amblem manifesti | 1080×1920 60 fps MP4, iki çalıştırma tolerans içinde aynı |
-| M2 | Küre | kabartmalı küre, kamera geçişi | Önizleme ≥ 60 fps, geçişte titreme yok |
+| M2 | Küre ✅ | WebGL2 küre ve düz harita, WebCodecs dışa aktarım, ETOPO1 kabartması ✅ | Önizleme ≥ 60 fps, geçişte titreme yok |
 | M3 | Sınırlar ve vurgu | Türkiye görüşüne göre sınırlar, ülke/ittifak vurgusu | 1:10m sınır 4× örneklemede pürüzsüz |
-| M4 | Yazı ve kart | MSDF yazı, "önemli gelişme" kartı, kaynak satırı | Türkçe karakterler, animasyonda titreme yok |
-| M5 | Veriden sahne | kayıt kimliğinden sahne, doğrulayıcı (kaynak, kırmızı çizgi) | Kırmızı çizgi kaydı reddedilir |
+| M4 | Yazı ve kart (yarısı ✅) | tam video şablonu (kanca + beş bölüm, döngü), kalıcı durum ve kaynak satırı, güvenli alan denetimi ✅; MSDF yazı sırada | Türkçe karakterler, animasyonda titreme yok |
+| M5 | Veriden sahne ✅ | `tools/scene/generate.mjs`: kayıttan sahne (kanca, beş bölüm, kamera, süre, stil), doğrulayıcı (okuma hızı, kaynak kelimeleri, yasak kelimeler), kırmızı çizgi reddi; CI her çalışmada en yeni beş kayıttan üretir | Kırmızı çizgi kaydı reddedilir ✅ |
 | M6 | Şablonlar | çağrı, sayaç, zaman çizelgesi, karşılaştırma | Her şablondan örnek video |
-| M7 | Tam otomasyon | Bölüm 10'daki hat: kayıttan videoya, insansız | Altı saatte bir runner'da üretim, sitede yayında |
+| M7 | Tam otomasyon (yarısı ✅) | Bölüm 10'daki hat: kayıttan videoya, insansız; seçici, üretici, işleyici ve GitHub sürümü olarak yayın ✅; site sayfası ve kanallar sırada | Altı saatte bir runner'da üretim, sitede yayında |
 
 ## 10. Tam otomatik hat / The fully automatic pipeline
 
@@ -180,23 +182,28 @@ Sahibin isteği: sistem kendi kendine çalışsın. Hat şöyle:
 toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici ─▶ sahne üretici ─▶ işleyici ─▶ yayın
 ```
 
-1. **Seçici.** Her çalıştırmada son altı saatin kayıtlarından video değeri en yüksek olanları
-   seçer: tür ağırlığı (kinetik, deniz, tatbikat, anlaşma önde), izleme bölgesine yakınlık,
-   birden çok kaynak, konumu olması, daha önce video yapılmamış olması. Günde en çok N video
-   (başlangıç: 4). Türk kuvvetleri ve `redline_check` her zaman dışarıda.
-2. **Sahne üretici.** Kayıttan sahne dosyasını kendisi yazar: türüne göre şablon, konumdan kamera,
-   ülkelerden vurgu, bölge kaydı sayısından istatistik, başlık ve kaynak kayıttan. Metin kaydın
-   metnidir; yeni iddia üretmez.
-3. **Doğrulayıcı.** Sahne; kaynak satırı, durum etiketi, kırmızı çizgi ve metnin taşmaması için
-   denetlenir. Geçmeyen sahne işlenmez, günlüğe yazılır.
-4. **İşleyici.** GitHub Actions runner'ında başsız Chrome + ffmpeg. GPU yok: WebGL yazılımla
-   (SwiftShader) çalışır, yavaş ama deterministik; 12 saniyelik dikey kart birkaç dakikada biter.
-   Her video üç boyutta ve bir kapak karesiyle çıkar.
-5. **Yayın.** Videolar sitenin "Videolar" sayfasına ve günlük bir sürüm sayfasına otomatik çıkar.
-   Kanallara gönderim bölüm 6'daki ayrı kararla açılır.
+1. **Seçici** ✅ (`tools/scene/select.mjs`). Son 48 saatin videosu olmayan kayıtları research/04'ün
+   haber değeri puanıyla sıralar: güncellik (12 saatte yarıya iner), tür büyüklüğü, Türkiye'ye
+   yakınlık, ayrı yayıncı sayısı, doğrulama durumu, yenilik (son videolarla aynı tür ve bölge
+   puanı düşürür), konum. Doğrulanmamış kayıt dışlanmaz, sırası düşer (ADR 0023). Çalışma başına
+   bir video, altı saatte bir: günde en çok dört.
+2. **Sahne üretici** ✅ (`tools/scene/generate.mjs`). Kayıttan sahne: kanca, bölümler, kamera, süre,
+   stil. Metin kaydın metnidir; yeni iddia üretmez. Türk kuvvetleri, geri çekilmiş ya da yanlış
+   kayıt, haritada yeri olmayan kayıt reddedilir.
+3. **Doğrulayıcı** ✅. Sahne motorun `validate()`'inden geçer (okuma hızı, kaynak kelimeleri, yasak
+   kelimeler); yazı güvenli alandan taşarsa dışa aktarım durur.
+4. **İşleyici** ✅. Runner'da başsız Chrome, WebGL SwiftShader'da, WebCodecs H.264; 24 saniyelik
+   video yaklaşık dört dakika, 8 Mbps.
+5. **Yayın** ✅ (`.github/workflows/produce.yml`). MP4 ve ilk kare, `video-<kayıt kimliği>`
+   etiketli bir GitHub sürümüne çıkar; sürüm notu başlık, durum, tarih, kaynaklar ve "otomatik
+   üretildi, kimse okumadı" beyanıdır. Sürümler defterdir: sürümü olan kayıt bir daha seçilmez.
+   Son yirmi video `videos.json` ile bu deponun Pages sitesine çıkar; platformun "Videolar" sayfası
+   onu aynı kökten okur (Cloudflare adresinde `apps/site` vekil olur) ✅. Kanallara gönderim
+   (Telegram, Bluesky, Mastodon, Instagram; research/04 bölüm 4) sırada; hesaplar sahibin kararı ve
+   kendi işidir.
 6. **Gözetim.** Sitedeki tarayıcı denetimi gibi: üretilen her videodan kareler örneklenir, boş
-   kare, taşan yazı ya da eksik kaynak satırı varsa iş kırmızıya düşer ve sağlık raporuna girer.
-   Acil durdurma: tek bir depo değişkeni (`MOTION_AUTO=off`).
+   kare, taşan yazı ya da eksik kaynak satırı varsa iş kırmızıya düşer ve sağlık raporuna girer
+   (sırada). Acil durdurma: depo değişkeni `MOTION_PRODUCE=off` ✅.
 
 ## 11. Tasarım tipleri / Design directions
 
@@ -209,7 +216,15 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 | C | **Editoryal** | Gazete sayfası: açık zemin, düz harita, Türkiye kırmızı, siyah ağır başlık |
 | D | **Uydu gecesi** | Uzaydan küre, soğuk ışık, buzlu cam kart, sade |
 
-**Sahibin kararı (2026-09-30): dördü de kalır, sahne dosyasında `style: A|B|C|D` ile seçilir.**
+| E | **Ateşböceği** ✅ | Karanlık dünyada tek şey yanar: konu ülke turuncu hale, Türkiye soğuk ince çizgi; saldırı ve enerji haberleri |
+| G | **İsviçre rölyefi** ✅ | Imhof: yükseltiye göre renk (ova yeşil-gri, dağ açık), mavi-gri gölge, sıcak ışık; dağlık cepheler, su, boğazlar |
+| K | **Çini atlas** ✅ | İznik paleti, Piri Reis tarzı 32 yönlü rumb hatları, denizde çini deseni; diplomasi, Mavi Vatan |
+
+Araştırmanın (docs/research/03) diğer yönleri sırada: H gizliliği kaldırılmış dosya, I harekât paftası
+(milsymbol, MIT), sonra F saha defteri, J riso baskı, L kabartma maket. Teknikler: alt-kare hareket
+bulanıklığı, blue-noise dithering, bloom (E için), van Wijk yakınlaştırma yolu, 2× süper örnekleme.
+
+**Sahibin kararı (2026-09-30): hepsi kalır, sahne dosyasında `style:` ile seçilir.**
 Otomatik hatta seçici, olayın türüne göre varsayılan bir stil atar (ör. kinetik ve deniz olayları
 A, diplomasi ve anlaşmalar C) ve istenirse günlük dönüşümlü kullanır.
 
@@ -283,3 +298,42 @@ Dataslayer ve Socialync, Instagram sıralama sinyalleri 2026; Reuters Institute,
 4. ~~Amblemler~~ — karar verildi: devlet armaları ve ittifak amblemleri, haber bağlamında (bölüm 6).
 5. **Ses:** kendi efektlerimiz (önerilen) mi, yoksa Türkçe seslendirme de mi (lisansı uygunsa)?
 6. **Kanallar:** hangi hesaplar açılacak (Instagram, YouTube, TikTok, Telegram, X)? Otomatik gönderim ve istatistik bunları ister.
+
+## 14. Araştırmadan motora geçen kurallar / Rules taken from the research
+
+Kaynak ve kanıt düzeyleri: [docs/research](docs/research). Rakamların çoğu uygulayıcı görüşü; A/B
+ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
+
+**Zaman ve okuma**
+- İlk karede somut özne + fiil + yer; fade-in yok, kamera 0. karede hareket halinde. ✅
+- Yazı hızı ≤ 15 karakter/sn (≈ 2 Türkçe kelime/sn); blok süresi = karakter ÷ 15, en az 1,2 sn. ✅ (doğrulayıcı)
+- Her 1,5–2,5 sn'de bir anlamlı görsel değişim; saniyede bir kesme yok (haber zaten uyarıcı).
+- Süre 15–25 sn; "ne anlama geliyor" satırı 8–15. saniyede, doruk son %20'de, son kare ilk karenin
+  kamera açısına döner (döngü). ✅ (`karadeniz-gemi`)
+
+**Güven**
+- Durum etiketi (DOĞRULANMADI / DOĞRULANDI / GELİŞEN) her videoda, ilk 2 sn'de ve son karede. ✅
+- Kaynak satırı sürekli ekranda, okunur boyutta; yalnız son karede değil. ✅
+- Hook'taki her içerik kelimesi kaynak metinde karşılık bulmalı; bulamazsa sahne reddedilir. ✅
+- Kara liste: dış grup düşmanlığı ve ahlaki öfke kelimeleri (hain, rezil, küstah …); soru hook'u yok. ✅
+- Kaygı yerine ölçek ve yenilik çerçevesi: mesafe ("Boğaz'a 430 km") ✅, "ilk kez" yalnızca veri
+  setinden hesaplanabiliyorsa.
+
+**Kompozisyon**
+- Güvenli alan (üç platformun kesişimi): üst %14, alt %35, sol 65 px, sağ 180 px. Hook, durum ve
+  kaynak satırı bu kutuda; alt bantta yalnızca dekor. ✅ (alt sınır TikTok'un 400 px'i; Meta'nın %35'i
+  yazıya yalnızca 980 px bırakırdı)
+- Taraf renkleri kırmızı-yeşil değil; renk her zaman amblem ya da desenle desteklenir.
+- Aynı gün aynı düzen tekrarlanmaz; en az 5–6 düzen (YouTube "inauthentic content" politikası).
+
+**Hat**
+- Seçim puanı S = 100·D·(0,30M + 0,20P + 0,20C + 0,15R + 0,15N)·(0,6 + 0,4G), kesin elemelerden
+  sonra; turda 1, günde 2–6 video (ayrıntı: research/04).
+- Metin LLM'e yazdırılmaz; kayıt alanlarından deterministik şablon cümleleri.
+- Ses: prosedürel efektler (WebAudio, kamu malı jsfxr); seslendirme adayı Chatterbox (MIT), Türkçe
+  kalitesi ölçülmeden açılmaz. Ticari olmayan lisanslı sesler (Piper dfki, XTTS, MMS) kullanılmaz.
+- Yayın: Telegram, Bluesky, Mastodon, Instagram Reels otomatik; YouTube denetim onayına kadar
+  private; TikTok ve X otomatik değil. `published.json` defteri tekrar gönderimi engeller.
+- CI'da GPU yok: Chrome `--use-angle=swiftshader-webgl --enable-unsafe-swiftshader` ✅; WebCodecs
+  High profil runner'da çalıştı, olmazsa Baseline (`avc1.42E033`) ✅; çıktı ffprobe ve blackdetect
+  kapısından geçer (sırada).

@@ -5,3 +5,4 @@ out/
 *.mov
 .claude/
 assets/emblems/*/
+scenes/auto/

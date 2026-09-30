@@ -2,13 +2,15 @@ import { loadAssets } from './assets';
 import { loadScene, type StyleId } from './engine/scene';
 import { H, W } from './render/globe';
 import { STYLES } from './styles';
-import { drawHook } from './templates/hook';
+import { drawVideo } from './templates/video';
+import { makeMap, type MapRenderer } from './render/map';
 
-const SCENES = import.meta.glob('../scenes/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+// hand-written scenes in scenes/, generated ones in scenes/auto/; a scene is found by its file name
+const SCENES = import.meta.glob('../scenes/**/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 const params = new URLSearchParams(location.search);
 const name = params.get('scene') || 'hook-karadeniz';
-const text = SCENES[`../scenes/${name}.yaml`];
+const text = Object.entries(SCENES).find(([k]) => k.endsWith(`/${name}.yaml`))?.[1];
 if (!text) throw new Error(`no scene ${name}`);
 const scene = loadScene(text);
 const styleParam = params.get('style') as StyleId | null;
@@ -24,19 +26,22 @@ const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false })
 const frames = Math.round(scene.duration * scene.fps);
 const ready = loadAssets(scene.subject?.emblem ? [scene.subject.emblem] : []);
 
+let map: MapRenderer | null = null;
+const prefer = params.get('renderer') === 'canvas2d' ? 'canvas2d' : 'webgl2';
 function draw(t: number, frame: number, assets: Awaited<typeof ready>) {
+  map ??= makeMap(assets, scene.subject?.country, prefer);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.filter = 'none';
-  drawHook(ctx, assets, scene, STYLES[scene.style], t, frame);
+  drawVideo(ctx, assets, map, scene, STYLES[scene.style], t, frame);
 }
 
 declare global {
-  interface Window { motion: { ready: Promise<{ fps: number; frames: number; id: string; style: string }>; frame: (i: number, format?: 'jpeg' | 'png') => string } }
+  interface Window { motion: { ready: Promise<{ fps: number; frames: number; id: string; style: string; renderer: string }>; frame: (i: number, format?: 'jpeg' | 'png') => string; encode?: (bitrate?: number) => Promise<string> } }
 }
 
 let assetsLoaded: Awaited<typeof ready> | null = null;
 window.motion = {
-  ready: ready.then((a) => { assetsLoaded = a; return { fps: scene.fps, frames, id: scene.id, style: scene.style }; }),
+  ready: ready.then((a) => { assetsLoaded = a; map ??= makeMap(a, scene.subject?.country, prefer); return { fps: scene.fps, frames, id: scene.id, style: scene.style, renderer: map.kind }; }),
   // the exporter's entry point: draw frame i and hand back the finished image
   // JPEG at 0.95 by default: several times faster to encode than PNG at this size, and the H.264
   // pass that follows discards far more than it does; `png` stays available for stills
@@ -46,6 +51,51 @@ window.motion = {
     return format === 'png' ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.95);
   },
 };
+
+/**
+ * Encode the whole scene inside the page: each frame goes from the canvas straight to the browser's
+ * H.264 encoder (hardware where there is one) and into an MP4, with no image copied out of the GPU
+ * or through the DevTools protocol. Returns the file as base64; throws when the browser cannot
+ * encode this size, and the exporter falls back to ffmpeg.
+ */
+async function encode(bitrate = 16_000_000): Promise<string> {
+  if (!assetsLoaded) throw new Error('assets not loaded');
+  if (typeof VideoEncoder === 'undefined') throw new Error('WebCodecs is not available');
+  const { Muxer, ArrayBufferTarget } = await import('mp4-muxer');
+  // High profile where the platform encoder has it; Baseline for Chrome's software encoder
+  // (OpenH264, on a runner without a GPU), which supports nothing else
+  let config: VideoEncoderConfig | null = null;
+  for (const codec of ['avc1.640033', 'avc1.42E033']) {
+    const c: VideoEncoderConfig = { codec, width: W, height: H, bitrate, framerate: scene.fps, avc: { format: 'avc' } };
+    if ((await VideoEncoder.isConfigSupported(c)).supported) { config = c; break; }
+  }
+  if (!config) throw new Error('this browser cannot encode 1080x1920 H.264');
+  console.info(`encoder ${config.codec}`);
+  const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H, frameRate: scene.fps }, fastStart: 'in-memory' });
+  let failure: Error | null = null;
+  const encoder = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { failure = e as Error; } });
+  encoder.configure(config);
+  const us = 1e6 / scene.fps;
+  const started = performance.now();
+  for (let i = 0; i < frames; i++) {
+    if (failure) throw failure;
+    draw(i / scene.fps, i, assetsLoaded);
+    const vf = new VideoFrame(canvas, { timestamp: Math.round(i * us), duration: Math.round(us) });
+    encoder.encode(vf, { keyFrame: i % (scene.fps * 2) === 0 });
+    vf.close();
+    // wait for the encoder to catch up, but never forever: a dequeue event that does not come must not hang an export
+    while (encoder.encodeQueueSize > 6) await new Promise((r) => { encoder.addEventListener('dequeue', r, { once: true }); setTimeout(r, 50); });
+    if (i % 60 === 0) console.info(`encode ${i}/${frames} ${Math.round(performance.now() - started)} ms`);
+  }
+  await encoder.flush();
+  if (failure) throw failure;
+  muxer.finalize();
+  const bytes = new Uint8Array(muxer.target.buffer);
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+window.motion.encode = encode;
 
 if (!exporting) {
   // preview: the same drawing, driven by the real clock, looping
@@ -69,7 +119,7 @@ if (!exporting) {
       draw(t, Math.floor(t * scene.fps), a);
       avg = avg * 0.9 + (performance.now() - t0) * 0.1;
       if (playing) bar.value = String(Math.round((t / scene.duration) * 1000));
-      fps.textContent = `${(1000 / Math.max(now - last, 1)).toFixed(0)} fps · kare ${avg.toFixed(1)} ms · stil ${scene.style}`;
+      fps.textContent = `${(1000 / Math.max(now - last, 1)).toFixed(0)} fps · kare ${avg.toFixed(1)} ms · stil ${scene.style} · ${map?.kind}`;
       last = now;
       requestAnimationFrame(loop);
     };

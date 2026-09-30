@@ -1,0 +1,128 @@
+name: produce
+
+# The automatic video loop (PLAN.md section 10, milestone M7). Every six hours, forty minutes after
+# the datasets repository's automatic records run: pick the best recent record that has no video yet
+# (tools/scene/select.mjs), write its scene (tools/scene/generate.mjs), render it, and publish the
+# MP4, its first frame and its metadata as a GitHub release tagged video-<record id>. The releases
+# are the ledger: a record with a release is never picked again. The second job republishes the
+# latest twenty videos to this repository's Pages site (greater-turkiye.github.io/motion/), which the
+# platform's videos page reads from the same origin. Nobody writes or reviews anything on the way; the
+# status and the source are on screen in every frame and the release notes say it was automatic.
+#
+# Kill switch: set the repository variable MOTION_PRODUCE to "off".
+on:
+  schedule:
+    - cron: "43 0,6,12,18 * * *"
+  workflow_dispatch:
+    inputs:
+      record:
+        description: "Record id to render instead of the selector's pick (optional)"
+        required: false
+      pages_only:
+        description: "Only republish the Pages site from the existing releases"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: produce
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: vars.MOTION_PRODUCE != 'off' && !inputs.pages_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      id: ${{ steps.pick.outputs.id }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: assets/emblems
+          key: emblems-${{ hashFiles('assets/emblems/manifest.json') }}
+      - run: npm ci
+      - name: Emblems (pinned by hash in the manifest)
+        run: python3 tools/data/fetch_emblems.py --sync
+      - name: Choose a record
+        id: pick
+        env:
+          RECORD: ${{ inputs.record }}
+        run: |
+          git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
+          gh release list --limit 200 --json tagName --jq '.[].tagName' | sed -n 's/^video-//p' > published.txt
+          if [ -n "$RECORD" ]; then id="$RECORD"; else id=$(node tools/scene/select.mjs --datasets ../datasets --published published.txt); fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "record: ${id:-none}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Scene
+        if: steps.pick.outputs.id != ''
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+        run: node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --notes notes.md --meta meta.json
+      - name: Video and poster
+        if: steps.pick.outputs.id != ''
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+        run: |
+          scene="auto-$ID"
+          node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video
+          node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster
+          mkdir -p release
+          cp out/video/*.mp4 "release/$scene.mp4"
+          cp out/poster/*-frames/0000.jpg "release/$scene.jpg"
+          cp meta.json "release/$scene.json"
+          ls -la release
+      - name: Publish
+        if: steps.pick.outputs.id != ''
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+        run: |
+          case "$ID" in evt_[0-9a-z]*) ;; *) echo "not a record id: $ID"; exit 1 ;; esac
+          title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/auto-'+process.env.ID+'.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker)")
+          gh release create "video-$ID" release/* --title "$title" --notes-file notes.md --latest=false
+          echo "published: video-$ID" >> "$GITHUB_STEP_SUMMARY"
+
+  pages:
+    needs: produce
+    # after a new video, or when asked for directly; a run that published nothing changes nothing
+    if: always() && vars.MOTION_PRODUCE != 'off' && (needs.produce.outputs.id != '' || inputs.pages_only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - name: The latest twenty videos
+        run: |
+          mkdir -p site/v
+          for tag in $(gh release list --limit 20 --json tagName --jq '.[].tagName' | grep '^video-evt_'); do
+            gh release download "$tag" --dir site/v --pattern '*.mp4' --pattern '*.jpg' --pattern '*.json' --clobber
+          done
+          node tools/scene/site.mjs site
+          du -sh site
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
