@@ -144,6 +144,8 @@ jobs:
           for tag in $(gh release list --limit 20 --json tagName --jq '.[].tagName' | grep '^video-evt_'); do
             gh release download "$tag" --dir site/v --pattern '*.mp4' --pattern '*.jpg' --pattern '*.json' --clobber
           done
+          # the studio stills, when the studio workflow has made them
+          gh release download studio --pattern studio.tar --dir . --clobber 2>/dev/null && tar -C site -xf studio.tar || echo "no studio yet"
           node tools/scene/site.mjs site
           du -sh site
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
