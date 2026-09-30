@@ -197,8 +197,10 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 5. **Yayın** ✅ (`.github/workflows/produce.yml`). MP4 ve ilk kare, `video-<kayıt kimliği>`
    etiketli bir GitHub sürümüne çıkar; sürüm notu başlık, durum, tarih, kaynaklar ve "otomatik
    üretildi, kimse okumadı" beyanıdır. Sürümler defterdir: sürümü olan kayıt bir daha seçilmez.
-   Sitenin "Videolar" sayfası ve kanallara gönderim (Telegram, Bluesky, Mastodon, Instagram;
-   research/04 bölüm 4) sırada; hesaplar sahibin kararı ve kendi işidir.
+   Son yirmi video `videos.json` ile bu deponun Pages sitesine çıkar; platformun "Videolar" sayfası
+   onu aynı kökten okur (Cloudflare adresinde `apps/site` vekil olur) ✅. Kanallara gönderim
+   (Telegram, Bluesky, Mastodon, Instagram; research/04 bölüm 4) sırada; hesaplar sahibin kararı ve
+   kendi işidir.
 6. **Gözetim.** Sitedeki tarayıcı denetimi gibi: üretilen her videodan kareler örneklenir, boş
    kare, taşan yazı ya da eksik kaynak satırı varsa iş kırmızıya düşer ve sağlık raporuna girer
    (sırada). Acil durdurma: depo değişkeni `MOTION_PRODUCE=off` ✅.

@@ -344,6 +344,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       const scene = generate(record, { datasets, style });
       write(scene, record, args.get('out'));
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
+      // what the site's videos page shows next to the video (tools/scene/site.mjs)
+      if (args.get('meta')) writeFileSync(args.get('meta'), JSON.stringify({
+        id: record.id, title: record.title.tr, title_en: record.title.en ?? null, status: scene.hook.status,
+        date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), style: scene.style,
+        sources: record.sources.map((s) => s.url),
+        release: `https://github.com/Greater-Turkiye/motion/releases/tag/video-${record.id}`,
+      }, null, 1) + '\n');
     } catch (e) { console.error(e.message); process.exit(3); }
   }
 }
