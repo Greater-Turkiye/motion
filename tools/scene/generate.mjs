@@ -47,25 +47,71 @@ const REGIONS = {
   'central-asia': { at: [65, 42], name: 'Orta Asya', from: "Orta Asya'dan" },
 };
 
-/** Countries a headline names as actors: the first one named becomes the subject (its emblem over
- *  its territory, its label). Cyprus is left out on purpose: which Cyprus is a judgement, not a word. */
-const COUNTRIES = [
-  [/\bRussia(n|ns)?\b/i, 'RUS', 'RUSYA FEDERASYONU', [44, 53.8]],
-  [/\bUkrain(e|ian|ians)\b/i, 'UKR', 'UKRAYNA', [31.5, 49.3]],
-  [/\bIsrael(i|is)?\b/i, 'ISR', 'İSRAİL', [34.9, 31.3]],
-  [/\bIran(ian|ians)?\b/i, 'IRN', 'İRAN', [54, 32.5]],
-  [/\b(United States|U\.S\.|USA|American)\b/, 'USA', 'ABD', [-98, 39]],
-  [/\bGree(ce|k)\b/i, 'GRC', 'YUNANİSTAN', [22, 39.5]],
-  [/\bSyria(n|ns)?\b/i, 'SYR', 'SURİYE', [38.5, 35]],
-  [/\bArmenia(n|ns)?\b/i, 'ARM', 'ERMENİSTAN', [44.9, 40.2]],
-  [/\bAzerbaijan(i|is)?\b/i, 'AZE', 'AZERBAYCAN', [47.7, 40.3]],
-  [/\bIraq(i|is)?\b/i, 'IRQ', 'IRAK', [43.7, 33.2]],
-  [/\bLeban(on|ese)\b/i, 'LBN', 'LÜBNAN', [35.9, 33.9]],
-  [/\bEgypt(ian|ians)?\b/i, 'EGY', 'MISIR', [30, 26.5]],
-  [/\bLibya(n|ns)?\b/i, 'LBY', 'LİBYA', [17, 27]],
-  [/\bBulgaria(n|ns)?\b/i, 'BGR', 'BULGARİSTAN', [25.3, 42.7]],
-  [/\bRomania(n|ns)?\b/i, 'ROU', 'ROMANYA', [25, 45.9]],
+/** The country table (assets/data/countries.json, tools/data/build_countries.mjs): every country a
+ *  headline can name, with its Turkish name, its capital or centre, and a pattern for its names and
+ *  demonyms. The parties of a story are the countries its English headline names, in order. */
+const COUNTRY_TABLE = JSON.parse(readFileSync(path.join(ROOT, 'assets/data/countries.json'), 'utf8'))
+  .map((c) => ({ ...c, re: new RegExp(c.match, 'u') }));
+function partiesOf(titleEn) {
+  const hits = [];
+  for (const c of COUNTRY_TABLE) {
+    const m = titleEn.match(c.re);
+    if (m) hits.push({ i: m.index, c });
+  }
+  return hits.sort((a, b) => a.i - b.i).map((h) => h.c);
+}
+
+/** Families of event types, each with its own template (PLAN.md section 15). */
+const FAMILIES = [
+  [/^(kinetic\.|maritime\.incident|test\.)/, 'strike'],
+  [/^(diplomatic\.(talks|agreement)|procurement\.|basing\.)/, 'deal'],
+  [/^exercise\./, 'exercise'],
+  [/^deployment\./, 'count'],
+  [/./, 'statement'],
 ];
+const familyOf = (type) => FAMILIES.find(([re]) => re.test(type ?? ''))[1];
+
+/** What we call each type on screen, and the words a headline must contain before we say so: the
+ *  types come from keyword rules and are sometimes wrong (a winter air-defence package was filed as a
+ *  drone strike), so the label is used only when the headline itself carries the evidence. */
+const TYPES = {
+  'kinetic.drone-strike': ['İHA SALDIRISI', /\b(drones?|UAVs?|Shahed|Geran)\b|İHA|insansız/i],
+  'kinetic.missile-strike': ['FÜZE SALDIRISI', /\b(missiles?|rockets?|ballistic|Iskander|Kinzhal)\b|füze|roket|balistik/i],
+  'kinetic.airstrike': ['HAVA SALDIRISI', /\b(air ?strikes?|bomb(s|ing|ed)?|glide bombs?|KABs?)\b|bomba|hava saldırı/i],
+  'kinetic.shelling': ['TOPÇU ATIŞI', /\b(shell(ing|ed)?|artillery|MLRS|Grad|Uragan|howitzers?)\b|topçu/i],
+  'kinetic.clash': ['ÇATIŞMA', /\b(clash(es)?|fighting|battles?|combat)\b|çatışma/i],
+  'kinetic.attack': ['SALDIRI', /\b(attack(s|ed)?|strikes?|struck|hit)\b|saldır/i],
+  'maritime.incident': ['DENİZ OLAYI', /\b(ship|vessel|tanker|port|boat)s?\b|gemi|liman/i],
+  'diplomatic.talks': ['ÜST DÜZEY TEMAS', /\b(talks|meet(s|ing)?|met|visit(s|ed)?|call)\b|görüş|ziyaret/i],
+  'diplomatic.agreement': ['ANLAŞMA', /\b(agreement|deal|signed|memorandum|accord|pact|framework)\b|anlaşma|imza|mutabakat/i],
+  'diplomatic.statement': ['RESMİ AÇIKLAMA', /\b(statement|said|says|condemn(s|ed)?|warn(s|ed)?)\b|açıklama|kına/i],
+  'procurement.contract': ['SİLAH ALIMI', /\b(buy(s|ing)?|bought|purchase[sd]?|contract|acquire[sd]?|order(s|ed)?)\b|satın|sözleşme|alım/i],
+  'procurement.delivery': ['TESLİMAT', /\b(deliver(y|ed|s)|receive[sd]?)\b|teslim/i],
+  'basing.agreement': ['ÜS ANLAŞMASI', /\b(base|basing|presence)\b|üs|varlığ/i],
+  'exercise.multinational': ['TATBİKAT', /\b(exercise|drill)s?\b|tatbikat/i],
+  'exercise.military': ['TATBİKAT', /\b(exercise|drill)s?\b|tatbikat/i],
+  'exercise.naval': ['DENİZ TATBİKATI', /\b(exercise|drill)s?\b|tatbikat/i],
+  'exercise.air': ['HAVA TATBİKATI', /\b(exercise|drill)s?\b|tatbikat/i],
+  'policy.sanctions': ['YAPTIRIM', /\bsanctions?\b|yaptırım/i],
+  'policy.defense': ['SAVUNMA POLİTİKASI', /\b(defen[cs]e|security)\b|savunma|güvenlik/i],
+  'deployment.announced': ['KONUŞLANMA', /\b(deploy(s|ed|ment)?|troops|lost|losses)\b|konuşlan|kaybetti|kayıp/i],
+};
+const typeLabel = (record, texts) => {
+  const t = TYPES[record.event_type];
+  return t && texts.some((x) => t[1].test(x)) ? t[0] : null;
+};
+
+/** Default style by family and type, so the stream looks as varied as the news (PLAN.md section 15). */
+function styleFor(type) {
+  if (/^kinetic\.(drone-strike|missile-strike|airstrike)/.test(type)) return 'E';
+  if (/^kinetic\.(clash|shelling)/.test(type)) return 'G';
+  if (/^(kinetic|maritime|test)\./.test(type)) return 'A';
+  if (/^diplomatic\.(talks|agreement)/.test(type)) return 'K';
+  if (/^(procurement|basing)\.|^policy\.sanctions/.test(type)) return 'H';
+  if (/^exercise\./.test(type)) return 'I';
+  if (/^deployment\./.test(type)) return 'B';
+  return 'C';
+}
 
 /** Red lines (handbook; motion CLAUDE.md section 2): no video about Turkish forces. Matched on both
  *  titles; a false positive costs one video, a false negative is not acceptable. */
@@ -75,21 +121,45 @@ const TURKISH_FORCES = [
   /\bTSK\b/, /\bMehmetçik/i, /\bMSB\b.*\b(sevk|konuşlan|intikal)/i,
 ];
 
-/** Default style by event family (PLAN.md section 11); `--style` overrides. */
-function styleFor(type) {
-  if (/^kinetic\.(drone-strike|missile-strike|airstrike)/.test(type)) return 'E';
-  if (/^kinetic\.(clash|shelling)/.test(type)) return 'G';
-  if (/^(kinetic|maritime)\./.test(type)) return 'A';
-  if (/^diplomatic\./.test(type)) return 'K';
-  if (/^(deployment|policy|procurement)\./.test(type)) return 'B';
-  return 'C';
-}
-
 const STATUS = { unverified: 'DOĞRULANMADI', 'partially-verified': 'KISMEN DOĞRULANDI', verified: 'DOĞRULANDI', disputed: 'TARTIŞMALI' };
 const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.com': 'REUTERS', 'apnews.com': 'AP', 'bbc.com': 'BBC',
   'bbc.co.uk': 'BBC', 'timesofisrael.com': 'TIMES OF ISRAEL', 'kyivindependent.com': 'KYIV INDEPENDENT', 'msb.gov.tr': 'MSB' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
-const publisher = (u) => { const h = host(u); return PUBLISHERS[h] ?? TR(h.split('.').slice(-2, -1)[0] ?? h); };
+/** The name on the source line: a known publisher, else its domain name; a government domain
+ *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
+const GENERIC = new Set(['gov', 'mil', 'gouv', 'gob', 'mfa', 'co', 'com', 'net', 'org', 'ac', 'edu', 'int']);
+const publisher = (u) => {
+  const h = host(u);
+  if (PUBLISHERS[h]) return PUBLISHERS[h];
+  const parts = h.split('.');
+  const name = parts.length > 1 ? parts[parts.length - 2] : h;
+  return (GENERIC.has(name) ? h : name).toUpperCase(); // a Latin name keeps its Latin I: KREMLIN, not KREMLİN
+};
+
+/** Who is speaking, when the record says so: a government's own site, or a headline that names the
+ *  speaker of a statement ("… : UK statement to the OSCE"). Never the first country named: a
+ *  statement about Russia is not Russia's statement. */
+const SPEAKER_HOSTS = [
+  ['gov.uk', 'GBR'], ['mid.ru', 'RUS'], ['kremlin.ru', 'RUS'], ['government.ru', 'RUS'], ['mil.ru', 'RUS'],
+  ['state.gov', 'USA'], ['defense.gov', 'USA'], ['whitehouse.gov', 'USA'], ['mfa.gov.ua', 'UKR'], ['mil.gov.ua', 'UKR'],
+  ['president.gov.ua', 'UKR'], ['gov.il', 'ISR'], ['mfa.gr', 'GRC'], ['mod.mil.gr', 'GRC'], ['elysee.fr', 'FRA'],
+  ['diplomatie.gouv.fr', 'FRA'], ['auswaertiges-amt.de', 'DEU'], ['bundesregierung.de', 'DEU'], ['mfa.am', 'ARM'],
+  ['mfa.gov.az', 'AZE'], ['president.az', 'AZE'], ['mfa.ir', 'IRN'], ['mofa.gov.sa', 'SAU'], ['mfa.gov.cn', 'CHN'],
+];
+function speakerOf(record, titleEn) {
+  for (const s of record.sources ?? []) {
+    let h = '';
+    try { h = host(s.url); } catch { continue; }
+    const hit = SPEAKER_HOSTS.find(([d]) => h === d || h.endsWith('.' + d));
+    if (hit) return hit[1];
+  }
+  for (const seg of titleEn.split(/:\s+|\s+[–—]\s+/)) {
+    if (!/\b(statement|says|said|warns|condemns|calls on|announces|announced)\b/i.test(seg)) continue;
+    const who = partiesOf(seg.split(/\b(statement|says|said|warns|condemns|calls on|announces|announced)\b/i)[0]);
+    if (who.length) return who[0].iso3;
+  }
+  return null;
+}
 
 const words = (s) => s.split(/\s+/).filter(Boolean);
 /** "Savaş güncellemesi: Ön saflarda 198 çatışma" → "Ön saflarda 198 çatışma": a feed's rubric is not the news. */
@@ -114,21 +184,21 @@ export function hookLines(title) {
     if (!m) continue;
     const n = words(at(m))[0];
     const tail = m[4] === 'ölü' || m[4] === 'yaralı' ? TR(m[4]) : `${m[2] ? 'KİŞİ ' : ''}${verb}`;
-    return { lines: [TR(n), tail], used: at(m) };
+    return { kind: 'casualty', lines: [TR(n), tail], used: at(m) };
   }
   // a number and what it counts; a short word after it ("112 Rus İHA") belongs to the count, and a
   // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
   const num = title.match(/(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
   if (num) {
     const noun = num[2].length <= 4 && num[3] ? `${num[2]}${num[3]}` : num[2];
-    return { lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
+    return { kind: 'number', lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
   }
   const cs = clauses(title);
   // a clause of two or three words that ends the title or stands alone reads as a verdict ("kaptan öldürüldü")
   const short = cs.slice(1).filter((c) => { const w = words(c); return w.length >= 2 && w.length <= 3 && c.length <= 26; }).pop();
   if (short) {
     const w = words(short);
-    return { lines: w.length === 2 ? w.map(TR) : [TR(w[0]), TR(w.slice(1).join(' '))], used: short };
+    return { kind: 'clause', lines: w.length === 2 ? w.map(TR) : [TR(w[0]), TR(w.slice(1).join(' '))], used: short };
   }
   // otherwise who, and what they did: the first word and the last two of the first clause that has them
   const first = words(title)[0].replace(/[,:;]$/, '').split("'")[0]; // "Kiev'deki" → "Kiev"
@@ -136,7 +206,7 @@ export function hookLines(title) {
   const bw = words(body);
   // Turkish ends on its verb; "etkisiz hale getirildi" needs three words to mean anything
   const tail = bw.slice(bw.at(-2) === 'hale' ? -3 : -2).join(' ');
-  return { lines: [TR(first), TR(tail)], used: `${first} ${tail}` };
+  return { kind: 'fallback', lines: [TR(first), TR(tail)], used: `${first} ${tail}` };
 }
 
 /** Lines of at most `max` characters, whole words only, at most `n` lines. A title too long for
@@ -176,16 +246,38 @@ export function records(datasets) {
   return all;
 }
 
-/** Records within 150 km of the point in the seven days up to the event (the event included). */
+/** Our records within 150 km of the point in the seven days up to the event (the event included),
+ *  with how many days before the event each happened: the "recent" beat lights them in order. */
 function nearbyStats(datasets, record, pt) {
   const end = Date.parse(record.time.start) + 864e5, start = end - 8 * 864e5;
-  let n = 0;
+  const points = [];
   for (const r of records(datasets)) {
     const p = r.location?.geometry?.type === 'Point' ? r.location.geometry.coordinates : null;
     const t = Date.parse(r.time.start);
-    if (p && t >= start && t < end && geoDistance(p, pt) * 6371 <= 150) n++;
+    if (p && t >= start && t < end && geoDistance(p, pt) * 6371 <= 150)
+      points.push({ at: [Math.round(p[0] * 100) / 100, Math.round(p[1] * 100) / 100], days: Math.max(0, Math.round((end - 864e5 - t) / 864e5)) });
+  }
+  return { n: points.length, points: points.slice(0, 80) };
+}
+
+/** Our records in the twelve months before the event whose headline names both countries. */
+function pairStats(datasets, record, a, b) {
+  const end = Date.parse(record.time.start) + 864e5, start = end - 366 * 864e5;
+  let n = 0;
+  for (const r of records(datasets)) {
+    const t = Date.parse(r.time.start), en = r.title?.en ?? '';
+    if (t >= start && t < end && a.re.test(en) && b.re.test(en)) n++;
   }
   return { n };
+}
+
+/** The name an exercise goes by, when its headline gives one in quotes ('Cyprus Arrow'). */
+function exerciseName(texts) {
+  for (const t of texts) {
+    const m = t.match(/['‘’"“”]([\p{L}\d][\p{L}\d\s\-/.]{2,28}[\p{L}\d])['‘’"“”]/u);
+    if (m) return m[1];
+  }
+  return null;
 }
 
 /** Records of the same region in the same month, and that region's rank among all regions. */
@@ -221,93 +313,178 @@ export function generate(record, { datasets, style } = {}) {
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
   const where = pt && loc?.place_name?.tr ? loc.place_name.tr : region?.name ?? loc?.place_name?.tr ?? '';
   const kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
-  const news = unrubric(titleTr);
-  const hook = hookLines(news);
-  const subClause = clauses(news).find((c) => !c.includes(hook.used) && !hook.used.includes(c) && words(c).length >= 3 && c.length <= 72);
-  // a whole clause of at most two lines, or nothing: never a clause cut in the middle
-  const sub = subClause && subClause.length <= 72 ? subClause : '';
+  // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
+  // words the checker accepts: the same headline, shorter, not a new claim
+  const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
+  const news = abbrev(unrubric(titleTr));
+  if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
   const name = publisher(sources[0].url);
   const auto = (record.tags ?? []).includes('otomatik');
 
-  const subjectHit = COUNTRIES.map(([re, iso, label, lat]) => ({ i: titleEn.search(re), iso, label, lat })).filter((c) => c.i >= 0).sort((a, b) => a.i - b.i)[0];
+  const family = familyOf(record.event_type);
+  let parties = partiesOf(titleEn).filter((c) => c.iso3 !== 'TUR' || family === 'deal' || family === 'exercise').slice(0, 6);
+  const speakerIso = family === 'statement' || family === 'deal' ? speakerOf(record, titleEn) : null;
+  if (speakerIso) {
+    // the speaker leads, whether or not the headline names it
+    const sp = COUNTRY_TABLE.find((c) => c.iso3 === speakerIso);
+    parties = [sp, ...parties.filter((c) => c.iso3 !== speakerIso)].slice(0, 6);
+  }
+  const label = typeLabel(record, texts);
   const manifest = JSON.parse(readFileSync(path.join(ROOT, 'assets/emblems/manifest.json'), 'utf8')).items;
-  const emblemKind = subjectHit && (manifest[subjectHit.iso]?.['arms-eagle'] ? 'arms-eagle' : manifest[subjectHit.iso]?.arms ? 'arms' : null);
+  const flag = (iso) => (manifest[iso]?.flag ? `${iso}/flag` : undefined);
+  const arms = (iso) => (manifest[iso]?.['arms-eagle'] ? `${iso}/arms-eagle` : manifest[iso]?.arms ? `${iso}/arms` : undefined);
+  const nameOf = (c) => TR(c.tr);
+  const exName = family === 'exercise' ? exerciseName(texts) : null;
 
-  // beats and their lengths, from the characters they carry
-  const beats = [];
   // a place name without coordinates is not a place on the map: then the ring and the title are the region's
   const placeTitle = TR((pt ? loc?.place_name?.tr : null) ?? region?.name ?? '');
   const placeText = precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
   const facts = wrapLines(news).map((l) => l.replace(/(\d[\d.,]*)/g, '*$1*'));
-  const nearest = pt ? nearestTr(pt) : null;
+  const nearest = nearestTr(at);
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
     : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : name[0] + name.slice(1).toLowerCase()}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
 
+  // ---- the hook, from the record's own fields first ------------------------------------------------
+  const found = hookLines(news);
+  // a clause is a hook only when it ends on a verb ("kaptan öldürüldü"), not on a bare noun phrase
+  const verbish = (s) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar)$/iu.test((s ?? '').split(' ').at(-1) ?? '');
+  let hook = found;
+  const deal = family === 'deal' && parties.length >= 2;
+  // a meeting or a statement with one named country: that country speaks (the quote card)
+  // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
+  const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;
+  const regionWord = TR(region?.name ?? placeTitle);
+  if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
+  else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
+  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [TR(region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
+  else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
+  else if (family === 'count' && found.kind === 'number') hook = found;
+  else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
+    // no casualty, no number, no place: where it happened and what it was, never a stray word pair
+    hook = { kind: 'region', lines: [regionWord, label ?? 'GELİŞME'], used: '' };
+  }
+  const subClause = clauses(news).find((c) => (!hook.used || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72);
+  // a whole clause of at most two lines, or nothing: never a clause cut in the middle
+  const sub = subClause ?? '';
+  // what the hook may say beyond the headline: the record's own fields (its type as we name it, its
+  // place, the countries its headline names, the exercise's name), never a word from nowhere
+  const fields = [label, placeTitle, TR(region?.name ?? ''), ...parties.map(nameOf), exName ? TR(exName) : '', 'TATBİKAT TATBİKATI AÇIKLAMA GELİŞME'].filter(Boolean).join(' · ');
+
+  // ---- beats, by family ------------------------------------------------------------------------------
+  const beats = [];
   const hookChars = [...hook.lines, sub].join(' ').length;
   let t = secs(hookChars, 2.6, 0.4);
   const push = (b, chars, min, pad) => { beats.push({ ...b, at: round1(t) }); t += secs(chars, min, pad); };
-  push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
-  // the source's words, not ours: the kicker says so
-  push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0);
-  if (nearest && nearest.km >= 100) push({ kind: 'distance', from: { at: pt, label: placeTitle }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, placeTitle.length + nearest.name.length + 34, 3.2);
-  push({ kind: 'status', text: statusText }, statusText.length, 3.0);
-  if (around && around.n >= 3) {
-    // context from our own records, around the place itself: a city story is not "the Black Sea"
-    const where = loc.place_name.tr;
-    const lines = [`Son 7 günde ${where} çevresinde`, `*${around.n}* kayıt.`];
-    const kick = 'VERİ SETİMİZDE';
-    push({ kind: 'close', kicker: kick, lines }, kick.length + lines.join(' ').length, 3.4, 0.9);
-  } else if (stats && region && stats.n > 0) {
+  const factsBeat = () => push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0);
+  const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
+  const distanceBeat = (fromLabel) => {
+    if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, fromLabel.length + nearest.name.length + 34, 3.2);
+  };
+  const regionClose = () => {
+    if (!(stats && region && stats.n > 0)) return;
     // a rank means something only with enough records behind it
     const lines = stats.n >= 10 ? [`${region.from} *${stats.n}* kayıt:`, stats.rank === 1 ? 'en yoğun bölge.' : `bölgeler arasında ${stats.rank}.`] : [`${region.from} *${stats.n}* kayıt.`];
-    const kick = `VERİ SETİMİZDE · ${stats.month}`;
+    const kick = `KAYITLARIMIZDA · ${stats.month}`;
     push({ kind: 'close', kicker: kick, lines }, kick.length + lines.join(' ').length, 3.4, 0.9);
+  };
+
+  if (deal) {
+    push({ kind: 'link', title: label ?? 'TEMAS' }, (label ?? 'TEMAS').length + parties.map(nameOf).join(' ').length, 3.2);
+    factsBeat();
+    statusBeat();
+    const pair = datasets ? pairStats(datasets, record, parties[0], parties[1]) : { n: 0 };
+    if (pair.n >= 2) {
+      const lines = ['Son 12 ayda bu iki ülke:', `*${pair.n}* kayıt.`];
+      push({ kind: 'close', kicker: 'KAYITLARIMIZDA', lines }, 14 + lines.join(' ').length, 3.4, 0.9);
+    } else regionClose();
+  } else if (family === 'exercise') {
+    if (parties.length) push({ kind: 'roster', title: exName ? TR(exName) : label ?? 'TATBİKAT' }, (exName ?? '').length + parties.map(nameOf).join(' ').length + 12, 3.4);
+    push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
+    factsBeat();
+    distanceBeat(placeTitle);
+    statusBeat();
+  } else if (speaker) {
+    push({ kind: 'quote', speaker: 0, lines: facts.map((l) => l.replace(/\*/g, '')) }, facts.join(' ').length + parties[0].tr.length, 4.2);
+    statusBeat();
+    regionClose();
+  } else {
+    push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
+    factsBeat();
+    if (pt) distanceBeat(placeTitle);
+    if (around && around.n >= 3) {
+      const text = `${loc.place_name.tr} çevresinde, 150 km içinde.`;
+      push({ kind: 'recent', title: 'KAYITLARIMIZDA · SON 7 GÜN', points: around.points, text }, 28 + text.length, 3.6);
+    }
+    statusBeat();
+    if (!(around && around.n >= 3)) regionClose();
   }
   const duration = round1(t);
 
-  // camera: open on Türkiye and the event together, fly in, frame the distance, pull back to the start
+  // ---- camera ----------------------------------------------------------------------------------------
   const home = [35, 39];
-  const span = geoDistance(home, at) / (Math.PI / 180);
-  const open = { center: [round1((home[0] + at[0]) / 2 - 4), round1((home[1] + at[1]) / 2 + 1.5)], zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
-  const near = (dx, dy, zoom) => ({ center: [round1(at[0] + dx), round1(at[1] + dy)], zoom });
-  const keys = [{ t: 0, ...open }, { t: beats[0].at, ...near(0.3, 2.4, 1.0) }];
+  const deg = (a, b) => geoDistance(a, b) / (Math.PI / 180);
+  let open, near;
+  if (deal || (speaker && !pt)) {
+    // frame the parties (and Türkiye, so the viewer knows where they are)
+    const pts = [...parties.slice(0, deal ? 6 : 1).map((c) => c.at), home];
+    const mid = [pts.reduce((s, p) => s + p[0], 0) / pts.length, pts.reduce((s, p) => s + p[1], 0) / pts.length];
+    const spread = Math.max(...pts.map((p) => deg(p, mid)));
+    const z = Math.min(1.6, Math.max(0.35, 480 / (spread * 24.4 + 260)));
+    open = { center: [round1(mid[0]), round1(mid[1])], zoom: round1(z * 0.85) };
+    near = (dx, dy, zoom) => ({ center: [round1(mid[0] + dx), round1(mid[1] + dy)], zoom: round1(z * zoom) });
+  } else {
+    const span = deg(home, at);
+    open = { center: [round1((home[0] + at[0]) / 2 - 4), round1((home[1] + at[1]) / 2 + 1.5)], zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
+    near = (dx, dy, zoom) => ({ center: [round1(at[0] + dx), round1(at[1] + dy)], zoom });
+  }
+  const wide = deal || (speaker && !pt);
+  const keys = [{ t: 0, ...open }, { t: beats[0].at, ...(wide ? near(0, 0, 1.0) : near(0.3, 2.4, 1.0)) }];
   for (const b of beats) {
     const end = round1(beats[beats.indexOf(b) + 1]?.at ?? duration);
-    if (b.kind === 'place') keys.push({ t: end, ...near(-1.0, 1.0, 2.3) });
+    if (wide) { keys.push({ t: end, ...near(0, 0.3, b.kind === 'facts' || b.kind === 'quote' ? 1.12 : 1.04) }); continue; }
+    if (b.kind === 'place' || b.kind === 'roster') keys.push({ t: end, ...near(-1.0, 1.0, 2.3) });
     if (b.kind === 'facts') keys.push({ t: end, ...near(-1.8, 1.6, 2.7) });
+    if (b.kind === 'recent') keys.push({ t: end, ...near(0, 1.0, 1.9) });
     if (b.kind === 'distance') {
       const to = b.to.at;
       const mid = [(at[0] + to[0]) / 2, (at[1] + to[1]) / 2];
-      const d = geoDistance(at, to) / (Math.PI / 180);
-      keys.push({ t: round1(end - 0.2), center: [round1(mid[0]), round1(mid[1])], zoom: round1(Math.min(3.2, Math.max(0.9, 420 / (d * 24.4)))) });
+      keys.push({ t: round1(end - 0.2), center: [round1(mid[0]), round1(mid[1])], zoom: round1(Math.min(3.2, Math.max(0.9, 420 / (deg(at, to) * 24.4)))) });
     }
     if (b.kind === 'status') keys.push({ t: end, ...near(-0.5, 0.6, 2.2) });
   }
-  if (keys[keys.length - 1].t >= duration) keys.pop();
-  keys.push({ t: duration, ...open });
+  // keys strictly in time order, the last one the opening again (the loop)
+  const ordered = keys.filter((k, i) => i === 0 || k.t > keys[i - 1].t);
+  while (ordered.length > 1 && ordered[ordered.length - 1].t >= duration) ordered.pop();
+  ordered.push({ t: duration, ...open });
 
+  // ---- labels and parties ------------------------------------------------------------------------
   const labels = [{ text: 'TÜRKİYE', at: [35, 39.2], kind: 'home' }];
   if (region?.sea) labels.push({ ...region.sea, kind: 'sea' });
   // a located event names its place on the map, so an inland view is never an empty page
   if (pt && placeTitle) labels.push({ text: placeTitle, at: [pt[0], pt[1] - 0.9], kind: 'country' });
-  if (subjectHit) labels.unshift({ text: subjectHit.label, at: subjectHit.lat, kind: 'country' });
+  const partyList = parties.filter((c) => c.iso3 !== 'TUR');
+  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: c.at, kind: 'country' });
+  const lead = partyList[0];
+  const single = !deal && family !== 'exercise';
 
   const scene = {
     id: `auto-${record.id}`,
     record: record.id,
+    template: deal ? 'deal' : speaker ? 'statement' : family,
     format: 'vertical',
     fps: 60,
     duration,
     style: style ?? styleFor(record.event_type ?? ''),
-    source_text: texts,
-    camera: { from: { center: open.center, zoom: open.zoom }, to: keys[1], seconds: keys[1].t, ease: 'outCubic', keys },
-    event: { at: at.map((x) => Math.round(x * 100) / 100), precision },
-    ...(subjectHit ? { subject: { country: subjectHit.iso, ...(emblemKind ? { emblem: `${subjectHit.iso}/${emblemKind}` } : {}), label: subjectHit.label } } : {}),
+    source_text: [...texts, fields],
+    camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
+    ...(family === 'strike' || family === 'exercise' || pt ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
+    ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
+    ...(parties.length ? { parties: parties.map((c) => ({ country: c.iso3, label: nameOf(c), at: c.at, ...(flag(c.iso3) ? { emblem: flag(c.iso3) } : {}) })) } : {}),
     labels,
     hook: { kicker, lines: hook.lines, sub, status: STATUS[st], source: `KAYNAK: ${name}` },
     beats,

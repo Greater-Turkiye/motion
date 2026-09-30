@@ -388,18 +388,23 @@ export class GlobeGL {
     return this.lines(rings);
   }
 
-  /** Per scene: which country is the subject, and its glow (blurred once, on the CPU). */
-  setScene(subjectNum: string | null, homeNum: string) {
+  /** Per scene: which countries the story is about (one, or the parties of an agreement or an
+   *  exercise), their outline, and their glow (blurred once, on the CPU). */
+  setScene(subjectNums: string[], homeNum: string) {
     const gl = this.gl;
-    this.subjLine = subjectNum ? this.outline(subjectNum) : null;
+    const nums = subjectNums.filter((n) => n && n !== homeNum);
+    const rings = nums.flatMap((n) => {
+      const g = this.features.find((x) => String(x.id).padStart(3, '0') === n)?.geometry as Polygon | MultiPolygon | undefined;
+      return !g ? [] : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : [];
+    });
+    this.subjLine = rings.length ? this.lines(rings) : null;
     this.homeLine = this.outline(homeNum);
-    this.subjectNum = subjectNum; this.homeNum = homeNum;
+    this.subjectNums = new Set(nums); this.homeNum = homeNum;
     if (this.glowTex) { gl.deleteTexture(this.glowTex); this.glowTex = null; }
-    if (!subjectNum) return;
-    const f = this.features.find((x) => String(x.id).padStart(3, '0') === subjectNum);
-    if (!f) return;
+    const fs = nums.map((n) => this.features.find((x) => String(x.id).padStart(3, '0') === n)).filter((f): f is Feature => !!f);
+    if (!fs.length) return;
     const mask = texture(gl, GLOW_W, GLOW_H, { internal: gl.R8, format: gl.RED, type: gl.UNSIGNED_BYTE, filter: gl.NEAREST });
-    this.rasterise(mask, GLOW_W, GLOW_H, [{ f, id: 255 }]);
+    this.rasterise(mask, GLOW_W, GLOW_H, fs.map((f) => ({ f, id: 255 })));
     const fb = framebuffer(gl, mask);
     const px = new Uint8Array(GLOW_W * GLOW_H * 4);
     gl.readPixels(0, 0, GLOW_W, GLOW_H, gl.RGBA, gl.UNSIGNED_BYTE, px);
@@ -415,7 +420,7 @@ export class GlobeGL {
     }
     this.glowTex = texture(gl, GLOW_W, GLOW_H, { internal: gl.R8, format: gl.RED, type: gl.UNSIGNED_BYTE, filter: gl.LINEAR, data: out });
   }
-  private subjectNum: string | null = null;
+  private subjectNums = new Set<string>();
   private homeNum = '792';
 
   private palette(s: Style) {
@@ -423,7 +428,7 @@ export class GlobeGL {
     const px = new Uint8Array(256 * 4);
     const put = (i: number, c: string, kind: number) => { const v = rgba(c); px[i * 4] = v[0] * 255; px[i * 4 + 1] = v[1] * 255; px[i * 4 + 2] = v[2] * 255; px[i * 4 + 3] = kind; };
     put(0, s.land, 0);
-    this.nums.forEach((num, i) => put(i + 1, num === this.homeNum ? s.home : num && num === this.subjectNum ? s.subject : s.land, num === this.homeNum ? 2 : num && num === this.subjectNum ? 3 : 1));
+    this.nums.forEach((num, i) => put(i + 1, num === this.homeNum ? s.home : num && this.subjectNums.has(num) ? s.subject : s.land, num === this.homeNum ? 2 : num && this.subjectNums.has(num) ? 3 : 1));
     for (let i = 250; i < 256; i++) put(i, s.land, 4);
     gl.bindTexture(gl.TEXTURE_2D, this.palTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);

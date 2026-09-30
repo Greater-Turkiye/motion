@@ -33,12 +33,15 @@ canvas.width = W; canvas.height = H;
 const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false })!;
 
 const frames = Math.round(scene.duration * scene.fps);
-const ready = loadAssets(scene.subject?.emblem ? [scene.subject.emblem] : []);
+// every emblem the scene names: the subject's, and the parties' (an agreement, an exercise)
+const ready = loadAssets([...new Set([scene.subject?.emblem, ...(scene.parties ?? []).map((p) => p.emblem)].filter((e): e is string => !!e))]);
+// the countries the story is about, lit on the map
+const subjects = [scene.subject?.country, ...(scene.parties ?? []).map((p) => p.country)].filter((c): c is string => !!c);
 
 let map: MapRenderer | null = null;
 const prefer = params.get('renderer') === 'canvas2d' ? 'canvas2d' : 'webgl2';
 function draw(t: number, frame: number, assets: Awaited<typeof ready>) {
-  map ??= makeMap(assets, scene.subject?.country, prefer);
+  map ??= makeMap(assets, subjects, prefer);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.filter = 'none';
   drawVideo(ctx, assets, map, scene, STYLES[scene.style], t, frame);
@@ -72,7 +75,7 @@ declare global {
 
 let assetsLoaded: Awaited<typeof ready> | null = null;
 window.motion = {
-  ready: ready.then((a) => { assetsLoaded = a; map ??= makeMap(a, scene.subject?.country, prefer); return { fps: scene.fps, frames, id: scene.id, style: scene.style, renderer: map.kind }; }),
+  ready: ready.then((a) => { assetsLoaded = a; map ??= makeMap(a, subjects, prefer); return { fps: scene.fps, frames, id: scene.id, style: scene.style, renderer: map.kind }; }),
   // the exporter's entry point: draw frame i and hand back the finished image
   // JPEG at 0.95 by default: several times faster to encode than PNG at this size, and the H.264
   // pass that follows discards far more than it does; `png` stays available for stills

@@ -353,12 +353,14 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
 1. **Çekirdek** ✅: kararlı etiketler (yer bir kez seçilir, kapanınca solar), en yakın Türk şehrine
    mesafe ("TÜRKİYE'YE UZAKLIK" 700 km üstünde), bağlam satırı olay noktasının 150 km çevresinden
    (son 7 gün), sayı kalıplarında kelime sınırı.
-2. **Stil paketleri** ✅ (hareket; yazı tipleri araştırma raporundan sonra): yazı animasyonu, kamera, geçiş ve ilerleme çubuğu stilin parçası; serbest
+2. **Stil paketleri** ✅ (hareket ve yazı tipleri): yazı animasyonu, kamera, geçiş ve ilerleme çubuğu stilin parçası; serbest
    karıştırma yalnızca denemede. Tek parametre (`style`) her şeyi birlikte değiştirir.
-3. **Olay ailesi şablonları**: saldırı (nokta + son 7 günün deseni + en yakın Türk şehri), diplomasi
+3. **Olay ailesi şablonları** ✅: saldırı (nokta + son 7 günün deseni + en yakın Türk şehri), diplomasi
    (iki ülke + başkentler arası yay + amblemler), tatbikat (katılımcılar + deniz alanı + Türkiye'ye
    mesafe), açıklama (konuşan ülke + alıntı kartı), sayı iddiası (büyük sayı + kimin iddiası).
-4. **Kancalar kaydın alanlarından**: can kaybı, yer + olay türü (türün başlıkta kanıtı varsa), iki
-   ülke, tatbikat adı; başlıktan rastgele kelime seçimi kalkar.
+4. **Kancalar kaydın alanlarından** ✅: can kaybı, yer + olay türü (türün başlıkta kanıtı varsa), iki
+   ülke, tatbikat adı; başlıktan rastgele kelime seçimi kalkar. Konuşan taraf yalnızca kaynağın alan
+   adından ya da başlıktaki "X statement" kalıbından belirlenir: "Rusya hakkında İngiltere açıklaması"
+   Rusya'nın açıklaması değildir (ilk denemede tam bu hata vardı).
 5. **Stüdyo**: aynı haber tüm stillerde yan yana; varsayılan stil olay ailesine göre.
 6. **Seslendirme ve ses tasarımı**: Chatterbox (MIT) Türkçe, bölüm başına klip; stile göre efekt.

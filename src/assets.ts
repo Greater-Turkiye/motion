@@ -14,10 +14,33 @@ export interface Assets {
   disputed: FeatureCollection;
   emblems: Map<string, HTMLImageElement>;
   relief: HTMLImageElement | null;   // assets/data/relief.png, built by tools/data/build_relief.py
+  /** assets/data/countries.json (tools/data/build_countries.mjs): ISO codes, names, label points */
+  countryTable: CountryRow[];
+  nums: Map<string, string>;         // ISO3 → the map's numeric id
 }
+
+export interface CountryRow { iso3: string; iso2: string; num: string; tr: string; en: string; at: [number, number]; match: string }
 
 const LATIN = 'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212';
 const LATIN_EXT = 'U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20C0';
+
+/** Every family a style may use (assets/fonts, licences in assets/fonts/licenses and LICENSES.md).
+ *  Static faces are declared over the whole weight range so the browser never fakes a bold. */
+const FAMILIES: [string, string, FontFaceDescriptors][] = [
+  ['BigShoulders', 'bigshoulders.ttf', { weight: '100 900' }],
+  ['Archivo', 'archivo.ttf', { weight: '100 900', stretch: '62% 125%' }],
+  ['Newsreader', 'newsreader.ttf', { weight: '200 800' }],
+  ['Schibsted', 'schibstedgrotesk.ttf', { weight: '400 900' }],
+  ['Unbounded', 'unbounded.ttf', { weight: '200 900' }],
+  ['Martian', 'martianmono.ttf', { weight: '100 800', stretch: '75% 112.5%' }],
+  ['JetBrains', 'jetbrainsmono.ttf', { weight: '100 800' }],
+  ['SpecialElite', 'specialelite-regular.ttf', { weight: '100 900' }],
+  ['CourierPrime', 'courierprime-regular.ttf', { weight: '100 600' }],
+  ['CourierPrime', 'courierprime-bold.ttf', { weight: '700 900' }],
+  ['BlackOps', 'blackopsone-regular.ttf', { weight: '100 900' }],
+  ['Cinzel', 'cinzel.ttf', { weight: '400 900' }],
+  ['Fraunces', 'fraunces.ttf', { weight: '100 900' }],
+];
 
 async function fonts() {
   const faces = [
@@ -27,10 +50,11 @@ async function fonts() {
     new FontFace('X', 'url(fonts/plexmono-400-latin-ext.woff2)', { weight: '400', unicodeRange: LATIN_EXT }),
     new FontFace('X', 'url(fonts/plexmono-500-latin.woff2)', { weight: '500 700', unicodeRange: LATIN }),
     new FontFace('X', 'url(fonts/plexmono-500-latin-ext.woff2)', { weight: '500 700', unicodeRange: LATIN_EXT }),
+    ...FAMILIES.map(([name, file, d]) => new FontFace(name, `url(fonts/${file})`, d)),
   ];
-  for (const f of faces) document.fonts.add(await f.load());
-  // a Turkish sample in every weight used, so no glyph is fetched in the middle of an export
-  await Promise.all(['900 40px M', '800 40px M', '600 40px M', '500 40px M', '700 20px X', '500 20px X'].map((f) => document.fonts.load(f, 'ĞÜŞİÖÇğüşıöç')));
+  for (const f of faces) { await f.load(); document.fonts.add(f); }
+  const names = ['M', 'X', ...new Set(FAMILIES.map(([n]) => n))];
+  await Promise.all(names.flatMap((n) => ['900', '700', '500'].map((w) => document.fonts.load(`${w} 40px ${n}`, 'ĞÜŞİÖÇğüşıöç'))));
 }
 
 function image(src: string): Promise<HTMLImageElement> {
@@ -45,10 +69,11 @@ function image(src: string): Promise<HTMLImageElement> {
 
 /** `key` is "<ISO3 or org>/<kind>", e.g. "RUS/arms-eagle", "nato/emblem"; see assets/emblems/manifest.json. */
 export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
-  const [topo, disputed, manifest] = await Promise.all([
+  const [topo, disputed, manifest, countryTable] = await Promise.all([
     fetch('data/countries-50m.json').then((r) => r.json()),
     fetch('data/disputed-tur-view.geojson').then((r) => r.json()),
     fetch('emblems/manifest.json').then((r) => r.json()),
+    fetch('data/countries.json').then((r) => r.json()) as Promise<CountryRow[]>,
     fonts(),
   ]);
   const bound = <T>(shape: T, pts: Position[]): Culled<T> => {
@@ -71,5 +96,5 @@ export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
     emblems.set(key, await image('emblems/' + it.file));
   }
   const relief = await image('data/relief.png').catch(() => null); // optional: the map renders without it
-  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief };
+  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief, countryTable, nums: new Map(countryTable.map((c) => [c.iso3, c.num])) };
 }

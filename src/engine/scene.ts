@@ -13,7 +13,15 @@ export type Beat =
   | { kind: 'facts'; at: number; kicker?: string; lines: string[] }
   | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string }
   | { kind: 'status'; at: number; text?: string }
-  | { kind: 'close'; at: number; kicker?: string; lines: string[] };
+  | { kind: 'close'; at: number; kicker?: string; lines: string[] }
+  /** the parties linked on the map, capital to capital; title is what joins them (a meeting, an agreement) */
+  | { kind: 'link'; at: number; title: string; text?: string }
+  /** our own records around the place in the last days, lit one by one, with their count */
+  | { kind: 'recent'; at: number; title: string; points: { at: LonLat; days: number }[]; text?: string }
+  /** the parties as a list of flags and names (an exercise's participants) */
+  | { kind: 'roster'; at: number; title: string; text?: string }
+  /** what a party said, in the source's own words, under its flag */
+  | { kind: 'quote'; at: number; speaker?: number; lines: string[] };
 
 export interface Scene {
   id: string;
@@ -28,6 +36,8 @@ export interface Scene {
   camera: { from: Camera; to: Camera; seconds: number; ease: string; keys?: Key[] };
   event?: { at: LonLat; precision: 'region' | 'locality' | 'exact' };
   subject?: { country: string; emblem?: string; label?: string };
+  /** the countries of a two- or many-sided story (talks, an agreement, an exercise): lit together, linked, listed */
+  parties?: { country: string; label: string; at: LonLat; emblem?: string }[];
   /** `alts`: other points on the ground where the label may sit instead (one is chosen per video) */
   labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home'; alts?: LonLat[] }[];
   hook: { kicker: string; lines: string[]; sub: string; status: string; source: string };
@@ -99,7 +109,7 @@ export function validate(s: Scene): string[] {
   const sourceName = words(s.hook.source.replace(/^.*?:/, ''));
   // a sentence with a {placeholder} is context the engine computes (a distance), not the source's claim
   const sub = s.hook.sub.split(/(?<=[.!])\s+/).filter((x) => !x.includes('{'));
-  const checked = [...s.hook.lines, ...sub, ...s.beats.flatMap((b) => (b.kind === 'facts' ? b.lines : []))];
+  const checked = [...s.hook.lines, ...sub, ...s.beats.flatMap((b) => (b.kind === 'facts' || b.kind === 'quote' ? b.lines : []))];
   for (const line of checked) for (const w of words(line)) {
     if (STOP.has(w) || sourceName.includes(w)) continue;
     if (/^\d/.test(w) ? !(s.source_text || []).some((t) => t.includes(w)) : !src.some((x) => x.startsWith(stem(w)))) out.push(`"${w}" (in "${line}") is not in the source`);
@@ -114,6 +124,10 @@ export function beatText(b: Beat): string[] {
     case 'distance': return [`${b.from.label} ${b.to.label}`, b.text ?? ''];
     case 'status': return [b.text ?? ''];
     case 'close': return [b.kicker ?? '', ...b.lines];
+    case 'link': return [b.title, b.text ?? ''];
+    case 'recent': return [b.title, b.text ?? ''];
+    case 'roster': return [b.title, b.text ?? ''];
+    case 'quote': return b.lines;
   }
 }
 

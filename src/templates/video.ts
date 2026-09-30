@@ -124,6 +124,11 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number)
     const p = proj(sc.event.at);
     if (p) obstacles.push({ x: p[0] - 60, y: p[1] - 60, w: 120, h: 120 });
   }
+  // the parties' points on a link beat: labels keep clear of them
+  if (beat?.kind === 'link') for (const p of sc.parties ?? []) {
+    const q = proj(p.at);
+    if (q) obstacles.push({ x: q[0] - 22, y: q[1] - 22, w: 44, h: 44 });
+  }
   if (beat?.kind === 'distance') {
     const w = windowOf(sc, beatIdx, t);
     const draw = anim(t, beat.at + 0.2, 1.4, ease.inOutCubic);
@@ -270,6 +275,50 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     ctx.globalAlpha = 1;
   }
 
+  // link: capital to capital, a great circle drawn with a bright head (research/05, effect 1)
+  if (beat?.kind === 'link' && sc.parties && sc.parties.length > 1) {
+    const w = windowOf(sc, beatIdx, t);
+    const [p0, ...rest] = sc.parties;
+    rest.forEach((p, k) => {
+      const head = anim(t, beat.at + 0.25 + 0.3 * k, 1.3, ease.inOutCubic);
+      const arc = geoInterpolate(p0.at, p.at);
+      const pts: [number, number][] = [];
+      for (let j = 0; j <= 80; j++) { const q = proj(arc((j / 80) * head)); if (q) pts.push(q); }
+      if (pts.length < 2) return;
+      ctx.globalAlpha = 0.9 * w.out; ctx.strokeStyle = s.accent; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); pts.forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+      const [hx, hy] = pts[pts.length - 1];
+      if (head < 1) { ctx.globalAlpha = w.out; ctx.fillStyle = s.ink; ctx.beginPath(); ctx.arc(hx, hy, 7, 0, Math.PI * 2); ctx.fill(); }
+    });
+    for (const p of sc.parties) {
+      const q = proj(p.at);
+      if (!q) continue;
+      ctx.globalAlpha = w.out * anim(t, beat.at, 0.4);
+      ctx.beginPath(); ctx.arc(q[0], q[1], 10, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
+      ctx.beginPath(); ctx.arc(q[0], q[1], 18, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 2; ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // recent: our own records around the place, lit in the order they happened (research/05, effect 4)
+  if (beat?.kind === 'recent') {
+    const w = windowOf(sc, beatIdx, t);
+    const pts = [...beat.points].sort((x, y) => y.days - x.days); // oldest first
+    pts.forEach((p, k) => {
+      const q = proj(p.at);
+      if (!q) return;
+      const on = anim(t, beat.at + 0.3 + (1.8 * k) / Math.max(1, pts.length), 0.35, ease.outBack);
+      if (on <= 0) return;
+      const fresh = 1 - Math.min(1, p.days / 7); // the newer, the brighter
+      ctx.globalAlpha = w.out * Math.min(1, on) * (0.35 + 0.65 * fresh);
+      ctx.fillStyle = s.accent;
+      ctx.beginPath(); ctx.arc(q[0], q[1], 5 + 5 * on, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha *= 0.35;
+      ctx.beginPath(); ctx.arc(q[0], q[1], 14 * on, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
   // the subject's emblem over its own territory (ADR 0026: news context, never beside our mark);
   // it belongs to the opening and leaves before the camera zooms in far enough to crop it
   if (emblemImg && lay.emblem) {
@@ -294,7 +343,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const hookEnd = full ? sc.beats[0].at : D;
   if (t < hookEnd) drawHookBlock(ctx, sc, s, t, full ? 1 - span(t, hookEnd - 0.3, hookEnd) : 1);
   else if (full && t > D - 0.5) drawHookBlock(ctx, sc, s, 0, span(t, D - 0.5, D));
-  if (beat) drawBeat(ctx, sc, s, beatIdx, t);
+  if (beat) drawBeat(ctx, sc, s, beatIdx, t, a);
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
@@ -318,11 +367,11 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number, alpha: number) {
   if (alpha <= 0) return;
   const lift = (1 - alpha) * 40;
-  ctx.font = '600 40px M';
+  ctx.font = `600 40px ${s.fonts.text}`;
   const subLines = wrap(ctx, sc.hook.sub.replace('{km}', sc.event ? String(kmToBosphorus(sc.event.at)) : '?'), WIDTH);
   // each line as big as it can be on its own: a short word stays huge even when the next line is long
   // (sized for the loosest tracking of the settle below)
-  const sizes = sc.hook.lines.map((l) => fit(ctx, [l], (p) => `900 ${p}px M`, 188, 4 / 188));
+  const sizes = sc.hook.lines.map((l) => fit(ctx, [l], (p) => `900 ${p}px ${s.fonts.display}`, 188, 4 / 188));
   const heights = sizes.map((px) => Math.round(px * 0.915));
   const subTop = BLOCK_BOTTOM - subLines.length * 50;
   const linesTop = subTop - 40 - heights.reduce((a, b) => a + b, 0);
@@ -330,7 +379,7 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   guard({ x: LEFT - 6, y: kickerY - 26, w: WIDTH, h: BLOCK_BOTTOM - kickerY + 26 }, 'hook');
 
   const kp = alpha;
-  ctx.globalAlpha = kp; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
+  ctx.globalAlpha = kp; ctx.fillStyle = s.accent; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '8px';
   ctx.fillText(sc.hook.kicker, LEFT - 30 * (1 - anim(t, 0.05, 0.4)), kickerY - lift);
   ctx.letterSpacing = '0px';
 
@@ -340,7 +389,7 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
     const p = anim(t, 0.04 * i, 0.7, ease.outExpo);
     const px = sizes[i];
     const base = linesTop + heights.slice(0, i + 1).reduce((a, b) => a + b, 0) - 18 * (px / 188);
-    ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${(-5 + 9 * (1 - p)) * (px / 188)}px`;
+    ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${(-5 + 9 * (1 - p)) * (px / 188)}px`;
     ctx.fillStyle = i === sc.hook.lines.length - 1 ? s.accent : s.ink;
     ctx.globalAlpha = alpha;
     ctx.fillText(text, LEFT - 6, base - lift);
@@ -348,7 +397,7 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   ctx.letterSpacing = '0px';
 
   const sp = anim(t, 0.95, 0.45);
-  ctx.globalAlpha = sp * alpha; ctx.fillStyle = s.ink; ctx.font = '600 40px M';
+  ctx.globalAlpha = sp * alpha; ctx.fillStyle = s.ink; ctx.font = `600 40px ${s.fonts.text}`;
   subLines.forEach((l, i) => ctx.fillText(l, LEFT, subTop + 40 + i * 50 + (1 - sp) * 18 - lift));
   ctx.globalAlpha = 1;
 }
@@ -356,7 +405,7 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
 function drawFooter(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, alpha: number) {
   if (alpha <= 0) return;
   ctx.globalAlpha = alpha;
-  ctx.font = '700 22px X'; ctx.letterSpacing = '3px';
+  ctx.font = `700 22px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
   const status = sc.hook.status, source = sc.hook.source;
   const sw = ctx.measureText(status).width;
   // the status as a pill, so it reads as a label of the whole video and not as part of a sentence
@@ -454,7 +503,7 @@ function drawProgress(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: num
   });
 }
 
-function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number, t: number) {
+function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number, t: number, a: Assets) {
   const b = sc.beats[i];
   const w = windowOf(sc, i, t);
   const alpha = w.inP * w.out;
@@ -462,7 +511,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
   const mode: TextMode = sc.anim?.text ?? s.motion.text;
   const rise = (mode === 'rise' ? (1 - w.inP) * 36 : 0) + (1 - w.out) * 30;
   const kicker = (text: string, y: number) => {
-    ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
+    ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '8px';
     ctx.fillText(text, LEFT, y); ctx.letterSpacing = '0px';
   };
   const lines = (ls: string[], x: number, y0: number, lh: number, t0: number, color: string, size: number) =>
@@ -470,25 +519,25 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
 
   switch (b.kind) {
     case 'place': {
-      ctx.font = '600 40px M';
+      ctx.font = `600 40px ${s.fonts.text}`;
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
-      const px = fit(ctx, [b.title], (p) => `900 ${p}px M`, 132, -0.02);
+      const px = fit(ctx, [b.title], (p) => `900 ${p}px ${s.fonts.display}`, 132, -0.02);
       const top = BLOCK_BOTTOM - text.length * 52 - (text.length ? 24 : 0) - px * 0.9;
       guard({ x: LEFT, y: top, w: WIDTH, h: BLOCK_BOTTOM - top }, 'place');
       kicker('NEREDE', top - 22 + rise);
-      ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.02 * px}px`;
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.02 * px}px`;
       reveal(ctx, b.title, LEFT - 4, top + px * 0.9 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
-      ctx.letterSpacing = '0px'; ctx.font = '600 40px M';
+      ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
       lines(text, LEFT, top + px * 0.9 + 24 + 52 + rise, 52, b.at + (mode === 'type' ? b.title.length / TYPE_CPS : 0.35), s.muted, 40);
       break;
     }
     case 'facts': {
-      const px = fit(ctx, b.lines.map((l) => l.replace(/\*/g, '')), (p) => `800 ${p}px M`, 76);
+      const px = fit(ctx, b.lines.map((l) => l.replace(/\*/g, '')), (p) => `800 ${p}px ${s.fonts.text}`, 76);
       const lh = Math.round(px * 1.18);
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'facts');
       kicker(b.kicker ?? 'NE OLDU', top + 0.8 * lh - 0.72 * px - 26 + rise);
-      ctx.font = `800 ${px}px M`;
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
     }
@@ -496,8 +545,8 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const d = km(b.from.at, b.to.at);
       const count = anim(t, b.at + 0.2, 1.4, ease.inOutCubic);
       const num = `~${Math.round((d * count) / 10) * 10} KM`;
-      const px = fit(ctx, [`~${d} KM`], (p) => `900 ${p}px M`, 200, -0.03);
-      ctx.font = '600 40px M';
+      const px = fit(ctx, [`~${d} KM`], (p) => `900 ${p}px ${s.fonts.display}`, 200, -0.03);
+      ctx.font = `600 40px ${s.fonts.text}`;
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const top = BLOCK_BOTTOM - text.length * 50 - 64 - px * 0.9;
       guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'distance');
@@ -505,18 +554,18 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       kicker(d <= 700 ? 'TÜRKİYE\'YE NE KADAR YAKIN' : 'TÜRKİYE\'YE UZAKLIK', top - 16 + rise);
       // the counter is its own animation in every mode: a number that runs up is the point of this beat
       ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
-      ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.03 * px}px`;
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.03 * px}px`;
       ctx.fillText(num, LEFT - 6, top + px * 0.9 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = '700 40px M';
+      ctx.letterSpacing = '0px'; ctx.font = `700 40px ${s.fonts.text}`;
       reveal(ctx, `${b.from.label} → ${b.to.label}`, LEFT, top + px * 0.9 + 60 + rise, t, b.at + 0.3, mode, s.ink, s.accent, alpha, 40);
-      ctx.font = '600 36px M';
+      ctx.font = `600 36px ${s.fonts.text}`;
       lines(text, LEFT, top + px * 0.9 + 64 + 50 + rise, 50, b.at + 0.9, s.muted, 36);
       break;
     }
     case 'status': {
       const label = sc.hook.status;
-      const px = fit(ctx, [label], (p) => `900 ${p}px M`, 104, 0.02);
-      ctx.font = '600 40px M';
+      const px = fit(ctx, [label], (p) => `900 ${p}px ${s.fonts.display}`, 104, 0.02);
+      ctx.font = `600 40px ${s.fonts.text}`;
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const top = BLOCK_BOTTOM - text.length * 52 - 40 - px * 1.25;
       guard({ x: LEFT - 12, y: top - 40, w: WIDTH + 12, h: BLOCK_BOTTOM - top + 40 }, 'status');
@@ -524,27 +573,104 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       kicker('DURUM', top - 16 + rise);
       // the stamp: a frame that closes around the word
       ctx.globalAlpha = alpha;
-      ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${0.02 * px}px`;
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${0.02 * px}px`;
       const tw = ctx.measureText(label).width;
       ctx.strokeStyle = s.status; ctx.lineWidth = 5;
       ctx.beginPath(); ctx.roundRect(LEFT - 12, top + rise, (tw + 24) * p, px * 1.25, 8); ctx.stroke();
       ctx.fillStyle = s.status; ctx.fillText(label, LEFT, top + px * 1.0 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = '600 40px M';
+      ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
       lines(text, LEFT, top + px * 1.25 + 60 + rise, 52, b.at + 0.4, s.ink, 40);
       break;
     }
     case 'close': {
-      const px = fit(ctx, b.lines.map((l) => l.replace(/\*/g, '')), (p) => `800 ${p}px M`, 72);
+      const px = fit(ctx, b.lines.map((l) => l.replace(/\*/g, '')), (p) => `800 ${p}px ${s.fonts.text}`, 72);
       const lh = Math.round(px * 1.2);
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - 50, w: WIDTH, h: BLOCK_BOTTOM - top + 50 }, 'close');
       if (b.kicker) kicker(b.kicker, top + 0.8 * lh - 0.72 * px - 26 + rise);
-      ctx.font = `800 ${px}px M`;
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      break;
+    }
+    case 'link':
+    case 'roster': {
+      // title, then the parties as flag chips, two to a row
+      const parties = sc.parties ?? [];
+      ctx.font = `600 38px ${s.fonts.text}`;
+      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
+      const px = fit(ctx, [b.title], (p) => `900 ${p}px ${s.fonts.display}`, 104, -0.01);
+      const rows = Math.ceil(parties.length / 2), chipH = 64, gap = 14;
+      const top = BLOCK_BOTTOM - text.length * 50 - rows * (chipH + gap) - 20 - px * 0.95;
+      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, b.kind);
+      kicker(b.kind === 'link' ? 'TARAFLAR' : 'KATILIMCILAR', top - 16 + rise);
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.01 * px}px`;
+      reveal(ctx, b.title, LEFT - 3, top + px * 0.85 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
+      ctx.letterSpacing = '0px';
+      const colW = (WIDTH - gap) / 2;
+      parties.forEach((p, k) => {
+        const x = LEFT + (k % 2) * (colW + gap), y = top + px * 0.95 + 20 + Math.floor(k / 2) * (chipH + gap) + rise;
+        chip(ctx, a, p.emblem, p.label, x, y, colW, chipH, s, alpha * anim(t, b.at + 0.3 + 0.12 * k, 0.4, ease.outBack));
+      });
+      ctx.font = `600 38px ${s.fonts.text}`;
+      lines(text, LEFT, top + px * 0.95 + 20 + rows * (chipH + gap) + 42 + rise, 50, b.at + 0.9, s.muted, 38);
+      break;
+    }
+    case 'recent': {
+      const n = b.points.length;
+      const count = Math.round(n * anim(t, b.at + 0.3, 1.8, ease.linear));
+      const px = fit(ctx, [String(n)], (p) => `900 ${p}px ${s.fonts.display}`, 200, -0.03);
+      ctx.font = `600 38px ${s.fonts.text}`;
+      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
+      const top = BLOCK_BOTTOM - text.length * 50 - 60 - px * 0.9;
+      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'recent');
+      kicker(b.title, top - 16 + rise);
+      // a count of our records, not of casualties: it may run up
+      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.03 * px}px`;
+      ctx.fillText(String(count), LEFT - 6, top + px * 0.9 + rise);
+      ctx.letterSpacing = '0px'; ctx.font = `600 38px ${s.fonts.text}`;
+      lines(text, LEFT, top + px * 0.9 + 58 + rise, 50, b.at + 0.5, s.ink, 38);
+      break;
+    }
+    case 'quote': {
+      const speaker = b.speaker != null ? sc.parties?.[b.speaker] : undefined;
+      const px = fit(ctx, b.lines, (p) => `700 ${p}px ${s.fonts.text}`, 64);
+      const lh = Math.round(px * 1.22);
+      const top = BLOCK_BOTTOM - b.lines.length * lh;
+      guard({ x: LEFT, y: top - 150, w: WIDTH, h: BLOCK_BOTTOM - top + 150 }, 'quote');
+      // the quotation mark is the frame: it says these are someone's words, not ours
+      ctx.globalAlpha = alpha * anim(t, b.at, 0.4); ctx.fillStyle = s.accent; ctx.font = `900 150px ${s.fonts.display}`;
+      ctx.fillText('“', LEFT - 8, top + 48 + rise);
+      if (speaker) chip(ctx, a, speaker.emblem, speaker.label, LEFT + 110, top - 118 + rise, WIDTH - 110, 56, s, alpha * anim(t, b.at + 0.15, 0.4));
+      ctx.font = `700 ${px}px ${s.fonts.text}`;
+      lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at + 0.3, s.ink, px);
       break;
     }
   }
   ctx.globalAlpha = 1; ctx.letterSpacing = '0px';
+}
+
+/** A party as a chip: its flag in a rounded frame and its name in capitals. */
+function chip(ctx: CanvasRenderingContext2D, a: Assets, emblem: string | undefined, label: string, x: number, y: number, w: number, h: number, s: Style, alpha: number) {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.55);
+  ctx.strokeStyle = hexA(s.ink.startsWith('#') ? s.ink : '#ffffff', 0.35); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 10); ctx.fill(); ctx.stroke();
+  const img = emblem ? a.emblems.get(emblem) : undefined;
+  let tx = x + 18;
+  if (img) {
+    const fh = h - 22, fw = Math.min(fh * 1.5, (fh * img.naturalWidth) / (img.naturalHeight || 1));
+    ctx.save(); ctx.beginPath(); ctx.roundRect(x + 11, y + 11, fw, fh, 4); ctx.clip();
+    ctx.drawImage(img, x + 11, y + 11, fw, fh); ctx.restore();
+    tx = x + 11 + fw + 14;
+  }
+  ctx.fillStyle = s.ink; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '2px'; ctx.textBaseline = 'middle';
+  let name = label;
+  while (ctx.measureText(name).width > x + w - tx - 12 && name.length > 3) name = name.slice(0, -2) + '…';
+  ctx.fillText(name, tx, y + h / 2 + 1);
+  ctx.restore();
 }
 
 function rgbOf(hex: string): [number, number, number] {
