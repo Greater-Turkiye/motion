@@ -1,0 +1,3675 @@
+{
+ "about": "State arms and flags, alliance emblems and flags, from Wikimedia Commons via Wikidata. Kept only under public domain, CC0, CC BY or CC BY-SA. News context only (ADR 0026).",
+ "items": {
+  "AFG": {
+   "arms": {
+    "author": "",
+    "file": "arms/afg.svg",
+    "licence": "Public domain",
+    "sha256": "326371d929154a94b63b85692a07334a689a76b92376675a8d6430ecb5d81ba6",
+    "source": "https://commons.wikimedia.org/wiki/File:Arms_of_the_Islamic_Emirate_of_Afghanistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Arms_of_the_Islamic_Emirate_of_Afghanistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Taliban Vector:  Lexicon",
+    "file": "flag/afg.svg",
+    "licence": "Public domain",
+    "sha256": "fc326ebb964d9a50e31984495d1cf94f810a8af2ecaac5615001358404a389be",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_the_Taliban.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "AGO": {
+   "arms": {
+    "author": "",
+    "file": "arms/ago.svg",
+    "licence": "Public domain",
+    "sha256": "a9cd381f66a249a9639dfd02c9106d87f39bd80bbd4538ff809d383daf0da223",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Angola.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Emblem_of_Angola.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Henrique de Carvalho Santos Vector:  SKopp",
+    "file": "flag/ago.svg",
+    "licence": "Public domain",
+    "sha256": "c1b3fb116d39434b4426bae3b90c2162ff5aa257a585eaf8535ae8412776dc33",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Angola.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ALB": {
+   "arms": {
+    "author": "Government of Albania",
+    "file": "arms/alb.svg",
+    "licence": "Public domain",
+    "sha256": "43847cd817c004bd25b5412329c1edb1a20f7a749a9e290ba922f7ef1de66866",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Albania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Coat_of_arms_of_Albania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Sadik Kaceli",
+    "file": "flag/alb.svg",
+    "licence": "Public domain",
+    "sha256": "3f241fb4f5393daf4a9098fd1486c8e801216ffe698ff8f7601f33968761100d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Albania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Flag_of_Albania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "AND": {
+   "arms": {
+    "author": "Heralder",
+    "file": "arms/and.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "2b0159ce37efa9fd0894ad4403a90adc45905e5561f6d9a6e945e7ddc6b9dba9",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_Andorra.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Coat_of_Arms_of_Andorra.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Napoleon III Vector:  HansenBCN",
+    "file": "flag/and.svg",
+    "licence": "Public domain",
+    "sha256": "643c49d312ca388a2b128b41c560d18851a9d06c8f835d096ec867fb11657867",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Andorra.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Andorra.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ARE": {
+   "arms": {
+    "author": "Government of the United Arab Emirates",
+    "file": "arms/are.svg",
+    "licence": "Public domain",
+    "sha256": "143c91eca0d79c9c7363e908ec2b35f68a56437850a9335734db1f9624279bd9",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_United_Arab_Emirates.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Emblem_of_the_United_Arab_Emirates.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Abdulla Mohammed Al Maainah",
+    "file": "flag/are.svg",
+    "licence": "Public domain",
+    "sha256": "2eb3d53df8f3f845dfafff448fb165647c8e3ed2b2f08296af1080fece92ad35",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Arab_Emirates.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ARG": {
+   "arms": {
+    "author": "Dexxter, based on the official National Symbol and on the before work by  Tonyjeff. The sun was extracted from File:Sol de Mayo-Bandera de Argentina.svg, created by the user Barcex.",
+    "file": "arms/arg.svg",
+    "licence": "Public domain",
+    "sha256": "eedd075f73b4e4b56c6b61999df06d4e3e73a1ef3c9030d96bfbaa74a377ac9a",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Argentina.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Coat_of_arms_of_Argentina.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Manuel Belgrano",
+    "file": "flag/arg.svg",
+    "licence": "Public domain",
+    "sha256": "dafb5bc6543c59249be9c7dec2298eaeaa1fe7805a62754990315cc6db93b2f3",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Argentina.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ARM": {
+   "arms": {
+    "author": "",
+    "file": "arms/arm.svg",
+    "licence": "Public domain",
+    "sha256": "27cd75ec1e4105a87ab39fa7cde839d1d858a77adf6f40b7b1c7e3d1f42bf646",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Armenia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Coat_of_arms_of_Armenia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Stepan Malkhasyants Vector:  SKopp",
+    "file": "flag/arm.svg",
+    "licence": "Public domain",
+    "sha256": "1eb2190d967efac59bb4f18f699b465f76dc3128593011e59243450cd593f846",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Armenia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Flag_of_Armenia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ATG": {
+   "arms": {
+    "author": "LadyofHats, based on a bitmap by Ralf Hartemink",
+    "file": "arms/atg.svg",
+    "licence": "Public domain",
+    "sha256": "36b61f0090b12085c8520b717437d8df76b48d2cf44e433cba410eed67700adb",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Antigua_and_Barbuda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Coat_of_arms_of_Antigua_and_Barbuda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Sir Reginald Samuel Vector:  David Benbennick",
+    "file": "flag/atg.svg",
+    "licence": "Public domain",
+    "sha256": "93e3952fcf5eab35b82dda0d850288b1889a77eead213f6ffcdb06bdfe51171f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Antigua_and_Barbuda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/Flag_of_Antigua_and_Barbuda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "AUS": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/aus.svg",
+    "licence": "Public domain",
+    "sha256": "fbdc88ef2ccafcb5982570d0dde0b480a30b3c7de425c8ec003ee128084f9dd0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Commonwealth_of_Australia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Coat_of_arms_of_the_Commonwealth_of_Australia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown  (Vector graphics image by Ian Fieggen) (only minor code changes by uploader.)",
+    "file": "flag/aus.svg",
+    "licence": "Public domain",
+    "sha256": "821360d5d8e32a1e0ec7053fdae4c9964fce3556065cb4f91367c6bf2e792b18",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Australia_(converted).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "AUT": {
+   "arms": {
+    "author": "David Liuzzo (Originalbeschreibung: „Bundesadler der Republik Österreich, Staatswappen in der heraldischen Ausgestaltung.“ / Original Description: “Coat of arms of Austria, depicting the more heraldic",
+    "file": "arms/aut.svg",
+    "licence": "Public domain",
+    "sha256": "ed9b34307ccaf7aa1e9555afa6350e66b3eba9b060a92e32e4e89228edbdc6b3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Austria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Coat_of_arms_of_Austria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Bundesministerium für Landesverteidigung",
+    "file": "flag/aut.svg",
+    "licence": "Public domain",
+    "sha256": "82b0a6991dc9716e9aaae39f1237cceccff16278ebde18cc9b681c2b63d72fef",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Austria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "AZE": {
+   "arms": {
+    "author": "Original:  BetacommandBot Vector:  Zscout370",
+    "file": "arms/aze.svg",
+    "licence": "Public domain",
+    "sha256": "223c263be8b56551a7b06c0c64c6cd6b0f1d5108baf779c3f4abd1687fee3b90",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Azerbaijan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Emblem_of_Azerbaijan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp and others",
+    "file": "flag/aze.svg",
+    "licence": "Public domain",
+    "sha256": "f16a9688b22090aaeac332332410a67ce073b9556bc9192771231ad713d5dacd",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Azerbaijan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BDI": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol.",
+    "file": "arms/bdi.svg",
+    "licence": "Public domain",
+    "sha256": "9e90e95877ec0422a4c0252d17b5e8e9f154b761c4b1962b0ddffedee1dc404c",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Burundi.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Coat_of_arms_of_Burundi.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/bdi.svg",
+    "licence": "Public domain",
+    "sha256": "6beb4b95b91709e09ea4fc0ed7f72fcc1567ff21dfaf28ce0b8234eccfc0a2af",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Burundi.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Flag_of_Burundi.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BEL": {
+   "arms": {
+    "author": "Sodacan, with some elements by Katepanomegas",
+    "file": "arms/bel.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "786cf0d4ef6f6b883f9abcc61e6609206d285e2f049d7bb16271c20eb06597bd",
+    "source": "https://commons.wikimedia.org/wiki/File:Great_coat_of_arms_of_Belgium.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Great_coat_of_arms_of_Belgium.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Dbenbenn and others",
+    "file": "flag/bel.svg",
+    "licence": "Public domain",
+    "sha256": "95933c385c9e72479ec7e63f6cbca50d07695fd2e41fab334ea549c20b234fd1",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Belgium.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Belgium.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BEN": {
+   "arms": {
+    "author": "Tinynanorobots, Fenn-O-maniC",
+    "file": "arms/ben.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "2e84acfcb4456309ee22dc9d1639c70f1673ebdc62edce63ef4e21c0efb9c778",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Benin.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/13/Coat_of_arms_of_Benin.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by User:SKopp, rewritten by User:Gabbe",
+    "file": "flag/ben.svg",
+    "licence": "Public domain",
+    "sha256": "03e7fd78282d719338630eaf2301fa9c9dbcbf57a9639a20e8fbb43353409569",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Benin.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BFA": {
+   "arms": {
+    "author": "F l a n k e r",
+    "file": "arms/bfa.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "9b8fbf55b7316833d12d85862d89892f9e61a3200acb2c47fa368ed282627eeb",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Burkina_Faso_(1984-2025).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Coat_of_arms_of_Burkina_Faso_%281984-2025%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by SKopp, rewritten by Gabbe and Андрей Перцев",
+    "file": "flag/bfa.svg",
+    "licence": "Public domain",
+    "sha256": "ab95314190d43acb0825c7e05b4419b070cad6907d36e4e60903da590ddabb56",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Burkina_Faso.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Burkina_Faso.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BGD": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol",
+    "file": "arms/bgd.svg",
+    "licence": "Public domain",
+    "sha256": "eac2c1ad53f3dbfaf5d3a85258d4a0de6a3ad957917e01fc89f9434eab4c24d6",
+    "source": "https://commons.wikimedia.org/wiki/File:National_emblem_of_Bangladesh.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/National_emblem_of_Bangladesh.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/bgd.svg",
+    "licence": "Public domain",
+    "sha256": "453b90fee62df5770d9610e8ba99e047f63f986a027cc071f2a90d79c8012150",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bangladesh.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Flag_of_Bangladesh.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BGR": {
+   "arms": {
+    "author": "Пакко",
+    "file": "arms/bgr.svg",
+    "licence": "Public domain",
+    "sha256": "4566b9ad33ac3d9bf32b3b8b57dde4a698d91186904358d6086a316f64340a1b",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Bulgaria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Coat_of_arms_of_Bulgaria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp",
+    "file": "flag/bgr.svg",
+    "licence": "Public domain",
+    "sha256": "9c023198075538da242eeb7c16192d6aed8757e4e954ed974822c24637e4cc7f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bulgaria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Bulgaria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BHR": {
+   "arms": {
+    "author": "Government of Bahrain",
+    "file": "arms/bhr.svg",
+    "licence": "CC0",
+    "sha256": "d448a0890205cfc770622eef82200af8bd2e8aa48be0a76920b60113da3d71a3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_The_Kingdom_of_Bahrain.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Coat_of_Arms_of_The_Kingdom_of_Bahrain.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Source: Drawn by SKopp, rewritten by Zscout370",
+    "file": "flag/bhr.svg",
+    "licence": "Public domain",
+    "sha256": "bfa65642e5dc9b67c3c5570dc48711f83a02dd865a251514a7243df7a5d73b24",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bahrain.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Bahrain.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BHS": {
+   "arms": {
+    "author": "Autor of SVG image: Ivangricenko",
+    "file": "arms/bhs.svg",
+    "licence": "Public domain",
+    "sha256": "116435acb656034ae66c54f0adcd71e0e6ec7f1f355561765ab97663f53736f2",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Bahamas.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Coat_of_arms_of_the_Bahamas.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Government of Bahamas",
+    "file": "flag/bhs.svg",
+    "licence": "Public domain",
+    "sha256": "6d4af8fbc02510698da025adad4b03f73085e1b9a50ad48928cb4b6807cfcba3",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Bahamas.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/93/Flag_of_the_Bahamas.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BIH": {
+   "arms": {
+    "author": "See File history below for details.",
+    "file": "arms/bih.svg",
+    "licence": "Public domain",
+    "sha256": "5943614bf6c373d72e46cc5198654a056b1b4e341f8aa87f7d5f30efed94882d",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Bosnia_and_Herzegovina.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Coat_of_arms_of_Bosnia_and_Herzegovina.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Mladen Kolobarić",
+    "file": "flag/bih.svg",
+    "licence": "Public domain",
+    "sha256": "2b379399e315c3df92a104a08b9e14d1f66169dfee0fc2213794baa1c233b75c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bosnia_and_Herzegovina.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Flag_of_Bosnia_and_Herzegovina.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BLR": {
+   "arms": {
+    "author": "Кот Баюн, Добромир Костадинов",
+    "file": "arms/blr.svg",
+    "licence": "Public domain",
+    "sha256": "b30ba024e63821ca5f7c5009752f8fa1265996d2ed411a418cc8bd23e1f9d8bf",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Belarus_(2020%E2%80%93present).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Coat_of_arms_of_Belarus_%282020%E2%80%93present%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/blr.svg",
+    "licence": "Public domain",
+    "sha256": "d4bf35a695071ec004a06a29c3d012d672030bf9257c7e79c511a4c2b3d7e6c4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Belarus.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Flag_of_Belarus.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BLZ": {
+   "arms": {
+    "author": "Original by Caleb Moore\n\nExtracted by Himasaram",
+    "file": "arms/blz.svg",
+    "licence": "Public domain",
+    "sha256": "4e5d55072f7a2c767be497a160b66bb093a0775a23338bc48484b054a89ece65",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Belize.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Coat_of_arms_of_Belize.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Caleb Moore",
+    "file": "flag/blz.svg",
+    "licence": "Public domain",
+    "sha256": "52374851127cb3c3f6cd646079ea2ec97d8d04e910ab1f335bb85027d0235ae0",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Belize.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Flag_of_Belize.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BOL": {
+   "arms": {
+    "author": "See File history, below, for details.",
+    "file": "arms/bol.svg",
+    "licence": "Public domain",
+    "sha256": "2011ee5a95a2aeeceab7eb9b0c63504174ac636200c25554559a803f20c226c3",
+    "source": "https://commons.wikimedia.org/wiki/File:Escudo_de_Bolivia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Escudo_de_Bolivia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See file history' below for details.",
+    "file": "flag/bol.svg",
+    "licence": "Public domain",
+    "sha256": "714854e37084cc25c195efdd14d5392a8c64ea03128f7fa858b7677e83a5556e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bolivia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BRA": {
+   "arms": {
+    "author": "",
+    "file": "arms/bra.svg",
+    "licence": "Public domain",
+    "sha256": "4c77ca1c7e857046cb5c66c429e10bc9dec74e4dd328cd470a76d5c20676e2cf",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Brazil.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Coat_of_arms_of_Brazil.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Raimundo Teixeira Mendes",
+    "file": "flag/bra.svg",
+    "licence": "Public domain",
+    "sha256": "041479c6a955990d32c8e45b7283afcd62eacc3592eba9bbf0162299ad77ff01",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Brazil.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BRB": {
+   "arms": {
+    "author": "Neville C. Connell, director of the Barbados Museum",
+    "file": "arms/brb.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "3609e8528547267bf42f4a63947f8f5c00b7070c89d71028d8a72c0cdb409bd4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Barbados_(2).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Coat_of_arms_of_Barbados_%282%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Denelson83",
+    "file": "flag/brb.svg",
+    "licence": "Public domain",
+    "sha256": "85ba0b3ff5f7b7a296aa4c41914f82ff70b6be9822e19c75d5ed0b2746496ff6",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Barbados.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Barbados.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BRN": {
+   "arms": {
+    "author": "extracted from the flag of Brunei, provided at the Open Clip Art website.",
+    "file": "arms/brn.svg",
+    "licence": "CC0",
+    "sha256": "cdc1a019d71310b101a909348495d571b92b1733e956a17fb8c0fabcf4d984ed",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Brunei.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Emblem_of_Brunei.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Nightstallion",
+    "file": "flag/brn.svg",
+    "licence": "Public domain",
+    "sha256": "11c704ce4271bcbddd1c372cb6dd457a278c51ce7db7ad98ab5f5c5517695dd6",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Brunei.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Brunei.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BTN": {
+   "arms": {
+    "author": "Original Author: Vector-Images.com\nConverted to SVG by: Oren neu dag",
+    "file": "arms/btn.svg",
+    "licence": "Public domain",
+    "sha256": "a571b4502f00c135e85983967ef1e0e987ff8f4150c4f90b689e76e93f464e8e",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Bhutan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Emblem_of_Bhutan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/btn.svg",
+    "licence": "Public domain",
+    "sha256": "bfbf299f9ee043d6fcc11c12cfe2dede242579b948f93a38d3c2e0ba4ebab383",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bhutan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Flag_of_Bhutan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "BWA": {
+   "arms": {
+    "author": "",
+    "file": "arms/bwa.svg",
+    "licence": "Public domain",
+    "sha256": "ba86a63cfd2dc4f73fed598b8bdff64febd372a639acbaaf4cb1f95fb526e6d1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Botswana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Coat_of_arms_of_Botswana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp, Gabbe, Madden",
+    "file": "flag/bwa.svg",
+    "licence": "Public domain",
+    "sha256": "c0972de37f5576412afc642138f479c8d843e82ffa8d96024c529bab30ba4676",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Botswana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Botswana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CAF": {
+   "arms": {
+    "author": "Unknown",
+    "file": "arms/caf.svg",
+    "licence": "Public domain",
+    "sha256": "1104db0d46f0d3a33b86fba1dd0440112174769e443f2d44f2fd98b47ff5ac4c",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Central_African_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Central_African_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Barthélemy Boganda",
+    "file": "flag/caf.svg",
+    "licence": "Public domain",
+    "sha256": "b42b5c220c98ac1df77995372a963f11d7e28205348d17fae9617c657e10892e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Central_African_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Central_African_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CAN": {
+   "arms": {
+    "author": "",
+    "file": "arms/can.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "18ba69fae647789c7b34e801b95d1991694e362a5283f9763e566a216ecf0d78",
+    "source": "https://commons.wikimedia.org/wiki/File:Royal_Coat_of_arms_of_Canada.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Royal_Coat_of_arms_of_Canada.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: George F. G. Stanley\n\nModified by: The original uploader was Illegitimate Barrister at  Wikimedia Commons.  The current SVG encoding is a rewrite performed by MapGrid.",
+    "file": "flag/can.svg",
+    "licence": "Public domain",
+    "sha256": "afe6921891d516f037e8fb9920128f8bfd86ef2ffe1a6d1d4aa7e22a032434bc",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(Pantone).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_%28Pantone%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CHE": {
+   "arms": {
+    "author": "Redo by User:-xfi-\nCredits:\n\nE Pluribus Anthony\nReisio\nWiki-vr\nZscout370",
+    "file": "arms/che.svg",
+    "licence": "Public domain",
+    "sha256": "598d72f12353a9f9c100729f552edfff869207dc16b8d73b5ff8310044664c6f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Switzerland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Coat_of_arms_of_Switzerland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown\nVector:\nUser:Marc Mongenet\nCredits:\n\nUser:-xfi-\nUser:Zscout370",
+    "file": "flag/che.svg",
+    "licence": "Public domain",
+    "sha256": "900a0befb655721c1b52b5ec2754f2f553f52b230443aaf016cc224e6a0707ce",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Switzerland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CHL": {
+   "arms": {
+    "author": "",
+    "file": "arms/chl.svg",
+    "licence": "Public domain",
+    "sha256": "a2c97d3b423128c0f858a92f5990e6f11157914254c880c5630332d1b1db722b",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Chile_(c).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Coat_of_arms_of_Chile_%28c%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See file history below for details.",
+    "file": "flag/chl.svg",
+    "licence": "Public domain",
+    "sha256": "ca4d50dcf36926c82f02b895975f351a639b0aa1b91bb6ef776f4f07f225cc34",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Chile.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Chile.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CHN": {
+   "arms": {
+    "author": "multiple people, e.g. Lin Huiyin and Liang Sicheng, see [2]",
+    "file": "arms/chn.svg",
+    "licence": "Public domain",
+    "sha256": "79d31e7d3b8ae71bb6353a410b08a19859a578e216c953347a8dcb044a211257",
+    "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%AD%E8%8F%AF%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9C%8B%E5%9C%8B%E5%BE%BD.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/%E4%B8%AD%E8%8F%AF%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9C%8B%E5%9C%8B%E5%BE%BD.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zeng Liansong",
+    "file": "flag/chn.svg",
+    "licence": "Public domain",
+    "sha256": "5fce7409cd290e6b3c5ecd09c0d2c400ae459e3d59c6c0539793ac0e803d0179",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_People%27s_Republic_of_China.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CIV": {
+   "arms": {
+    "author": "Republic of Côte d'Ivoirevectored byFOX 52",
+    "file": "arms/civ.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "29b2226cdfbcd0b53ba758afb723f1bcdcf0905ec09b895006c7a63f87168c0b",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Ivory_Coast_(2).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Coat_of_arms_of_Ivory_Coast_%282%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/civ.svg",
+    "licence": "Public domain",
+    "sha256": "86101b1e1c4f9fe1caea981d5f81994c9939c005aef3d7af8c3a1c2620132736",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_C%C3%B4te_d%27Ivoire.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CMR": {
+   "arms": {
+    "author": "Original: Unknown author Vector:  Connormah",
+    "file": "arms/cmr.svg",
+    "licence": "Public domain",
+    "sha256": "5ba1c99211189c057c9a714947fd6bd79a4e49542576fcae4a5d4823bdad685b",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Cameroon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Coat_of_arms_of_Cameroon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "(of code) -xfi-",
+    "file": "flag/cmr.svg",
+    "licence": "Public domain",
+    "sha256": "858909de3843d2a3755820310e57ebac2a442fba116f2dcda35e14659eff153e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Cameroon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Cameroon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "COD": {
+   "arms": {
+    "author": "SVG-image-maker",
+    "file": "arms/cod.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "83dacb6caeb82e9cbdbdd0779609dfd3db09b3b58193126f214a442da639f653",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Democratic_Republic_of_the_Congo_(black_spear).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Coat_of_arms_of_the_Democratic_Republic_of_the_Congo_%28black_spear%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Nightstallion",
+    "file": "flag/cod.svg",
+    "licence": "Public domain",
+    "sha256": "c862865e11e9bac140fa7d4a3b99c131bfedc98e178d747ac3fe8a0341dd3945",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Democratic_Republic_of_the_Congo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "COG": {
+   "arms": {
+    "author": "Original: Louis Mühlemann Vector:  Fenn-O-maniC",
+    "file": "arms/cog.svg",
+    "licence": "Public domain",
+    "sha256": "f1c745d783f841c14ab87210ef7afc77e55ee5c8f8ce807dedfe77b4f5ff22a2",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Republic_of_the_Congo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Coat_of_arms_of_the_Republic_of_the_Congo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/cog.svg",
+    "licence": "Public domain",
+    "sha256": "79b0117de76bf4ba824f21dc1320584d9f74337b2290e4ac1c12eefd72820c5c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Republic_of_the_Congo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_the_Republic_of_the_Congo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "COL": {
+   "arms": {
+    "author": "See File history below for details.",
+    "file": "arms/col.svg",
+    "licence": "Public domain",
+    "sha256": "06e80e5367d284f5ed6a98b6d25da372257d497d33a99303a247fa354f92fd56",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Colombia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Coat_of_arms_of_Colombia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/col.svg",
+    "licence": "Public domain",
+    "sha256": "85fd47e9d0c91d088b196609e0cb49424950d30084f31c80a44fbac18b7a377b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Colombia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "COM": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol, with the help of users AnonMoos, Kafka1, Omar86, زهير حرب and Thommy.",
+    "file": "arms/com.svg",
+    "licence": "Public domain",
+    "sha256": "58c992304d9174df4b70f3807a014359d0b7840f21e8cfa4b39d43a275df0ed2",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_the_Comoros.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Seal_of_the_Comoros.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Comoros; Vector: see file history",
+    "file": "flag/com.svg",
+    "licence": "Public domain",
+    "sha256": "0ffec041c6beb361c09810fac90016894c475049f956675af45ae90340a69d2c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Comoros.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Flag_of_the_Comoros.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CPV": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol, with the help of Waldir.",
+    "file": "arms/cpv.svg",
+    "licence": "Public domain",
+    "sha256": "b6f97b84d1263f34a97d9d9e09ef885b8e8329652874eac236c73ddeab8a1e35",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Cape_Verde.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Coat_of_arms_of_Cape_Verde.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Pedro Gregório Vector:  SKopp",
+    "file": "flag/cpv.svg",
+    "licence": "Public domain",
+    "sha256": "1fec125ca20bc86792d362379f4762f2899054b660d0d66ba323c2c53b9a9546",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Cape_Verde_(10-17).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Cape_Verde_%2810-17%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CRI": {
+   "arms": {
+    "author": "original from xrmap flag collection 2.9, HansenBCN",
+    "file": "arms/cri.svg",
+    "licence": "Public domain",
+    "sha256": "7e248a4c85adea82d0096c7efce3d94ec1479272b50ecc798e6a4f6fe055dafd",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Costa_Rica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Coat_of_arms_of_Costa_Rica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/cri.svg",
+    "licence": "Public domain",
+    "sha256": "fe4927d79e735bd7765cba91830b28c7e2aacc316365f5d8d2cea3f1e75167ac",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Costa_Rica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Flag_of_Costa_Rica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CUB": {
+   "arms": {
+    "author": "Miguel Teurbe Tolón",
+    "file": "arms/cub.svg",
+    "licence": "Public domain",
+    "sha256": "9f6e22b507897e79ff65dabd4ace9a0ccfb1f110be2975030dfc1b6ecc4b89cc",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Cuba.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Coat_of_arms_of_Cuba.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Miguel Teurbe Tolón and Narciso López",
+    "file": "flag/cub.svg",
+    "licence": "Public domain",
+    "sha256": "40bf19be4756ad71ee67f889b6c3880ac2114a105c608c9453d89a6064558886",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Cuba.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CYP": {
+   "arms": {
+    "author": "Borb, modified by User:Di (they-them)",
+    "file": "arms/cyp.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "8c6e763ae6f88171b8a8e1064f720981cfcac142f10e43114934b13d72e1a3b6",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Cyprus_(2006).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Coat_of_arms_of_Cyprus_%282006%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "İsmet Güney, SVG by User:Vzb83~commonswiki",
+    "file": "flag/cyp.svg",
+    "licence": "Public domain",
+    "sha256": "6b7eb910db8e80c07b15c12875b3aab1e08882904461de46f7cde9711b683c5e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Cyprus.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Cyprus.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "CZE": {
+   "arms": {
+    "author": "",
+    "file": "arms/cze.svg",
+    "licence": "Public domain",
+    "sha256": "d5ead89c609e6f378a49a15a562b439073bab0860877ec8ce90b5ee4770dbd26",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Czech_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Coat_of_arms_of_the_Czech_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Jaroslav Kursa",
+    "file": "flag/cze.svg",
+    "licence": "Public domain",
+    "sha256": "b68e2109de7e1ead469214b96e3c9ee8b69a7e6e4e6ac1096998500ab7b02d1c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Czech_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "DEU": {
+   "arms": {
+    "author": "Karl-Tobias Schwab",
+    "file": "arms/deu.svg",
+    "licence": "Public domain",
+    "sha256": "3ea7d9cb06dab6f9b29701daed707689c595c8bad3601fc702bb2a9f8737e257",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Germany.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Coat_of_arms_of_Germany.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:SKopp, User:Madden, and other users",
+    "file": "flag/deu.svg",
+    "licence": "Public domain",
+    "sha256": "44a4580e94ae11037b8983e43e37a220e72f884217dba5b33a94309db2dcd88b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Germany.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "DJI": {
+   "arms": {
+    "author": "Zscout370 at English Wikipedia",
+    "file": "arms/dji.svg",
+    "licence": "Public domain",
+    "sha256": "c15fe3bf5d918ae91470261196f822699a10e14452f558383b0e0e0639a56d56",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Djibouti.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Emblem_of_Djibouti.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/dji.svg",
+    "licence": "Public domain",
+    "sha256": "3c59dd181f5701aebb4c1602ae39430932a1075ee1d23d3aaea221c3ed45584f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Djibouti.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_Djibouti.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "DMA": {
+   "arms": {
+    "author": "See File History, below, for details.",
+    "file": "arms/dma.svg",
+    "licence": "Attribution",
+    "sha256": "d203bced7fe3ff7671d3aae63c8c18f571ff18ad054658e8703c3c395f94c778",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Dominica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Coat_of_arms_of_Dominica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Alwin Bully",
+    "file": "flag/dma.svg",
+    "licence": "Public domain",
+    "sha256": "2b4ef1688f9b154efc8d2018089da54758e5dad6adeb75059fe213c4209fe2e8",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Dominica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Flag_of_Dominica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "DOM": {
+   "arms": {
+    "author": "See File history below for details.",
+    "file": "arms/dom.svg",
+    "licence": "Public domain",
+    "sha256": "6e9f74f218b620abeddf9808d95aac1cc7ea6fe99ded8c2dce69d08918154ec8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Dominican_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_the_Dominican_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Juan Pablo Duarte",
+    "file": "flag/dom.svg",
+    "licence": "Public domain",
+    "sha256": "abf70de3568a7ea4c502cf1d9972a8a7dc00ce05358eacc2336aff7851de3240",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_the_Dominican_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "DZA": {
+   "arms": {
+    "author": "Original: Government of Algeria Vector:  User:SilverBullet X.",
+    "file": "arms/dza.svg",
+    "licence": "Public domain",
+    "sha256": "ee8b2709682d9f11badcbbfd06afc78723c42bbde416bd2300b92faf8aec4749",
+    "source": "https://commons.wikimedia.org/wiki/File:National_Emblem_of_Algeria_(bronze_effect).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/National_Emblem_of_Algeria_%28bronze_effect%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: National Liberation Front of Algeria Vector:  SKopp",
+    "file": "flag/dza.svg",
+    "licence": "Public domain",
+    "sha256": "35fe9924da28ee1efefce8c62f18d88fb890c1fbb247040d92291eb89bcd83d7",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Algeria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Algeria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ECU": {
+   "arms": {
+    "author": "Ysangkok and others",
+    "file": "arms/ecu.svg",
+    "licence": "CC0",
+    "sha256": "31c93be91a59e508eb06d5ae187d39a6197bde98b78354872aeca8e58691d151",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Ecuador.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Coat_of_arms_of_Ecuador.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "President of the Republic of Ecuador, first uploaded by Denelson83 as Flag of Ecuador.svg, modifications by Husunqu, Zscout370",
+    "file": "flag/ecu.svg",
+    "licence": "Public domain",
+    "sha256": "b6579b12e0f49555d608ee7a59e82aa932d4481af439f936bf1009e115f2d20e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Ecuador.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Flag_of_Ecuador.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "EGY": {
+   "arms": {
+    "author": "Flag of Egypt (variant).svg: F l a n k e r from original Flag of Egypt.svg / derivative work: Fry1989 (talk)",
+    "file": "arms/egy.svg",
+    "licence": "Public domain",
+    "sha256": "33cb30481a5276bc89e2ed20cb4741539e2e295c7abd4a5435a809e2e415d996",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Egypt_(Official).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Coat_of_arms_of_Egypt_%28Official%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/egy.svg",
+    "licence": "Public domain",
+    "sha256": "a285f98d7a785979ed8c74652506dc180055f1035d4812e2eaf442c8eb3096e0",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ERI": {
+   "arms": {
+    "author": "SanchoPanzaXXI",
+    "file": "arms/eri.svg",
+    "licence": "Public domain",
+    "sha256": "c16997866f563b0e2ab24b5901a89b5339ecef372d0681e8d4c3c02a8346e6e2",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Eritrea_(or_argent_azur).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Emblem_of_Eritrea_%28or_argent_azur%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/eri.svg",
+    "licence": "Public domain",
+    "sha256": "71b773bfa5b33e52eb020c7eff52736532aded5b354d01ff5b13d5f528251c08",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Eritrea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Flag_of_Eritrea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ESP": {
+   "arms": {
+    "author": "",
+    "file": "arms/esp.svg",
+    "licence": "Public domain",
+    "sha256": "934e511b1140fa4a4d175487fb2b4d21da4fe6c0bde893ef1e81787e48b47b1f",
+    "source": "https://commons.wikimedia.org/wiki/File:Escudo_de_Espa%C3%B1a_(variant).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Escudo_de_Espa%C3%B1a_%28variant%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "RelShot 263, Echando una mano; earlier version was Pedro A. Gracia Fajardo, escudo de Manual de Imagen Institucional de la Administración General del Estado",
+    "file": "flag/esp.svg",
+    "licence": "Public domain",
+    "sha256": "af0b860424a9bd6af63dce070d7f7cb4c7b490c6269fc1cd4f35c45679a20500",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Spain.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "EST": {
+   "arms": {
+    "author": "Riigikantselei",
+    "file": "arms/est.svg",
+    "licence": "Public domain",
+    "sha256": "c27374c746fd889bc377aae94437c7e3a956975592119cb74414a21cedcb80d1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Estonia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Coat_of_arms_of_Estonia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown author Vector:  SKopp, PeepP  and ‍others",
+    "file": "flag/est.svg",
+    "licence": "Public domain",
+    "sha256": "2ec2c11b0dc6c410a21bb1275930ee5403ffde4084b6733a3847a7027290119d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Estonia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Flag_of_Estonia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ETH": {
+   "arms": {
+    "author": "IvY88",
+    "file": "arms/eth.svg",
+    "licence": "Public domain",
+    "sha256": "8aa7d61be957dfd3a4d3dcbe0fc583d76ff0ca5068039d61bb3d651a6740063e",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Ethiopia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Emblem_of_Ethiopia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by User:SKopp",
+    "file": "flag/eth.svg",
+    "licence": "Public domain",
+    "sha256": "f1feaa7f773dfaf2e95787788922d4e4c768170fb3764860a26ec548a2acbd05",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Flag_of_Ethiopia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "FIN": {
+   "arms": {
+    "author": "",
+    "file": "arms/fin.svg",
+    "licence": "Public domain",
+    "sha256": "a9ed126479e824c074a9cac084ef7833df55606a5e6e429df3549748aa2bffb5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Finland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Coat_of_arms_of_Finland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown",
+    "file": "flag/fin.svg",
+    "licence": "Public domain",
+    "sha256": "644a2d69b1a97f4e71b4a8341916a321ef9b2666774d3e12a7c0d95f56e7f2b3",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Finland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Finland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "FJI": {
+   "arms": {
+    "author": "Simi Tukidia",
+    "file": "arms/fji.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "4e38d83494385692d1905f4a9c0a0517c9363d06656d6d7327704d374bfac0c7",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Fiji.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Coat_of_arms_of_Fiji.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Tessa Mackenzie",
+    "file": "flag/fji.svg",
+    "licence": "Public domain",
+    "sha256": "e2c0c872c02b315510c6923a7913d1783accabab0ea1eef103a3f23165af320f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Fiji.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Fiji.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "FRA": {
+   "arms": {
+    "author": "Hans-Ulrich Herzog",
+    "file": "arms/fra.svg",
+    "licence": "Public domain",
+    "sha256": "5e4ecea363189a145b49cf67c2b5590dc8ee34c8b0abfbd0c7d19bcdbd5585d0",
+    "source": "https://commons.wikimedia.org/wiki/File:Arms_of_the_French_Republic.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Arms_of_the_French_Republic.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown Vector:  SKopp",
+    "file": "flag/fra.svg",
+    "licence": "Public domain",
+    "sha256": "e949902c7677422d88137d385b9edbe91323470c7933824cc968aca3965fc37c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_France.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "FSM": {
+   "arms": {
+    "author": "Coat_of_arms_of_the_Federated_States_of_Micronesia.jpg: Aotearoa\nderivative work: Pbroks13 (talk)",
+    "file": "arms/fsm.svg",
+    "licence": "Public domain",
+    "sha256": "9fa6c1f8fbf624fc86c4e7bdc989d3635c29ea429d1202079c92a5f2bd162395",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_the_Federated_States_of_Micronesia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Seal_of_the_Federated_States_of_Micronesia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/fsm.svg",
+    "licence": "Public domain",
+    "sha256": "1b77fbb8bdd4d4a11a8b3f020728844f7fbd75e2e9b844f56eabc98d09f95313",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Federated_States_of_Micronesia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Flag_of_the_Federated_States_of_Micronesia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GAB": {
+   "arms": {
+    "author": "Original by Louis Mühlemann, vectorised by user:Fenn-O-maniC",
+    "file": "arms/gab.svg",
+    "licence": "Public domain",
+    "sha256": "3f699d042834461f6cc57cfde29c4b709cdb04969ee725cacf598b491fd19318",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Gabon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Coat_of_arms_of_Gabon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Léon Augé and Pierre Claver Eyeghe",
+    "file": "flag/gab.svg",
+    "licence": "Public domain",
+    "sha256": "43e2be0bceff86a5e9611d197478256416e2ed1b106b9df24651d553bc87b41f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Gabon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/Flag_of_Gabon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GBR": {
+   "arms": {
+    "author": "",
+    "file": "arms/gbr.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "9f174df23d430fa5fd2afb7a84c05cdcd2579a870212514e8dd9d158e6c63ec3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_United_Kingdom_(2022,_variant_2).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Coat_of_arms_of_the_United_Kingdom_%282022%2C_variant_2%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Acts of Union 1800 Vector:  Yaddah",
+    "file": "flag/gbr.svg",
+    "licence": "Public domain",
+    "sha256": "b93bb15033d6c2219f290121d40c0a741765bd4b077ebcf5a5b0d917ff725a28",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Kingdom_(3-5).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GEO": {
+   "arms": {
+    "author": "Mamuka Gongadze; SVG creator Vakhtang Jokhadze from F l a n k e r's Image:Coat of arms of Georgia.svg",
+    "file": "arms/geo.svg",
+    "licence": "Public domain",
+    "sha256": "2841fdf29baa1b161e2057190f073b43f17af22f1c1a37c302617d2225431589",
+    "source": "https://commons.wikimedia.org/wiki/File:Greater_coat_of_arms_of_Georgia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Greater_coat_of_arms_of_Georgia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Last update by MapGrid\n\nSKopp",
+    "file": "flag/geo.svg",
+    "licence": "Public domain",
+    "sha256": "0be14c9858af6deb6b913b42a091ee99b01405accc89acce3b88446422b2c951",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Georgia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Georgia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GHA": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/gha.svg",
+    "licence": "Public domain",
+    "sha256": "b0026491e67fe9bf9fd3cfceeb7278ae6b98dda7d49d877233b66930db387aa8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Ghana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Coat_of_arms_of_Ghana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Theodosia Okoh",
+    "file": "flag/gha.svg",
+    "licence": "Public domain",
+    "sha256": "777bffbb84309fece123a7f27fdf2c566556b829440a7919d5a9d813d5dc1122",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Ghana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Ghana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GIN": {
+   "arms": {
+    "author": "Turn685",
+    "file": "arms/gin.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "18d0b93080c5944dc8f90e6c6e0dd5e6666b608fbe20e9f1c8a004ac7488cba8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Coat_of_arms_of_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/gin.svg",
+    "licence": "Public domain",
+    "sha256": "4932e18d832d6a781bc00400b69136cc9406234d3800e1e66ea809550a84b423",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Flag_of_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GMB": {
+   "arms": {
+    "author": "Original design by Nicholas Potin, vectorised by user:Fenn-O-maniC",
+    "file": "arms/gmb.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "a017fd45bc6bcdc68abb8170d8bd1b80f6ce7c7e17642f4277367a7d5c976af6",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_The_Gambia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Coat_of_arms_of_The_Gambia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Vzb83\n\n\niThe source code of the previous  SVG was invalid due to 39 errors.",
+    "file": "flag/gmb.svg",
+    "licence": "Public domain",
+    "sha256": "1f95fb77a8b0965a07052d4dd19f18a0114a962194da8e9a1adb75d135c6ddda",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_The_Gambia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_The_Gambia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GNB": {
+   "arms": {
+    "author": "DzWiki",
+    "file": "arms/gnb.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "f6a2036122cd0f87c969b19cb45c76124e32a4a32fc170495ca0144b694bc7b4",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Guinea-Bissau.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Emblem_of_Guinea-Bissau.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/gnb.svg",
+    "licence": "Public domain",
+    "sha256": "198766a42c30435f0683a57cdfc5c3948d8ce1d011950a4a7f587bfae185057f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Guinea-Bissau.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_Guinea-Bissau.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GNQ": {
+   "arms": {
+    "author": "Szczepan dyskusja Mail 08:10, 2 April 2007 (UTC)",
+    "file": "arms/gnq.svg",
+    "licence": "Public domain",
+    "sha256": "529c1e638443e4727bdd7e49ecbf8dfe3d8e45e2a4df629066a643054d034e7f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Equatorial_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Coat_of_arms_of_Equatorial_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/gnq.svg",
+    "licence": "Public domain",
+    "sha256": "88d8921155c8d8d664afc4a417b3947643d51428cff237dcd43c9d0a366af653",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Equatorial_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Equatorial_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GRC": {
+   "arms": {
+    "author": "File:Coat of Arms of Greece (Ministries).svg: Tonyjeff, based on national symbol / derivative work: Philly boy92",
+    "file": "arms/grc.svg",
+    "licence": "Public domain",
+    "sha256": "b33a3f2a4d1ba39bd4e9b8be6c8581d04df74f89edae537e34114693580b9545",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Greece.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Coat_of_arms_of_Greece.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/grc.svg",
+    "licence": "Public domain",
+    "sha256": "d65b82614f0cd167a767abfda1abc1ef99e87ef48e5755f3d33e4526e3cad365",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Greece.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Greece.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GRD": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/grd.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "0e88e9d9fe9c48b101d39c3bcd65f7846ee31ba7e87444ce77ee1d4284205ea5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Grenada.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/03/Coat_of_arms_of_Grenada.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See file history below for details.",
+    "file": "flag/grd.svg",
+    "licence": "Public domain",
+    "sha256": "a2068c160dddaf85e5ac16423100c50d1970990a7468f3e81eed2d11426c689a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Grenada.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Grenada.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GTM": {
+   "arms": {
+    "author": "User:K21edgo",
+    "file": "arms/gtm.svg",
+    "licence": "Public domain",
+    "sha256": "a4a509fd572040e22596e7d37e32bdcf38e86fdb1fa0e875f628faa2abd258e5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Guatemala.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Coat_of_arms_of_Guatemala.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "K21edgo",
+    "file": "flag/gtm.svg",
+    "licence": "Public domain",
+    "sha256": "46f3b0c5a8db682596b47c2bb786c6f5a40f8b785b9d19572cb2040b3bdfe21a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Guatemala.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Flag_of_Guatemala.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "GUY": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/guy.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "63caeecf88b1f4de01bd6b2afa53b6349abcaa689cd223e4e6affe78d650faa3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Guyana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Coat_of_arms_of_Guyana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Whitney Smith",
+    "file": "flag/guy.svg",
+    "licence": "Public domain",
+    "sha256": "680182ee72c03b97bf3d51650f8f0f85ef56365344d62a10b33397fbe7d11d8d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Guyana.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Flag_of_Guyana.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "HND": {
+   "arms": {
+    "author": "Kes47",
+    "file": "arms/hnd.svg",
+    "licence": "Public domain",
+    "sha256": "dc88693032f79f35cbbd7df0105019f00cfd25a217a7b8d8ffb271509f941cf4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Honduras.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Coat_of_arms_of_Honduras.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Kes47",
+    "file": "flag/hnd.svg",
+    "licence": "Public domain",
+    "sha256": "9b16a4626ae4f9a4f352b8ab1083643ada57eb3b92b5bc265ca4db4c47f3f772",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Honduras_(1949%E2%80%932022,_2026%E2%80%93present).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Honduras_%281949%E2%80%932022%2C_2026%E2%80%93present%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "HRV": {
+   "arms": {
+    "author": "",
+    "file": "arms/hrv.svg",
+    "licence": "Public domain",
+    "sha256": "b5bafeb967f354a58e83dffb88a2206b5c759103c0c7864749f614386ed8a724",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Croatia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Coat_of_arms_of_Croatia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Nightstallion, Elephantus, Neoneo13, Denelson83, Rainman, R-41, Minestrone, Lupo, Zscout370,MaGa (based on Decision of the Parliament)",
+    "file": "flag/hrv.svg",
+    "licence": "Public domain",
+    "sha256": "220af373c5701c4f4c09a6e1765305f571442940a3c921bd2daac483761b2a8f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Croatia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "HTI": {
+   "arms": {
+    "author": "Lokal_Profil and Myriam Thyes",
+    "file": "arms/hti.svg",
+    "licence": "Public domain",
+    "sha256": "fed7adab425e0f152dd91faa325a3a7963fb49aa73030bee4e7ce090cf6c168a",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Haiti.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Coat_of_arms_of_Haiti.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "(colours and size changes of the now deleted versions) Madden, Vzb83, Denelson83, Chanheigeorge, Zscout370 and Nightstallion\n\nCoat of arms :Lokal_Profil and Myriam Thyes",
+    "file": "flag/hti.svg",
+    "licence": "Public domain",
+    "sha256": "3512c10d45823289a610da6477788847578e6ea9b70328bcc25e0d4cbef42dcb",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Haiti.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Flag_of_Haiti.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "HUN": {
+   "arms": {
+    "author": "",
+    "file": "arms/hun.svg",
+    "licence": "Public domain",
+    "sha256": "3ad221bd4454571293ae4c89be561c217d6559dbaee428e1517e36fe44dd03f4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Hungary.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Coat_of_arms_of_Hungary.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp",
+    "file": "flag/hun.svg",
+    "licence": "Public domain",
+    "sha256": "2e52f26ef457b26f2b9c7716ba3e0b86ddbcd952052e04da38123a2c2ffbd870",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Hungary.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "IDN": {
+   "arms": {
+    "author": "Gunawan Kartapranata",
+    "file": "arms/idn.svg",
+    "licence": "Public domain",
+    "sha256": "8153704649b7bab5ce2103d9c60c0f547c4d66aa2e9f736837a8a3c104a02082",
+    "source": "https://commons.wikimedia.org/wiki/File:National_emblem_of_Indonesia_Garuda_Pancasila.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Jayakatwang",
+    "file": "flag/idn.svg",
+    "licence": "Public domain",
+    "sha256": "2ab57d2d418baba7b0ff55729435d0c780ca52a98b754f92d44e96cd1399dae5",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Indonesia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "IND": {
+   "arms": {
+    "author": "Government of India",
+    "file": "arms/ind.svg",
+    "licence": "Public domain",
+    "sha256": "f6b7475f96250c408c515bc56d5a6f34a60676770ca6b02f5d317245f267f1af",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_India.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Government of India",
+    "file": "flag/ind.svg",
+    "licence": "Public domain",
+    "sha256": "95d7239707482165fbc0f685d5f493633639f16771c1fef9701f7ee66dcdf343",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_India.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "IRL": {
+   "arms": {
+    "author": "Setanta Saki",
+    "file": "arms/irl.svg",
+    "licence": "Public domain",
+    "sha256": "af333123808d289917c604beaed5d6c6d2225c25b5ab3069d7d768d86838c78f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Ireland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Coat_of_arms_of_Ireland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Éire",
+    "file": "flag/irl.svg",
+    "licence": "Public domain",
+    "sha256": "96c46e68d8588fd10d30bcb3ff7b9ab4ffb08c41902aa5455c99722bce676e69",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Ireland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "IRN": {
+   "arms": {
+    "author": "Madden",
+    "file": "arms/irn.svg",
+    "licence": "Public domain",
+    "sha256": "dabf1d4bdecc964866c0552588be4a0c1e32af538ce32b8db8cfaf6bb43d900f",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Iran.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Emblem_of_Iran.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SVG file: SiBr4Designer: Hamid NadimiConstruction: ISIRI",
+    "file": "flag/irn.svg",
+    "licence": "Public domain",
+    "sha256": "c1d6eb64f7060fb362ad8efd0205cdd37c7443fa1f009b9882feede56022009c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Iran.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Flag_of_Iran.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "IRQ": {
+   "arms": {
+    "author": "Tonyjeff, Omar86, Kafka1   and  AnonMoos; AnonMoos, Militaryace",
+    "file": "arms/irq.svg",
+    "licence": "Public domain",
+    "sha256": "b320e9e35c89b60cb87a5fb1025a2ec7fc65d4bdc356a6ae9ffaa3afc394f5db",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Iraq.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Coat_of_arms_of_Iraq.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/irq.svg",
+    "licence": "Public domain",
+    "sha256": "2a3ac265b9efcfb0b8761b753b8dba85b63af329deed39dc7a363e61dad70667",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Iraq.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Flag_of_Iraq.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ISL": {
+   "arms": {
+    "author": "Rkt2312",
+    "file": "arms/isl.svg",
+    "licence": "Public domain",
+    "sha256": "cec2ac3fb12d299194e7a1eea07e475b07ebc4d92f18c25fa2100e718f35ebd8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Iceland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Coat_of_arms_of_Iceland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Matthías Þórðarson Vector:  Árni Dagur and Magasjukur2",
+    "file": "flag/isl.svg",
+    "licence": "Public domain",
+    "sha256": "225f2c249cb0ae48bb954cc768c49f3f7143ae6150c0a44f58cedbb6a9a995b4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Iceland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Iceland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ISR": {
+   "arms": {
+    "author": "Original design by Max and Gabriel Shamir; Tonyjeff, based on national symbol.",
+    "file": "arms/isr.svg",
+    "licence": "Public domain",
+    "sha256": "f4a3316d21d8bc4de5dd987a1213bd27172e24117e93cc4050027108e59acdf4",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Israel.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Emblem_of_Israel.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Israel Belkind and Fanny Abramovitch (original)\n“The Provisional Council of State Proclamation of the Flag of the State of Israel” of 25 Tishrei 5709 (28 October 1948) provides the official specificat",
+    "file": "flag/isr.svg",
+    "licence": "Public domain",
+    "sha256": "a5732410968d238f8a506a455bd7be7fea2908d0abcf638020fbe7b58bd4ad2f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Israel.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ITA": {
+   "arms": {
+    "author": "F l a n k e r from the original paint of Paolo Paschetto",
+    "file": "arms/ita.svg",
+    "licence": "Public domain",
+    "sha256": "da0df764042f3cd7e5f8416a16110cb2260a5a2647225c852c6a11f9d01b620e",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Italy.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Emblem_of_Italy.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See below.",
+    "file": "flag/ita.svg",
+    "licence": "Public domain",
+    "sha256": "c939e50605c5a08df1aaf19818f74d2919a9d3c3b7aa7cd90520b8bfc9c5dddc",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Italy.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/03/Flag_of_Italy.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "JAM": {
+   "arms": {
+    "author": "William Sancroft",
+    "file": "arms/jam.svg",
+    "licence": "Public domain",
+    "sha256": "0d0b8fccc57df249b1ce53125ac9e051fd42f34491c694e7885f4f9665a98ad4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Jamaica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Coat_of_arms_of_Jamaica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "The SVG code is valid. This vector image was created with Inkscape by SKopp, and then manually edited by Zscout370, Madden and others.",
+    "file": "flag/jam.svg",
+    "licence": "Public domain",
+    "sha256": "ebad0857b427c3b40fbba25b83c30d1019b2bfb185fe434a45394abdaba86636",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Jamaica.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Jamaica.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "JOR": {
+   "arms": {
+    "author": "Original Author: Vector-Images.com\nConverted from EPS to SVG by: Oren neu dag",
+    "file": "arms/jor.svg",
+    "licence": "Public domain",
+    "sha256": "9d76e01b5d83a9dc315afcbb2d9efe28d68a47fd6e381b52d6c56fd01c5e38ba",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Jordan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Coat_of_arms_of_Jordan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown",
+    "file": "flag/jor.svg",
+    "licence": "Public domain",
+    "sha256": "7a044c4d0f995a5dafe157e4554e4b9bc5e77ab303c6a04685999cc1930f79dc",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Jordan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Flag_of_Jordan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "JPN": {
+   "arms": {
+    "author": "Fonsecafrancesco04",
+    "file": "arms/jpn.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "9f6b6e57796bd8619ef219f52b26f0a6674e7c8f66ba1401ca557a9db49c380f",
+    "source": "https://commons.wikimedia.org/wiki/File:Kamon_of_the_Imperial_House_of_Japan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Kamon_of_the_Imperial_House_of_Japan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Various",
+    "file": "flag/jpn.svg",
+    "licence": "Public domain",
+    "sha256": "35e785339e19d1ec1987cb9c3d8e66fc97f29a287db0b0b590b8dfdd96d4766b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Japan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Flag_of_Japan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KAZ": {
+   "arms": {
+    "author": "Government of Kazakhstan - SVG for the cyrillic version by User:Bingread, based on \"Векторизация эталонного герба РК (СТ РК 989 – 2008) --- С 1 апреля 2008 года утвержден и введен в действие СТ РК 989",
+    "file": "arms/kaz.svg",
+    "licence": "Public domain",
+    "sha256": "fced3d0bbd1cfaadeebe17a84ddcdf4b6df38ad464d7011a6671619ca793bb93",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Kazakhstan_latin.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Emblem_of_Kazakhstan_latin.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Shaken Niyazbekop",
+    "file": "flag/kaz.svg",
+    "licence": "Public domain",
+    "sha256": "bcf331e5a92785976aabe77aeac25de912e97d4e20557c521359e1033d1450af",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kazakhstan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Kazakhstan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KEN": {
+   "arms": {
+    "author": "Ashiriz",
+    "file": "arms/ken.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "0498fd219e8c6448b454209ad4dae858e9c2ff790639b605c3a20b13cf8d50fe",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Kenya_(Official).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Coat_of_arms_of_Kenya_%28Official%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Pumbaa80",
+    "file": "flag/ken.svg",
+    "licence": "Public domain",
+    "sha256": "4e750d2b4aba128580e40052630883aee27419dcbd87ea44a4ede609e7c42a1b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kenya.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Kenya.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KGZ": {
+   "arms": {
+    "author": "А. Абдраев (A. Abdraev), С. Дубанаев (S. Dubanaev) 1994. Standardized version:Nurbek Nasyranbekov Nargiza Kulataeva, Kanat Karapashov, Marcel Sheishenov(2016).",
+    "file": "arms/kgz.svg",
+    "licence": "Public domain",
+    "sha256": "2da21ee39dfa0d112f551fe2477c2867617da6d5db79ba7a739cfb9ebf3bc165",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Kyrgyzstan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Emblem_of_Kyrgyzstan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Shakiev N.T., Primov U.B.",
+    "file": "flag/kgz.svg",
+    "licence": "Public domain",
+    "sha256": "d6baff517bb0b83b0a6e8b8e650534b8420da5940dd758646e239e7429f7e29e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kyrgyzstan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Flag_of_Kyrgyzstan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KHM": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/khm.svg",
+    "licence": "Public domain",
+    "sha256": "714ae98aa3b649ae017ceb046cab4236a1a5c646dc9acec79cce26086df25025",
+    "source": "https://commons.wikimedia.org/wiki/File:Royal_arms_of_Cambodia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Royal_arms_of_Cambodia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/khm.svg",
+    "licence": "Public domain",
+    "sha256": "d3e7df02fdb48d08e6784f4c3eead2c026fe458a8cdea8d09c78cded471eac35",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Cambodia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_Cambodia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KIR": {
+   "arms": {
+    "author": "",
+    "file": "arms/kir.svg",
+    "licence": "Public domain",
+    "sha256": "a220acecb3983256026b13016bc66c4b126513125908594e8f7feac94b1146b4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Kiribati.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Coat_of_arms_of_Kiribati.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Hanzlan",
+    "file": "flag/kir.svg",
+    "licence": "Public domain",
+    "sha256": "ddefae7f5a49fffb9228ce2a47016d6b5390fb5bf2ff441df66867f20c2b51e3",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kiribati.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Kiribati.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KNA": {
+   "arms": {
+    "author": "BaronJaguar",
+    "file": "arms/kna.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "5b1fafd3722b8bd159f782ee113d80e8dc1ea150d0e1b88a67c4778a387b7b84",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_Saint_Kitts_and_Nevis.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Coat_of_Arms_of_Saint_Kitts_and_Nevis.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Edrice Lewis",
+    "file": "flag/kna.svg",
+    "licence": "Public domain",
+    "sha256": "c1b62da9d8c296b824f6ec45839f983f865ae2e1e04dbe873ee915d8bd06430b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Kitts_and_Nevis.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Saint_Kitts_and_Nevis.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KOR": {
+   "arms": {
+    "author": "Government of the Republic of Korea",
+    "file": "arms/kor.svg",
+    "licence": "Public domain",
+    "sha256": "173d27505ff0897cef920a94e9724ddab0a4d24079e4dc4c4a7038f03081fca6",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_South_Korea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Emblem_of_South_Korea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Government of the Republic of Korea Vector:  Great Brightstar and others",
+    "file": "flag/kor.svg",
+    "licence": "Public domain",
+    "sha256": "d8ec2a77a317c28617cbd5e7114c3ec9697120670e343ede5ee5bd0b1b4cd110",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Korea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "KWT": {
+   "arms": {
+    "author": "AK Alrabah",
+    "file": "arms/kwt.svg",
+    "licence": "CC0",
+    "sha256": "6ae82d0e68abb1b92684445f9a325881a95d1e8f4336e8a7e1c7d09a77e761ae",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_State_of_Kuwait.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Emblem_of_the_State_of_Kuwait.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/kwt.svg",
+    "licence": "Public domain",
+    "sha256": "b550075b6f53c591fabdcd505be66c5085dff0168edd9a96c6b3c1d939e8bcbb",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kuwait.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Flag_of_Kuwait.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LAO": {
+   "arms": {
+    "author": "DTR",
+    "file": "arms/lao.svg",
+    "licence": "Public domain",
+    "sha256": "9a8fc20ee43f5044069507ce89d5c1f700c7e053ce26061f80093bfc48fa28b0",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Laos_(1991-2025).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Emblem_of_Laos_%281991-2025%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp",
+    "file": "flag/lao.svg",
+    "licence": "Public domain",
+    "sha256": "4d8b2ffd9f0565f534f6cafb6c389b31d538465ae8fefc72a42797959884b44a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Laos.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Flag_of_Laos.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LBN": {
+   "arms": {
+    "author": "Zscout370",
+    "file": "arms/lbn.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "fafc303e604a6943c0b16fea111e0b71ad7f3ec2b97b94b44decfb220ff4eaa1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Lebanon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Coat_of_arms_of_Lebanon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Henri Pharaon",
+    "file": "flag/lbn.svg",
+    "licence": "Public domain",
+    "sha256": "ad184d36e7183828aecb2b3e6d05a92d454a4f01d478e38ce8c7db78d83e913c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lebanon.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Flag_of_Lebanon.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LBR": {
+   "arms": {
+    "author": "FXXX",
+    "file": "arms/lbr.svg",
+    "licence": "Public domain",
+    "sha256": "79613c7f67c94c3e6ac1de01988db528cf15318523517fd3fdb939a50a54412f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Liberia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Coat_of_arms_of_Liberia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Government of Liberia",
+    "file": "flag/lbr.svg",
+    "licence": "Public domain",
+    "sha256": "278a8dc3053e743c55c46314226cce30a92e0d83aa47406a7f70df8c43aed3a7",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Liberia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Flag_of_Liberia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LBY": {
+   "arms": {
+    "author": "Government of National Unity of the State of Libya",
+    "file": "arms/lby.svg",
+    "licence": "Public domain",
+    "sha256": "b0cc2294fe39d71dc0a095b14854455fe8d5a1aaf3e27ceac53eadc8283de3a7",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_the_Government_of_National_Unity_(Libya).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Seal_of_the_Government_of_National_Unity_%28Libya%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Various  The SVG code is valid. This  vector image was created with a text editor.",
+    "file": "flag/lby.svg",
+    "licence": "Public domain",
+    "sha256": "f2a61cb08640dbdf133f21e02c69b89fe601ec415bb9785e6cdad492ff47987a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Libya.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LCA": {
+   "arms": {
+    "author": "Diafora",
+    "file": "arms/lca.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "e2e15b9b240d909a7c1d9efff65cc1c440f4e578e09e8a38d50a6176a1ac383e",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Saint_Lucia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Coat_of_arms_of_Saint_Lucia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Dunstan St Omer",
+    "file": "flag/lca.svg",
+    "licence": "Public domain",
+    "sha256": "79d6eec40542439c9e1c848f6c607209a1b8e7c36cb973267df69a6a3c612e74",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Lucia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Saint_Lucia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LIE": {
+   "arms": {
+    "author": "SVG Added Ramos",
+    "file": "arms/lie.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "58613544382bdb00f6fa3611501d7060f6baca83d4b4b2d0cb31932d50e4ec37",
+    "source": "https://commons.wikimedia.org/wiki/File:Staatswappen-Liechtensteins.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Staatswappen-Liechtensteins.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Mnmazur and others",
+    "file": "flag/lie.svg",
+    "licence": "Public domain",
+    "sha256": "b103062879cf21eafa60bbeb78f9974b26a656d49285eee9792c3fb4662478d1",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Liechtenstein.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Flag_of_Liechtenstein.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LKA": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol.",
+    "file": "arms/lka.svg",
+    "licence": "Public domain",
+    "sha256": "66f88330a95093ee453837672d0ed736b4e417bec9188b56bb3adf929bc6f438",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Sri_Lanka.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Emblem_of_Sri_Lanka.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original:  Sri Lanka\nVectorization:  Zscout370, Mike Rohsopht",
+    "file": "flag/lka.svg",
+    "licence": "Public domain",
+    "sha256": "eea9217df822c4b9a50001821453f73cb45d61df96086cec87cb4a2be2e066fd",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Sri_Lanka.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Sri_Lanka.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LSO": {
+   "arms": {
+    "author": "Vectorised by user:Fenn-O-maniC",
+    "file": "arms/lso.svg",
+    "licence": "Public domain",
+    "sha256": "f45914d45ca82f1ebd3ef5aeaa6980dc38e754989cbfd80fdc513813b52960ab",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Lesotho.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Coat_of_arms_of_Lesotho.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/lso.svg",
+    "licence": "Public domain",
+    "sha256": "5a7712cdaafa9b729531d9429f2eff4cc9d73542dd853b45d1239431478287cb",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lesotho.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Flag_of_Lesotho.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LTU": {
+   "arms": {
+    "author": "Government of Lithuania",
+    "file": "arms/ltu.svg",
+    "licence": "Public domain",
+    "sha256": "ff8870326a233c51440fcd0e0981eb8967dee5c8b6a5b0e27fdd91a52d57149f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Lithuania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Coat_of_arms_of_Lithuania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Jonas Basanavičius, Tadas Daugirdas and Antanas Žmuidzinavičius Vector:  SKopp  The SVG code is valid. This  flag was created with a text editor.Previous version had been created with Inksca",
+    "file": "flag/ltu.svg",
+    "licence": "Public domain",
+    "sha256": "9743f780184a60fc75a312b34151ff1a2699e0bf0d456eb91dcbae0472b4d566",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lithuania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Lithuania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LUX": {
+   "arms": {
+    "author": "Katepanomegas",
+    "file": "arms/lux.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "35610d2eb2f9798e6c5290a2c7794629c0be3b67f7c6cd4330657f806cbd01f7",
+    "source": "https://commons.wikimedia.org/wiki/File:Greater_coat_of_arms_of_the_grand-duchy_of_Luxembourg.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Greater_coat_of_arms_of_the_grand-duchy_of_Luxembourg.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by User:SKopp",
+    "file": "flag/lux.svg",
+    "licence": "Public domain",
+    "sha256": "57c7d95e31cbb37cc41072b7c4c6149cc2286b37758c908e8335a4a7449cdf5e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Luxembourg.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Flag_of_Luxembourg.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "LVA": {
+   "arms": {
+    "author": "The original uploader was Zscout370 at English Wikipedia.",
+    "file": "arms/lva.svg",
+    "licence": "Public domain",
+    "sha256": "ae7dc98afe75659d82c7fdd2cdc023643413f30bf8950a634e59ae0e228c9db2",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Latvia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Coat_of_arms_of_Latvia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Ansis Cīrulis Vector:  SKopp",
+    "file": "flag/lva.svg",
+    "licence": "Public domain",
+    "sha256": "cf4a4e4291180ebb8c4af4970a3f74a6bd9693eed357c032be210c8d36f94b7b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Latvia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Latvia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MAR": {
+   "arms": {
+    "author": "Government of Morocco",
+    "file": "arms/mar.svg",
+    "licence": "Public domain",
+    "sha256": "99d43799989b679a36940861a0d35b7e31ae52fec2983a01a669bbe9e79a2f60",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Morocco.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Coat_of_arms_of_Morocco.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Denelson83, Zscout370",
+    "file": "flag/mar.svg",
+    "licence": "Public domain",
+    "sha256": "576f97976dfd505c002d39b34eeef0f95f29e6396e26870b0a3887d7bb8e42b4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Morocco.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MCO": {
+   "arms": {
+    "author": "",
+    "file": "arms/mco.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "a4873402beeab262edddfc8dc8b1329838602eb942f4c9c3c6b432ab2382eb8a",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Monaco.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Coat_of_arms_of_Monaco.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by User:SKopp",
+    "file": "flag/mco.svg",
+    "licence": "Public domain",
+    "sha256": "28d1941e74f7b9e235ad7b5ad740cbb33d6564394b8efa2cbd6a8701504b68af",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Monaco.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Flag_of_Monaco.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MDA": {
+   "arms": {
+    "author": "",
+    "file": "arms/mda.svg",
+    "licence": "Public domain",
+    "sha256": "b56383ba85a8d8a614c4c424b93d9423af4812dd29136fbcdd15223684560a26",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Moldova.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Coat_of_arms_of_Moldova.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Gheorghe Vrabie",
+    "file": "flag/mda.svg",
+    "licence": "Public domain",
+    "sha256": "267604cb305206bdcc7856d49dab197ea4b1515fd4d200c29cdbdb07045055c8",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Moldova.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Moldova.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MDG": {
+   "arms": {
+    "author": "Ndriana",
+    "file": "arms/mdg.svg",
+    "licence": "Public domain",
+    "sha256": "79c1a4093cffda7d748710b84bef80adec7c3c773d46f1d5d4eb1e1fd6771371",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_Madagascar.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Seal_of_Madagascar.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/mdg.svg",
+    "licence": "Public domain",
+    "sha256": "a302a82027fb4c1739350e49505791537ed26a3b6326558b09bdc87dcf2b6cb8",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Madagascar.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Madagascar.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MDV": {
+   "arms": {
+    "author": "Ichwan Palongengi. Original emblem is property of the Maldivian government",
+    "file": "arms/mdv.svg",
+    "licence": "Public domain",
+    "sha256": "42f65c630cbef163b195ebf20b16629c00ff54d36a0212cb0148730f4a8006c7",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Maldives.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Emblem_of_Maldives.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history, below, for details.",
+    "file": "flag/mdv.svg",
+    "licence": "Public domain",
+    "sha256": "45f64c4eecbda57c8f419eb222be5c5e64b03f721fc171db01a408144da332c0",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Maldives.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Maldives.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MEX": {
+   "arms": {
+    "author": "Omar Alejandro Covarrubias Neri based on the arms by Francisco Eppens Helguera (1968) and Juan Manuel Gabino Villascán.",
+    "file": "arms/mex.svg",
+    "licence": "Public domain",
+    "sha256": "2b8d21103887910eb26f3dc4e59f5b0351b14b6ebf885e37c400bb49297da490",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Mexico.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Coat_of_arms_of_Mexico.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Omar Alejandro Covarrubias Neri, 9 April 2006. Based on the 1968 arms by Francisco Eppens Helguera and Juan Manuel Gabino Villascán.",
+    "file": "flag/mex.svg",
+    "licence": "Public domain",
+    "sha256": "bcfebaa9d94827919e65c5414e4ee35a076f89520a1b57d75e0949e1ca81c3b9",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mexico.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Mexico.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MHL": {
+   "arms": {
+    "author": "Ericmetro",
+    "file": "arms/mhl.svg",
+    "licence": "Public domain",
+    "sha256": "2e1f3facd4878b1b57cd923c9690dfd06535de29ce27494dc666031dd941af15",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_the_Marshall_Islands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Seal_of_the_Marshall_Islands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "No machine-readable author provided. SKopp assumed (based on copyright claims).",
+    "file": "flag/mhl.svg",
+    "licence": "Public domain",
+    "sha256": "36253e5f47caa0830e65cbc36c26f9fe2f8d78a3e22bb020fede6bd43fc2f258",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Marshall_Islands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flag_of_the_Marshall_Islands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MKD": {
+   "arms": {
+    "author": "MacedonianBoy",
+    "file": "arms/mkd.svg",
+    "licence": "Public domain",
+    "sha256": "e98abac50777975ff01d07fa4c5e1d18d3597b09ea91b9c0428d81e3f436beda",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_North_Macedonia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Coat_of_arms_of_North_Macedonia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:SKopp, redrawn by User:Gabbe",
+    "file": "flag/mkd.svg",
+    "licence": "Public domain",
+    "sha256": "f9a526edefb4278f21377c34e090de0f7c790800c9f4b1007007bf64d0064a1d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_North_Macedonia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_North_Macedonia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MLI": {
+   "arms": {
+    "author": "UnknownUnknown , vectorized by Perhelion",
+    "file": "arms/mli.svg",
+    "licence": "Public domain",
+    "sha256": "b6c10aea5f80cad20ad55f6bdb7f3863cb3c384db4a336b13ea0e0ed83e50ac0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Mali.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Coat_of_arms_of_Mali.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp",
+    "file": "flag/mli.svg",
+    "licence": "Public domain",
+    "sha256": "ae9516c41b4bb5385e047fc66da8e0e3e3b9360a5850c36d4b5c21950be3853c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mali.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Mali.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MLT": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol.",
+    "file": "arms/mlt.svg",
+    "licence": "Public domain",
+    "sha256": "289f2e2dc81ae7fffcb3d8563ca7d53db5b2580c5d86f4db0f97dc8785a21e74",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Malta.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Coat_of_arms_of_Malta.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/mlt.svg",
+    "licence": "Public domain",
+    "sha256": "a5c2eee915ed72695afcc7898018bf57c41e62c9b7b964e8de8bbbec9e895d2d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Malta.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Malta.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MMR": {
+   "arms": {
+    "author": "File:State seal of Myanmar.png: Unknown authorUnknown author\nderivative work: Pho Sai",
+    "file": "arms/mmr.svg",
+    "licence": "Public domain",
+    "sha256": "eb791f5212938f7d1e610421cdc8573659f3c50c8e730a95512e344faf050d0c",
+    "source": "https://commons.wikimedia.org/wiki/File:State_Seal_of_the_Republic_of_the_Union_of_Myanmar.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/State_Seal_of_the_Republic_of_the_Union_of_Myanmar.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/mmr.svg",
+    "licence": "Public domain",
+    "sha256": "b96625d297f111bf6f588251780f972d3f6e3b1f663831c164bd35e93a06ba2a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Myanmar.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Flag_of_Myanmar.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MNE": {
+   "arms": {
+    "author": "Radoslav Rotković",
+    "file": "arms/mne.svg",
+    "licence": "Public domain",
+    "sha256": "bcebdf95250638fa736e8dff7533f394457310e9c2f7fab7a5bc76ab76f8a2c7",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Montenegro.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Coat_of_arms_of_Montenegro.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "B1mbo, Froztbyte, Great Brightstar",
+    "file": "flag/mne.svg",
+    "licence": "Public domain",
+    "sha256": "53761b966181c55a3c3853292cb55705ff4d9879f9b59f06601bd29d846a3bf6",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Montenegro.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Flag_of_Montenegro.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MNG": {
+   "arms": {
+    "author": "Tseveendorjiin Oidov (Honored Artist of Mongolia)",
+    "file": "arms/mng.svg",
+    "licence": "Public domain",
+    "sha256": "c43001e4d04337cc75d7358aecc9752f53c60677c1b499b985e958a8326391ef",
+    "source": "https://commons.wikimedia.org/wiki/File:State_emblem_of_Mongolia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/State_emblem_of_Mongolia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/mng.svg",
+    "licence": "Public domain",
+    "sha256": "b7ccaa99a79fe613cb0a8953ef2f49b25f5e56c5c2b05b5725627ff01d60af6f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mongolia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Mongolia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MOZ": {
+   "arms": {
+    "author": "Jam123",
+    "file": "arms/moz.svg",
+    "licence": "CC0",
+    "sha256": "4c88dcf1e3a3658b1d85929afdc9f0953ef72276929579ae04f9993112c81479",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Mozambique.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Emblem_of_Mozambique.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "FRELIMO",
+    "file": "flag/moz.svg",
+    "licence": "Public domain",
+    "sha256": "391e69a4674df584930d705369103aed29cbfb338572894aac1278cd53715bdd",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mozambique.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Mozambique.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MRT": {
+   "arms": {
+    "author": "Jelloud Najem",
+    "file": "arms/mrt.svg",
+    "licence": "Public domain",
+    "sha256": "867749a088d0b5fcc04e95d8daec6866e65a2631569f989e2087ac4422e303db",
+    "source": "https://commons.wikimedia.org/wiki/File:National_Seal_of_Mauritania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/National_Seal_of_Mauritania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/mrt.svg",
+    "licence": "Public domain",
+    "sha256": "fd715836861147eb68371fb8eface9938a5a74e392fb993ff6342ec0a57a5caf",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mauritania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Flag_of_Mauritania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MUS": {
+   "arms": {
+    "author": "User:Escondites",
+    "file": "arms/mus.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "e3214cb7677c75c0366d7b31e9e6adfebde3d792effb2bb95c4f05c23389eca1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Mauritius.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Coat_of_arms_of_Mauritius.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370",
+    "file": "flag/mus.svg",
+    "licence": "Public domain",
+    "sha256": "37ba98746c41bd488e49afc59ce98312a5bfa91be289cbcca5827c0a7a7c4e6d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Mauritius.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Mauritius.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MWI": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/mwi.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "53e42af6917880d587fe714830a6534a54359434777bd7d2677e6a0193ccdae1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Malawi.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Coat_of_arms_of_Malawi.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown author Vector:  Achim1999",
+    "file": "flag/mwi.svg",
+    "licence": "Public domain",
+    "sha256": "2d982e9605bf72b7ecaa7d286b4f0c17fe1914aba83c393a40af57e323d2914c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Malawi.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Flag_of_Malawi.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "MYS": {
+   "arms": {
+    "author": "This vector image includes elements that have been taken or adapted from this file:",
+    "file": "arms/mys.svg",
+    "licence": "Public domain",
+    "sha256": "71741ec4a4a66154486d94ec985622b58f0e87ea4caa18458af9f9ce9566ceb5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Malaysia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "MapGrid (old version SKopp, Zscout370   and  Ranking Update)",
+    "file": "flag/mys.svg",
+    "licence": "Public domain",
+    "sha256": "53b0aa224ba67a2d32be58aab6eb2e4395ac3df66e62692ac83a30bc296ee3a2",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Malaysia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Flag_of_Malaysia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NAM": {
+   "arms": {
+    "author": "",
+    "file": "arms/nam.svg",
+    "licence": "Public domain",
+    "sha256": "c7141dc1f7d3a6ceb8da73daca4aec971b8df4504229e4a27a178690006dadce",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Namibia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Coat_of_arms_of_Namibia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SVG by Vzb83~commonswiki et al.",
+    "file": "flag/nam.svg",
+    "licence": "Public domain",
+    "sha256": "33c2a98ecf5a8e2ed5890dfcc4a6f4f5c0ce3ee2173a783fca0fbe0be25462b2",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Namibia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Namibia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NER": {
+   "arms": {
+    "author": "Pbroks13 (talk)",
+    "file": "arms/ner.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "6e93e3323d18cc7df750bbc2223b290e9c860b0e22fd68e3218f62904b35a842",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Niger.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/03/Coat_of_arms_of_Niger.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Made by: Philippe Verdy User:verdy_p, see also fr:Utilisateur:verdy_p.",
+    "file": "flag/ner.svg",
+    "licence": "Public domain",
+    "sha256": "841f8f45796be4e970b29b790eb198bd666335c03393147d2a1e7838c37ee2ce",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Niger.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Flag_of_Niger.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NGA": {
+   "arms": {
+    "author": "Lumia1234",
+    "file": "arms/nga.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "75c45bfdc045846a9f30db47dfaaa95d7a798457eaf45bda2292f3664652c060",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Nigeria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Coat_of_arms_of_Nigeria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Jon Harald Søby.",
+    "file": "flag/nga.svg",
+    "licence": "Public domain",
+    "sha256": "29a8a7fff1ca574873f953e086753bb2f90be55c3efac5c91f829b1a1c6c01be",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nigeria.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NIC": {
+   "arms": {
+    "author": "",
+    "file": "arms/nic.svg",
+    "licence": "Attribution",
+    "sha256": "9ef0e7ba8c721d0188b9bf25ff749f1ec3fb2462c319743336b5a6f2f2a06e21",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Nicaragua.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Coat_of_arms_of_Nicaragua.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "C records",
+    "file": "flag/nic.svg",
+    "licence": "Public domain",
+    "sha256": "fdb152e6dcb6090b662d14d41c6c04edb3ecc4368c0825b8cf49eb87e5a5f3e5",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nicaragua.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Nicaragua.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NLD": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/nld.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "75384722029814ec4d4af6832461ab9d31dbf4abcb816e22f3902c00b3f064fa",
+    "source": "https://commons.wikimedia.org/wiki/File:Royal_coat_of_arms_of_the_Netherlands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Royal_coat_of_arms_of_the_Netherlands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370",
+    "file": "flag/nld.svg",
+    "licence": "Public domain",
+    "sha256": "9c2a624a9ca5a82940d8902a7b818230d7bc2efde991837d6f78bc78c1b27110",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NOR": {
+   "arms": {
+    "author": "Emblazonment by Sverre Morken (1992), redrawn by Jonas Madsen Rogne (2023) on behalf of the Norwegian Government Design Programme.",
+    "file": "arms/nor.svg",
+    "licence": "Public domain",
+    "sha256": "84260ace276ea626a1887ca206b40142b159eb3cc80ce65ad82b3c5eede0c58d",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Norway.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Coat_of_arms_of_Norway.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Fredrik Meltzer Vector:  Gutten på Hemsen",
+    "file": "flag/nor.svg",
+    "licence": "Public domain",
+    "sha256": "be906b906b9063a909154d9bae757ef6aa5927c67f678200d4e846101b1adc09",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Norway.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NPL": {
+   "arms": {
+    "author": "Biplab Anand",
+    "file": "arms/npl.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "f67bcc604764a8c20c8e2054bb7d9bf10547e735fad63c95b169721b305661e9",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Nepal.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Emblem_of_Nepal.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Drawn by Pumbaa80, Achim1999",
+    "file": "flag/npl.svg",
+    "licence": "Public domain",
+    "sha256": "98b33ea847a3f6e6f21c777423acc9d80512a85f858d967ceaf56d206c10be1e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NRU": {
+   "arms": {
+    "author": "Original: Parliament of Nauru Vector:  Designism",
+    "file": "arms/nru.svg",
+    "licence": "Public domain",
+    "sha256": "da2ed8d2c75f491537bef5f43f84164f8d206902000ef7f8970aebb00a205947",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Nauru_(2020).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Coat_of_arms_of_Nauru_%282020%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Skimel",
+    "file": "flag/nru.svg",
+    "licence": "Public domain",
+    "sha256": "473c54044f8e2c935c6e2110a57affb44c3625be75702558b621340a39c6a0d6",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nauru.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Flag_of_Nauru.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "NZL": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/nzl.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "a5bf856c0ad324b4ee298d509ac4f6fe86bc9ca4c7a515c8d181e65b0d0dc88d",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_New_Zealand.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Coat_of_arms_of_New_Zealand.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Albert Hastings Markham Vector:  Zscout370, Hugh Jass, s. File history",
+    "file": "flag/nzl.svg",
+    "licence": "Public domain",
+    "sha256": "e4b1bc62d8283cbefc000b9538d6cb58019b18651bb9e0818ccaffa9ed8716f1",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_New_Zealand.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Flag_of_New_Zealand.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PAK": {
+   "arms": {
+    "author": "Meraj Muhammad",
+    "file": "arms/pak.svg",
+    "licence": "Public domain",
+    "sha256": "c828330e0632263f69d0cde8fb433db788a8265c3957e1054ed9c407c75400fe",
+    "source": "https://commons.wikimedia.org/wiki/File:State_emblem_of_Pakistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/State_emblem_of_Pakistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Zscout370",
+    "file": "flag/pak.svg",
+    "licence": "Public domain",
+    "sha256": "d6ace20003ef4172b2cb2f090614f06602fb139a900cd1c65c4f8cc17367bc37",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Pakistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Pakistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PAN": {
+   "arms": {
+    "author": "Milenioscuro",
+    "file": "arms/pan.svg",
+    "licence": "Public domain",
+    "sha256": "21626a19182e3f90b507069122f0a6cc541ce99508811ea22c60856abdba2d16",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Panama.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Coat_of_arms_of_Panama.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370 et al.",
+    "file": "flag/pan.svg",
+    "licence": "Public domain",
+    "sha256": "464fc8f974b506c5a8353899dba96d68154f2f991a5a9319f68184be86c31556",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Panama.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Flag_of_Panama.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PER": {
+   "arms": {
+    "author": "",
+    "file": "arms/per.svg",
+    "licence": "Public domain",
+    "sha256": "65175f9fb56e8cc9aadd6041863cf8d37f9b14ad1730cd2ee105dc5782fbf194",
+    "source": "https://commons.wikimedia.org/wiki/File:Escudo_nacional_del_Per%C3%BA.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Escudo_nacional_del_Per%C3%BA.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "David Benbennick",
+    "file": "flag/per.svg",
+    "licence": "Public domain",
+    "sha256": "4358cec747829a0009dac86055e74e60b05e6eb57eba5f7bc30da2c88168a7f2",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Peru.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PHL": {
+   "arms": {
+    "author": "Galo Ocampo",
+    "file": "arms/phl.svg",
+    "licence": "Public domain",
+    "sha256": "5ec207fba608d908b177582973a685787b39592cc739750e0a39db6b08eece92",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Philippines.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Coat_of_arms_of_the_Philippines.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/phl.svg",
+    "licence": "Public domain",
+    "sha256": "b0010e0b5f5945506e98b76f3469faf964c1ce30de75673186d303f9112b5454",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Philippines.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Flag_of_the_Philippines.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PLW": {
+   "arms": {
+    "author": "originally Washiucho",
+    "file": "arms/plw.svg",
+    "licence": "Public domain",
+    "sha256": "9ab51e7e29c22f9fd5c3f7f1337ede89f923347b5d7c14afa481895ccb8605e8",
+    "source": "https://commons.wikimedia.org/wiki/File:Seal_of_Palau.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Seal_of_Palau.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: John Blau Skebong Vector:  Nightstallion",
+    "file": "flag/plw.svg",
+    "licence": "Public domain",
+    "sha256": "d6d41e2af2a4e4ae67e673f7a1f8677353485a7476f9998e2223af4112bab919",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Palau.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Palau.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PNG": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/png.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "b837622cce87ebbbaa88e376a5edc08de0eddc05b6da19eeb8629b68988a9e87",
+    "source": "https://commons.wikimedia.org/wiki/File:National_emblem_of_Papua_New_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/National_emblem_of_Papua_New_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Nightstallion",
+    "file": "flag/png.svg",
+    "licence": "Public domain",
+    "sha256": "6ee1b87f3ea1eb7f1a12bda84304e82c5588d3223649b63410c953edffa4a3cb",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Papua_New_Guinea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Flag_of_Papua_New_Guinea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "POL": {
+   "arms": {
+    "author": "Zygmunt Kamiński / Andrzej Heidrich",
+    "file": "arms/pol.svg",
+    "licence": "Public domain",
+    "sha256": "1a914454039b089475084a2eef8a3ab919a809aa944c146e6173bdd086ae5bea",
+    "source": "https://commons.wikimedia.org/wiki/File:Herb_Polski.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Herb_Polski.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See below.",
+    "file": "flag/pol.svg",
+    "licence": "Public domain",
+    "sha256": "c6a5131abfd6eede2c632b5b042e658266676fd072295acd4eaa6debd53755af",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Poland.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PRK": {
+   "arms": {
+    "author": "Redrawn to SVG by DasREDeemr",
+    "file": "arms/prk.svg",
+    "licence": "Public domain",
+    "sha256": "9ff31cb9476334c150eabe275d315e0a91158d4c6c403b868049c678ae969b84",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_North_Korea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Emblem_of_North_Korea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown author Vector:  Zscout370",
+    "file": "flag/prk.svg",
+    "licence": "Public domain",
+    "sha256": "0facdb3b7f4028e3ab0ce5457983ff62b22e77177e896cf472654ae6b2f9ebeb",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_North_Korea.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PRT": {
+   "arms": {
+    "author": "Tonyjeff, based on national symbol",
+    "file": "arms/prt.svg",
+    "licence": "Public domain",
+    "sha256": "ef93d0af732e8297ca1f0066ac3491135838570a6ddb928b6d1bb62c0ee4c3d5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Portugal.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Coat_of_arms_of_Portugal.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Columbano Bordalo Pinheiro Vector:  Vítor Luís Rodrigues, António Martins-Tuválkin",
+    "file": "flag/prt.svg",
+    "licence": "Public domain",
+    "sha256": "211074edc5a100b857e52521993ba68929bad8e67fe78de47c06705b1a86c3ba",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Portugal_(official).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Flag_of_Portugal_%28official%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PRY": {
+   "arms": {
+    "author": "Original:  User:Ysangkok",
+    "file": "arms/pry.svg",
+    "licence": "Public domain",
+    "sha256": "01e231d0e641bc888adc6472fabde4d175e7b411b4d5f4dc2eeb44c26c5039ee",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Paraguay.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Coat_of_arms_of_Paraguay.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Republica del Paraguay",
+    "file": "flag/pry.svg",
+    "licence": "Public domain",
+    "sha256": "f564b33791a5612195cbbb8e58d4d7ba4235cecc9778111404bb3758bd144441",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Paraguay.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Paraguay.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "PSE": {
+   "arms": {
+    "author": "Colohisto",
+    "file": "arms/pse.svg",
+    "licence": "Public domain",
+    "sha256": "237d03a16b01eff832848e54d24b3ae1e0b419f2131956f5d8ecfebd128c64e7",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Palestine.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Coat_of_arms_of_Palestine.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Orionist, previous versions by Makaristos, Mysid, etc.",
+    "file": "flag/pse.svg",
+    "licence": "Public domain",
+    "sha256": "df299146faffa45913ac8677931f4a5cd94b60fc99e39a51eb9ef922ca6da182",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Palestine.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "QAT": {
+   "arms": {
+    "author": "9BBWMJ",
+    "file": "arms/qat.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "8fad4be30ea7c15d8257e5c8a686001b2e78c63ce40a90133aa143be0a60e958",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Qatar-2022.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Emblem_of_Qatar-2022.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/qat.svg",
+    "licence": "Public domain",
+    "sha256": "92a082037fa252496f22e40bd52909678dec793fb31fcb8e9c4abd73b154f613",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Qatar.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Qatar.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ROU": {
+   "arms": {
+    "author": "",
+    "file": "arms/rou.svg",
+    "licence": "Public domain",
+    "sha256": "232bed9e5166fbc5dfc6b1c38e9550ffca2ab5dc29d5359008a2189d0533eea5",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Romania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Coat_of_arms_of_Romania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "AdiJapan",
+    "file": "flag/rou.svg",
+    "licence": "Public domain",
+    "sha256": "57e1c4d27feec8e7a459e2dc522b9e6ec3eec996d9504733a9a17d9b4fce3026",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Romania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "RUS": {
+   "arms": {
+    "author": "",
+    "file": "arms/rus.svg",
+    "licence": "Public domain",
+    "sha256": "bb6f3c799dad93f1996032182082052012d9c3445669fb98a5f6a900473b2aeb",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_the_Russian_Federation.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Coat_of_Arms_of_the_Russian_Federation.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "arms-eagle": {
+    "author": "",
+    "file": "arms-eagle/rus.svg",
+    "licence": "Public domain",
+    "sha256": "d55997a7b80c1fd3a54676d6a435695657d487fadeaa35e4acf629abe87969c4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_the_Russian_Federation_2.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Coat_of_Arms_of_the_Russian_Federation_2.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Peter the Great",
+    "file": "flag/rus.svg",
+    "licence": "Public domain",
+    "sha256": "eb1dbd977fdb824dcae7767ce9ec3a023e41158e81b5f524772609ddcb622025",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Russia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Russia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "RWA": {
+   "arms": {
+    "author": "FischX and Zscout370",
+    "file": "arms/rwa.svg",
+    "licence": "Public domain",
+    "sha256": "d617ac2729159a05eaf54ba75f8748182600643147de178b9d784f7b7ecc28d3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Rwanda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Coat_of_arms_of_Rwanda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Unknown Vector:  Zscout370",
+    "file": "flag/rwa.svg",
+    "licence": "Public domain",
+    "sha256": "4b2b50d1a73c4889b13721f23bfe597fd61962c14952d062e504acaa734d6792",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Rwanda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Flag_of_Rwanda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SAU": {
+   "arms": {
+    "author": "Anus kafm",
+    "file": "arms/sau.svg",
+    "licence": "Public domain",
+    "sha256": "7afb1c647afe66cf037a3920dda7ed1cd498877b9786374246ed1c52cb962643",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Saudi_Arabia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Emblem_of_Saudi_Arabia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "The Shura Council",
+    "file": "flag/sau.svg",
+    "licence": "Public domain",
+    "sha256": "b0b36326e3e5b74624ee8b5de8273ea00f7bbe9b5ba0da6250cbe7b3c637505e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saudi_Arabia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SDN": {
+   "arms": {
+    "author": "Thommy",
+    "file": "arms/sdn.svg",
+    "licence": "Public domain",
+    "sha256": "095c0782b486900b5986eba6d4d8639fee7947782628b858cc7c538588bbd0a5",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Sudan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Emblem_of_Sudan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/sdn.svg",
+    "licence": "Public domain",
+    "sha256": "1f7504f8d4b352eb1726d81a563212c650a8d316d67c97c6167b96895ffa703d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Sudan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_Sudan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SEN": {
+   "arms": {
+    "author": "",
+    "file": "arms/sen.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "a4035552231767efd5139f0d8a4aee92767a4dac932c0283c4d7e245d8c799a0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Senegal.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Coat_of_arms_of_Senegal.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original upload by Nightstallion",
+    "file": "flag/sen.svg",
+    "licence": "Public domain",
+    "sha256": "c9fb30d11cf7e230ee44d5cf663b7dce52a11c58798155b37fabec4158441497",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Senegal.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Flag_of_Senegal.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SGP": {
+   "arms": {
+    "author": "",
+    "file": "arms/sgp.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "8e59c30d826dc2f8a25daeb211ac3f46686849fc1b8858a1521bf0cb10532682",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Singapore.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Coat_of_arms_of_Singapore.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Government of Singapore Vector:  Zscout370",
+    "file": "flag/sgp.svg",
+    "licence": "Public domain",
+    "sha256": "261a4507c08c834e8e335ae147bde951010d92ef05330ff39f0d0eb713d2f617",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Singapore.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Singapore.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SLB": {
+   "arms": {
+    "author": "Prez001",
+    "file": "arms/slb.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "e773b19b6d194d8b7b34a9733abd0b0dd9e8a0d5cda39b11fa275cc1033df37e",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_the_Solomon_Islands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Coat_of_arms_of_the_Solomon_Islands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:SKopp",
+    "file": "flag/slb.svg",
+    "licence": "Public domain",
+    "sha256": "c893758e4935ab9be6b17bcfd8722d8c279b89c2a64e3d269a403e2b50fee878",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Solomon_Islands.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Flag_of_the_Solomon_Islands.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SLE": {
+   "arms": {
+    "author": "Lion héraldique.svg -  Bluebear2\nHeraldique meuble lion passant.svg - Rinaldum, S@m, Zigeuner\nCoat of arms of Haiti (1964-1986).svg - Thommy9\nderivative work: Yuma",
+    "file": "arms/sle.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "8f43680470b08b305adda396befc0d080f17005acde297aa42b78be8469cf98d",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Sierra_Leone.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Coat_of_arms_of_Sierra_Leone.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370",
+    "file": "flag/sle.svg",
+    "licence": "Public domain",
+    "sha256": "21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Sierra_Leone.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Flag_of_Sierra_Leone.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SLV": {
+   "arms": {
+    "author": "See File history below for details.",
+    "file": "arms/slv.svg",
+    "licence": "Public domain",
+    "sha256": "096b79600d2296de4d7075c88570874c81f290fbf682aa5d5f3dfa7fd9b2e5f2",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_El_Salvador.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Coat_of_arms_of_El_Salvador.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/slv.svg",
+    "licence": "Public domain",
+    "sha256": "20bf4c3b91d2ec2a08e60f90797db1a45efd59601bd9036ffd4a55477d5e5f6f",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_El_Salvador.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SMR": {
+   "arms": {
+    "author": "",
+    "file": "arms/smr.svg",
+    "licence": "Public domain",
+    "sha256": "d8074af24b220fd22eecd97b25eee1ae70c7f569d625e8b61d4c9d3c3bd3e84a",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_San_Marino.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Coat_of_arms_of_San_Marino.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370",
+    "file": "flag/smr.svg",
+    "licence": "Public domain",
+    "sha256": "050539f131fb13e8d0bf192a5130f4a08866fc71762f409c6656806b23a19be4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_San_Marino.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_San_Marino.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SOM": {
+   "arms": {
+    "author": "Thommy",
+    "file": "arms/som.svg",
+    "licence": "Public domain",
+    "sha256": "a74d54fa2e6821ed76ec035dfdf583cf8747b3908dc4bea169ee2481058457d0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Somalia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Coat_of_arms_of_Somalia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "see upload history",
+    "file": "flag/som.svg",
+    "licence": "Public domain",
+    "sha256": "dcae884cb3f44354da055e01d5163f8f356314e68b5328b9ac01f7c15ce10f90",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Somalia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Flag_of_Somalia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SRB": {
+   "arms": {
+    "author": "upload: User:Rokerismoravee",
+    "file": "arms/srb.svg",
+    "licence": "Public domain",
+    "sha256": "6197f63ec950cdfd4a838cc32e52c7aa0ff4fd50ca2b5258c0e753ebe6a69912",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Serbia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Coat_of_arms_of_Serbia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/srb.svg",
+    "licence": "Public domain",
+    "sha256": "e0a8bff6ee5445d6676a788c3761b412275688196abdd4bd149d74d6c723040c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Serbia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SSD": {
+   "arms": {
+    "author": "Unknown authorUnknown author",
+    "file": "arms/ssd.svg",
+    "licence": "Public domain",
+    "sha256": "60c717f6f72bf7b98984c756e5fcf8d5a1690f54855c2da1d9a7d603e94fd4f8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_South_Sudan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Coat_of_arms_of_South_Sudan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Achim1999",
+    "file": "flag/ssd.svg",
+    "licence": "Public domain",
+    "sha256": "40337cecf575fed94a7840765de29af7a51c9ff8fb6bec6a31b3fb014acb3dfa",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Sudan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Flag_of_South_Sudan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "STP": {
+   "arms": {
+    "author": "Josedar",
+    "file": "arms/stp.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "27f873cb3e598552a5715967c2a430d6574fd1cf112b1eddc26005412fa189c4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Coat_of_arms_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/stp.svg",
+    "licence": "Public domain",
+    "sha256": "4bf0fca47d1233993f79f9489c2a18ced26e577ff137b3a54500188ebd81b0a7",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SUR": {
+   "arms": {
+    "author": "Coat_of_arms_of_Suriname.png: Brokopondo\nderivative work: Completefailure (talk)",
+    "file": "arms/sur.svg",
+    "licence": "Public domain",
+    "sha256": "9dffdaf4cad00e5f159a456dbbe268745646270ebc4add2378cfed82a2e8f3cf",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Suriname.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Coat_of_arms_of_Suriname.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/sur.svg",
+    "licence": "Public domain",
+    "sha256": "1dc6655865009e3a89ad49b18ed9e76bb6b723722ea254bb38e78b2f52484f83",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Suriname.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Flag_of_Suriname.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SVK": {
+   "arms": {
+    "author": "Tlusťa",
+    "file": "arms/svk.svg",
+    "licence": "Public domain",
+    "sha256": "4844084b1d5439511b8dd387251fc660401c3192ef811bd5de6c77e802d435c3",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Slovakia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Coat_of_arms_of_Slovakia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Ladislav Čisárik and Ladislav Vrtel Vector:  SKopp",
+    "file": "flag/svk.svg",
+    "licence": "Public domain",
+    "sha256": "de60b8f1ba41a4985756b81d42f52d0b52bf61a54f2260b674412f3d2f358577",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Slovakia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SVN": {
+   "arms": {
+    "author": "Zscout370",
+    "file": "arms/svn.svg",
+    "licence": "Public domain",
+    "sha256": "1ac23284d2f8474d44eb23aadf1a19a39697adf5920ed29a554c60c11232d72f",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Slovenia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Coat_of_arms_of_Slovenia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Marko Pogačnik Vector:  Achim1999",
+    "file": "flag/svn.svg",
+    "licence": "Public domain",
+    "sha256": "aa4fda18694f1e60c937933eebd752cc3ed0701652f0dfca84677c3267b26db9",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Slovenia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SWE": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/swe.svg",
+    "licence": "Public domain",
+    "sha256": "e19d7d6fc0d527a464e7f7e5a0ccb4756b87163c2e1eccf48018c2782a5751cf",
+    "source": "https://commons.wikimedia.org/wiki/File:Great_coat_of_arms_of_Sweden.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Great_coat_of_arms_of_Sweden.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Jon Harald Søby and others.",
+    "file": "flag/swe.svg",
+    "licence": "Public domain",
+    "sha256": "350fa9d5023de2ed2fd7fd0f9d0de04e25551d6154aab859949bb7c81543f10b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Sweden.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Sweden.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SWZ": {
+   "arms": {
+    "author": "RoyFocker 12",
+    "file": "arms/swz.svg",
+    "licence": "Public domain",
+    "sha256": "39100cc013cc6a11490ecbde4b4ed9fe65609c1a77a3b306e7984bd9ca7b97a0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Eswatini.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Coat_of_arms_of_Eswatini.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Sobhuza II",
+    "file": "flag/swz.svg",
+    "licence": "Public domain",
+    "sha256": "ff1aba207b351f7c045037ba506c62aeb493c489742e58a59982a72af44e5c4e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Eswatini.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Flag_of_Eswatini.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SYC": {
+   "arms": {
+    "author": "Sodacan\n\n\niThe source code of this  SVG is valid.\n  This  vector image was created with Inkscape by v .",
+    "file": "arms/syc.svg",
+    "licence": "Public domain",
+    "sha256": "c333a9522003cf38c08092f864e31941a6775de71b58a988cff5c652d995e1df",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Seychelles.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Coat_of_arms_of_Seychelles.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "User:Vxb83",
+    "file": "flag/syc.svg",
+    "licence": "Public domain",
+    "sha256": "b55c102d24e3963a45a4c24243c00032381e88cf42c9b2fa49062d7abb202321",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Seychelles.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Seychelles.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "SYR": {
+   "arms": {
+    "author": "",
+    "file": "arms/syr.svg",
+    "licence": "Public domain",
+    "sha256": "a0ddae6d2873a08738af3a4337a6f53427a69ea0fe1477cd0c4f549241fcbe53",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Syria_(2025%E2%80%93present).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Emblem_of_Syria_%282025%E2%80%93present%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Modification by AnonMoos of PD image File:Flag of Syria (1930–1958, 1961–1963).svg (previous non-vector versions were by Coup de crayon 2011)",
+    "file": "flag/syr.svg",
+    "licence": "Public domain",
+    "sha256": "60bdbf2beb6d61fb03084ba177891215def2d7c8dee74e4fff11b0f3dc6594df",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Syria_(2025-).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Flag_of_Syria_%282025-%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TCD": {
+   "arms": {
+    "author": "Milenioscuro",
+    "file": "arms/tcd.svg",
+    "licence": "CC BY 3.0",
+    "sha256": "dfc04bf318c6cbf083e5edac91c3fb6f3eb3038172065d9f558c159b3480f7be",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Chad.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Coat_of_arms_of_Chad.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "SKopp &amp; others (see upload log)",
+    "file": "flag/tcd.svg",
+    "licence": "Public domain",
+    "sha256": "46d9a786225c476c021be32564d43497ec48d654694379969ac86d4aec8cf8a0",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Chad.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Flag_of_Chad.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TGO": {
+   "arms": {
+    "author": "Edem Fiadjoe",
+    "file": "arms/tgo.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "c531fcbd21f17e406c0fbcf8a02796dab205bc6535fb2e24169948a1e8723089",
+    "source": "https://commons.wikimedia.org/wiki/File:Armoiries_du_Togo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Armoiries_du_Togo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Sangjinhwa",
+    "file": "flag/tgo.svg",
+    "licence": "Public domain",
+    "sha256": "2a3334bb8ccd83e91c84055f258b86c36b9890a3e707c3f6d507d769c396f169",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Togo_(3-2).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Flag_of_Togo_%283-2%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "THA": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/tha.svg",
+    "licence": "Public domain",
+    "sha256": "b9b050e806a7e38172059601c41b4a57cbfbaf87c47ee3fba53e7ebd7ed735a1",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Thailand.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Emblem_of_Thailand.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Zscout370",
+    "file": "flag/tha.svg",
+    "licence": "Public domain",
+    "sha256": "f137bb494e00c3c29e9d03fbf4d15c2650d82f2a8f02cf51341f6a4557117db9",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Thailand.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Flag_of_Thailand.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TJK": {
+   "arms": {
+    "author": "",
+    "file": "arms/tjk.svg",
+    "licence": "Public domain",
+    "sha256": "e7d69e7a17e27361c90ffeeb325382817e6d4a9007c5ca8caba250aa742cdde6",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Tajikistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Emblem_of_Tajikistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/tjk.svg",
+    "licence": "Public domain",
+    "sha256": "46508117e00c52476ba18463dfeefeb8ede13c2daaa4227cc886ca9bdd40def3",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Tajikistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Tajikistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TKM": {
+   "arms": {
+    "author": "Inductiveload",
+    "file": "arms/tkm.svg",
+    "licence": "Public domain",
+    "sha256": "7e1244e85aaf2b917421c7bb45c2966363f0d4679ea23765b97d15a6eea02690",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Turkmenistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Emblem_of_Turkmenistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/tkm.svg",
+    "licence": "Public domain",
+    "sha256": "f0bf471d0f3070cd1ece9c66ccb7bfc5e86e32072b657e9a3a426a624dd72510",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Turkmenistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Turkmenistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TLS": {
+   "arms": {
+    "author": "en:User:Vino4u",
+    "file": "arms/tls.svg",
+    "licence": "Public domain",
+    "sha256": "c68791f0df3268f9c07ceaefa7c813d643cd413b58a172fafda2513d581111e9",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_East_Timor.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Coat_of_arms_of_East_Timor.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history, below, for details.",
+    "file": "flag/tls.svg",
+    "licence": "Public domain",
+    "sha256": "086a0f322643bef67059a6b64be35c788aef86a9941f6640b220255e7180ae93",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_East_Timor.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flag_of_East_Timor.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TON": {
+   "arms": {
+    "author": "Original design attributed to Reverend Shirley Baker (1836 - 1903). SVG by Tauʻolunga",
+    "file": "arms/ton.svg",
+    "licence": "Public domain",
+    "sha256": "3b36dabe774962c08faa207629cb5964c6a34917eedc016cf93a5859584251a6",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Tonga.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Coat_of_arms_of_Tonga.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Uelingatoni Ngu Tupoumalohi",
+    "file": "flag/ton.svg",
+    "licence": "Public domain",
+    "sha256": "2a85421fae36d0a6e29fe93faf97a96087f023887ac033b0cbd2b2073cccd26a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Tonga.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Tonga.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TTO": {
+   "arms": {
+    "author": "BaronJaguar",
+    "file": "arms/tto.svg",
+    "licence": "CC BY 4.0",
+    "sha256": "dd3c6665660b529783cde6b2d836056ca1081af80ebebd32a8a099c2f67bd0ad",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Trinidad_and_Tobago_(2025).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Coat_of_arms_of_Trinidad_and_Tobago_%282025%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history, below, for details.",
+    "file": "flag/tto.svg",
+    "licence": "Public domain",
+    "sha256": "71f6d39d7ea27b3201321eec6a22b3529f9ba96d2acd59e440c6484873121baa",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Trinidad_and_Tobago.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Flag_of_Trinidad_and_Tobago.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TUN": {
+   "arms": {
+    "author": "FXXX",
+    "file": "arms/tun.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "f185a61a133e3bf86db4485fe10f60695c5d9524556f165ef814b54be0d8978c",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Tunisia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/80/Coat_of_arms_of_Tunisia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Various Wikimedia Commons' contributors",
+    "file": "flag/tun.svg",
+    "licence": "Public domain",
+    "sha256": "0e8dd5d1b2a821a2669b3e7569db96681d86194e396682953e658ca018eb5e19",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Tunisia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TUR": {
+   "flag": {
+    "author": "David Benbennick (original author)",
+    "file": "flag/tur.svg",
+    "licence": "Public domain",
+    "sha256": "5a47e932cdb371d9708d8c9a209d3acfd006cdd3ee7dd38ae44df6180e170e90",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Turkey.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TUV": {
+   "arms": {
+    "author": "Denelson83",
+    "file": "arms/tuv.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "64bbbc3703c09b7091a54e935eab7fd135e6ad6fe4cc5f73b0943090f6378495",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Tuvalu.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Coat_of_arms_of_Tuvalu.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Unknown authorUnknown author",
+    "file": "flag/tuv.svg",
+    "licence": "Public domain",
+    "sha256": "837c091d5749eedb3637f5fd6d796d66b4e960b91df0c84f3ff21b50da313bb5",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Tuvalu.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tuvalu.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TWN": {
+   "arms": {
+    "author": "Sekisama",
+    "file": "arms/twn.svg",
+    "licence": "Public domain",
+    "sha256": "e56076ae87b324115a333352e30c2da2352f0172d85ed846f78f8b4e60f4ab27",
+    "source": "https://commons.wikimedia.org/wiki/File:National_Emblem_of_the_Republic_of_China.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/National_Emblem_of_the_Republic_of_China.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Sun Yat-sen",
+    "file": "flag/twn.svg",
+    "licence": "Public domain",
+    "sha256": "11a8acaecfcc6258cfeedc15555fbc4dbe2b1df640497be2d5dcb4f60a5c4167",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Republic_of_China.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Flag_of_the_Republic_of_China.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "TZA": {
+   "arms": {
+    "author": "FischX",
+    "file": "arms/tza.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "d2b19691ef37e8000bba507b99834cddb4c3a2a85ce3d0583903b2d6f0ac5f57",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Tanzania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Coat_of_arms_of_Tanzania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "",
+    "file": "flag/tza.svg",
+    "licence": "Public domain",
+    "sha256": "88760e4ce561a916b6cb71688301e6bb07844843833ce63b18974916d2a6d0c1",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Tanzania.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "UGA": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/uga.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "ba55141722475a9f364297672e924e01ed9a8fe43b1c24494c9029539102d4a8",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Uganda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Coat_of_arms_of_Uganda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "tobias",
+    "file": "flag/uga.svg",
+    "licence": "Public domain",
+    "sha256": "3b2508f07d951809da7988321172c27d97a244499713e57e691111df4e9ecb64",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Uganda.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Flag_of_Uganda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "UKR": {
+   "arms": {
+    "author": "Andriy Grechylo",
+    "file": "arms/ukr.svg",
+    "licence": "Public domain",
+    "sha256": "75d63703a3ac031b2931ce22c5bc7b917eac6c3b79000287b3a6f6b6782f83a7",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_Ukraine_(Pantone).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Coat_of_Arms_of_Ukraine_%28Pantone%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Government of Ukraine",
+    "file": "flag/ukr.svg",
+    "licence": "Public domain",
+    "sha256": "77e3eb29bbc7d4bae51f2e959d4ef4656eb1e34484cf772b4081a22f4af5256b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Ukraine.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "URY": {
+   "arms": {
+    "author": "Unknown (original 1829 emblem)User:Tatoute (SVG file)",
+    "file": "arms/ury.svg",
+    "licence": "Public domain",
+    "sha256": "eac800fc113f1d9c7d084d47eb8722de2f56b7761afa7b1acdc7464af8cdf20a",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Uruguay.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Coat_of_arms_of_Uruguay.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/ury.svg",
+    "licence": "Public domain",
+    "sha256": "34b6a6675698eaadafdafffbf9d3cfa72761b893e49659e3a0e8523f5b7fc1f7",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Uruguay.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Uruguay.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "USA": {
+   "arms": {
+    "author": "Ssolbergj",
+    "file": "arms/usa.svg",
+    "licence": "Public domain",
+    "sha256": "2e7a6d04e697f0b3c59f42e7aa0fa273249019897b98c10a420e08cb2b9fab9d",
+    "source": "https://commons.wikimedia.org/wiki/File:Greater_coat_of_arms_of_the_United_States.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Greater_coat_of_arms_of_the_United_States.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Vector file created by Dbenbenn, Zscout370, Jacobolus, Indolences, and Technion.",
+    "file": "flag/usa.svg",
+    "licence": "Public domain",
+    "sha256": "1daaa17db7cab64e49bd4553ff0705cd7e480c533c628605789fe956ad57fa45",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_States_(DDD-F-416E_specifications).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "UZB": {
+   "arms": {
+    "author": "",
+    "file": "arms/uzb.svg",
+    "licence": "Public domain",
+    "sha256": "e0998260687fd356752d28793a91495ad107de1cf3cbad4bf99c60f79f4071a9",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Uzbekistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Emblem_of_Uzbekistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Farhod Yoʻldoshev",
+    "file": "flag/uzb.svg",
+    "licence": "Public domain",
+    "sha256": "705caaf4443808659ac4d6c5eb7b428f27d30aaabd4205e1158ebf4dcefce723",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Uzbekistan.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Uzbekistan.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "VAT": {
+   "arms": {
+    "author": "Goran_tek-en",
+    "file": "arms/vat.svg",
+    "licence": "Public domain",
+    "sha256": "0814a867e6107260db551facbd0589ce81630f6a622e9ca7abfa6c2a326ee092",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Vatican_City_(2023%E2%80%93present).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Coat_of_arms_of_Vatican_City_%282023%E2%80%93present%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Goran_tek-en",
+    "file": "flag/vat.svg",
+    "licence": "Public domain",
+    "sha256": "59ac80ec65dde9fbbf6456609baa583218bf4290bd2a50b2616c354b1660724e",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Vatican_City_(2023%E2%80%93present).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Flag_of_Vatican_City_%282023%E2%80%93present%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "VCT": {
+   "arms": {
+    "author": "Prez001",
+    "file": "arms/vct.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "b907a0e44d0147dd830a80024d09cf26dffe21fdd1d853f057f683639fc7c0d6",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Saint_Vincent_and_the_Grenadines.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Coat_of_arms_of_Saint_Vincent_and_the_Grenadines.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "No machine-readable author provided. SKopp assumed (based on copyright claims).",
+    "file": "flag/vct.svg",
+    "licence": "Public domain",
+    "sha256": "91dd575f767f29bfb5a1ffa8fb9771413edb03449ab77eafe900ea675d66c6bf",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Vincent_and_the_Grenadines.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Flag_of_Saint_Vincent_and_the_Grenadines.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "VEN": {
+   "arms": {
+    "author": "Various, see File history below for details.",
+    "file": "arms/ven.svg",
+    "licence": "Public domain",
+    "sha256": "6af0d8b95d98196cf85cda3d8ba8531f5e4149fc28a8bc325fae5e581e868ed0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Venezuela.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Coat_of_arms_of_Venezuela.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Various, see File history below for details.",
+    "file": "flag/ven.svg",
+    "licence": "Public domain",
+    "sha256": "facdf9d3992996b00daa7cd1749d2f583528f7bcc9c4b4c88bc7b9cd16f2712c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Venezuela.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "VNM": {
+   "arms": {
+    "author": "Bùi Trang Chước",
+    "file": "arms/vnm.svg",
+    "licence": "Public domain",
+    "sha256": "40e6ec0a611438a3b879bd1bb905b81d08ddd0c73cb32251b75f9d8e629ec61d",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Vietnam.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Emblem_of_Vietnam.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/vnm.svg",
+    "licence": "Public domain",
+    "sha256": "175120e06bb95dda22133758395f352acb46433ff81eee449326db54e78af2c4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Vietnam.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "VUT": {
+   "arms": {
+    "author": "Sodacan",
+    "file": "arms/vut.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "9baa7b6e1f0aa910177452dbda5afa2824b5a321a1dc9a9d11bb1095b1e4d6f1",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Vanuatu.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Coat_of_arms_of_Vanuatu.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Kalontas Mahlon",
+    "file": "flag/vut.svg",
+    "licence": "Public domain",
+    "sha256": "dda80df857425b07d5d227e11e34e9b4d8ca55b23221f84ee4dfbdccc33865e4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Vanuatu.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Vanuatu.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "WSM": {
+   "arms": {
+    "author": "Simitukidia",
+    "file": "arms/wsm.svg",
+    "licence": "CC BY-SA 3.0",
+    "sha256": "5b6f991796b367d73835a1d8c98f7ae90007b761873c4e2ab3752c3e82a0334d",
+    "source": "https://commons.wikimedia.org/wiki/File:Public_Seal_of_Samoa.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Public_Seal_of_Samoa.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Original: Malietoa Tanumafili II and Tupua Tamasese Meaʻole Vector:  See the file history below for details.",
+    "file": "flag/wsm.svg",
+    "licence": "Public domain",
+    "sha256": "3b7f004e35c7de0075a76901afafe33f1e7f8cebe5dbbe15b40eee48c155f527",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Samoa.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Samoa.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "XKS": {
+   "arms": {
+    "author": "Government of the Republic of Kosovo (current image) Cradel (old current version), earlier versions by Aotearoa and B1mbo",
+    "file": "arms/xks.svg",
+    "licence": "Public domain",
+    "sha256": "fe0d59b17e546ce05f090d6bcf5fbd3995b87a918857776ff1d85d213fd6fcfe",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Republic_of_Kosovo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Emblem_of_the_Republic_of_Kosovo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Cradel (current version), earlier version by Ningyou",
+    "file": "flag/xks.svg",
+    "licence": "Public domain",
+    "sha256": "9c6ee498a2f96888ef3ac9cdbecc9a953802e0c3401ac56b3763f41b8fe8377b",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Kosovo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Kosovo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "YEM": {
+   "arms": {
+    "author": "Squiresy92",
+    "file": "arms/yem.svg",
+    "licence": "Public domain",
+    "sha256": "aea8f0b1e63ee075978944107cd2d04752f0454089000d4245e85d93e3618e64",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Yemen_(2).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Emblem_of_Yemen_%282%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Nightstallion et al., see File history below for details.",
+    "file": "flag/yem.svg",
+    "licence": "Public domain",
+    "sha256": "a92f3989182049dc218f7698c45d8cdfc64e6f945c71f20a9d188dd01698df2d",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Yemen.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/Flag_of_Yemen.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ZAF": {
+   "arms": {
+    "author": "Echando una mano",
+    "file": "arms/zaf.svg",
+    "licence": "CC BY-SA 4.0",
+    "sha256": "227ed9ca432309659f9ea8eb46a61197a66d7d8252a159ffc7aa1d6e6e44abd4",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_South_Africa_(heraldic).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Coat_of_arms_of_South_Africa_%28heraldic%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Flag design by Frederick Brownell, image by Wikimedia Commons users",
+    "file": "flag/zaf.svg",
+    "licence": "Public domain",
+    "sha256": "90a3147fd9e2f81d659d247d7aa518b138901f73505bd72c1e6668178f749815",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Africa.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ZMB": {
+   "arms": {
+    "author": "FXXX",
+    "file": "arms/zmb.svg",
+    "licence": "Public domain",
+    "sha256": "75bbb7afdf4ee0f3e4efc5ba666906d6d8e55afecdc322db87b454dafbc398a0",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Zambia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Coat_of_arms_of_Zambia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Gabriel Ellison",
+    "file": "flag/zmb.svg",
+    "licence": "Public domain",
+    "sha256": "5a49c51dc87ec82838e3aadd45ac525cb4e0e7b85c4006c221e389a4125e6d56",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Zambia.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Zambia.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ZWE": {
+   "arms": {
+    "author": "FischX, Meul",
+    "file": "arms/zwe.svg",
+    "licence": "Public domain",
+    "sha256": "7d93b5df2edde2a23a6954e3a23078b676360268696cde2b1f4c6fedb068b862",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Zimbabwe.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Coat_of_arms_of_Zimbabwe.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.",
+    "file": "flag/zwe.svg",
+    "licence": "Public domain",
+    "sha256": "81548edd2e9340b07f67219b2185ececb93466e4e4da96cbea3e61f0dca65067",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Zimbabwe.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Flag_of_Zimbabwe.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "african-union": {
+   "flag": {
+    "author": "African Union - supranational union in Africa",
+    "file": "orgs/african-union-flag.svg",
+    "licence": "Public domain",
+    "sha256": "906ed617fc3e1d353e24124de8ad6bcd7601db162c3da1cc3e7d499804b5a08c",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_African_Union.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_the_African_Union.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "arab-league": {
+   "emblem": {
+    "author": "Jeff Dahl",
+    "file": "orgs/arab-league-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "d3a20d98d5a817c076832c7efe479bc91727565ea80db79d8d5f4cd725a09b74",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Arab_League.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Emblem_of_the_Arab_League.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Flad",
+    "file": "orgs/arab-league-flag.svg",
+    "licence": "Public domain",
+    "sha256": "60be7f568ba4f38c858a73abf3070987ea12aeda3d0cfa94ebcb46014f12edd4",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Arab_League.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Flag_of_the_Arab_League.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "cis": {
+   "emblem": {
+    "author": "self.",
+    "file": "orgs/cis-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "1ce648282558203ab32001f6c7c311be6ea71cb5056ec4734b6c4b1ef6e5e94b",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_CIS.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Emblem_of_CIS.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "The original uploader was Denelson83 at  Wikimedia Commons. Redrawn from scratch by MapGrid in 2021.",
+    "file": "orgs/cis-flag.svg",
+    "licence": "Public domain",
+    "sha256": "7d2d90b4481f8e75d7a71d33fff6d421675139f8f2cc7c7ee337a3ae2a5ddef2",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_CIS.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_the_CIS.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "csto": {
+   "emblem": {
+    "author": "CSTO, vector graphics: ArBelov",
+    "file": "orgs/csto-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "d8aef6eb4748709d4136fb1798fc1fe109eb81d447264f95148e6069af944dd7",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Collective_Security_Treaty_Organization.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Emblem_of_the_Collective_Security_Treaty_Organization.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Collective Security Treaty Organization",
+    "file": "orgs/csto-flag.svg",
+    "licence": "Public domain",
+    "sha256": "7c8b5737ad1e8a2ab211df68141e2c94639017d8735c11d3c18e0aa545d23cad",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Collective_Security_Treaty_Organization.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Flag_of_the_Collective_Security_Treaty_Organization.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "eu": {
+   "flag": {
+    "author": "User:Verdy p, User:-xfi-, User:Paddu, User:Nightstallion, User:Funakoshi, User:Jeltz, User:Dbenbenn, User:Zscout370",
+    "file": "orgs/eu-flag.svg",
+    "licence": "Public domain",
+    "sha256": "c15c9ce1d754dec3d2ba61d5e9456888f85cad9014e3b9231933fe599f10494a",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Europe.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "nato": {
+   "emblem": {
+    "author": "Unknown authorUnknown author",
+    "file": "orgs/nato-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "b0e6bae367db7fe1f956f2768e39cddfde2df82e186bd60bcf4a66dd1ae87d8d",
+    "source": "https://commons.wikimedia.org/wiki/File:NATO_OTAN_landscape_logo.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/NATO_OTAN_landscape_logo.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Current file:\n\nFound by 475847394d347339 in websites noted in the source section.\nPrevious file\n\nVectorization:  Mysid and uploaded to Flag of NATO.svg\nCode cleaned up by Artem Karimov.",
+    "file": "orgs/nato-flag.svg",
+    "licence": "Public domain",
+    "sha256": "81e92b6f2a5223a43089f30717f51619b0abcc160b96b52696a69a3e10dd0533",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_NATO.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Flag_of_NATO.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "oic": {
+   "flag": {
+    "author": "Abyssmanx",
+    "file": "orgs/oic-flag.svg",
+    "licence": "Public domain",
+    "sha256": "3a51d17031c2d19131efb3af05c98ed460254ff23a4aa25bf4b2b3befe7e6678",
+    "source": "https://commons.wikimedia.org/wiki/File:OIC_Logo_since_2011.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/OIC_Logo_since_2011.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "ots": {
+   "emblem": {
+    "author": "Organization of Turkic States - International organization to which Turkic sovereign states are members",
+    "file": "orgs/ots-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "8e626a7c921f9ce6ff1af0cb6a34bbafffb0d43947ab7b69254b2631419fd8b8",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Organization_of_Turkic_States_(2024).svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Emblem_of_the_Organization_of_Turkic_States_%282024%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "Organization of Turkic States - International organization to which Turkic sovereign states are members",
+    "file": "orgs/ots-flag.svg",
+    "licence": "Public domain",
+    "sha256": "63d0ade5ae22bff71e776fcc5e4c7b68efa2d751391640c73e467d1432374ba9",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Organization_of_Turkic_States.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Flag_of_the_Organization_of_Turkic_States.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  },
+  "un": {
+   "arms": {
+    "author": "Joowwww",
+    "file": "orgs/un-arms.svg",
+    "licence": "Public domain",
+    "sha256": "241166b2c8c94ca5005af5904b1a56cb686abe6d6bfb038a95bae70b425da187",
+    "source": "https://commons.wikimedia.org/wiki/File:UN_emblem_blue.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/UN_emblem_blue.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "emblem": {
+    "author": "FDRMRZUSA",
+    "file": "orgs/un-emblem.svg",
+    "licence": "Public domain",
+    "sha256": "776a9061db4ddbb9e834e1483d4ec51177baae5441ad8e21b76b5f0810effbf0",
+    "source": "https://commons.wikimedia.org/wiki/File:Logo_of_the_United_Nations.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Logo_of_the_United_Nations.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   },
+   "flag": {
+    "author": "See File history below for details.\n\n Denelson83, Zscout370 ve Madden",
+    "file": "orgs/un-flag.svg",
+    "licence": "Public domain",
+    "sha256": "c15749b8e69f0fbf19aba8e5c0d4213c91b8421214565bc0c6e6bedfe31ff611",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Nations.svg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Flag_of_the_United_Nations.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+   }
+  }
+ },
+ "skipped": [
+  {
+   "file": "National emblem of Oman.svg",
+   "key": "OMN",
+   "kind": "arms",
+   "why": "OGL-om 1.0"
+  },
+  {
+   "file": "Flag of Oman.svg",
+   "key": "OMN",
+   "kind": "flag",
+   "why": "OGL-om 1.0"
+  }
+ ]
+}
