@@ -1,7 +1,7 @@
 import { parse } from 'yaml';
 
 export type LonLat = [number, number];
-export const STYLE_IDS = ['A', 'B', 'C', 'D', 'E', 'G', 'K'] as const;
+export const STYLE_IDS = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'K'] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 
 export interface Camera { center: LonLat; zoom: number }
@@ -31,6 +31,9 @@ export interface Scene {
   labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home' }[];
   hook: { kicker: string; lines: string[]; sub: string; status: string; source: string };
   beats: Beat[];
+  /** How it moves (all optional): text entrance, camera path, a stories-style progress bar, and
+   *  sub-frame motion blur on export (on unless false). The page's URL can override each one. */
+  anim?: { text?: 'rise' | 'wipe' | 'type' | 'pop'; camera?: 'glide' | 'fly' | 'snap'; progress?: boolean; blur?: boolean };
 }
 
 /** Reading speed ceiling: 15 characters a second is about two Turkish words (research/01, rule 4). */

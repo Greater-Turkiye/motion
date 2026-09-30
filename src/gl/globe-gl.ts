@@ -82,6 +82,7 @@ uniform float uReliefK, uLimb, uHasRelief;
 uniform vec3 uHyp0, uHyp1, uHyp2; uniform float uHasHyp;
 uniform vec3 uShadowT, uLightT; uniform float uHasTint;
 uniform vec4 uRhumbC, uTile; uniform vec2 uRhumbP[3]; uniform int uRhumbN;
+uniform float uHalftone, uSpeckle, uContourStep, uGratStep; uniform vec4 uContourC, uInk;
 uniform vec4 uBg0, uBg1, uSea, uGrat, uAtmo, uGlowC, uHatch;
 uniform float uReveal, uPulse, uHasAtmo, uHasGlow;
 out vec4 o;
@@ -129,6 +130,10 @@ void main() {
   int id = int(texelFetch(uId, t, 0).r * 255.0 + 0.5);
   vec3 c = uSea.rgb;
   int kind = 0;
+  // height for the contour lines, read outside every branch so its screen derivative is defined
+  float hAll = texture(uRelief, vec2((ll.x + 180.0) / 360.0, (ll.y + 90.0) / 180.0)).b;
+  float hc = hAll / max(uContourStep, 1e-3);
+  float contour = 1.0 - clamp(abs(fract(hc + 0.5) - 0.5) / max(fwidth(hc), 1e-4) - 0.5, 0.0, 1.0);
   {
     // derivatives (fwidth) need uniform control flow, so this runs everywhere and only the sea keeps it
     float onSea = id == 0 ? 1.0 : 0.0;
@@ -181,7 +186,14 @@ void main() {
     float hi = rn.b;                            // 0 sea level .. 1 at 5 km
     // plains stay quiet, mountains speak; the home and subject fills keep most of their flat colour
     float k = uReliefK * (0.35 + 0.65 * smoothstep(0.02, 0.45, hi)) * ((kind == 2 || kind == 3) ? 0.45 : 1.0);
-    if (uHasTint > 0.5) {
+    if (uHalftone > 0.0) {
+      // printed relief: shadow becomes a 45° dot screen whose dots grow with the darkness
+      float dark = clamp((1.0 - clamp(shade, 0.35, 1.22)) * k * 2.2, 0.0, 1.0);
+      vec2 q = mat2(0.7071, -0.7071, 0.7071, 0.7071) * gl_FragCoord.xy / uHalftone;
+      float r = length(fract(q) - 0.5);
+      float rad = sqrt(dark) * 0.62;
+      c = mix(c, uInk.rgb, 0.8 * (1.0 - smoothstep(rad - 0.08, rad + 0.08, r)));
+    } else if (uHasTint > 0.5) {
       // shadows go blue-grey and light goes warm, as on a Swiss school map, instead of black and white
       float dsh = clamp(shade, 0.35, 1.22) - 1.0;
       c = dsh < 0.0 ? mix(c, uShadowT, min(1.0, -dsh * k * 1.5)) : mix(c, uLightT, min(1.0, dsh * k * 2.2));
@@ -190,8 +202,9 @@ void main() {
     }
     c += vec3(0.03) * k * smoothstep(0.4, 0.9, hi); // a touch of snow light on high ground
   }
-  // graticule every 10 degrees, one pixel, anti-aliased
-  vec2 g = abs(fract(ll / 10.0 + 0.5) - 0.5) * 10.0;
+  if (id > 0 && uContourC.a > 0.0 && hAll > 0.004) c = mix(c, uContourC.rgb, uContourC.a * contour);
+  // graticule every uGratStep degrees (10 unless the style says otherwise), one pixel, anti-aliased
+  vec2 g = abs(fract(ll / uGratStep + 0.5) - 0.5) * uGratStep;
   vec2 fw = max(fwidth(ll), vec2(1e-5));
   float gl1 = 1.0 - min(min(g.x / fw.x, g.y / fw.y), 1.0);
   c = mix(c, uGrat.rgb, uGrat.a * gl1);
@@ -201,6 +214,12 @@ void main() {
     c = mix(c, uGlowC.rgb, clamp(uGlowC.a * gv * uReveal * (0.85 + 0.3 * uPulse), 0.0, 1.0));
   }
   if (uFlat < 0.5 && uLimb > 0.0) c *= mix(1.0 - uLimb, 1.0, sqrt(max(0.0, 1.0 - r * r)));
+  if (uSpeckle > 0.0) {
+    // photocopy toner: rare dark specks and a faint unevenness, fixed to the page, not to the map
+    float hsh = fract(sin(dot(floor(gl_FragCoord.xy / 2.0), vec2(12.9898, 78.233))) * 43758.5453);
+    c = mix(c, uInk.rgb, step(1.0 - 0.006 * uSpeckle, hsh) * 0.7);
+    c *= 1.0 - 0.03 * uSpeckle * hsh;
+  }
   o = vec4(mix(col, c, edge), 1.0);
 }`;
 
@@ -441,6 +460,9 @@ export class GlobeGL {
       gl.uniform2fv(u('uRhumbP'), s.rhumb.centers.slice(0, 3).flatMap(([lo, la]) => [lo, merc(la) / DEG]));
     }
     gl.uniform4fv(u('uTile'), rgba(s.tile ?? 'rgba(0,0,0,0)'));
+    gl.uniform1f(u('uHalftone'), s.halftone ?? 0); gl.uniform1f(u('uSpeckle'), s.speckle ?? 0);
+    gl.uniform4fv(u('uInk'), rgba(s.ink)); gl.uniform1f(u('uGratStep'), s.gratStep ?? 10);
+    gl.uniform4fv(u('uContourC'), rgba(s.contour?.color ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uContourStep'), s.contour?.step ?? 1);
     gl.uniform4fv(u('uBg0'), rgba(s.bg[0])); gl.uniform4fv(u('uBg1'), rgba(s.bg[1]));
     gl.uniform4fv(u('uSea'), rgba(s.sea)); gl.uniform4fv(u('uGrat'), rgba(s.graticule));
     gl.uniform4fv(u('uAtmo'), rgba(s.atmosphere ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uHasAtmo'), s.atmosphere && !s.flat ? 1 : 0);

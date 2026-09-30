@@ -4,6 +4,7 @@ import { anim, ease, lerp, rng, span } from '../engine/time';
 import type { Beat, Camera, LonLat, Scene } from '../engine/scene';
 import { H, W } from '../render/globe';
 import type { MapRenderer } from '../render/map';
+import { makeProject } from '../gl/globe-gl';
 import { drawLabels, placeLabels, type Box, type Label } from '../render/labels';
 import type { Style } from '../styles';
 
@@ -74,6 +75,7 @@ function guard(box: Box, what: string) {
  *  keys and returns to zero at the end, so the loop has no seam. */
 function cameraAt(sc: Scene, t: number): Camera {
   const cam = sc.camera;
+  const mode = sc.anim?.camera ?? 'glide';
   const sway = Math.sin((2 * Math.PI * t) / sc.duration);
   if (!cam.keys) {
     const k = (ease[cam.ease] || ease.outCubic)(span(t, 0, cam.seconds));
@@ -85,10 +87,16 @@ function cameraAt(sc: Scene, t: number): Camera {
   let i = 0;
   while (i < ks.length - 2 && t >= ks[i + 1].t) i++;
   const a = ks[i], b = ks[i + 1];
-  const k = ease.inOutCubic(span(t, a.t, b.t));
+  // glide: one smooth move across the whole gap between keys
+  // snap: the move happens in the first third, fast and decisive, then the frame holds
+  // fly: like glide, but a long move rises and comes down (van Wijk and Nuij's zoom-out-then-in)
+  const k = mode === 'snap' ? ease.outExpo(span(t, a.t, a.t + Math.min(1.2, (b.t - a.t) * 0.35)))
+    : ease.inOutCubic(span(t, a.t, b.t));
+  const far = Math.hypot(b.center[0] - a.center[0], b.center[1] - a.center[1]);
+  const rise = mode === 'fly' ? 1 + Math.min(1.2, far / 6) * Math.sin(Math.PI * k) : 1;
   return {
     center: [lerp(a.center[0], b.center[0], k) + 0.5 * sway, lerp(a.center[1], b.center[1], k)],
-    zoom: Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), k)) * (1 + 0.015 * sway),
+    zoom: (Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), k)) * (1 + 0.015 * sway)) / rise,
   };
 }
 
@@ -102,27 +110,31 @@ function windowOf(sc: Scene, i: number, t: number) {
   return { start, end, on: t >= start - 1e-6 && t < end, inP, out };
 }
 
-/** Draws text runs where words between asterisks take the accent colour. */
-function marked(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, ink: string, accent: string) {
-  let cx = x;
-  for (const [j, part] of text.split('*').entries()) {
-    if (!part) continue;
-    ctx.fillStyle = j % 2 ? accent : ink;
-    ctx.fillText(part, cx, y);
-    cx += ctx.measureText(part).width;
-  }
-}
-
 /**
  * One video: the hook, then the beats of PLAN.md section 14 (place, facts, distance, status, close),
  * with the status and the source on screen from the first second to the last frame. Every value
  * below is a function of `t`; the last frame is the first one again, so the video loops.
  */
+/** How far a point in the middle of the picture moves on screen between t and t + dt, in pixels:
+ *  the exporter uses it to decide how many sub-frames a frame needs for its motion blur. */
+export function screenMotion(sc: Scene, s: Style, t: number, dt: number) {
+  const p0 = makeProject(s, cameraAt(sc, t)), p1 = makeProject(s, cameraAt(sc, t + dt));
+  const v = cameraAt(sc, t);
+  let worst = 0;
+  for (const [dx, dy] of [[0, 0], [4, 3], [-4, -3]]) {
+    const at: LonLat = [v.center[0] + dx, v.center[1] + dy];
+    const a = p0(at), b = p1(at);
+    if (a && b) worst = Math.max(worst, Math.hypot(a[0] - b[0], a[1] - b[1]));
+  }
+  return worst;
+}
+
 export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRenderer, sc: Scene, s: Style, t: number, frame: number) {
   const D = sc.duration;
   const full = sc.beats.length > 0;
   const tail = full ? 1 - span(t, D - 0.9, D - 0.05) : 1; // everything that was not on frame 0 leaves before the loop
-  const view = cameraAt(sc, t);
+  // a stop-motion style moves its camera in steps (12 a second for the photocopied dossier)
+  const view = cameraAt(sc, s.stepFps ? Math.floor(t * s.stepFps) / s.stepFps : t);
   const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
   const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
   const beat: Beat | undefined = sc.beats[beatIdx];
@@ -209,7 +221,9 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     labels.push({ text: l.text, x: p[0], y: p[1], size: home ? 32 : 24, color: home ? '#ffffff' : s.label, spacing: 0.4, weight: home ? 700 : 500,
       priority: home ? 1 : 2 + i, alpha: anim(t, 0.6 + 0.08 * i, 0.4) * tail });
   });
-  if (s.flat) labels.forEach((l) => { if (l.text === 'TÜRKİYE') l.color = '#ffffff'; });
+  // on a flat page the TÜRKİYE label sits on the home fill: white on a dark fill, ink on a light one
+  const homeDark = (() => { const [r, g, b] = rgbOf(s.home); return 0.2126 * r + 0.7152 * g + 0.0722 * b < 150; })();
+  if (s.flat) labels.forEach((l) => { if (l.text === 'TÜRKİYE') l.color = homeDark ? '#ffffff' : s.ink; });
   drawLabels(ctx, placeLabels(ctx, labels, obstacles));
 
   // wash under the text block
@@ -227,6 +241,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
+  if (full && sc.anim?.progress) drawProgress(ctx, sc, s, t);
 
   // vignette and grain
   if (!s.flat) {
@@ -296,13 +311,105 @@ function drawFooter(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, alpha: n
   ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
 }
 
+type TextMode = 'rise' | 'wipe' | 'type' | 'pop';
+const TYPE_CPS = 45; // typewriter speed: three times reading speed, so the line is complete long before it must be read
+
+/** A line of text split into runs; words between asterisks take the accent colour. */
+const runs = (text: string) => text.split('*').map((p, j) => ({ p, acc: j % 2 === 1 })).filter((r) => r.p);
+
+/**
+ * One line of a beat, entering the way the scene asks (anim.text):
+ * rise, it slides up and fades in; wipe, a bar in the accent colour draws it from the left;
+ * type, it is typed out behind a block cursor; pop, word by word, each springing up to size.
+ * The font and letter spacing are whatever the caller set; `size` is the line's font size.
+ */
+function reveal(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, t: number, t0: number, mode: TextMode,
+  ink: string, accent: string, alpha: number, size: number) {
+  const rs = runs(text);
+  const draw = (rr: { p: string; acc: boolean }[], yy: number) => {
+    let cx = x;
+    for (const r of rr) { ctx.fillStyle = r.acc ? accent : ink; ctx.fillText(r.p, cx, yy); cx += ctx.measureText(r.p).width; }
+    return cx;
+  };
+  if (mode === 'wipe') {
+    const p = anim(t, t0, 0.55, ease.inOutCubic);
+    if (p <= 0) return;
+    const w = ctx.measureText(rs.map((r) => r.p).join('')).width + 16;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x - 8, y - size * 1.05, w * p, size * 1.45); ctx.clip();
+    ctx.globalAlpha = alpha; draw(rs, y);
+    ctx.restore();
+    if (p < 1) { ctx.globalAlpha = alpha; ctx.fillStyle = accent; ctx.fillRect(x - 8 + w * p - 3, y - size * 0.85, 6, size * 1.05); }
+  } else if (mode === 'type') {
+    const n = Math.floor(Math.max(0, t - t0) * TYPE_CPS);
+    if (n <= 0) return;
+    let left = n;
+    const shown: { p: string; acc: boolean }[] = [];
+    for (const r of rs) { if (left <= 0) break; shown.push({ p: r.p.slice(0, left), acc: r.acc }); left -= r.p.length; }
+    ctx.globalAlpha = alpha;
+    const end = draw(shown, y);
+    const total = rs.reduce((a, r) => a + r.p.length, 0);
+    // the cursor stays while typing and for a moment after, blinking three times a second
+    if (n < total + 12 && Math.floor((t - t0) * 6) % 2 === 0) { ctx.fillStyle = accent; ctx.fillRect(end + 6, y - size * 0.74, size * 0.42, size * 0.84); }
+  } else if (mode === 'pop') {
+    let cx = x, k = 0;
+    for (const r of rs) for (const wd of r.p.split(/(\s+)/)) {
+      if (!wd) continue;
+      const ww = ctx.measureText(wd).width;
+      if (/\S/.test(wd)) {
+        const p = anim(t, t0 + 0.07 * k, 0.42, ease.outBack), a = anim(t, t0 + 0.07 * k, 0.12);
+        k++;
+        if (a > 0) {
+          ctx.save(); ctx.globalAlpha = alpha * a;
+          ctx.translate(cx + ww / 2, y); const sc = 0.5 + 0.5 * p; ctx.scale(sc, sc);
+          ctx.fillStyle = r.acc ? accent : ink; ctx.fillText(wd, -ww / 2, 0);
+          ctx.restore();
+        }
+      }
+      cx += ww;
+    }
+  } else {
+    const p = anim(t, t0, 0.45, ease.outExpo);
+    ctx.globalAlpha = alpha * p;
+    draw(rs, y + (1 - p) * 24);
+  }
+}
+
+/** When line k of a block starts: typed lines wait for the one before, the others follow a beat apart. */
+function lineStart(lines: string[], k: number, t0: number, mode: TextMode) {
+  if (mode === 'type') return t0 + lines.slice(0, k).reduce((a, l) => a + l.replace(/\*/g, '').length, 0) / TYPE_CPS + 0.08 * k;
+  if (mode === 'pop') return t0 + lines.slice(0, k).reduce((a, l) => a + l.split(/\s+/).length, 0) * 0.07;
+  return t0 + 0.12 * k;
+}
+
+/** Stories-style progress: one segment per block, filling as the video plays (a reason to stay). */
+function drawProgress(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
+  const starts = [0, ...sc.beats.map((b) => b.at)], ends = [...sc.beats.map((b) => b.at), sc.duration];
+  const x0 = LEFT, x1 = W - LEFT, gap = 8, y = SAFE.top - 34;
+  const total = x1 - x0 - gap * (starts.length - 1);
+  let x = x0;
+  ctx.globalAlpha = 1;
+  starts.forEach((a, i) => {
+    const w = (total * (ends[i] - a)) / sc.duration;
+    ctx.fillStyle = hexA(s.ink.startsWith('#') ? s.ink : '#ffffff', 0.22); ctx.fillRect(x, y, w, 5);
+    ctx.fillStyle = s.accent; ctx.fillRect(x, y, w * span(t, a, ends[i]), 5);
+    x += w + gap;
+  });
+}
+
 function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number, t: number) {
   const b = sc.beats[i];
   const w = windowOf(sc, i, t);
   const alpha = w.inP * w.out;
   if (alpha <= 0) return;
-  const rise = (1 - w.inP) * 36 + (1 - w.out) * 30;
-  const at = (dt: number, d = 0.45) => anim(t, b.at + dt, d, ease.outExpo); // staggered entry inside a beat
+  const mode: TextMode = sc.anim?.text ?? 'rise';
+  const rise = (mode === 'rise' ? (1 - w.inP) * 36 : 0) + (1 - w.out) * 30;
+  const kicker = (text: string, y: number) => {
+    ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
+    ctx.fillText(text, LEFT, y); ctx.letterSpacing = '0px';
+  };
+  const lines = (ls: string[], x: number, y0: number, lh: number, t0: number, color: string, size: number) =>
+    ls.forEach((l, k) => reveal(ctx, l, x, y0 + lh * k, t, lineStart(ls, k, t0, mode), mode, color, s.accent, alpha, size));
 
   switch (b.kind) {
     case 'place': {
@@ -311,12 +418,11 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const px = fit(ctx, [b.title], (p) => `900 ${p}px M`, 132, -0.02);
       const top = BLOCK_BOTTOM - text.length * 52 - (text.length ? 24 : 0) - px * 0.9;
       guard({ x: LEFT, y: top, w: WIDTH, h: BLOCK_BOTTOM - top }, 'place');
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
-      ctx.fillText('NEREDE', LEFT, top - 22 + rise);
-      ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.02 * px}px`; ctx.fillStyle = s.ink;
-      ctx.fillText(b.title, LEFT - 4, top + px * 0.9 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = '600 40px M'; ctx.fillStyle = s.muted;
-      text.forEach((l, k) => { ctx.globalAlpha = alpha * at(0.35 + 0.1 * k); ctx.fillText(l, LEFT, top + px * 0.9 + 24 + 52 * (k + 1) + rise); });
+      kicker('NEREDE', top - 22 + rise);
+      ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.02 * px}px`;
+      reveal(ctx, b.title, LEFT - 4, top + px * 0.9 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
+      ctx.letterSpacing = '0px'; ctx.font = '600 40px M';
+      lines(text, LEFT, top + px * 0.9 + 24 + 52 + rise, 52, b.at + (mode === 'type' ? b.title.length / TYPE_CPS : 0.35), s.muted, 40);
       break;
     }
     case 'facts': {
@@ -324,14 +430,9 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const lh = Math.round(px * 1.18);
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'facts');
-      ctx.font = '700 26px X'; ctx.letterSpacing = '8px'; ctx.fillStyle = s.accent; ctx.globalAlpha = alpha;
-      ctx.fillText(b.kicker ?? 'NE OLDU', LEFT, top + 0.8 * lh - 0.72 * px - 26 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = `800 ${px}px M`;
-      b.lines.forEach((l, k) => {
-        const p = at(0.12 * k);
-        ctx.globalAlpha = alpha * p;
-        marked(ctx, l, LEFT, top + lh * (k + 1) - lh * 0.2 + (1 - p) * 24 + rise, s.ink, s.accent);
-      });
+      kicker(b.kicker ?? 'NE OLDU', top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px M`;
+      lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
     }
     case 'distance': {
@@ -343,14 +444,15 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const top = BLOCK_BOTTOM - text.length * 50 - 64 - px * 0.9;
       guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'distance');
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
-      ctx.fillText('NE KADAR YAKIN', LEFT, top - 16 + rise);
+      kicker('NE KADAR YAKIN', top - 16 + rise);
+      // the counter is its own animation in every mode: a number that runs up is the point of this beat
+      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
       ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${-0.03 * px}px`;
       ctx.fillText(num, LEFT - 6, top + px * 0.9 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = '700 40px M'; ctx.fillStyle = s.ink; ctx.globalAlpha = alpha * at(0.3);
-      ctx.fillText(`${b.from.label} → ${b.to.label}`, LEFT, top + px * 0.9 + 60 + rise);
-      ctx.font = '600 36px M'; ctx.fillStyle = s.muted;
-      text.forEach((l, k) => { ctx.globalAlpha = alpha * at(0.9 + 0.12 * k); ctx.fillText(l, LEFT, top + px * 0.9 + 64 + 50 * (k + 1) + rise); });
+      ctx.letterSpacing = '0px'; ctx.font = '700 40px M';
+      reveal(ctx, `${b.from.label} → ${b.to.label}`, LEFT, top + px * 0.9 + 60 + rise, t, b.at + 0.3, mode, s.ink, s.accent, alpha, 40);
+      ctx.font = '600 36px M';
+      lines(text, LEFT, top + px * 0.9 + 64 + 50 + rise, 50, b.at + 0.9, s.muted, 36);
       break;
     }
     case 'status': {
@@ -360,31 +462,37 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const top = BLOCK_BOTTOM - text.length * 52 - 40 - px * 1.25;
       guard({ x: LEFT - 12, y: top - 40, w: WIDTH + 12, h: BLOCK_BOTTOM - top + 40 }, 'status');
-      const p = at(0, 0.6);
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px';
-      ctx.fillText('DURUM', LEFT, top - 16 + rise);
+      const p = anim(t, b.at, 0.6, ease.outExpo);
+      kicker('DURUM', top - 16 + rise);
       // the stamp: a frame that closes around the word
+      ctx.globalAlpha = alpha;
       ctx.font = `900 ${px}px M`; ctx.letterSpacing = `${0.02 * px}px`;
       const tw = ctx.measureText(label).width;
       ctx.strokeStyle = s.status; ctx.lineWidth = 5;
       ctx.beginPath(); ctx.roundRect(LEFT - 12, top + rise, (tw + 24) * p, px * 1.25, 8); ctx.stroke();
       ctx.fillStyle = s.status; ctx.fillText(label, LEFT, top + px * 1.0 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = '600 40px M'; ctx.fillStyle = s.ink;
-      text.forEach((l, k) => { ctx.globalAlpha = alpha * at(0.4 + 0.12 * k); ctx.fillText(l, LEFT, top + px * 1.25 + 40 + 52 * k + 20 + rise); });
+      ctx.letterSpacing = '0px'; ctx.font = '600 40px M';
+      lines(text, LEFT, top + px * 1.25 + 60 + rise, 52, b.at + 0.4, s.ink, 40);
       break;
     }
     case 'close': {
-      const px = fit(ctx, b.lines, (p) => `800 ${p}px M`, 72);
+      const px = fit(ctx, b.lines.map((l) => l.replace(/\*/g, '')), (p) => `800 ${p}px M`, 72);
       const lh = Math.round(px * 1.2);
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - 50, w: WIDTH, h: BLOCK_BOTTOM - top + 50 }, 'close');
-      if (b.kicker) { ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.font = '700 26px X'; ctx.letterSpacing = '8px'; ctx.fillText(b.kicker, LEFT, top + 0.8 * lh - 0.72 * px - 26 + rise); }
-      ctx.letterSpacing = '0px'; ctx.font = `800 ${px}px M`;
-      b.lines.forEach((l, k) => { const p = at(0.12 * k); ctx.globalAlpha = alpha * p; marked(ctx, l, LEFT, top + lh * (k + 1) - lh * 0.2 + (1 - p) * 20 + rise, s.ink, s.accent); });
+      if (b.kicker) kicker(b.kicker, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px M`;
+      lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
     }
   }
   ctx.globalAlpha = 1; ctx.letterSpacing = '0px';
+}
+
+function rgbOf(hex: string): [number, number, number] {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function hexA(hex: string, a: number) {

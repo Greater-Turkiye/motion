@@ -29,6 +29,11 @@ export interface Style {
   shadeTint?: [string, string];       // relief shadow and light colours instead of black and white (G)
   rhumb?: { color: string; centers: [number, number][] };  // portolan rhumb lines on the sea, 32 winds (K; flat styles only)
   tile?: string;                      // a faint tile pattern on the sea (K)
+  halftone?: number;                  // relief printed as a 45° dot screen, cell size in px (H)
+  speckle?: number;                   // photocopy toner speckle, 0..1 (H)
+  contour?: { color: string; step: number };  // contour lines, step as a share of 5 km (I)
+  gratStep?: number;                  // graticule spacing in degrees (default 10)
+  stepFps?: number;                   // camera moves in steps, n per second: stop motion (H)
 }
 
 export const STYLES: Record<StyleId, Style> = {
@@ -65,4 +70,16 @@ export const STYLES: Record<StyleId, Style> = {
     glow: null, atmosphere: null, accent: '#1F3F8F', ink: '#1B1B1B', muted: '#4d4a44', status: '#B8322A',
     label: 'rgba(27,27,27,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.3, limb: 0,
     rhumb: { color: 'rgba(31,63,143,0.26)', centers: [[27.5, 35.2], [38.5, 42.6], [18.5, 40.5]] }, tile: 'rgba(47,167,168,0.10)' },
+  // research/03 H: a declassified dossier, photocopied: toner on paper, Factbook-blue sea, halftone relief
+  H: { id: 'H', name: 'Gizliliği kaldırılmış', flat: true, bg: ['#ECE7DB', '#E2DCCD'], sea: '#C9D6DF', land: '#E9E4D8', border: 'rgba(26,26,26,0.8)',
+    graticule: 'rgba(26,26,26,0.10)', home: '#d8cbb6', homeStroke: '#1A1A1A', subject: '#dcd3c3', subjectStroke: '#B3261E',
+    glow: null, atmosphere: null, accent: '#B3261E', ink: '#1A1A1A', muted: '#4a4640', status: '#B3261E',
+    label: 'rgba(26,26,26,0.9)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.07, relief: 0.8, limb: 0,
+    halftone: 7, speckle: 0.5, stepFps: 12 },
+  // research/03 I: a printed field sheet: pale green lowland, brown contours, a one-degree grid
+  I: { id: 'I', name: 'Harekât paftası', flat: true, bg: ['#F2EFE4', '#E9E5D6'], sea: '#9CC7E0', land: '#F2EFE4', border: 'rgba(29,29,29,0.7)',
+    graticule: 'rgba(29,29,29,0.22)', home: '#E30A17', homeStroke: '#1D1D1D', subject: '#D40000', subjectStroke: '#D40000',
+    glow: null, atmosphere: null, accent: '#C8102E', ink: '#1D1D1D', muted: '#4b4b43', status: '#A0703C',
+    label: 'rgba(29,29,29,0.9)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.55, limb: 0,
+    hypso: ['#CFE3B4', '#EFE9D2', '#E6D5B8'], contour: { color: 'rgba(160,112,60,0.55)', step: 0.04 }, gratStep: 1 },
 };
