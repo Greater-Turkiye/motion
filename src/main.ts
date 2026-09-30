@@ -2,7 +2,8 @@ import { loadAssets } from './assets';
 import { loadScene, type StyleId } from './engine/scene';
 import { H, W } from './render/globe';
 import { STYLES } from './styles';
-import { drawVideo } from './templates/video';
+import { drawVideo, screenMotion } from './templates/video';
+import { Accumulator } from './gl/accum';
 import { makeMap, type MapRenderer } from './render/map';
 
 // hand-written scenes in scenes/, generated ones in scenes/auto/; a scene is found by its file name
@@ -16,6 +17,13 @@ const scene = loadScene(text);
 const styleParam = params.get('style') as StyleId | null;
 if (styleParam && STYLES[styleParam]) scene.style = styleParam;
 const exporting = params.has('export');
+// variants from the URL, so the same scene can be rendered several ways: ?text=pop&camera=fly&progress=1&blur=0
+const A = (scene.anim ||= {});
+const pick = <T extends string>(v: string | null, ok: readonly T[]) => (v && (ok as readonly string[]).includes(v) ? (v as T) : undefined);
+A.text = pick(params.get('text'), ['rise', 'wipe', 'type', 'pop'] as const) ?? A.text;
+A.camera = pick(params.get('camera'), ['glide', 'fly', 'snap'] as const) ?? A.camera;
+if (params.has('progress')) A.progress = params.get('progress') !== '0';
+if (params.has('blur')) A.blur = params.get('blur') !== '0';
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 canvas.width = W; canvas.height = H;
@@ -35,6 +43,28 @@ function draw(t: number, frame: number, assets: Awaited<typeof ready>) {
   drawVideo(ctx, assets, map, scene, STYLES[scene.style], t, frame);
 }
 
+/**
+ * One exported frame: several sub-frames spread over half a frame's time (a 180° shutter) when the
+ * camera moves fast enough to judder, averaged and dithered by the accumulator; a still or slow
+ * frame is drawn once and only dithered. The number of sub-frames follows the motion, so the cost
+ * is paid where the eye would see the difference.
+ */
+let accum: Accumulator | null | undefined;
+function exportFrame(i: number, assets: Awaited<typeof ready>) {
+  const t = i / scene.fps;
+  accum ??= Accumulator.make(W, H);
+  if (!accum) { draw(t, i, assets); return; }
+  const px = A.blur === false ? 0 : screenMotion(scene, STYLES[scene.style], t, 1 / scene.fps);
+  const n = px < 1.5 ? 1 : px < 4 ? 2 : px < 10 ? 4 : 6;
+  accum.begin();
+  for (let k = 0; k < n; k++) {
+    draw(Math.max(0, n === 1 ? t : t + ((k + 0.5) / n - 0.5) * 0.5 / scene.fps), i, assets);
+    accum.push(canvas);
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(accum.finish(), 0, 0);
+}
+
 declare global {
   interface Window { motion: { ready: Promise<{ fps: number; frames: number; id: string; style: string; renderer: string }>; frame: (i: number, format?: 'jpeg' | 'png') => string; encode?: (bitrate?: number) => Promise<string> } }
 }
@@ -47,7 +77,7 @@ window.motion = {
   // pass that follows discards far more than it does; `png` stays available for stills
   frame(i: number, format: 'jpeg' | 'png' = 'jpeg') {
     if (!assetsLoaded) throw new Error('assets not loaded');
-    draw(i / scene.fps, i, assetsLoaded);
+    exportFrame(i, assetsLoaded);
     return format === 'png' ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.95);
   },
 };
@@ -79,7 +109,7 @@ async function encode(bitrate = 16_000_000): Promise<string> {
   const started = performance.now();
   for (let i = 0; i < frames; i++) {
     if (failure) throw failure;
-    draw(i / scene.fps, i, assetsLoaded);
+    exportFrame(i, assetsLoaded);
     const vf = new VideoFrame(canvas, { timestamp: Math.round(i * us), duration: Math.round(us) });
     encoder.encode(vf, { keyFrame: i % (scene.fps * 2) === 0 });
     vf.close();

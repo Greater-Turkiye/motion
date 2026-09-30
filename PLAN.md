@@ -222,9 +222,13 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 | G | **İsviçre rölyefi** ✅ | Imhof: yükseltiye göre renk (ova yeşil-gri, dağ açık), mavi-gri gölge, sıcak ışık; dağlık cepheler, su, boğazlar |
 | K | **Çini atlas** ✅ | İznik paleti, Piri Reis tarzı 32 yönlü rumb hatları, denizde çini deseni; diplomasi, Mavi Vatan |
 
-Araştırmanın (docs/research/03) diğer yönleri sırada: H gizliliği kaldırılmış dosya, I harekât paftası
-(milsymbol, MIT), sonra F saha defteri, J riso baskı, L kabartma maket. Teknikler: alt-kare hareket
-bulanıklığı, blue-noise dithering, bloom (E için), van Wijk yakınlaştırma yolu, 2× süper örnekleme.
+| H | **Gizliliği kaldırılmış** ✅ | Fotokopi dosya: kâğıt, toner, yarım ton kabartma, benek, 12 fps kamera |
+| I | **Harekât paftası** ✅ | Basılı pafta: yeşil ova, kahverengi eş yükselti eğrileri, 1° ızgara. APP-6 birlik sembolleri bilerek yok: dost/hasım çerçevesi hedefleme görünümü okunur (kırmızı çizgi) |
+
+Hareket seçenekleri ✅: yazı girişi (yükselme, silme, daktilo, kelime kelime), kamera (süzülme, uçuş =
+van Wijk'in önce uzaklaşıp sonra yaklaşan yolu, sert geçiş), hikâye tarzı ilerleme çubuğu, alt-kare
+hareket bulanıklığı ve dither. Sırada: F saha defteri, J riso baskı, L kabartma maket; bloom (E için),
+2× süper örnekleme.
 
 **Sahibin kararı (2026-09-30): hepsi kalır, sahne dosyasında `style:` ile seçilir.**
 Otomatik hatta seçici, olayın türüne göre varsayılan bir stil atar (ör. kinetik ve deniz olayları
