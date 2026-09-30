@@ -61,9 +61,15 @@ async function encode(bitrate = 16_000_000): Promise<string> {
   if (!assetsLoaded) throw new Error('assets not loaded');
   if (typeof VideoEncoder === 'undefined') throw new Error('WebCodecs is not available');
   const { Muxer, ArrayBufferTarget } = await import('mp4-muxer');
-  const config: VideoEncoderConfig = { codec: 'avc1.640033', width: W, height: H, bitrate, framerate: scene.fps, avc: { format: 'avc' } };
-  const support = await VideoEncoder.isConfigSupported(config);
-  if (!support.supported) throw new Error('this browser cannot encode 1080x1920 H.264');
+  // High profile where the platform encoder has it; Baseline for Chrome's software encoder
+  // (OpenH264, on a runner without a GPU), which supports nothing else
+  let config: VideoEncoderConfig | null = null;
+  for (const codec of ['avc1.640033', 'avc1.42E033']) {
+    const c: VideoEncoderConfig = { codec, width: W, height: H, bitrate, framerate: scene.fps, avc: { format: 'avc' } };
+    if ((await VideoEncoder.isConfigSupported(c)).supported) { config = c; break; }
+  }
+  if (!config) throw new Error('this browser cannot encode 1080x1920 H.264');
+  console.info(`encoder ${config.codec}`);
   const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H, frameRate: scene.fps }, fastStart: 'in-memory' });
   let failure: Error | null = null;
   const encoder = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { failure = e as Error; } });

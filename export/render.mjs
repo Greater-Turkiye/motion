@@ -67,8 +67,10 @@ const base = `http://127.0.0.1:${server.address().port}/`;
 const port = 9400 + Math.floor(Math.random() * 500);
 const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--no-default-browser-check',
   '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
-  // WebGL2 everywhere: the real GPU where there is one, SwiftShader on a runner without one
-  '--use-angle=default', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
+  // WebGL2 everywhere: the real GPU where there is one, SwiftShader on a runner without one (since
+  // Chrome 137 SwiftShader is no longer picked on its own; on Linux CI we ask for it by name)
+  ...(process.env.CI && process.platform === 'linux' ? ['--use-gl=angle', '--use-angle=swiftshader-webgl'] : ['--use-angle=default']),
+  '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
   `--user-data-dir=${mkdtempSync(path.join(tmpdir(), 'motion-'))}`, 'about:blank'], { stdio: 'ignore' });
 let up = false;
 for (let i = 0; i < 80 && !up; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); up = true; } catch { await sleep(250); } }
