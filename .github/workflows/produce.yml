@@ -14,6 +14,10 @@ name: produce
 # the run in seconds unless the last video is at least 5 h 30 min old. A late or lost wake-up costs
 # an hour, not six, and no secret or outside timer is needed.
 #
+# Narration (PLAN.md section 15.7): Chatterbox reads the scene's own on-screen words; the scene then
+# says "SESLENDİRME: YAPAY SES" in every frame. If the voice fails the video goes out silent and without
+# the note; production does not stop for it. MOTION_VOICE set to "off" turns narration off.
+#
 # Kill switch: set the repository variable MOTION_PRODUCE to "off".
 on:
   schedule:
@@ -93,16 +97,44 @@ jobs:
         env:
           ID: ${{ steps.pick.outputs.id }}
         run: node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --notes notes.md --meta meta.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
+        with:
+          python-version: "3.11"
+      - name: Narration
+        id: voice
+        if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+        run: |
+          node tools/audio/narration.mjs "auto-$ID" out/narration.json
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet chatterbox-tts
+          python -u tools/audio/tts.py out/narration.json out/voice
+          # the picture waits for the voice: blocks lengthen until each clip fits
+          node tools/audio/retime.mjs "auto-$ID" out/voice
+          # only now, with every clip made, does the scene carry the synthetic-voice note
+          echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
+          { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı)."; } >> notes.md
+          echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: Video and poster
         if: steps.pick.outputs.id != ''
         env:
           ID: ${{ steps.pick.outputs.id }}
+          VOICE: ${{ steps.voice.outputs.ok }}
         run: |
           scene="auto-$ID"
           node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video
           node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster
           mkdir -p release
-          cp out/video/*.mp4 "release/$scene.mp4"
+          if [ "$VOICE" = "true" ]; then
+            node tools/audio/voice.mjs out/voice out/video/*.mp4 "release/$scene.mp4"
+          else
+            cp out/video/*.mp4 "release/$scene.mp4"
+          fi
           cp out/poster/*-frames/0000.jpg "release/$scene.jpg"
           cp meta.json "release/$scene.json"
           ls -la release

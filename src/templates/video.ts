@@ -120,6 +120,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // the text block and its wash; the hook's kicker can stand higher than the beats' blocks
   const top = t < (sc.beats[0]?.at ?? D) ? Math.min(960, hookTop) : 960;
   const obstacles: Box[] = [{ x: 0, y: top, w: W, h: H - top }];
+  if (sc.voice === 'synthetic') obstacles.push({ x: LEFT - 10, y: SAFE.top - 6, w: 400, h: 40 });
+  // the progress bar: a name drawn across it reads as a broken bar
+  if (full && (sc.anim?.progress ?? s.motion.progress)) obstacles.push({ x: 0, y: SAFE.top - 50, w: W, h: 30 });
   const labels: Label[] = [];
 
   if (sc.event) {
@@ -350,6 +353,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
   if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
+  if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
 
   // vignette and grain
   if (!s.flat) {
@@ -506,6 +510,20 @@ function lineStart(lines: string[], k: number, t0: number, mode: TextMode) {
 }
 
 /** Stories-style progress: one segment per block, filling as the video plays (a reason to stay). */
+/** Where the synthetic-voice note sits: top left inside the safe area, under the progress bar. */
+const VOICE_NOTE = { x: LEFT, y: SAFE.top + 22, text: 'SESLENDİRME: YAPAY SES' };
+
+/** A narrated video says, in every frame, that the voice is synthetic (TikTok, YouTube and Meta ask
+ *  for AI-made realistic audio to be labelled; the viewer should not have to find it in a caption). */
+function drawVoiceNote(ctx: CanvasRenderingContext2D, s: Style) {
+  ctx.globalAlpha = 0.85;
+  ctx.font = `700 18px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = s.muted; ctx.fillText(VOICE_NOTE.text, VOICE_NOTE.x, VOICE_NOTE.y);
+  guard({ x: VOICE_NOTE.x, y: VOICE_NOTE.y - 18, w: ctx.measureText(VOICE_NOTE.text).width, h: 24 }, 'voice note');
+  ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
+}
+
 function drawProgress(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
   const starts = [0, ...sc.beats.map((b) => b.at)], ends = [...sc.beats.map((b) => b.at), sc.duration];
   const x0 = LEFT, x1 = W - LEFT, gap = 8, y = SAFE.top - 34;

@@ -364,7 +364,27 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    adından ya da başlıktaki "X statement" kalıbından belirlenir: "Rusya hakkında İngiltere açıklaması"
    Rusya'nın açıklaması değildir (ilk denemede tam bu hata vardı).
 5. **Stüdyo**: aynı haber tüm stillerde yan yana; varsayılan stil olay ailesine göre.
-6. **Ses tasarımı** ✅ (prosedürel, `export/score.mjs`). **Seslendirme** sırada: araştırma (07) birincil
-   aday olarak FreyaTTS-small'ı (Apache-2.0, Türkçe öncelikli, CPU'da gerçek zamandan hızlı), yedek olarak
-   Chatterbox'ı (MIT) öneriyor; sözcük zamanlaması WhisperX `align()` ile; sayılar yazıyla okunur; her
-   videoda "sentetik ses" beyanı.
+6. **Ses tasarımı**: prosedürel ses (`export/score.mjs`) sahibin dinlemesinde reddedildi ("rezalet");
+   kapalı. Yerine CC0 kayıtlardan beş set hazırlandı (`tools/audio/mix.mjs`, dinleme odası); sahip bir
+   set seçene kadar videolarda müzik ve efekt yok.
+7. **Seslendirme** ✅ (2026-10-01): sahip "sorma, sen karar ver" dedi. Karar ve gerekçe:
+   - Model **Chatterbox Multilingual** (MIT, Resemble AI), varsayılan ses, CPU'da runner'da. Her klip
+     PerTh filigranı taşır. FreyaTTS-small daha doğal olabilir; aynı sahnede karşılaştırma sırada, daha
+     iyiyse değiştirilir.
+   - Metin **ekrandakinin aynısı** (`tools/audio/narration.mjs`): kanca, yer, olgular, mesafe, durum,
+     veri setinin sayısı. Yeni iddia eklenmez; sayılar yazıyla, büyük harfli başlıklar küçük harfle
+     okunur; kancanın alt satırı olgularda tekrar edilmez. Bir blok penceresine sığmayan metin önce
+     isteğe bağlı parçasını ("Henüz kimse incelemedi.") kaybeder.
+   - **Görüntü sesi bekler** (`tools/audio/retime.mjs`): model kısa cümleleri yavaş okuyor (ilk
+     denemede "Karadeniz. Kesin konum yok." 4 sn); ses görüntünün gerisine düşünce hata gibi duruyor.
+     Bu yüzden klipler yapıldıktan sonra her blok, klibi sığana kadar uzatılır, kamera anahtarları
+     da onunla esner; video 2–5 sn uzar (karadeniz-gemi 22 → 26,5 sn). Bloklar yalnızca uzar, okuma
+     hızı kuralları bozulmaz.
+   - Yerleştirme (`tools/audio/voice.mjs`): klip bloğunun başında, 1,15 kat hızlı; yine de taşarsa
+     en fazla 1,3 kata kadar hızlanır. Ses -16 LUFS.
+   - **Beyan**: seslendirilmiş her videonun her karesinde "SESLENDİRME: YAPAY SES" yazar (sol üst,
+     güvenli alanda) ve sürüm notunda model adı bulunur. TikTok, YouTube ve Meta gerçekçi yapay sesin
+     etiketlenmesini istiyor; izleyici bunu açıklamada aramak zorunda kalmamalı.
+   - Seslendirme başarısız olursa video sessiz ve beyansız çıkar; üretim durmaz.
+     `MOTION_VOICE=off` depo değişkeni seslendirmeyi kapatır.
+   - Müzik yatağı yok: sahip set seçince `voice.mjs --bed` ile konuşmanın altına eklenir.
