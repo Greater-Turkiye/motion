@@ -197,7 +197,9 @@ export function generate(record, { datasets, style } = {}) {
   const precision = pt ? (loc.precision === 'exact' ? 'exact' : 'locality') : 'region';
 
   const date = new Date(record.time.start);
-  const kicker = `${TR(region?.name ?? loc?.place_name?.tr ?? '')} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
+  // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
+  const where = pt && loc?.place_name?.tr ? loc.place_name.tr : region?.name ?? loc?.place_name?.tr ?? '';
+  const kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   const news = unrubric(titleTr);
   const hook = hookLines(news);
   const subClause = clauses(news).find((c) => !c.includes(hook.used) && !hook.used.includes(c) && words(c).length >= 3 && c.length <= 72);

@@ -183,7 +183,9 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
 ```
 
 1. **Seçici** ✅ (`tools/scene/select.mjs`). Son 48 saatin videosu olmayan kayıtları research/04'ün
-   haber değeri puanıyla sıralar: güncellik (12 saatte yarıya iner), tür büyüklüğü, Türkiye'ye
+   haber değeri puanıyla sıralar: güncellik (24 saatte yarıya iner; akışlar altı saatlik partilerle
+   geldiği için araştırmanın 12 saati parti zamanını cezalandırıyordu), tür büyüklüğü (başlıkta ölü ya da
+   yaralı varsa en yüksek; olağan diplomatik temas düşük), Türkiye'ye
    yakınlık, ayrı yayıncı sayısı, doğrulama durumu, yenilik (son videolarla aynı tür ve bölge
    puanı düşürür), konum. Doğrulanmamış kayıt dışlanmaz, sırası düşer (ADR 0023). Çalışma başına
    bir video, altı saatte bir: günde en çok dört.
@@ -327,7 +329,7 @@ ile sınanana kadar varsayılan değerdir, kural değil. Uygulananlar ✅.
 - Aynı gün aynı düzen tekrarlanmaz; en az 5–6 düzen (YouTube "inauthentic content" politikası).
 
 **Hat**
-- Seçim puanı S = 100·D·(0,30M + 0,20P + 0,20C + 0,15R + 0,15N)·(0,6 + 0,4G), kesin elemelerden
+- Seçim puanı S = 100·D·(0,30M + 0,20P + 0,20C + 0,15R + 0,15N)·(0,8 + 0,2G), kesin elemelerden
   sonra; turda 1, günde 2–6 video (ayrıntı: research/04).
 - Metin LLM'e yazdırılmaz; kayıt alanlarından deterministik şablon cümleleri.
 - Ses: prosedürel efektler (WebAudio, kamu malı jsfxr); seslendirme adayı Chatterbox (MIT), Türkçe

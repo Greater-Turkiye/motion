@@ -7,9 +7,9 @@
 // and the generator accepts it (red lines, a place on the map, a scene that passes its checks).
 // Candidates are ranked by the research's newsworthiness score, adapted to what our records carry:
 //
-//   S = 100 · D · (0.30 M + 0.20 P + 0.20 C + 0.15 R + 0.15 N) · (0.6 + 0.4 G)
+//   S = 100 · D · (0.30 M + 0.20 P + 0.20 C + 0.15 R + 0.15 N) · (0.8 + 0.2 G)
 //
-//   D recency, halving every 12 h        M magnitude, from the event type
+//   D recency, halving every 24 h        M magnitude, from the event type and reported casualties
 //   P proximity to Türkiye, from region  C corroboration, distinct publishers, saturating at 5
 //   R reliability, from the status      N novelty: 1 minus the overlap with the last published videos
 //   G whether the record has a point on the map
@@ -21,18 +21,22 @@ import { generate, records } from './generate.mjs';
 
 const MAGNITUDE = [
   [/^kinetic\.(missile-strike|airstrike|drone-strike)/, 1.0], [/^kinetic\./, 0.95], [/^maritime\./, 0.9],
-  [/^(deployment|exercise)\./, 0.75], [/^(procurement|policy)\./, 0.6], [/^diplomatic\./, 0.55], [/./, 0.3],
+  [/^(deployment|exercise)\./, 0.75], [/^(procurement|policy)\./, 0.55], [/^diplomatic\.(agreement|treaty)/, 0.55], [/^diplomatic\./, 0.4], [/./, 0.3],
 ];
 const PROXIMITY = { aegean: 1.0, cyprus: 1.0, 'east-med': 0.95, 'black-sea': 0.95, syria: 0.95, iraq: 0.9, caucasus: 0.9,
   iran: 0.85, levant: 0.8, balkans: 0.8, 'libya-north-africa': 0.7, 'gulf-red-sea': 0.6, 'central-asia': 0.7, global: 0.4 };
+// the headline reports people killed or wounded: that outranks the event type alone
+const HARM = /\b(killed|dead|died|deaths?|wounded|injured|casualties)\b/i;
 const RELIABILITY = { verified: 1.0, 'partially-verified': 0.8, disputed: 0.4, unverified: 0.5 };
 
 const hours = (r, now) => (now - Date.parse(r.reported_at ?? r.time.start)) / 3.6e6;
 const publishers = (r) => new Set((r.sources ?? []).map((s) => { try { return new URL(s.url).hostname.replace(/^www\./, ''); } catch { return s.url; } })).size;
 
 export function score(r, now, recent) {
-  const D = Math.pow(2, -Math.max(0, hours(r, now)) / 12);
-  const M = MAGNITUDE.find(([re]) => re.test(r.event_type ?? ''))[1];
+  // 24 h rather than the research's 12: our feeds arrive in six-hour batches and a record's
+  // reported_at is when the feed carried it, so twelve hours punished the batch timing, not the news
+  const D = Math.pow(2, -Math.max(0, hours(r, now)) / 24);
+  const M = Math.max(MAGNITUDE.find(([re]) => re.test(r.event_type ?? ''))[1], HARM.test(r.title?.en ?? '') ? 1.0 : 0);
   const P = Math.max(0.4, ...(r.regions ?? []).map((g) => PROXIMITY[g] ?? 0.4));
   const C = Math.min(1, Math.log2(1 + publishers(r)) / Math.log2(6));
   const R = RELIABILITY[r.assessment?.status] ?? 0.3;
@@ -40,7 +44,9 @@ export function score(r, now, recent) {
   const same = recent.filter((p) => p.event_type === r.event_type && (p.regions ?? []).some((g) => (r.regions ?? []).includes(g))).length;
   const N = 1 / (1 + same);
   const G = r.location?.geometry ? 1 : 0;
-  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.6 + 0.4 * G);
+  // a point on the map helps the video, but less than the research's 0.6 + 0.4 G: on the first run
+  // a located routine visit outranked an unlocated strike with two dead
+  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G);
 }
 
 if (process.argv[1]?.endsWith('select.mjs')) {
