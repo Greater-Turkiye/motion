@@ -49,7 +49,7 @@ npm test                                      # iki ayrı işlemede aynı karele
 | Harita | `src/gl/globe-gl.ts` (WebGL2), yedek `src/render/globe.ts` (2B) |
 | Dışa aktarım | `export/render.mjs` — önce WebCodecs, olmazsa sekmelerde paralel kare + ffmpeg (`--encoder`, `--workers`) |
 | Amblemler | `assets/emblems/manifest.json` — Wikidata/Commons, yalnızca kamu malı ve serbest lisans; dosyalar git'te değil |
-| CI | `.github/workflows/render.yml` — tip denetimi, datasets `auto-data`'nın en yeni beş kaydından sahne, yedi stilde kanca, A stilinde tam video, en yeni üretilmiş sahnenin videosu, determinizm; videolar artefakt. Runner'da GPU yok: SwiftShader, kare başına ~0,15 sn (22 sn video 193 sn) |
+| CI | `.github/workflows/render.yml` — tip denetimi, datasets `auto-data`'nın en yeni beş kaydından sahne, yedi stilde saniyede bir kare, A stilinde tam video, en yeni üretilmiş sahnenin videosu, determinizm; videolar artefakt. Runner'da GPU yok: SwiftShader, kare başına 0,15–0,35 sn (22 sn video 3–8 dk, runner'a göre) |
 | Lisanslar | [LICENSES.md](LICENSES.md) |
 
 | Ölçüm (GTX 660) | M1, 2B tuval | M2, WebGL2 + WebCodecs |
