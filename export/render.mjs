@@ -17,7 +17,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { cpus, tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -73,13 +73,21 @@ const base = `http://127.0.0.1:${server.address().port}/`;
 
 // 2. a headless Chrome at exactly the frame size
 const port = 9400 + Math.floor(Math.random() * 500);
+// a fresh profile per run, removed when the run ends however it ends: left behind, each is ~100 MB
+// in the temp folder, and a day of renders filled a disk
+const profile = mkdtempSync(path.join(tmpdir(), 'motion-'));
 const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--no-default-browser-check',
   '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
   // WebGL2 everywhere: the real GPU where there is one, SwiftShader on a runner without one (since
   // Chrome 137 SwiftShader is no longer picked on its own; on Linux CI we ask for it by name)
   ...(process.env.MOTION_SWIFTSHADER || (process.env.CI && process.platform === 'linux') ? ['--use-gl=angle', '--use-angle=swiftshader-webgl'] : ['--use-angle=default']),
   '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader',
-  `--user-data-dir=${mkdtempSync(path.join(tmpdir(), 'motion-'))}`, 'about:blank'], { stdio: 'ignore' });
+  `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
+process.on('exit', () => {
+  try { chrome.kill(); } catch { /* already gone */ }
+  // Chrome lets go of its files a moment after it is killed (Windows holds them locked until then)
+  try { rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { /* the OS cleans temp */ }
+});
 let up = false;
 // up to a minute: a busy runner has taken more than twenty seconds to bring Chrome up
 for (let i = 0; i < 240 && !up; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); up = true; } catch { await sleep(250); } }
@@ -217,4 +225,7 @@ for (const style of STYLES) {
 }
 chrome.kill();
 server.close();
+// Chrome's helper processes let go of the profile a moment after the browser goes: wait for them
+await new Promise((r) => { if (chrome.exitCode !== null) r(); else chrome.once('exit', r); });
+for (let i = 0; i < 25; i++) { try { rmSync(profile, { recursive: true, force: true }); break; } catch { await sleep(200); } }
 process.exit(failed ? 1 : 0);

@@ -15,6 +15,7 @@
 | `assets/emblems/**` | Wikimedia Commons, Wikidata üzerinden | Her dosyanın lisansı ve yazarı `assets/emblems/manifest.json`'da; yalnızca kamu malı, CC0, CC BY, CC BY-SA |
 | earcut (paketlenir) | [mapbox/earcut](https://github.com/mapbox/earcut) | ISC |
 | mp4-muxer (paketlenir) | [Vanilagy/mp4-muxer](https://github.com/Vanilagy/mp4-muxer) | MIT |
+| Seslendirme modeli (runner'da indirilir, depoya girmez) | [Chatterbox Multilingual](https://github.com/resemble-ai/chatterbox), Resemble AI | MIT; üretilen her klip PerTh filigranı taşır, videoda "SESLENDİRME: YAPAY SES" yazar |
 | ffmpeg (`ffmpeg-static`, yalnız geliştirme) | [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) | GPL-3.0 ikili; depoya girmez, videoya gömülmez |
 
 Amblem kullanım kuralı (PLAN.md bölüm 6, ADR 0026): yalnızca haber bağlamında, konusunun üstünde,
