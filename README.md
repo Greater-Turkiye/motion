@@ -37,5 +37,6 @@ npm test                                      # iki ayrı işlemede aynı karele
 | Dışa aktarım | `export/render.mjs` — kareler birbirinden bağımsız; `--workers` sekme sayısı |
 | Amblemler | `assets/emblems/manifest.json` — Wikidata/Commons, yalnızca kamu malı ve serbest lisans; dosyalar git'te değil |
 | CI | `.github/workflows/render.yml` — tip denetimi, dört stilde video, determinizm; videolar artefakt |
+| Lisanslar | [LICENSES.md](LICENSES.md) |
 
 Bu makinede (GTX 660) dört saniyelik dikey kanca dört sekmeyle ~33 saniyede işleniyor.
