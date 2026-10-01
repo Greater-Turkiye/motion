@@ -141,6 +141,11 @@ for i, seg in enumerate(segments):
         c = cer(seg["text"], h)
         # a number heard wrong is the worst error a news voice can make ("bin kilometre" heard as "1 km"):
         # every number the text says must be heard, whatever the letters score
+        # a clip that goes on after its sentence in words ("…236 kayıt, yan sekt.") scores within the line
+        # on letters, since only the tail is wrong: hearing more than the text has is a failed try
+        if len(letters(h)) > 1.12 * len(letters(seg["text"])) + 2:
+            print(f"seg{i} try {k + 1}  ran on: heard {len(letters(h))} letters for {len(letters(seg['text']))}", flush=True)
+            c = max(c, 0.5)
         if numbers(seg["text"]) != numbers(h):
             print(f"seg{i} try {k + 1}  numbers differ: said {numbers(seg['text'])}, heard {numbers(h)}", flush=True)
             c = max(c, 0.5)
