@@ -23,7 +23,9 @@ export function carousel(id, out, { build = true } = {}) {
   const sc = parse(sceneFile(ROOT, id));
   const starts = [0, ...sc.beats.map((b) => b.at)];
   const ends = [...sc.beats.map((b) => b.at), sc.duration];
-  const times = starts.map((a, i) => Math.min(a + (i === 0 ? 2.2 : 2.0), ends[i] - 0.25));
+  // late in each block, when everything has landed: a count that runs up ("80" kayıt) was caught at
+  // 75 two seconds in; the block's last 0.6 s is its exit, so the slide is taken just before it
+  const times = starts.map((a, i) => Math.max(a + (i === 0 ? 2.2 : 2.0), ends[i] - 0.7));
   const frames = times.map((t) => Math.round(t * sc.fps));
   const tmp = path.join(ROOT, 'out', 'post-frames', id);
   rmSync(tmp, { recursive: true, force: true });
