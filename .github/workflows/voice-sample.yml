@@ -48,11 +48,11 @@ jobs:
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           case "$ENGINE" in
-            chatterbox) python -m pip install --quiet chatterbox-tts ;;
+            chatterbox) python -m pip install --quiet chatterbox-tts faster-whisper ;;
             freya)
               git clone --quiet https://github.com/freyavoiceai/FreyaTTS.git ../FreyaTTS
               git -C ../FreyaTTS checkout --quiet 146d36c1cb6660646be57d31339db4eed9315de3
-              python -m pip install --quiet -r ../FreyaTTS/requirements.txt
+              python -m pip install --quiet -r ../FreyaTTS/requirements.txt faster-whisper
               echo "PYTHONPATH=$(cd ../FreyaTTS && pwd)" >> "$GITHUB_ENV" ;;
             *) echo "unknown engine: $ENGINE"; exit 1 ;;
           esac

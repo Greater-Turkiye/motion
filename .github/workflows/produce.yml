@@ -112,7 +112,7 @@ jobs:
           node tools/audio/narration.mjs "auto-$ID" out/narration.json
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet chatterbox-tts
+          python -m pip install --quiet chatterbox-tts faster-whisper
           python -u tools/audio/tts.py out/narration.json out/voice
           # the picture waits for the voice: blocks lengthen until each clip fits
           node tools/audio/retime.mjs "auto-$ID" out/voice
