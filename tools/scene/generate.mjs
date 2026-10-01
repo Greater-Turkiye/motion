@@ -193,7 +193,9 @@ export function hookLines(title) {
   }
   // a number and what it counts; a short word after it ("112 Rus İHA") belongs to the count, and a
   // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
-  const num = title.match(/(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
+  // a number joined to a name is a model, not a count: "Geran-5 jet dronunu" is one drone, not five
+  // ("Su-35", "F-16", "Geran -5" as a translation spaces it), nor is a number inside a word ("P1")
+  const num = title.match(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
   if (num) {
     // and without its possessive-accusative ending: "1470 askerini" is "1470 / ASKER", "5 jet dronunu" "5 / JET DRON"
     const bare = (w) => (w.length > 6 ? w.replace(/(?<=[^aeıioöuü\s])(ını|ini|unu|ünü)$/u, '') : w);
@@ -382,7 +384,10 @@ export function generate(record, { datasets, style } = {}) {
   }
   // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
   // noktalarını ve depolarını vurdu") gives a first piece that says nothing on its own
-  const subClause = clauses(news).find((c) => (!hook.used || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72 && verbish(c.replace(/[.!]$/, '')));
+  // a bare number ("1470 / ASKER") says nothing until its sentence is read: under a number hook the
+  // clause that holds the number is the right sub-line ("…1470 askerini daha kaybetti"); under any
+  // other hook a clause that repeats the hook's words would only say it twice
+  const subClause = clauses(news).find((c) => (!hook.used || hook.kind === 'number' || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72 && verbish(c.replace(/[.!]$/, '')));
   // a whole clause of at most two lines, or nothing: never a clause cut in the middle
   const sub = subClause ? subClause[0].toLocaleUpperCase('tr') + subClause.slice(1) : '';
   // the kicker names the place unless the hook's first line already does ("KİEV BÖLGESİ" twice)
