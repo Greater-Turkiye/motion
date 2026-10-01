@@ -188,8 +188,10 @@ toplayıcı (6 saatte bir) ─▶ otomatik kayıtlar (auto-data) ─▶ seçici 
    yaralı varsa en yüksek; olağan diplomatik temas düşük), Türkiye'ye
    yakınlık, ayrı yayıncı sayısı, doğrulama durumu, yenilik (son videolarla aynı tür ve bölge
    puanı düşürür), konum. Doğrulanmamış kayıt dışlanmaz, sırası düşer (ADR 0023). Çalışma başına
-   bir video, altı saatte bir: günde en çok dört. İş akışı her saat :17'de uyanır, son video 5 sa 30 dk'dan
-   yeniyse saniyeler içinde çıkar; GitHub'ın geciktirdiği ya da düşürdüğü zamanlamalar bir saat kaybettirir, altı değil ✅.
+   bir video, altı saatte bir: günde en çok dört. İş akışı saatte üç kez (:07, :27, :47) uyanır, son video
+   5 sa 30 dk'dan yeniyse saniyeler içinde çıkar; GitHub'ın düşürdüğü bir uyanış yirmi dakika
+   kaybettirir. Saatte bir yetmedi: 1 Ekim gecesi GitHub dört saatlik uyanıştan yalnızca birini
+   çalıştırdı (datasets ve platform depolarında da aynısı) ✅.
 2. **Sahne üretici** ✅ (`tools/scene/generate.mjs`). Kayıttan sahne: kanca, bölümler, kamera, süre,
    stil. Metin kaydın metnidir; yeni iddia üretmez. Türk kuvvetleri, geri çekilmiş ya da yanlış
    kayıt, haritada yeri olmayan kayıt reddedilir.
