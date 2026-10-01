@@ -10,9 +10,10 @@ name: produce
 # status and the source are on screen in every frame and the release notes say it was automatic.
 #
 # Cadence: GitHub delays scheduled runs under load and sometimes drops them (a 12:43 run started at
-# 18:08 on 2026-09-30), so the schedule wakes every hour at an off-peak minute and the gate job ends
-# the run in seconds unless the last video is at least 5 h 30 min old. A late or lost wake-up costs
-# an hour, not six, and no secret or outside timer is needed.
+# 18:08 on 2026-09-30; on the night of 1 October only one hourly wake-up in four ran, here and in
+# the datasets and platform repositories alike), so the schedule wakes three times an hour at
+# off-peak minutes and the gate job ends the run in seconds unless the last video is at least 5 h
+# 30 min old. A lost wake-up costs twenty minutes, and no secret or outside timer is needed.
 #
 # Narration (PLAN.md section 15.7): Chatterbox reads the scene's own on-screen words; the scene then
 # says "SESLENDİRME: YAPAY SES" in every frame. If the voice fails the video goes out silent and without
@@ -21,7 +22,7 @@ name: produce
 # Kill switch: set the repository variable MOTION_PRODUCE to "off".
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "7,27,47 * * * *"
   workflow_dispatch:
     inputs:
       record:
