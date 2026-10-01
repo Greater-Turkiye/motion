@@ -426,3 +426,12 @@ Kırmızı çizgiler aynı: soru kancası yok, kaynağın söylemediği iddia yo
 - Kazanan varsayılan olur; kaybedenler kalkar, yerine yeni bir fikir sınanır (ör. ses açılışı, yazı
   boyutu, mesafeyi kancanın kendisi yapmak).
 
+## 17. Instagram gönderisi / The Instagram carousel (2026-10-01)
+
+Sahip örneklerde Instagram gönderisi istedi. Karar: ayrı bir 4:5 şablonu yerine aynı çizici, gönderi
+modunda (`?post=1`). Gerekçe: her karede videonun aynı olguları, durumu ve kaynağı olur; ikinci bir
+yerleşim bakımı ve iki yerde ayrışan kurallar olmaz. Her bölüm bir kare (bölüm oturduktan sonraki an),
+4:5 pencereden kesilir (y 250–1600: platformun üst bandı dışarıda). Gönderiye özgü iki işaret var:
+kaçıncı kare olduğu ("2/6"; kaydırarak okunan bir gönderide okur ne kadar kaldığını bilmeli) ve kapakta
+"KAYDIR →". Üretimde her videonun sürümüne eklenir; yayımlamak sahibin hesabını gerektirir.
+
