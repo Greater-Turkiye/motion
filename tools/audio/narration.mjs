@@ -50,7 +50,7 @@ const SAY = { ABD: 'Amerika Birleşik Devletleri', km: 'kilometre', 'km²': 'kil
 
 /** Screen text → speech: accents off, numbers in words, capitals lowered, abbreviations said. */
 export function speakable(text, title = false) {
-  let s = text.replace(/\*/g, '').replace(/\s+·\s+/g, ', ').replace(/\s+-{1,2}\s+/g, ', ');
+  let s = text.replace(/\*/g, '').replace(/\s+·\s+/g, ', ').replace(/\s+(-{1,2}|[–—])\s+/g, ', ');
   s = s.replace(/±\s*/g, 'artı eksi ');
   // "bölgeler arasında 2." → "ikinci"; only small ranks, and only a number that ends the sentence
   s = s.replace(/(?<![\d.,])(\d{1,2})\.(?=\s*$)/g, (m, d) => ORDINAL[Number(d)] ?? m);
@@ -59,7 +59,8 @@ export function speakable(text, title = false) {
   s = s.replace(/(\d+),(\d+)/g, (_, a, b) => `${sayNumber(Number(a))} virgül ${sayNumber(Number(b))}`);
   s = s.replace(/\d+/g, (m) => sayNumber(Number(m)));
   // "yedi'ye" is read the same as "yediye", but a spelled number keeps no apostrophe
-  s = s.replace(/(sıfır|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|elli|altmış|yetmiş|seksen|doksan|yüz|bin|milyon|milyar)'(\p{L})/gu, '$1$2');
+  s = s.replace(/dört'(?=[aeıioöuü])/gu, "dörd'");
+  s = s.replace(/(sıfır|bir|iki|üç|dört|dörd|beş|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|elli|altmış|yetmiş|seksen|doksan|yüz|bin|milyon|milyar)'(\p{L})/gu, '$1$2');
   s = s.replace(/[\p{L}²]+/gu, (w) => SAY[w] ?? (title && w === w.toLocaleUpperCase('tr') && /\p{Lu}/u.test(w) && !KEEP.has(w) ? lower(w) : w));
   return s.replace(/\s+/g, ' ').replace(/\s+([,.:;!?])/g, '$1').trim();
 }
@@ -107,6 +108,9 @@ function factsOnlyRepeatHook(sc) {
   const body = norm(f.lines.join(' ').replace(/\*/g, ''));
   if (!body.startsWith(sub)) return false;
   const rest = body.slice(sub.length).trim();
+  // only the source's credit after a dash: the whole sentence, read once, carries it
+  const raw = f.lines.join(' ').replace(/\*/g, '').split(/\s+/).slice(sub.split(' ').length).join(' ');
+  if (/^[\s,;:]*[–—-]/.test(raw)) return true;
   const head = norm(speakable(sc.hook.lines.join(' '), true));
   return rest.length > 0 && norm(speakable(rest)).split(' ').every((w) => head.includes(w.slice(0, 5)));
 }
@@ -161,11 +165,14 @@ function hookParts(sc) {
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not
   // "Bin dört yüz yetmiş asker." and then the sentence, or only the bare number when time is short
+  // the facts will read the whole sentence, so the hook reads only its headline (see factsOnlyRepeatHook);
+  // a GELİŞME label is no headline aloud, so then only the place
+  if (sc.template !== 'digest' && factsOnlyRepeatHook(sc)) return [h.lines[1] === 'GELİŞME' ? `${T(h.lines[0])}.` : hookSentence(h.lines)];
   if (/^\d/.test(h.lines[0] ?? '') && h.sub.includes(h.lines[0])) return [B(h.sub)];
   // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
   if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines)}`];
-  // the facts will read the whole sentence, so the hook reads only its headline (see factsOnlyRepeatHook)
-  if (factsOnlyRepeatHook(sc)) return [hookSentence(h.lines)];
+  // a hook whose label is only GELİŞME (development) says nothing aloud: the sentence is the news
+  if (h.lines[1] === 'GELİŞME' && h.sub) return [`${T(h.lines[0])}. ${B(h.sub)}`];
   return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
@@ -178,6 +185,10 @@ export function narration(sc) {
   blocks.forEach((parts, i) => {
     const window = ends[i] - starts[i];
     let keep = parts.filter(Boolean).map(sentence);
+    // a block that opens with exactly what the voice has just said drops that ("Karadeniz." then
+    // "Karadeniz. Kesin konum yok." reads "Kesin konum yok."), as long as something is left
+    const last = out.at(-1)?.text;
+    if (last && keep.length > 1 && norm(keep[0]) === norm(last)) keep = keep.slice(1);
     // the first part always stays; optional parts go while the words would overrun the window
     while (keep.length > 1 && keep.join(' ').length / SPEECH_CPS > window) keep = keep.slice(0, -1);
     const text = keep.join(' ');
