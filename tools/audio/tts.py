@@ -24,6 +24,7 @@ its sentence, which Whisper ignored, so the letters still matched:
   slowest real reading so far was 6.6 a second, with its pauses) counts as a failed try.
 """
 import json, re, sys, time, pathlib
+import numpy as np
 import torch, torchaudio
 from faster_whisper import WhisperModel
 
@@ -117,9 +118,12 @@ print(f"{engine} and the checker loaded in {time.time() - t0:.0f} s", flush=True
 def heard(wav, sr):
     """What Whisper hears, and when its last word ends (seconds; None when it heard nothing)."""
     mono = torchaudio.functional.resample(wav.mean(0), sr, 16000).numpy()
-    segs = list(ear.transcribe(mono, language="tr", beam_size=5, word_timestamps=True)[0])
+    # half a second of silence on each side: a clip that starts or ends on a word is otherwise misheard
+    # at its edges ("yaklaşık bin kilometre" came back "1 km" alone, "1000 km" in the finished video)
+    pad = np.zeros(8000, dtype=mono.dtype)
+    segs = list(ear.transcribe(np.concatenate([pad, mono, pad]), language="tr", beam_size=5, word_timestamps=True)[0])
     words = [w for s in segs for w in (s.words or [])]
-    return " ".join(s.text for s in segs).strip(), (max(w.end for w in words) if words else None)
+    return " ".join(s.text for s in segs).strip(), (max(w.end for w in words) - 0.5 if words else None)
 
 def longest(text):
     return 1.2 + len(text) / 7.5
