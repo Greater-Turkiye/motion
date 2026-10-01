@@ -409,7 +409,9 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     const sp = COUNTRY_TABLE.find((c) => c.iso3 === speakerIso);
     parties = [sp, ...parties.filter((c) => c.iso3 !== speakerIso)].slice(0, 6);
   }
-  const label = typeLabel(record, texts);
+  // talks and agreements are between parties: "ÜST DÜZEY TEMAS" over "Zelensky holds meeting with
+  // commanders on Lyman front" called a leader's meeting with his own army a contact between states
+  const label = /^diplomatic\.(talks|agreement)$/.test(record.event_type ?? '') && parties.length < 2 ? null : typeLabel(record, texts);
   const manifest = JSON.parse(readFileSync(path.join(ROOT, 'assets/emblems/manifest.json'), 'utf8')).items;
   const flag = (iso) => (manifest[iso]?.flag ? `${iso}/flag` : undefined);
   const arms = (iso) => (manifest[iso]?.['arms-eagle'] ? `${iso}/arms-eagle` : manifest[iso]?.arms ? `${iso}/arms` : undefined);
@@ -578,7 +580,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const scene = {
     id: `auto-${record.id}`,
     record: record.id,
-    template: deal ? 'deal' : speaker ? 'statement' : family,
+    // what the scene is, by its blocks: a talks record with one party is drawn as a single event
+    template: deal ? 'deal' : speaker ? 'statement' : family === 'deal' ? 'event' : family,
     format: 'vertical',
     fps: 60,
     duration,
