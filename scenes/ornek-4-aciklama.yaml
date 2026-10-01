@@ -1,0 +1,128 @@
+# Generated from evt_01m3t4tvpfehprce72vrxvzv3x by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-4-aciklama
+record: evt_01m3t4tvpfehprce72vrxvzv3x
+template: statement
+format: vertical
+fps: 60
+duration: 26.9
+style: C
+source_text:
+  - Cumhurbaşkanı von der Leyen'in Arnavutluk Başbakanı Rama ile ortak basın toplantısında yaptığı açıklama
+  - Statement by President von der Leyen at the joint press conference with Albanian Prime Minister Rama
+  - RESMİ AÇIKLAMA · TİRAN · BALKANLAR · ARNAVUTLUK · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME
+camera:
+  from:
+    center: &a1
+      - 23.4
+      - 41.7
+    zoom: 0.8
+  to: &a2
+    t: 2.6
+    center:
+      - 20.1
+      - 43.7
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.8
+    - *a2
+    - t: 6.1
+      center:
+        - 18.8
+        - 42.3
+      zoom: 2.3
+    - t: 14.4
+      center:
+        - 18
+        - 42.9
+      zoom: 2.7
+    - t: 17.8
+      center:
+        - 23.2
+        - 41.5
+      zoom: 3.2
+    - t: 21.5
+      center:
+        - 19.3
+        - 41.9
+      zoom: 2.2
+    - t: 26.9
+      center: *a1
+      zoom: 0.8
+event:
+  at:
+    - 19.82
+    - 41.33
+  precision: locality
+subject:
+  country: ALB
+  emblem: ALB/arms
+  label: ARNAVUTLUK
+parties:
+  - country: ALB
+    label: ARNAVUTLUK
+    at: &a3
+      - 19.82
+      - 41.33
+    emblem: ALB/flag
+labels:
+  - text: ARNAVUTLUK
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: TİRAN
+    at:
+      - 19.819
+      - 40.428000000000004
+    kind: country
+hook:
+  kicker: 30 EYLÜL
+  lines:
+    - TİRAN
+    - RESMİ AÇIKLAMA
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: EUROPA"
+beats:
+  - kind: place
+    title: TİRAN
+    text: "Konum başlıktaki yer adından: ±20 km."
+    at: 2.6
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Cumhurbaşkanı von der
+      - Leyen'in Arnavutluk
+      - Başbakanı Rama ile ortak
+      - basın toplantısında yaptığı
+      - açıklama
+    at: 6.1
+  - kind: distance
+    from:
+      at:
+        - 19.819
+        - 41.328
+      label: TİRAN
+    to:
+      at:
+        - 26.56
+        - 41.68
+      label: EDİRNE
+    text: Kuş uçuşu, en yakın Türk şehrine.
+    at: 14.4
+  - kind: status
+    text: "Tek kaynak: Europa. Henüz kimse incelemedi."
+    at: 18
+  - kind: close
+    kicker: KAYITLARIMIZDA · EYLÜL
+    lines:
+      - "Balkanlar'dan *26* kayıt:"
+      - bölgeler arasında 2.
+    at: 21.5

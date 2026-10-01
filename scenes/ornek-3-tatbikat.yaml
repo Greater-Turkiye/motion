@@ -1,0 +1,100 @@
+# Generated from evt_01m2c7m4qyew0vvthsvfkxkbqg by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-3-tatbikat
+record: evt_01m2c7m4qyew0vvthsvfkxkbqg
+template: exercise
+format: vertical
+fps: 60
+duration: 21.3
+style: I
+source_text:
+  - Romanya Hava Kuvvetleri, 14-25 Eylül'de ülke genelinde 'Burebista 26' tatbikatı düzenleyeceğini duyurdu
+  - The Romanian Air Force announced exercise 'Burebista 26' across Romania for 14-25 September
+  - Forţele Aeriene desfăşoară exerciţiul 'Burebista 26', în perioada 14 - 25 septembrie
+  - HAVA TATBİKATI · ROMANYA · BALKANLAR · ROMANYA · BUREBİSTA 26 · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME
+camera:
+  from:
+    center: &a1
+      - 26
+      - 43.9
+    zoom: 0.9
+  to: &a2
+    t: 2.6
+    center:
+      - 25.3
+      - 48.3
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 6
+      center:
+        - 24
+        - 46.9
+      zoom: 2.3
+    - t: 9.3
+      center:
+        - 24
+        - 46.9
+      zoom: 2.3
+    - t: 17.8
+      center:
+        - 23.2
+        - 47.5
+      zoom: 2.7
+    - t: 21.3
+      center: *a1
+      zoom: 0.9
+event:
+  at:
+    - 24.98
+    - 45.85
+  precision: region
+parties:
+  - country: ROU
+    label: ROMANYA
+    at: &a3
+      - 26.1
+      - 44.43
+    emblem: ROU/flag
+labels:
+  - text: ROMANYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+hook:
+  kicker: ROMANYA · 14 EYLÜL
+  lines:
+    - BUREBİSTA 26
+    - TATBİKATI
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: BUCURESTIFM"
+  badge: TÜRKİYE'YE YAKIN · ~480 KM
+beats:
+  - kind: roster
+    title: BUREBİSTA 26
+    at: 2.6
+  - kind: place
+    title: ROMANYA
+    text: "Kesin konum yok: ülke genelinde."
+    at: 6
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Romanya Hava Kuvvetleri
+      - "*14*-25 Eylül'de ülke"
+      - genelinde 'Burebista *26*'
+      - tatbikatı düzenleyeceğini
+      - duyurdu
+    at: 9.3
+  - kind: status
+    text: "Tek kaynak: Bucurestifm. Bağımsız teyit yok."
+    at: 17.8

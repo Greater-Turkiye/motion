@@ -1,0 +1,94 @@
+# Generated from evt_01m3t4v1dxf8b88d42eenc560m by tools/scene/generate.mjs; do not edit by hand.
+id: test-kisa
+record: evt_01m3t4v1dxf8b88d42eenc560m
+template: strike
+format: vertical
+fps: 60
+duration: 11.8
+variant: kisa
+style: E
+source_text:
+  - Rusya'nın Sumy'e attığı süzülme bombası altı kişiyi yaraladı
+  - Russian glide-bomb strike on Sumy leaves six injured
+  - HAVA SALDIRISI · SUMY · KARADENİZ · RUSYA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME
+camera:
+  from:
+    center: &a1
+      - 30.9
+      - 46.5
+    zoom: 0.8
+  to: &a2
+    t: 2.6
+    center:
+      - 35.1
+      - 53.3
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.8
+    - *a2
+    - t: 8.1
+      center:
+        - 33
+        - 52.5
+      zoom: 2.7
+    - t: 11.8
+      center: *a1
+      zoom: 0.8
+event:
+  at:
+    - 34.78
+    - 50.92
+  precision: locality
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    kind: sea
+  - text: SUMY
+    at:
+      - 34.781
+      - 50.024
+    kind: country
+hook:
+  kicker: SUMY · 30 EYLÜL
+  lines:
+    - ALTI
+    - KİŞİ YARALANDI
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Rusya'nın Sumy'e attığı
+      - süzülme bombası altı kişiyi
+      - yaraladı
+    at: 2.6
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 8.1
