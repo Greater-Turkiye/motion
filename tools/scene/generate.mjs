@@ -110,9 +110,15 @@ const TYPES = {
   'policy.defense': ['SAVUNMA POLİTİKASI', /\b(defen[cs]e|security)\b|savunma|güvenlik/i],
   'deployment.announced': ['KONUŞLANMA', /\b(deploy(s|ed|ment)?|troops|lost|losses)\b|konuşlan|kaybetti|kayıp/i],
 };
+/** An attack label ("FÜZE SALDIRISI") needs the attack itself in the headline, not only the weapon:
+ *  "Freyja anti-balistik sisteminin ilk savaş testi" names a missile and attacks nothing, and a
+ *  fighter that "destroys a Geran-5" shoots a drone down rather than being struck by one. */
+const ATTACK = /\b(attack(s|ed|ing)?|strikes?|struck|hit(s)?|target(s|ed)?|bomb(s|ed|ing)?|shell(s|ed|ing)?|fired)\b|saldır|vurdu|vuruldu|vurul|hedef al|bombal|ateş aç/i;
 const typeLabel = (record, texts) => {
   const t = TYPES[record.event_type];
-  return t && texts.some((x) => t[1].test(x)) ? t[0] : null;
+  if (!t || !texts.some((x) => t[1].test(x))) return null;
+  if (/^kinetic\.(drone-strike|missile-strike|airstrike|shelling|attack)$/.test(record.event_type) && !texts.some((x) => ATTACK.test(x))) return null;
+  return t[0];
 };
 
 /** The style for an event type, from config/styles.yaml (the studio page shows every style on a
@@ -211,10 +217,13 @@ export function hookLines(title) {
   // a number joined to a name is a model, not a count: "Geran-5 jet dronunu" is one drone, not five
   // ("Su-35", "F-16", "Geran -5" as a translation spaces it), nor is a number inside a word ("P1")
   const num = title.match(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
-  if (num) {
+  // a number whose next word is a verb counts nothing ("zayiat geçen güne göre 1.900 arttı"), so it
+  // is no hook; a modifier keeps its noun ("46.230 askeri personel" is not "46.230 / ASKERİ")
+  if (num && !endsOnVerb(num[2])) {
     // and without its possessive-accusative ending: "1470 askerini" is "1470 / ASKER", "5 jet dronunu" "5 / JET DRON"
     const bare = (w) => (w.length > 6 ? w.replace(/(?<=[^aeıioöuü\s])(ını|ini|unu|ünü)$/u, '') : w);
-    const noun = bare(num[2].length <= 4 && num[3] ? `${num[2]}${num[3]}` : num[2]);
+    const modifier = /^(askeri|sivil|yabancı|ağır|hafif|toplam|balistik|seyir)$/iu.test(num[2]);
+    const noun = bare((num[2].length <= 4 || modifier) && num[3] ? `${num[2]}${num[3]}` : num[2]);
     return { kind: 'number', lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
   }
   const cs = clauses(title);
