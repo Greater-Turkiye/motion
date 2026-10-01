@@ -386,6 +386,12 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      kilometre" Whisper'a "1 km" diye geldi ve harf hatası 0,18 ile eşiğin altında kaldı. Haberde en ağır
      hata yanlış sayıdır: metnin söylediği her sayı (yazıyla) duyulan sayılarla (rakam ya da yazı) aynı
      değilse deneme başarısız sayılır. Üç denemede de tutmazsa seslendirme düşer, video müzikle çıkar.
+   - **Tek cümle bütün sesi düşürmez** (haftalık özetin ikinci üretimi): kanca cümlesi üç denemede de
+     sayı denetimini geçemedi ("266", "ekiyüz otuz altı") ve bütün seslendirme düştü, özet müzikle çıktı.
+     Artık: sayı içeren cümleye 5 deneme; Whisper'ın sayı yazımları tanınır ("ekiyüz" → iki yüz, bir
+     harf farklı sayı kelimesi yanında başka bir sayı kelimesi varsa); netleşmeyen cümle tek başına
+     bırakılır (bölümü yazısıyla sessiz geçer), seslendirme ancak cümlelerin yarısından fazlası
+     netleşmezse düşer.
    - **Cümleden sonra konuşma yok** (ilk haftalık özet): ikinci deneme "Bu hafta Karadeniz 236 kayıt"tan
      sonra "yan sekt" diye devam etti; harf hatası 0,20 ile sınırda geçti, çünkü yalnız kuyruk yanlıştı.
      Duyulan harfler metnin harflerinden %12'den fazla uzunsa deneme başarısız sayılır.
