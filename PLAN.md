@@ -414,6 +414,12 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    müzikli karışımda konuşmanın anlaşılırlığı yalnız sesle aynı (ilk cümlede küçük kayıp). Dosyalar
    CC0, `assets/sound/` içinde, kaynakları LICENSES.md'de. Seslendirme başarısız olursa video müzik ve
    efektle çıkar.
+   - **Telif** (sahip: "müziklerin bazıları YouTube'da anlaşmalı, telif konusu"): ses sentezlenmez, yalnız
+     kaydı ve lisansı belgeli CC0 dosyalar kullanılır; tanınmış şarkı ya da platform kütüphanesi müziği
+     yok. CC0 bir kaydı başkası Content ID'ye kaydetmiş olabilir; böyle bir itiraz gelirse önce depo
+     değişkeni `MOTION_MUSIC=off` ile müzik ve efektler kapanır (seslendirme kalır), itiraz LICENSES.md'deki
+     Freesound CC0 kaydıyla yanıtlanır. Platformun kendi lisanslı müziği yalnız uygulamadan elle
+     paylaşırken eklenebilir; API ile değil.
 
 ## 16. İzleyiciyi ne tutar: sınanacak sıralar / What holds a viewer: orders to test (2026-10-01)
 
