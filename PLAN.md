@@ -404,6 +404,16 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    - Seslendirme başarısız olursa video sessiz ve beyansız çıkar; üretim durmaz.
      `MOTION_VOICE=off` depo değişkeni seslendirmeyi kapatır.
    - Müzik yatağı yok: sahip set seçince `voice.mjs --bed` ile konuşmanın altına eklenir.
+8. **Ses seti** ✅ (2026-10-01): sahip "bana sorma" dedi; set ölçerek seçildi, kulakla değil (dinleyemiyorum):
+   konuşma bandında (300–3400 Hz) az enerji, yani sesle çatışmama, ve düzgün seviye, yani haberi
+   dramatize eden yükselişler olmaması. Beş yatak ölçüldü; **452999 "Postapocalyptic Drone"** (set 3,
+   minimal) en düzgünü (ses yüksekliği aralığı 1,5 LU; diğerleri 2–18) ve konuşma bandı toplamın 16 dB
+   altında; set 5'inki 3,7 dB ile konuşmanın üstüne biniyordu. 20,7 sn olduğu için iki kopya 1,5 sn
+   geçişle eklenir. Efektler hafif: her bölüme girişte whoosh (-16 dB), örüntüde yanan her kayda tik
+   (-20), mesafe inince pop (-16). Yatak -20 dB'de ve konuşmanın altında kısılır; Whisper testi:
+   müzikli karışımda konuşmanın anlaşılırlığı yalnız sesle aynı (ilk cümlede küçük kayıp). Dosyalar
+   CC0, `assets/sound/` içinde, kaynakları LICENSES.md'de. Seslendirme başarısız olursa video müzik ve
+   efektle çıkar.
 
 ## 16. İzleyiciyi ne tutar: sınanacak sıralar / What holds a viewer: orders to test (2026-10-01)
 
@@ -437,4 +447,15 @@ kaçıncı kare olduğu ("2/6"; kaydırarak okunan bir gönderide okur ne kadar 
 Son kare kapanış kartı (`?post=close`): kaydırmanın sonu, okurun kaydetmeye ya da takip etmeye karar
 verdiği yer. Olayın tek cümlesi (kancanın kendi alt satırı, yeni iddia yok), kim olduğumuz ve
 "KAYDET · TAKİP ET"; harita arkada açık, durum ve kaynak alt bantta.
+
+## 18. Rozetler / Badges (2026-10-01)
+
+Sahip "badgeler" istedi. Karar: iki rozet, ikisi de hesaplanmış bilgi, hiçbiri iddia değil.
+- **"TÜRKİYE'YE YAKIN · ~420 KM"**: konumu bilinen olay en yakın Türk şehrine 500 km'den yakınsa,
+  kancanın üstünde, vurgu renginde bir hap. İzleyicinin ilk sorusu "bu beni ilgilendiriyor mu?";
+  cevap ilk karede. 0. karede (kapak görseli) tam görünür. Yakınlık varyantında üst satır zaten mesafe
+  olduğu için orada çıkmaz.
+- **Kaynak sayısı**: birden çok yayın organı varsa alt bantta "KAYNAK: UKRINFORM +2". Güven işareti.
+- **Yapılmayan**: "6 SAAT ÖNCE" gibi göreli zaman rozeti. Video sonradan paylaşıldığında bayatlar ve
+  yanlış olur; olayların çoğunun saati değil yalnız günü belli. Tarih zaten üst satırda.
 

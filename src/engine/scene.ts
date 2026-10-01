@@ -40,7 +40,8 @@ export interface Scene {
   parties?: { country: string; label: string; at: LonLat; emblem?: string }[];
   /** `alts`: other points on the ground where the label may sit instead (one is chosen per video) */
   labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home'; alts?: LonLat[] }[];
-  hook: { kicker: string; lines: string[]; sub: string; status: string; source: string };
+  /** badge: a short computed cue over the kicker ("TÜRKİYE'YE YAKIN · ~430 KM"), never a claim */
+  hook: { kicker: string; lines: string[]; sub: string; status: string; source: string; badge?: string };
   beats: Beat[];
   /** How it moves (all optional): text entrance, camera path, a stories-style progress bar, and
    *  sub-frame motion blur on export (on unless false). The page's URL can override each one. */

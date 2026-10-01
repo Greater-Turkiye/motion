@@ -67,7 +67,7 @@ jobs:
       - name: Video with the voice
         run: |
           node export/render.mjs --scene "$SCENE" --out out/video
-          node tools/audio/voice.mjs out/voice out/video/*.mp4 "out/voice/$SCENE-$ENGINE.mp4"
+          node tools/audio/voice.mjs out/voice out/video/*.mp4 "out/voice/$SCENE-$ENGINE.mp4" --kit assets/sound/kit.json --scene "$SCENE"
           cp out/narration.json out/voice/
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

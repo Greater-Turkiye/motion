@@ -15,6 +15,10 @@
 | `assets/emblems/**` | Wikimedia Commons, Wikidata üzerinden | Her dosyanın lisansı ve yazarı `assets/emblems/manifest.json`'da; yalnızca kamu malı, CC0, CC BY, CC BY-SA |
 | earcut (paketlenir) | [mapbox/earcut](https://github.com/mapbox/earcut) | ISC |
 | mp4-muxer (paketlenir) | [Vanilagy/mp4-muxer](https://github.com/Vanilagy/mp4-muxer) | MIT |
+| `assets/sound/bed-452999.mp3` | Freesound 452999 "Postapocalyptic Drone", Breviceps (https://freesound.org/people/Breviceps/sounds/452999/) | CC0 1.0 |
+| `assets/sound/whoosh-169867.mp3` | Freesound 169867 "swoosh", Halgrimm (https://freesound.org/people/Halgrimm/sounds/169867/) | CC0 1.0 |
+| `assets/sound/tick-683048.mp3` | Freesound 683048 "Click / Tick", Squirrel_404 (https://freesound.org/people/Squirrel_404/sounds/683048/) | CC0 1.0 |
+| `assets/sound/pop-653369.mp3` | Freesound 653369 "SharpClick.wav", TriqyStudio (https://freesound.org/people/TriqyStudio/sounds/653369/) | CC0 1.0 |
 | Seslendirme modeli (runner'da indirilir, depoya girmez) | [Chatterbox Multilingual](https://github.com/resemble-ai/chatterbox), Resemble AI | MIT; üretilen her klip PerTh filigranı taşır, videoda "SESLENDİRME: YAPAY SES" yazar |
 | ffmpeg (`ffmpeg-static`, yalnız geliştirme) | [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) | GPL-3.0 ikili; depoya girmez, videoya gömülmez |
 
