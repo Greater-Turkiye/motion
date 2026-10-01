@@ -182,8 +182,9 @@ export function hookLines(title) {
   // whole words only: "on" must not match inside "Kiev'de on…" words, nor "üç" inside "üçü"
   const N = '(?<![\\p{L}\\d])(\\d+|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
   for (const [re, verb] of [
-    [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
-    [new RegExp(`${N}\\s+(kişi(nin)?\\s+)?(yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
+    // the active voice too: "bomba altı kişiyi yaraladı" is six wounded, said the source's way round
+    [new RegExp(`${N}\\s+(kişi(nin|yi)?\\s+)?(öldürdü|öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
+    [new RegExp(`${N}\\s+(kişi(nin|yi)?\\s+)?(yaraladı|yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
   ]) {
     const m = low.match(re);
     if (!m) continue;

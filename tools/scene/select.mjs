@@ -16,6 +16,11 @@
 //
 // The owner decided that unverified records are published (datasets ADR 0023), so reliability
 // lowers a record's rank instead of excluding it; the status is on screen in every frame.
+//
+// Then the opening: the twelve best are drawn as scenes and each score is weighed by its hook (H).
+// A viewer decides in the first two seconds, and a count or a casualty ("İKİ / KİŞİ ÖLDÜ", "221 /
+// ÇATIŞMA") holds better than a place and a type label; a label with no sentence under it least.
+//   H = 1.0 a number or a casualty · 0.92 any other hook with its sentence · 0.85 a bare label
 import { readFileSync, existsSync } from 'node:fs';
 import { generate, records } from './generate.mjs';
 
@@ -31,6 +36,13 @@ const RELIABILITY = { verified: 1.0, 'partially-verified': 0.8, disputed: 0.4, u
 
 const hours = (r, now) => (now - Date.parse(r.reported_at ?? r.time.start)) / 3.6e6;
 const publishers = (r) => new Set((r.sources ?? []).map((s) => { try { return new URL(s.url).hostname.replace(/^www\./, ''); } catch { return s.url; } })).size;
+
+/** How strongly a scene opens (see the header): the generator's hook, weighed. */
+export function hookWeight(scene) {
+  const first = scene.hook.lines[0] ?? '';
+  if (/^\d|^(BİR|İKİ|ÜÇ|DÖRT|BEŞ|ALTI|YEDİ|SEKİZ|DOKUZ|ON)$/u.test(first)) return 1.0;
+  return scene.hook.sub ? 0.92 : 0.85;
+}
 
 export function score(r, now, recent) {
   // 24 h rather than the research's 12: our feeds arrive in six-hour batches and a record's
@@ -66,12 +78,17 @@ if (process.argv[1]?.endsWith('select.mjs')) {
   const out = [];
   while (out.length < max && pool.length) {
     const ranked = pool.map((r) => ({ r, s: score(r, now, recent) })).sort((a, b) => b.s - a.s);
-    let picked = null;
-    for (const { r, s } of ranked) {
-      pool.splice(pool.indexOf(r), 1);
-      try { generate(r, { datasets }); picked = r; console.error(`pick ${r.id} score ${s.toFixed(1)}: ${r.title?.tr}`); break; } catch (e) { console.error(`skip ${e.message}`); }
+    // the best twelve the generator accepts, each weighed by how its scene opens
+    const drawn = [];
+    for (const c of ranked) {
+      if (drawn.length >= 12) break;
+      try { drawn.push({ ...c, h: hookWeight(generate(c.r, { datasets })) }); } catch (e) { pool.splice(pool.indexOf(c.r), 1); console.error(`skip ${e.message}`); }
     }
-    if (!picked) break;
+    if (!drawn.length) break;
+    const best = drawn.sort((a, b) => b.s * b.h - a.s * a.h)[0];
+    const picked = best.r;
+    pool.splice(pool.indexOf(picked), 1);
+    console.error(`pick ${picked.id} score ${best.s.toFixed(1)} × hook ${best.h} = ${(best.s * best.h).toFixed(1)}: ${picked.title?.tr}`);
     out.push(picked.id);
     recent.unshift(picked);
   }
