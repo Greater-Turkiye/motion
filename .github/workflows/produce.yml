@@ -97,7 +97,13 @@ jobs:
         if: steps.pick.outputs.id != ''
         env:
           ID: ${{ steps.pick.outputs.id }}
-        run: node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --notes notes.md --meta meta.json
+        run: |
+          # the story-order variants take turns (PLAN.md section 16), so their numbers can be compared
+          n=$(gh release list --limit 200 --json tagName --jq '[.[]|select(.tagName|startswith("video-"))]|length')
+          variants=(standart yakinlik kisa oruntu)
+          variant=${variants[$((n % 4))]}
+          echo "variant: $variant" >> "$GITHUB_STEP_SUMMARY"
+          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant "$variant" --notes notes.md --meta meta.json
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
         with:

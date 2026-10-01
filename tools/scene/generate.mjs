@@ -323,7 +323,33 @@ function regionStats(datasets, record) {
   return { n, rank, month: MONTHS[Number(month.slice(5, 7)) - 1] };
 }
 
-export function generate(record, { datasets, style } = {}) {
+/**
+ * Variants of one story's order, for testing what holds viewers (PLAN.md section 16). The facts are
+ * the same in every variant; only what comes first and how much follows changes.
+ *   standart  hook, place, what happened, distance or pattern, status (the control)
+ *   yakinlik  self-relevance first: the kicker says how far from Türkiye, the distance comes next
+ *   kisa      one idea, 12-15 s: the hook, what happened (or the family's own beat), the status
+ *   oruntu    the pattern first: the last seven days around the place (or the month's count) next
+ */
+export const VARIANTS = ['standart', 'yakinlik', 'kisa', 'oruntu'];
+function arrange(beats, variant) {
+  const len = (i) => (beats[i + 1]?.at ?? beats.end) - beats[i].at;
+  let list = beats.map((b, i) => ({ b, d: len(i) }));
+  const first = (kinds) => { const k = list.findIndex((x) => kinds.includes(x.b.kind)); if (k > 0) list.unshift(...list.splice(k, 1)); };
+  if (variant === 'yakinlik') first(['distance']);
+  if (variant === 'oruntu') first(['recent']);
+  if (variant === 'oruntu' && list[0].b.kind !== 'recent') first(['close']);
+  if (variant === 'kisa') {
+    const core = list.find((x) => ['facts', 'quote', 'link', 'roster'].includes(x.b.kind)) ?? list.find((x) => ['distance', 'recent', 'place'].includes(x.b.kind));
+    list = [core, list.find((x) => x.b.kind === 'status')].filter(Boolean);
+  }
+  let t = beats[0].at;
+  const out = list.map(({ b, d }) => { const o = { ...b, at: Math.round(t * 10) / 10 }; t += d; return o; });
+  return { beats: out, end: t };
+}
+
+export function generate(record, { datasets, style, variant = 'standart' } = {}) {
+  if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
   const titleTr = record.title?.tr, titleEn = record.title?.en ?? '';
   if (!titleTr) refuse('no Turkish title');
@@ -478,6 +504,15 @@ export function generate(record, { datasets, style } = {}) {
     statusBeat();
     if (!(around && around.n >= 3)) regionClose();
   }
+  // the variant's order, before the camera, which follows the beats by kind
+  if (variant !== 'standart' && beats.length) {
+    beats.end = t;
+    const a = arrange(beats, variant);
+    beats.splice(0, beats.length, ...a.beats);
+    t = a.end;
+    const dist = beats.find((b) => b.kind === 'distance');
+    if (variant === 'yakinlik' && dist) kicker = `TÜRKİYE'YE ~${km(dist.from.at, dist.to.at)} KM`;
+  }
   const duration = round1(t);
 
   // ---- camera ----------------------------------------------------------------------------------------
@@ -534,6 +569,7 @@ export function generate(record, { datasets, style } = {}) {
     format: 'vertical',
     fps: 60,
     duration,
+    ...(variant !== 'standart' ? { variant } : {}),
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
@@ -590,6 +626,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith('--')) args.set(a.slice(2), process.argv[i + 1]?.startsWith('--') ? true : process.argv[++i]); }
   const datasets = args.get('datasets');
   const style = args.get('style');
+  const variant = args.get('variant') ?? 'standart';
   if (args.has('latest')) {
     // the newest records first; a refusal is news about the record, not a failure of the run
     const n = Number(args.get('latest')) || 5;
@@ -604,13 +641,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const file = args.get('record') ?? findRecord(datasets, args.get('id'));
     const record = parse(readFileSync(file, 'utf8'));
     try {
-      const scene = generate(record, { datasets, style });
+      const scene = generate(record, { datasets, style, variant });
       write(scene, record, args.get('out'));
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
       // what the site's videos page shows next to the video (tools/scene/site.mjs)
       if (args.get('meta')) writeFileSync(args.get('meta'), JSON.stringify({
         id: record.id, title: record.title.tr, title_en: record.title.en ?? null, status: scene.hook.status,
-        date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), style: scene.style,
+        date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), style: scene.style, variant: scene.variant ?? 'standart',
         sources: record.sources.map((s) => s.url),
         release: `https://github.com/Greater-Turkiye/motion/releases/tag/video-${record.id}`,
       }, null, 1) + '\n');
