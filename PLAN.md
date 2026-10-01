@@ -404,3 +404,25 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    - Seslendirme başarısız olursa video sessiz ve beyansız çıkar; üretim durmaz.
      `MOTION_VOICE=off` depo değişkeni seslendirmeyi kapatır.
    - Müzik yatağı yok: sahip set seçince `voice.mjs --bed` ile konuşmanın altına eklenir.
+
+## 16. İzleyiciyi ne tutar: sınanacak sıralar / What holds a viewer: orders to test (2026-10-01)
+
+Sahip: "insan psikolojisini, ekrandaki şeyleri iyi düşün; birkaç farklı şey yap, performanslarını
+test ederiz." Olgular her varyantta aynı; yalnızca neyin önce geldiği ve ne kadarının izlediği değişir.
+Kırmızı çizgiler aynı: soru kancası yok, kaynağın söylemediği iddia yok, durum ve kaynak her karede.
+
+| Varyant | Sıra | Dayandığı fikir |
+|---|---|---|
+| `standart` | kanca, yer, ne oldu, mesafe ya da örüntü, durum | kontrol grubu |
+| `yakinlik` | kanca (üst satır "TÜRKİYE'YE ~990 KM"), mesafe, sonra geri kalanı | Kendine yakınlık: "bu beni ilgilendiriyor mu?" ilk iki saniyede cevaplanır. Mesafe standart sırada dördüncü; izleyicinin çoğu oraya varmadan kaydırıyor. |
+| `kisa` | kanca, ne oldu, durum (12-15 sn) | İzlenme yüzdesi ve döngü: tek fikirli kısa video sonuna kadar izlenir, başa sardığında döngü olur; platformlar izlenme oranını ödüllendirir. |
+| `oruntu` | kanca, son 7 günün deseni (yoksa ayın sayısı), sonra geri kalanı | Tek olay haberdir, örüntü eğilimdir: "son 7 günde Sumy çevresinde 25 kayıt" paylaşılır, çünkü "bak neler oluyor" der. |
+
+- Üretimde sırayla döner (yayımlanmış video sayısı mod 4); her videonun künyesinde (`meta.json`)
+  `variant` yazar.
+- Ölçülecekler (platform panelinden, sahip ya da ileride yayın hesabı API'si): ilk 3 sn'de kalma,
+  ortalama izlenme yüzdesi, tamamlanma, yeniden izleme, paylaşım, kaydetme. Her varyant en az 5 video
+  birikmeden karar verilmez; tek video gürültüdür.
+- Kazanan varsayılan olur; kaybedenler kalkar, yerine yeni bir fikir sınanır (ör. ses açılışı, yazı
+  boyutu, mesafeyi kancanın kendisi yapmak).
+

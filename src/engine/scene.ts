@@ -45,6 +45,8 @@ export interface Scene {
   /** How it moves (all optional): text entrance, camera path, a stories-style progress bar, and
    *  sub-frame motion blur on export (on unless false). The page's URL can override each one. */
   anim?: { text?: 'rise' | 'wipe' | 'type' | 'pop'; camera?: 'glide' | 'fly' | 'snap'; progress?: boolean; blur?: boolean };
+  /** which order of the same facts this is, for testing what holds viewers (tools/scene/generate.mjs VARIANTS) */
+  variant?: 'standart' | 'yakinlik' | 'kisa' | 'oruntu';
   /** 'synthetic': the video carries a machine-read narration and says so on screen in every frame */
   voice?: 'synthetic';
 }
