@@ -60,7 +60,9 @@ export function cues(scene, kit) {
   return out;
 }
 
-export function mix(sceneId, kit, outWav) {
+/** The scene's cues mixed; `normalize: false` keeps the kit's gains as they are, for a track that is
+ *  mixed again under a voice (tools/audio/voice.mjs). */
+export function mix(sceneId, kit, outWav, { normalize = true } = {}) {
   const scene = loadScene(sceneFile(ROOT, sceneId));
   const D = scene.duration;
   const list = cues(scene, kit);
@@ -93,7 +95,8 @@ export function mix(sceneId, kit, outWav) {
     filters.push(`[${n}:a]${trim}aformat=sample_rates=48000:channel_layouts=stereo,volume=${c.db}dB,adelay=${ms}|${ms}[c${n}]`);
     labels.push(`[c${n}]`); n++;
   }
-  filters.push(`${labels.join('')}amix=inputs=${labels.length}:normalize=0:duration=longest,atrim=0:${D},loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[out]`);
+  if (!labels.length) return 0;
+  filters.push(`${labels.join('')}amix=inputs=${labels.length}:normalize=0:duration=longest,apad,atrim=0:${D}${normalize ? ',loudnorm=I=-16:TP=-1.5:LRA=11' : ''},aresample=48000[out]`);
   execFileSync(ffmpegPath, ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', filters.join(';'), '-map', '[out]', '-ac', '2', '-ar', '48000', outWav]);
   return list.length;
 }
