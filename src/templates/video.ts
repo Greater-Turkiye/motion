@@ -169,9 +169,13 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const p = alts[0] ?? alts.find(Boolean);
     if (!p) return;
     const isSubject = l === subjectLabel;
+    // on a distance beat its end points carry their own names: the map's label of the same place
+    // gives way, or "TİRAN" stands twice a few pixels apart
+    const twin = beat?.kind === 'distance' && (l.text === beat.from.label || l.text === beat.to.label)
+      ? 1 - anim(t, beat.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
     labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? 32 : isSubject ? 26 : 24, sticky: home,
       color: home ? homeInk : s.label, spacing: isSubject ? 0.45 : 0.4, weight: home ? 700 : 500,
-      priority: isSubject ? 0 : home ? 1 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail });
+      priority: isSubject ? 0 : home ? 1 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
   });
   return { labels, obstacles, emblem };
 }

@@ -12,7 +12,8 @@
 import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { geoDistance } from 'd3-geo';
+import { geoDistance, geoCentroid, geoArea } from 'd3-geo';
+import { feature } from 'topojson-client';
 import { parse, stringify } from 'yaml';
 import { validate, CPS } from '../../src/engine/scene.ts';
 
@@ -26,6 +27,19 @@ const TR_PLACES = [
   ['MERSİN', [34.64, 36.8]], ['HATAY', [36.16, 36.2]], ['GAZİANTEP', [37.38, 37.07]], ['DİYARBAKIR', [40.23, 37.91]],
   ['VAN', [43.38, 38.49]], ['KARS', [43.1, 40.6]], ['TRABZON', [39.72, 41.0]], ['SİNOP', [35.15, 42.02]], ['ANKARA', [32.85, 39.93]],
 ];
+/** The middle of a country's largest landmass (Romania, not its capital; France, not an overseas
+ *  island), for a record that names only its country. */
+let SHAPES = null;
+function countryMiddle(iso3) {
+  const c = COUNTRY_TABLE.find((x) => x.iso3 === iso3);
+  if (!c) return null;
+  SHAPES ??= feature(JSON.parse(readFileSync(path.join(ROOT, 'assets/data/countries-50m.json'), 'utf8')), 'countries').features;
+  const f = SHAPES.find((x) => String(x.id) === String(c.num));
+  if (!f) return null;
+  const polys = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates })) : [f.geometry];
+  const big = polys.sort((a, b) => geoArea(b) - geoArea(a))[0];
+  return geoCentroid(big).map((x) => Math.round(x * 100) / 100);
+}
 const nearestTr = (p) => TR_PLACES.map(([n, at]) => ({ name: n, at, km: Math.round((geoDistance(p, at) * 6371) / 10) * 10 })).sort((a, b) => a.km - b.km)[0];
 const TR = (s) => s.toLocaleUpperCase('tr');
 
@@ -318,13 +332,16 @@ export function generate(record, { datasets, style } = {}) {
   const loc = record.location;
   const placeName = loc?.place_name?.tr ? trPlace(loc.place_name.tr) : null;
   const pt = loc?.geometry?.type === 'Point' ? loc.geometry.coordinates : null;
-  const at = pt ?? region?.at;
+  // a record placed at country level ("ülke genelinde") is drawn on that country, not on the middle
+  // of the watch region it is filed under (Burebista 26 sat on the Balkans' centre, in Serbia)
+  const whole = !pt && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null;
+  const at = pt ?? whole ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
   const precision = pt ? (loc.precision === 'exact' ? 'exact' : 'locality') : 'region';
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = pt && placeName ? placeName : region?.name ?? placeName ?? '';
+  const where = (pt || whole) && placeName ? placeName : region?.name ?? placeName ?? '';
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
@@ -352,8 +369,8 @@ export function generate(record, { datasets, style } = {}) {
   const exName = family === 'exercise' ? exerciseName(texts) : null;
 
   // a place name without coordinates is not a place on the map: then the ring and the title are the region's
-  const placeTitle = TR((pt ? placeName : null) ?? region?.name ?? '');
-  const placeText = precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
+  const placeTitle = TR((pt || whole ? placeName : null) ?? region?.name ?? '');
+  const placeText = whole ? 'Kesin konum yok: ülke genelinde.' : precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
   // counts take the accent colour; a model's number ("Geran -5", "Su-35", "P1") is part of a name
@@ -411,6 +428,7 @@ export function generate(record, { datasets, style } = {}) {
   const factsBeat = () => { if (!(sub && same(facts.join(' ').replace(/\*/g, ''), sub))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
   const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
   const distanceBeat = (fromLabel) => {
+    if (whole) return; // from the middle of a whole country, a distance measures nothing the record says
     if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, fromLabel.length + nearest.name.length + 34, 3.2);
   };
   const regionClose = () => {
