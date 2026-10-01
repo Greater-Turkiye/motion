@@ -12,6 +12,10 @@ on:
         description: "Scene id (scenes/ or scenes/auto/)"
         required: false
         default: karadeniz-gemi
+      engine:
+        description: "chatterbox (production) or freya (trial: FreyaTTS-small, pinned commit)"
+        required: false
+        default: chatterbox
 
 permissions:
   contents: read
@@ -22,6 +26,7 @@ jobs:
     timeout-minutes: 60
     env:
       SCENE: ${{ inputs.scene }}
+      ENGINE: ${{ inputs.engine }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -38,23 +43,31 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-      - name: Chatterbox (CPU)
+      - name: The voice model (CPU)
         run: |
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet chatterbox-tts
+          case "$ENGINE" in
+            chatterbox) python -m pip install --quiet chatterbox-tts ;;
+            freya)
+              git clone --quiet https://github.com/freyavoiceai/FreyaTTS.git ../FreyaTTS
+              git -C ../FreyaTTS checkout --quiet 146d36c1cb6660646be57d31339db4eed9315de3
+              python -m pip install --quiet -r ../FreyaTTS/requirements.txt
+              echo "PYTHONPATH=$(cd ../FreyaTTS && pwd)" >> "$GITHUB_ENV" ;;
+            *) echo "unknown engine: $ENGINE"; exit 1 ;;
+          esac
       - name: Narration
         run: |
           case "$SCENE" in *[!a-z0-9_-]*) echo "not a scene id: $SCENE"; exit 1 ;; esac
           node tools/audio/narration.mjs "$SCENE" out/narration.json
-          python -u tools/audio/tts.py out/narration.json out/voice
+          python -u tools/audio/tts.py out/narration.json out/voice "$ENGINE"
           f="scenes/$SCENE.yaml"; [ -f "$f" ] || f="scenes/auto/$SCENE.yaml"
           node tools/audio/retime.mjs "$f" out/voice
           echo "voice: synthetic" >> "$f"
       - name: Video with the voice
         run: |
           node export/render.mjs --scene "$SCENE" --out out/video
-          node tools/audio/voice.mjs out/voice out/video/*.mp4 "out/voice/$SCENE-narrated.mp4"
+          node tools/audio/voice.mjs out/voice out/video/*.mp4 "out/voice/$SCENE-$ENGINE.mp4"
           cp out/narration.json out/voice/
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
