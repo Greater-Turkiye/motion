@@ -2,7 +2,7 @@
 //
 //   node tools/scene/site.mjs site/        # reads site/v/*.json, writes site/videos.json
 //
-// Each published video has three files in site/v/: auto-<record>.mp4, .jpg (its first frame) and
+// Each published video has three files in site/v/ (and, since the carousel, its slides -01.jpg …): auto-<record>.mp4, .jpg (its first frame) and
 // .json (what generate.mjs --meta wrote). The list is newest first and names files relative to the
 // site root, so the page can load them from the same origin.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -16,7 +16,9 @@ for (const f of existsSync(dir) ? readdirSync(dir) : []) {
   const base = f.slice(0, -5);
   if (!existsSync(path.join(dir, base + '.mp4')) || !existsSync(path.join(dir, base + '.jpg'))) continue;
   const m = JSON.parse(readFileSync(path.join(dir, f), 'utf8'));
-  videos.push({ ...m, video: `v/${base}.mp4`, poster: `v/${base}.jpg` });
+  // the Instagram carousel's slides (tools/post/carousel.mjs), when the release has them
+  const post = readdirSync(dir).filter((x) => x.startsWith(`${base}-`) && /-\d{2}\.jpg$/.test(x)).sort().map((x) => `v/${x}`);
+  videos.push({ ...m, video: `v/${base}.mp4`, poster: `v/${base}.jpg`, ...(post.length ? { post } : {}) });
 }
 videos.sort((a, b) => String(b.published ?? b.date).localeCompare(String(a.published ?? a.date)));
 writeFileSync(path.join(root, 'videos.json'), JSON.stringify({ generated: new Date().toISOString(), videos }, null, 1) + '\n');
