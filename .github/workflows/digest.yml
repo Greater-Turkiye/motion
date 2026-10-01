@@ -1,6 +1,6 @@
 name: digest
 
-# The week in each watch region, one video per region with enough records (PLAN.md section 19):
+# The week in each watch region, one video per region with at least 15 records (PLAN.md section 19):
 # tools/scene/digest.mjs builds the scene from the last seven days, then it is narrated, rendered and
 # published exactly as a single story is (produce.yml), as a release tagged digest-<region>-<date>.
 # The produce workflow's gate counts only video-* releases, so a digest never delays the next story.

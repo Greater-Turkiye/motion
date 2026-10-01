@@ -21,6 +21,7 @@ import { score } from './select.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const r1 = (x) => Math.round(x * 10) / 10;
 const CPS = 15;
+export const MIN_WEEK = 15;
 const secs = (chars, min, pad = 0.6) => r1(Math.max(min, chars / CPS + pad));
 
 export function digest(datasets, regionKey, end = new Date()) {
@@ -35,7 +36,8 @@ export function digest(datasets, regionKey, end = new Date()) {
     if (!inWeek(r) || !(r.regions ?? []).includes(regionKey)) continue;
     try { week.push({ r, scene: generate(r, { datasets }) }); } catch { /* refused: not counted */ }
   }
-  if (week.length < 5) throw new Error(`${regionKey}: ${week.length} records this week, too few for a digest`);
+  // a week is a pattern only with enough behind it: five records made a "digest" of one day's notices
+  if (week.length < MIN_WEEK) throw new Error(`${regionKey}: ${week.length} records this week, fewer than ${MIN_WEEK}`);
   const n = week.length;
   const unverified = week.filter(({ r }) => r.assessment?.status === 'unverified').length;
   const outlets = new Set(week.flatMap(({ r }) => (r.sources ?? []).map((s) => { try { return host(s.url); } catch { return s.url; } }))).size;
