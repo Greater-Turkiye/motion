@@ -143,6 +143,9 @@ function blockParts(sc, b) {
 function hookParts(sc) {
   const h = sc.hook;
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
+  // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not
+  // "Bin dört yüz yetmiş asker." and then the sentence, or only the bare number when time is short
+  if (/^\d/.test(h.lines[0] ?? '') && h.sub.includes(h.lines[0])) return [B(h.sub)];
   return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
