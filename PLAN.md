@@ -369,8 +369,17 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
    set seçene kadar videolarda müzik ve efekt yok.
 7. **Seslendirme** ✅ (2026-10-01): sahip "sorma, sen karar ver" dedi. Karar ve gerekçe:
    - Model **Chatterbox Multilingual** (MIT, Resemble AI), varsayılan ses, CPU'da runner'da. Her klip
-     PerTh filigranı taşır. FreyaTTS-small daha doğal olabilir; aynı sahnede karşılaştırma sırada, daha
-     iyiyse değiştirilir.
+     PerTh filigranı taşır.
+   - **FreyaTTS-small denendi, alınmadı** (2026-10-01, karadeniz-gemi, aynı metin): kısa cümlelerde
+     kusursuz ve 3–5 kat hızlı, ama uzun cümlelerde dağılıyor. Whisper'ın duyduğu: "Tek kaynağı, kaynak,
+     tek renform", son cümle anlamsız. Harf hata oranı en kötü kliplerde 0,37 ve 0,46; Chatterbox'ın
+     altı klibi 0,00–0,12. Eğitim verisinin lisansı da yayımlanmamış. `voice-sample` iş akışında
+     `engine=freya` ile denemeye açık kalır; yeni sürümü çıkınca yeniden ölçülür.
+   - **Her klip yayından önce dinlenir** (`tools/audio/tts.py`): Whisper (small, int8) klibi yazıya
+     döker, duyduğu harfler verilen metnin harfleriyle karşılaştırılır (sayılar iki tarafta da yazıyla).
+     Hata 0,20'yi geçerse klip yeniden üretilir (en fazla üç deneme, en iyisi kalır); en iyisi bile
+     0,30'u geçerse seslendirme başarısız sayılır ve video sessiz çıkar. Bozuk okunmuş bir haber
+     yayımlanmaz.
    - Metin **ekrandakinin aynısı** (`tools/audio/narration.mjs`): kanca, yer, olgular, mesafe, durum,
      veri setinin sayısı. Yeni iddia eklenmez; sayılar yazıyla, büyük harfli başlıklar küçük harfle
      okunur; kancanın alt satırı olgularda tekrar edilmez. Bir blok penceresine sığmayan metin önce
