@@ -16,6 +16,12 @@ above 0.20 character error is made again, up to three tries, and the best one is
 is still above 0.30 the run fails and the video goes out silent. Calibrated on karadeniz-gemi:
 Chatterbox's six clips scored 0.00-0.12; FreyaTTS's two garbled ones ("Tek kaynağı, kaynak, tek
 renform") scored 0.37 and 0.46.
+
+Two more guards, after a published video (Sumy, 1 October) carried 19 s of the model running on past
+its sentence, which Whisper ignored, so the letters still matched:
+- each clip ends 0.35 s after the last word Whisper heard, so whatever follows the sentence goes;
+- a clip longer than its text could take to say (1.2 s plus one second per 7.5 characters; the
+  slowest real reading so far was 6.6 a second, with its pauses) counts as a failed try.
 """
 import json, re, sys, time, pathlib
 import torch, torchaudio
@@ -75,8 +81,14 @@ ear = WhisperModel("small", device="cpu", compute_type="int8")
 print(f"{engine} and the checker loaded in {time.time() - t0:.0f} s", flush=True)
 
 def heard(wav, sr):
+    """What Whisper hears, and when its last word ends (seconds; None when it heard nothing)."""
     mono = torchaudio.functional.resample(wav.mean(0), sr, 16000).numpy()
-    return " ".join(s.text for s in ear.transcribe(mono, language="tr", beam_size=5)[0]).strip()
+    segs = list(ear.transcribe(mono, language="tr", beam_size=5, word_timestamps=True)[0])
+    words = [w for s in segs for w in (s.words or [])]
+    return " ".join(s.text for s in segs).strip(), (max(w.end for w in words) if words else None)
+
+def longest(text):
+    return 1.2 + len(text) / 7.5
 
 clips, bad = [], []
 for i, seg in enumerate(segments):
@@ -84,9 +96,14 @@ for i, seg in enumerate(segments):
     for k in range(TRIES):
         t1 = time.time()
         wav, sr = speak(seg["text"])
-        h = heard(wav, sr)
+        made = wav.shape[-1] / sr
+        h, last = heard(wav, sr)
+        if last is not None:
+            wav = wav[..., : min(wav.shape[-1], int((last + 0.35) * sr))]
         c = cer(seg["text"], h)
-        print(f"seg{i} try {k + 1}  {wav.shape[-1] / sr:4.1f}s audio  {time.time() - t1:5.1f}s  CER {c:.2f}  heard: {h}", flush=True)
+        if wav.shape[-1] / sr > longest(seg["text"]):
+            c = max(c, 1.0)  # still too long after the cut: the model ran on in words, a failed try
+        print(f"seg{i} try {k + 1}  {made:4.1f}s made, {wav.shape[-1] / sr:4.1f}s kept  {time.time() - t1:5.1f}s  CER {c:.2f}  heard: {h}", flush=True)
         if best is None or c < best[0]:
             best = (c, wav, sr)
         if c <= RETRY:

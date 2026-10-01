@@ -382,6 +382,11 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      Hata 0,20'yi geçerse klip yeniden üretilir (en fazla üç deneme, en iyisi kalır); en iyisi bile
      0,30'u geçerse seslendirme başarısız sayılır ve video sessiz çıkar. Bozuk okunmuş bir haber
      yayımlanmaz.
+   - **Klip cümlesiyle biter** (2026-10-01, Sumy videosundan sonra): model cümleden sonra 19 sn
+     anlamsız ses üretti, Whisper bunu yok saydığı için harfler tuttu ve görüntü sesi bekleyerek
+     46 sn'ye uzadı. Artık her klip Whisper'ın duyduğu son kelimeden 0,35 sn sonra kesilir; kesildikten
+     sonra bile metnin sürebileceğinden uzunsa (1,2 sn + 7,5 harf/sn) deneme başarısız sayılır.
+     O video yayından kaldırılır ve aynı kayıt düzeltilmiş hatla yeniden üretilir.
    - Metin **ekrandakinin aynısı** (`tools/audio/narration.mjs`): kanca, yer, olgular, mesafe, durum,
      veri setinin sayısı. Yeni iddia eklenmez; sayılar yazıyla, büyük harfli başlıklar küçük harfle
      okunur; kancanın alt satırı olgularda tekrar edilmez. Bir blok penceresine sığmayan metin önce
