@@ -95,6 +95,22 @@ function hookSentence(lines) {
 }
 const norm = (x) => lower(x).replace(/[^\p{L}\p{N} ]/gu, '').replace(/\s+/g, ' ').trim();
 
+/** True when the facts block, past the hook's sub-line, says nothing the hook's big lines do not:
+ *  "Rus kuvvetleri Pavlohrad'a saldırdı, üç kişi yaralandı" under "ÜÇ / KİŞİ YARALANDI". Then the
+ *  hook reads only its headline and the facts read the whole sentence, attributed; otherwise the
+ *  voice said "Üç kişi yaralandı. Rus kuvvetleri Pavlohrad'a saldırdı." and then "Ayrıca üç kişi
+ *  yaralandı." */
+function factsOnlyRepeatHook(sc) {
+  const f = sc.beats.find((b) => b.kind === 'facts');
+  const sub = norm(sc.hook.sub);
+  if (!f || !sub) return false;
+  const body = norm(f.lines.join(' ').replace(/\*/g, ''));
+  if (!body.startsWith(sub)) return false;
+  const rest = body.slice(sub.length).trim();
+  const head = norm(speakable(sc.hook.lines.join(' '), true));
+  return rest.length > 0 && norm(speakable(rest)).split(' ').every((w) => head.includes(w.slice(0, 5)));
+}
+
 /** The parts of one block's narration, most important first; later parts are dropped to fit. */
 function blockParts(sc, b) {
   const labelOf = (i) => sc.parties?.[i]?.label ?? '';
@@ -107,7 +123,7 @@ function blockParts(sc, b) {
       // what the hook's sub-line already said is not said twice: the facts go on from there
       let body = b.lines.join(' ').replace(/\*/g, '');
       const sub = norm(sc.hook.sub);
-      if (sub && norm(body).startsWith(sub)) {
+      if (sub && norm(body).startsWith(sub) && !factsOnlyRepeatHook(sc)) {
         const words = sub.split(' ').length;
         body = body.split(/\s+/).slice(words).join(' ').replace(/^[,;:.\s]+/, '');
         return body ? [`Ayrıca ${B(body)}`] : [];
@@ -148,6 +164,8 @@ function hookParts(sc) {
   if (/^\d/.test(h.lines[0] ?? '') && h.sub.includes(h.lines[0])) return [B(h.sub)];
   // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
   if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines)}`];
+  // the facts will read the whole sentence, so the hook reads only its headline (see factsOnlyRepeatHook)
+  if (factsOnlyRepeatHook(sc)) return [hookSentence(h.lines)];
   return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
