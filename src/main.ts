@@ -25,6 +25,8 @@ A.text = pick(params.get('text'), ['rise', 'wipe', 'type', 'pop'] as const) ?? A
 A.camera = pick(params.get('camera'), ['glide', 'fly', 'snap'] as const) ?? A.camera;
 if (params.has('progress')) A.progress = params.get('progress') !== '0';
 if (params.has('blur')) A.blur = params.get('blur') !== '0';
+// ?post=1: the frame drawn as an Instagram carousel slide (tools/post/carousel.mjs)
+if (params.get('post') === '1') A.post = true;
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 canvas.width = W; canvas.height = H;

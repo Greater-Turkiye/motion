@@ -356,8 +356,11 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
-  if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
-  if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
+  if (sc.anim?.post) drawSlideMarks(ctx, sc, s, t);
+  else {
+    if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
+    if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
+  }
 
   // vignette and grain
   if (!s.flat) {
@@ -514,6 +517,26 @@ function lineStart(lines: string[], k: number, t0: number, mode: TextMode) {
 }
 
 /** Stories-style progress: one segment per block, filling as the video plays (a reason to stay). */
+/** The 4:5 window a carousel slide is cut from (tools/post/carousel.mjs): the map and the whole text
+ *  block, without the platform-covered top band. */
+export const POST_WINDOW = { y: 250, h: 1350 };
+
+/**
+ * A carousel slide's own marks, inside the 4:5 window: which slide of how many (top right), and on
+ * the cover a swipe cue (bottom right). A feed post is read by swiping, so the reader is told there
+ * is more and how much; nothing here is a claim, and the status and source stay as in the video.
+ */
+function drawSlideMarks(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
+  const n = sc.beats.length + 1;
+  const k = sc.beats.filter((b) => t >= b.at).length + 1;
+  ctx.save();
+  ctx.font = `700 24px ${s.fonts.mono}`; ctx.letterSpacing = '4px'; ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'right'; ctx.globalAlpha = 0.9; ctx.fillStyle = s.muted;
+  ctx.fillText(`${k}/${n}`, W - 60, POST_WINDOW.y + 70);
+  if (k === 1) { ctx.fillStyle = s.accent; ctx.fillText('KAYDIR  →', W - 60, POST_WINDOW.y + POST_WINDOW.h - 40); }
+  ctx.restore();
+}
+
 /** Where the synthetic-voice note sits: top left inside the safe area, under the progress bar. */
 const VOICE_NOTE = { x: LEFT, y: SAFE.top + 22, text: 'SESLENDİRME: YAPAY SES' };
 

@@ -144,6 +144,8 @@ jobs:
             cp out/video/*.mp4 "release/$scene.mp4"
           fi
           cp out/poster/*-frames/0000.jpg "release/$scene.jpg"
+          # the Instagram carousel: one 4:5 slide per block, from the same renderer (tools/post/carousel.mjs)
+          node tools/post/carousel.mjs "$scene" release --no-build
           cp meta.json "release/$scene.json"
           ls -la release
       - name: Publish
