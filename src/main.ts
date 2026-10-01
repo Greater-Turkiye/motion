@@ -27,6 +27,7 @@ if (params.has('progress')) A.progress = params.get('progress') !== '0';
 if (params.has('blur')) A.blur = params.get('blur') !== '0';
 // ?post=1: the frame drawn as an Instagram carousel slide (tools/post/carousel.mjs)
 if (params.get('post') === '1') A.post = true;
+if (params.get('post') === 'close') A.post = 'close';
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 canvas.width = W; canvas.height = H;

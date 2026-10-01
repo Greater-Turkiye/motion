@@ -47,7 +47,7 @@ export interface Scene {
    *  sub-frame motion blur on export (on unless false). The page's URL can override each one. */
   anim?: { text?: 'rise' | 'wipe' | 'type' | 'pop'; camera?: 'glide' | 'fly' | 'snap'; progress?: boolean; blur?: boolean;
     /** drawn as a 4:5 carousel slide: no progress bar or voice note, a slide counter, a swipe cue on the cover */
-    post?: boolean };
+    post?: boolean | 'close' };
   /** which order of the same facts this is, for testing what holds viewers (tools/scene/generate.mjs VARIANTS) */
   variant?: 'standart' | 'yakinlik' | 'kisa' | 'oruntu';
   /** 'synthetic': the video carries a machine-read narration and says so on screen in every frame */

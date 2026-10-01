@@ -5,7 +5,8 @@
 //
 // Each slide is the frame where its block has settled (the hook 2.2 s in, every other block 2 s after
 // it starts, never past the next one), drawn with ?post=1 (no progress bar or voice note, a "2/6"
-// counter, a swipe cue on the cover) and cut to the 4:5 window POST_WINDOW in src/templates/video.ts.
+// counter, a swipe cue on the cover) and cut to the 4:5 window POST_WINDOW in src/templates/video.ts;
+// then a closing card (?post=close): the story in one sentence, who we are, "KAYDET · TAKİP ET".
 // Writes <scene>-01.jpg, <scene>-02.jpg … and prints their paths.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readdirSync, rmSync } from 'node:fs';
@@ -28,12 +29,18 @@ export function carousel(id, out, { build = true } = {}) {
   rmSync(tmp, { recursive: true, force: true });
   execFileSync(process.execPath, ['export/render.mjs', ...(build ? [] : ['--no-build']), '--scene', id, '--frames', frames.join(','), '--format', 'png',
     '--save-frames', '--workers', '1', '--out', tmp], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, MOTION_QUERY: 'post=1' } });
+  // the closing card, over the map's last frame (the opening view again, Türkiye in it)
+  const closeTmp = path.join(tmp, 'close');
+  execFileSync(process.execPath, ['export/render.mjs', '--no-build', '--scene', id, '--frames', String(Math.round((sc.duration - 0.1) * sc.fps)), '--format', 'png',
+    '--save-frames', '--workers', '1', '--out', closeTmp], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, MOTION_QUERY: 'post=close' } });
   const dir = path.join(tmp, readdirSync(tmp).find((d) => d.endsWith('-frames')));
-  const pngs = readdirSync(dir).filter((f) => f.endsWith('.png') || f.endsWith('.jpg')).sort();
+  const closeDir = path.join(closeTmp, readdirSync(closeTmp).find((d) => d.endsWith('-frames')));
+  const pngs = [...readdirSync(dir).filter((f) => f.endsWith('.png')).sort().map((f) => path.join(dir, f)),
+    ...readdirSync(closeDir).filter((f) => f.endsWith('.png')).map((f) => path.join(closeDir, f))];
   mkdirSync(out, { recursive: true });
   return pngs.map((f, i) => {
     const dst = path.join(out, `${id}-${String(i + 1).padStart(2, '0')}.jpg`);
-    execFileSync(ffmpegPath, ['-loglevel', 'error', '-y', '-i', path.join(dir, f), '-vf', `crop=1080:${WINDOW.h}:0:${WINDOW.y}`, '-q:v', '2', dst]);
+    execFileSync(ffmpegPath, ['-loglevel', 'error', '-y', '-i', f, '-vf', `crop=1080:${WINDOW.h}:0:${WINDOW.y}`, '-q:v', '2', dst]);
     return dst;
   });
 }
