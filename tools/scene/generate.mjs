@@ -355,7 +355,8 @@ export function generate(record, { datasets, style } = {}) {
   const placeText = precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
-  const facts = wrapLines(news).map((l) => l.replace(/(\d[\d.,]*)/g, '*$1*'));
+  // counts take the accent colour; a model's number ("Geran -5", "Su-35", "P1") is part of a name
+  const facts = wrapLines(news).map((l) => l.replace(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)/gu, '*$1*'));
   const nearest = nearestTr(at);
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
