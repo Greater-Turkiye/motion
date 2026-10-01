@@ -657,3 +657,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     } catch (e) { console.error(e.message); process.exit(3); }
   }
 }
+
+// helpers the weekly digest (tools/scene/digest.mjs) builds on
+export { REGIONS, MONTHS, TR, STATUS, host, wrapLines, publisher };

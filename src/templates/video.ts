@@ -129,6 +129,15 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const p = proj(sc.event.at);
     if (p) obstacles.push({ x: p[0] - 60, y: p[1] - 60, w: 120, h: 120 });
   }
+  // a digest story's own place: ringed (see drawVideo) and named under the ring while its block is on
+  if (beat?.kind === 'facts' && beat.place) {
+    const q = proj(beat.place.at);
+    const w = windowOf(sc, beatIdx, t);
+    if (q) {
+      obstacles.push({ x: q[0] - 60, y: q[1] - 60, w: 120, h: 120 });
+      labels.push({ key: `fp${beatIdx}`, text: beat.place.label, x: q[0], y: q[1] + 78, size: 28, color: s.ink, spacing: 0.3, weight: 700, priority: -1, alpha: w.inP * w.out });
+    }
+  }
   // the parties' points on a link beat: labels keep clear of them
   if (beat?.kind === 'link') for (const p of sc.parties ?? []) {
     const q = proj(p.at);
@@ -245,10 +254,13 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const emblemAr = emblemImg ? emblemImg.naturalHeight / emblemImg.naturalWidth || 1 : 1;
   const lay = layout(sc, s, proj, t, emblemAr, hookMetrics(ctx, sc, s).top);
 
-  // the event: a region-level ring, never a pin, with shock waves every 1.1 s
-  if (sc.event) {
-    const p = proj(sc.event.at);
-    const dim = beat?.kind === 'distance' ? 0.45 : 1;
+  // the event: a region-level ring, never a pin, with shock waves every 1.1 s; a facts block with a
+  // place of its own (a digest's story) rings that place while it is on
+  const own = beat?.kind === 'facts' && beat.place ? beat.place : null;
+  const ring = own ? own.at : sc.event?.at;
+  if (ring) {
+    const p = proj(ring);
+    const dim = (beat?.kind === 'distance' ? 0.45 : 1) * (own ? windowOf(sc, beatIdx, t).inP * windowOf(sc, beatIdx, t).out : 1);
     if (p) {
       const [x, y] = p;
       ctx.globalAlpha = 1;
