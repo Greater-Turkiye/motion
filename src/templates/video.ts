@@ -347,6 +347,12 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   ctx.fillStyle = wash; ctx.fillRect(0, 900, W, H - 900);
 
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  if (sc.anim?.post === 'close') {
+    drawCloseCard(ctx, sc, s);
+    drawFooter(ctx, sc, s, 1);
+    drawSlideMarks(ctx, sc, s, sc.duration + 1);
+    return;
+  }
   // the hook: on screen from frame 0; in a full video it hands over to the first beat and returns in
   // the last half second, in exactly its frame-0 state, so the end runs into the start
   const hookEnd = full ? sc.beats[0].at : D;
@@ -527,13 +533,52 @@ export const POST_WINDOW = { y: 250, h: 1350 };
  * is more and how much; nothing here is a claim, and the status and source stay as in the video.
  */
 function drawSlideMarks(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
-  const n = sc.beats.length + 1;
-  const k = sc.beats.filter((b) => t >= b.at).length + 1;
+  // one slide per block and the closing card; the card is drawn with t past the end
+  const n = sc.beats.length + 2;
+  const k = t > sc.duration ? n : sc.beats.filter((b) => t >= b.at).length + 1;
   ctx.save();
   ctx.font = `700 24px ${s.fonts.mono}`; ctx.letterSpacing = '4px'; ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'right'; ctx.globalAlpha = 0.9; ctx.fillStyle = s.muted;
   ctx.fillText(`${k}/${n}`, W - 60, POST_WINDOW.y + 70);
   if (k === 1) { ctx.fillStyle = s.accent; ctx.fillText('KAYDIR  →', W - 60, POST_WINDOW.y + POST_WINDOW.h - 40); }
+  ctx.restore();
+}
+
+/**
+ * The carousel's last slide: what happened in one sentence, then who we are and what to do, over a
+ * darkened map. The last swipe is where a reader decides to save or follow; nothing here is a new
+ * claim (the sentence is the hook's own sub-line or lines), and the footer keeps status and source.
+ */
+function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
+  ctx.save();
+  // the map stays readable behind the card (Türkiye in it), the text block on a deeper band
+  ctx.fillStyle = hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.35);
+  ctx.fillRect(0, POST_WINDOW.y, W, POST_WINDOW.h);
+  const said = sc.hook.sub || sc.hook.lines.join(' ').toLocaleLowerCase('tr').replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+  ctx.font = `700 54px ${s.fonts.text}`;
+  const lines = wrap(ctx, said, WIDTH).slice(0, 4);
+  // the stack sits on the footer like every other slide's text, the map open above it
+  const height = 30 + lines.length * 70 + 150 + 56 + 90;
+  const top = FOOT - 80 - height;
+  const band = ctx.createLinearGradient(0, top - 120, 0, FOOT + 40);
+  band.addColorStop(0, hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0));
+  band.addColorStop(0.18, hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.85));
+  band.addColorStop(1, hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.92));
+  ctx.fillStyle = band; ctx.fillRect(0, top - 120, W, FOOT + 40 - (top - 120));
+  let y = top + 30;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = s.accent; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '8px';
+  ctx.fillText(`ÖZET · ${sc.hook.kicker}`, LEFT, y);
+  ctx.letterSpacing = '0px';
+  ctx.fillStyle = s.ink; ctx.font = `700 54px ${s.fonts.text}`;
+  for (const line of lines) { y += 70; ctx.fillText(line, LEFT, y); }
+  y += 150;
+  ctx.fillStyle = s.ink; ctx.font = `900 60px ${s.fonts.display}`;
+  ctx.fillText('GREATER TÜRKİYE', LEFT, y);
+  ctx.fillStyle = s.muted; ctx.font = `500 34px ${s.fonts.text}`;
+  ctx.fillText('Açık kaynaklarla bölgeyi izliyoruz.', LEFT, y + 56);
+  ctx.fillStyle = s.accent; ctx.font = `700 28px ${s.fonts.mono}`; ctx.letterSpacing = '6px';
+  ctx.fillText('KAYDET · TAKİP ET', LEFT, y + 146);
   ctx.restore();
 }
 

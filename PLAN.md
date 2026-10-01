@@ -434,4 +434,7 @@ yerleşim bakımı ve iki yerde ayrışan kurallar olmaz. Her bölüm bir kare (
 4:5 pencereden kesilir (y 250–1600: platformun üst bandı dışarıda). Gönderiye özgü iki işaret var:
 kaçıncı kare olduğu ("2/6"; kaydırarak okunan bir gönderide okur ne kadar kaldığını bilmeli) ve kapakta
 "KAYDIR →". Üretimde her videonun sürümüne eklenir; yayımlamak sahibin hesabını gerektirir.
+Son kare kapanış kartı (`?post=close`): kaydırmanın sonu, okurun kaydetmeye ya da takip etmeye karar
+verdiği yer. Olayın tek cümlesi (kancanın kendi alt satırı, yeni iddia yok), kim olduğumuz ve
+"KAYDET · TAKİP ET"; harita arkada açık, durum ve kaynak alt bantta.
 
