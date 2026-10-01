@@ -185,6 +185,10 @@ export function narration(sc) {
   blocks.forEach((parts, i) => {
     const window = ends[i] - starts[i];
     let keep = parts.filter(Boolean).map(sentence);
+    // a block that opens with exactly what the voice has just said drops that ("Karadeniz." then
+    // "Karadeniz. Kesin konum yok." reads "Kesin konum yok."), as long as something is left
+    const last = out.at(-1)?.text;
+    if (last && keep.length > 1 && norm(keep[0]) === norm(last)) keep = keep.slice(1);
     // the first part always stays; optional parts go while the words would overrun the window
     while (keep.length > 1 && keep.join(' ').length / SPEECH_CPS > window) keep = keep.slice(0, -1);
     const text = keep.join(' ');
