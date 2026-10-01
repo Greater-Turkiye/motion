@@ -73,6 +73,15 @@ function km([lo1, la1], [lo2, la2]) {
   return Math.round((Math.acos(Math.min(1, c)) * 6371) / 10) * 10;
 }
 
+/** A distance as the voice says it: the round hundred when it is within 3% ("yaklaşık bin" for ~990).
+ *  The model loops on runs of like-sounding number words ("dokuz yüz doksan" came back as 990, 9, 9, 9
+ *  in four of nine sample runs), and "yaklaşık" already says the figure is rounded; the screen keeps
+ *  the measured ~990. */
+export function spokenKm(n) {
+  const r = Math.round(n / 100) * 100;
+  return r > 0 && Math.abs(r - n) / n <= 0.03 ? r : n;
+}
+
 /** "KAYITLARIMIZDA · EYLÜL" → "Eylül ayında kayıtlarımızda,"; a kicker without a month is said as it is. */
 function kickerSaid(k) {
   if (!k) return '';
@@ -137,7 +146,7 @@ function blockParts(sc, b) {
       return [lead + B(body)];
     }
     case 'distance':
-      return [`${T(b.from.label)} ile ${T(b.to.label)} arası, kuş uçuşu yaklaşık ${sayNumber(km(b.from.at, b.to.at))} kilometre`];
+      return [`${T(b.from.label)} ile ${T(b.to.label)} arası, kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre`];
     case 'status':
       return [T(sc.hook.status), ...sentences(b.text)];
     case 'close':
