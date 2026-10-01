@@ -49,6 +49,40 @@ def letters(s):
     s = re.sub(r"\d+", lambda m: say(int(m.group())), s)
     s = s.replace("I", "ı").replace("İ", "i").lower()
     return re.sub(r"[^a-zçğıöşüâîû]", "", s)
+WORD_VALUE = {w: i for i, w in enumerate(ONES) if w} | {w: 10 * i for i, w in enumerate(TENS) if w}
+SCALE = {"bin": 1000, "milyon": 10**6, "milyar": 10**9}
+def numbers(s):
+    """The numbers a text says, in order, whether written in digits ("1000", "1.440") or in Turkish
+    words ("bin dört yüz kırk"): what a listener must hear right above everything else. A Turkish
+    number goes from the larger places to the smaller, so a word whose place is not smaller than the
+    last one's starts a new number: "on dört yirmi beş" (14-25 said aloud) is 14 and 25, not 39."""
+    s = s.replace("I", "ı").replace("İ", "i").lower()
+    out = []
+    state = {"cur": 0, "total": 0, "inside": False, "last": 10**12}
+    def flush():
+        if state["inside"]: out.append(state["total"] + state["cur"])
+        state.update(cur=0, total=0, inside=False, last=10**12)
+    def place(v): return 1 if v < 10 else 10
+    for tok in re.findall(r"\d[\d.,]*|[a-zçğıöşü]+", s):
+        if tok[0].isdigit():
+            flush(); out.append(int(re.sub(r"[.,](?=\d{3}\b)", "", tok).split(",")[0].replace(".", "")))
+            continue
+        w = tok if tok in WORD_VALUE or tok in SCALE or tok == "yüz" else re.sub(r"(da|de|ta|te|dan|den|tan|ten|a|e|ya|ye|ı|i|u|ü|yı|yi|yu|yü|ın|in|un|ün)$", "", tok)
+        if w in WORD_VALUE:
+            pl = place(WORD_VALUE[w])
+            if state["inside"] and pl >= state["last"]: flush()
+            state["cur"] += WORD_VALUE[w]; state["inside"] = True; state["last"] = pl
+        elif w == "yüz":
+            if state["inside"] and state["last"] <= 100 and state["cur"] >= 100: flush()
+            state["cur"] = (state["cur"] or 1) * 100; state["inside"] = True; state["last"] = 100
+        elif w in SCALE:
+            if state["inside"] and state["last"] >= SCALE[w] and state["cur"] == 0: flush()
+            state["total"] += (state["cur"] or 1) * SCALE[w]; state["cur"] = 0; state["inside"] = True; state["last"] = SCALE[w]
+        else:
+            flush()
+    flush()
+    return out
+
 def cer(ref, hyp):
     """Character error rate over letters only: forgiving of spacing and punctuation, not of sounds."""
     r, h = letters(ref), letters(hyp)
@@ -101,6 +135,11 @@ for i, seg in enumerate(segments):
         if last is not None:
             wav = wav[..., : min(wav.shape[-1], int((last + 0.35) * sr))]
         c = cer(seg["text"], h)
+        # a number heard wrong is the worst error a news voice can make ("bin kilometre" heard as "1 km"):
+        # every number the text says must be heard, whatever the letters score
+        if numbers(seg["text"]) != numbers(h):
+            print(f"seg{i} try {k + 1}  numbers differ: said {numbers(seg['text'])}, heard {numbers(h)}", flush=True)
+            c = max(c, 0.5)
         if wav.shape[-1] / sr > longest(seg["text"]):
             c = max(c, 1.0)  # still too long after the cut: the model ran on in words, a failed try
         print(f"seg{i} try {k + 1}  {made:4.1f}s made, {wav.shape[-1] / sr:4.1f}s kept  {time.time() - t1:5.1f}s  CER {c:.2f}  heard: {h}", flush=True)

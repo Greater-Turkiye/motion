@@ -382,6 +382,10 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      Hata 0,20'yi geçerse klip yeniden üretilir (en fazla üç deneme, en iyisi kalır); en iyisi bile
      0,30'u geçerse seslendirme başarısız sayılır ve video sessiz çıkar. Bozuk okunmuş bir haber
      yayımlanmaz.
+   - **Sayılar ayrıca denetlenir** (2026-10-01, Kiev nükleer enstitü videosundan sonra): "yaklaşık bin
+     kilometre" Whisper'a "1 km" diye geldi ve harf hatası 0,18 ile eşiğin altında kaldı. Haberde en ağır
+     hata yanlış sayıdır: metnin söylediği her sayı (yazıyla) duyulan sayılarla (rakam ya da yazı) aynı
+     değilse deneme başarısız sayılır. Üç denemede de tutmazsa seslendirme düşer, video müzikle çıkar.
    - **Klip cümlesiyle biter** (2026-10-01, Sumy videosundan sonra): model cümleden sonra 19 sn
      anlamsız ses üretti, Whisper bunu yok saydığı için harfler tuttu ve görüntü sesi bekleyerek
      46 sn'ye uzadı. Artık her klip Whisper'ın duyduğu son kelimeden 0,35 sn sonra kesilir; kesildikten
