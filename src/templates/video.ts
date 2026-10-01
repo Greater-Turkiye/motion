@@ -175,7 +175,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       ? 1 - anim(t, beat.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
     labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? 32 : isSubject ? 26 : 24, sticky: home,
       color: home ? homeInk : s.label, spacing: isSubject ? 0.45 : 0.4, weight: home ? 700 : 500,
-      priority: isSubject ? 0 : home ? 1 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
+      // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
+      // be the one that yields, or the two are drawn on top of each other (BRĂİLA: ROMANYA over TÜRKİYE)
+      priority: home ? -0.5 : isSubject ? 0 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
   });
   return { labels, obstacles, emblem };
 }
