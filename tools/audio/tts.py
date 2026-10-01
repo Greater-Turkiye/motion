@@ -87,7 +87,13 @@ def numbers(s):
             toks[j] = guess
     for tok in toks:
         if tok[0].isdigit():
-            flush(); out.append(int(re.sub(r"[.,](?=\d{3}\b)", "", tok).split(",")[0].replace(".", "")))
+            flush()
+            v = int(re.sub(r"[.,](?=\d{3}\b)", "", tok).split(",")[0].replace(".", ""))
+            # a round figure in digits can go on in words, the way Whisper writes it: "200 otuz altı" is 236
+            if v and v % 10 == 0:
+                state.update(cur=v, inside=True, last=1000 if v % 1000 == 0 else 100 if v % 100 == 0 else 10)
+            else:
+                out.append(v)
             continue
         w = tok if tok in WORD_VALUE or tok in SCALE or tok == "yüz" else re.sub(r"(da|de|ta|te|dan|den|tan|ten|a|e|ya|ye|ı|i|u|ü|yı|yi|yu|yü|ın|in|un|ün)$", "", tok)
         if w in WORD_VALUE:
