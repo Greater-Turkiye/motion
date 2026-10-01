@@ -82,7 +82,7 @@ export function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], obst
     // a steep fade: half-covered labels that linger read as ghosts. A sticky label (TÜRKİYE) gives way
     // to no other label, but it does give way to the text block and the emblem: the country's own
     // fill still says where Türkiye is, and "KİEV · 30 EYLÜLTÜRKİYE" reads as one broken line
-    const vis = (l.sticky ? 1 - smooth(0.02, 0.2, byText) : 1 - smooth(0.02, 0.12, covered)) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
+    const vis = (l.sticky ? 1 - smooth(0.02, 0.08, byText) : 1 - smooth(0.02, 0.12, covered)) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
     const alpha = (l.alpha ?? 1) * vis;
     if (alpha <= 0.01) continue;
     placed.push({ label: { ...l, alpha, x: box.x + 6 + (box.w - 12) / 2, y: box.y + 4 + (box.h - 8) / 2 }, box });
