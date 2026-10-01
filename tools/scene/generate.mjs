@@ -200,7 +200,8 @@ export function hookLines(title) {
   // "48 kişinin yaralanmasının ardından" is shown as "48 / KİŞİ YARALANDI", the source's own verb
   // in its plain past form (the scene check still finds it in the source by its stem)
   // whole words only: "on" must not match inside "Kiev'de on…" words, nor "üç" inside "üçü"
-  const N = '(?<![\\p{L}\\d])(\\d+|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
+  // "biri öldü", "birini öldürdü": one person, said the Turkish way (shown "BİRİ / ÖLDÜ")
+  const N = '(?<![\\p{L}\\d])(\\d+|birini|biri|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
   for (const [re, verb] of [
     // the active voice too: "bomba altı kişiyi yaraladı" is six wounded, said the source's way round
     [new RegExp(`${N}\\s+(kişi(nin|yi)?\\s+)?(öldürdü|öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
@@ -208,7 +209,7 @@ export function hookLines(title) {
   ]) {
     const m = low.match(re);
     if (!m) continue;
-    const n = words(at(m))[0];
+    const n = words(at(m))[0].replace(/^(biri)ni$/iu, '$1');
     const tail = m[4] === 'ölü' || m[4] === 'yaralı' ? TR(m[4]) : `${m[2] ? 'KİŞİ ' : ''}${verb}`;
     return { kind: 'casualty', lines: [TR(n), tail], used: at(m) };
   }
