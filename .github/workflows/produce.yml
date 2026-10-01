@@ -186,7 +186,7 @@ jobs:
       - name: The latest twenty videos
         run: |
           mkdir -p site/v
-          for tag in $(gh release list --limit 20 --json tagName --jq '.[].tagName' | grep '^video-evt_'); do
+          for tag in $(gh release list --limit 20 --json tagName --jq '.[].tagName' | grep -E '^(video-evt_|digest-)'); do
             gh release download "$tag" --dir site/v --pattern '*.mp4' --pattern '*.jpg' --pattern '*.json' --clobber
           done
           # the studio stills, when the studio workflow has made them

@@ -469,3 +469,22 @@ Sahip "badgeler" istedi. Karar: iki rozet, ikisi de hesaplanmış bilgi, hiçbir
 - **Yapılmayan**: "6 SAAT ÖNCE" gibi göreli zaman rozeti. Video sonradan paylaşıldığında bayatlar ve
   yanlış olur; olayların çoğunun saati değil yalnız günü belli. Tarih zaten üst satırda.
 
+## 19. Haftalık özet / The weekly digest (2026-10-01)
+
+Tek haber "ne oldu?" sorusunu cevaplar; hafta "yakınımızda neler oluyor?" sorusunu. Takip etmenin
+nedeni ikincisidir. Karar: her izleme bölgesi için, son yedi günde en az 15 kaydı varsa, haftada bir
+(pazartesi 06:27 UTC) bir özet videosu (`tools/scene/digest.mjs`, `digest.yml`).
+- Bloklar her videonun blokları: kanca ("BU HAFTA · 25 EYLÜL – 1 EKİM / KARADENİZ / 242 KAYIT"),
+  haritada yeri olan bütün kayıtlar, haftanın en önemli üç haberi (haber değeri puanı, tazelik hariç;
+  üç ayrı yer ve gün), durum ("N kayıttan M'i doğrulanmadı", kaç ayrı yayın organı). Böylece
+  seslendirme, ses denetimi, gönderi ve sahne denetimi aynen çalışır.
+- Üç haberin her biri kaynağın kendi başlığıdır; haritada kendi halkası ve adıyla gösterilir.
+- Sayılar bizim kayıtlarımızdan; yalnız tek haberlik videonun kabul ettiği kayıtlar sayılır, yani
+  kırmızı çizgiler (Türk kuvvetleri, kişisel veri, geri çekilmiş kayıt) burada da geçerli.
+- Sürüm etiketi `digest-<bölge>-<tarih>`: tek haber üretiminin 5 sa 30 dk kapısı yalnız `video-*`
+  sürümlerine baktığı için özet bir sonraki haberi geciktirmez; Pages ikisini de listeler.
+- Eşik 15: beş kayıtlık bir "hafta" Levant'ta bir BM bülteni ve bir toplantı duyurusundan oluşuyordu. Bu
+  ikisi ("… Toplantı (AM)", "Kısaca Dünya Haberleri") artık tek haber videosu olarak da reddedilir: olay
+  değil, duyuru. Veri şimdilik çoğunlukla Karadeniz'de (bir haftada 242 kabul edilen kayıt); diğer
+  bölgeler toplayıcılar genişledikçe kendiliğinden özet alır.
+

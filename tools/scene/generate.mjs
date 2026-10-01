@@ -369,6 +369,9 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const texts = [...new Set([titleTr, titleEn, ...sources.map((s) => s.title ?? '')].filter(Boolean))];
   for (const re of TURKISH_FORCES) if (texts.some((t) => re.test(t))) refuse('about Turkish forces (red line)');
   // no personal data (red line): a call sign, or a person named by first name and initial ("Kristin N.")
+  // a meeting notice or a news roundup is not an event: "Güvenlik Konseyi, 10230. Toplantı (AM)",
+  // "Kısaca Dünya Haberleri: Malezya …, Myanmar …" (UN press pages the feeds carry)
+  if (texts.some((t) => /\b\d+(st|nd|rd|th)? meeting \((AM|PM)\)|toplantı \((AM|PM|ÖÖ|ÖS)\)|^(kısaca dünya haberleri|world news in brief)\b/iu.test(t))) refuse('a meeting notice or a news roundup, not an event');
   if (texts.some((t) => /\b(call ?sign|callsign)\b|çağrı işareti/i.test(t) || /\b[A-Z][a-z]{2,} [A-Z]\.(?=[\s,(]|$)/.test(t))) refuse('names a person (red line: no personal data)');
 
   const regionKey = record.regions?.find((g) => REGIONS[g]);
@@ -666,3 +669,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     } catch (e) { console.error(e.message); process.exit(3); }
   }
 }
+
+// helpers the weekly digest (tools/scene/digest.mjs) builds on
+export { REGIONS, MONTHS, TR, STATUS, host, wrapLines, publisher };

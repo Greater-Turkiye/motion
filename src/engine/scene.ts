@@ -10,7 +10,8 @@ export interface Key extends Camera { t: number }
 /** What follows the hook, one block of text at a time (PLAN.md section 14, research/02 beat sheet). */
 export type Beat =
   | { kind: 'place'; at: number; title: string; text?: string }
-  | { kind: 'facts'; at: number; kicker?: string; lines: string[] }
+  /** place: where this story happened, ringed and named while the block is on (the weekly digest's stories) */
+  | { kind: 'facts'; at: number; kicker?: string; lines: string[]; place?: { at: LonLat; label: string } }
   | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string }
   | { kind: 'status'; at: number; text?: string }
   | { kind: 'close'; at: number; kicker?: string; lines: string[] }

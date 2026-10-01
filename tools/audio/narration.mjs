@@ -146,6 +146,8 @@ function hookParts(sc) {
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not
   // "Bin dört yüz yetmiş asker." and then the sentence, or only the bare number when time is short
   if (/^\d/.test(h.lines[0] ?? '') && h.sub.includes(h.lines[0])) return [B(h.sub)];
+  // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
+  if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines)}`];
   return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
