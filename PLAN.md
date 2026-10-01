@@ -386,6 +386,9 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      kilometre" Whisper'a "1 km" diye geldi ve harf hatası 0,18 ile eşiğin altında kaldı. Haberde en ağır
      hata yanlış sayıdır: metnin söylediği her sayı (yazıyla) duyulan sayılarla (rakam ya da yazı) aynı
      değilse deneme başarısız sayılır. Üç denemede de tutmazsa seslendirme düşer, video müzikle çıkar.
+   - **Cümleden sonra konuşma yok** (ilk haftalık özet): ikinci deneme "Bu hafta Karadeniz 236 kayıt"tan
+     sonra "yan sekt" diye devam etti; harf hatası 0,20 ile sınırda geçti, çünkü yalnız kuyruk yanlıştı.
+     Duyulan harfler metnin harflerinden %12'den fazla uzunsa deneme başarısız sayılır.
    - **Klip cümlesiyle biter** (2026-10-01, Sumy videosundan sonra): model cümleden sonra 19 sn
      anlamsız ses üretti, Whisper bunu yok saydığı için harfler tuttu ve görüntü sesi bekleyerek
      46 sn'ye uzadı. Artık her klip Whisper'ın duyduğu son kelimeden 0,35 sn sonra kesilir; kesildikten
