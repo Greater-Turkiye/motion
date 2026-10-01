@@ -577,7 +577,10 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
     ...(parties.length ? { parties: parties.map((c) => ({ country: c.iso3, label: nameOf(c), at: c.at, ...(flag(c.iso3) ? { emblem: flag(c.iso3) } : {}) })) } : {}),
     labels,
-    hook: { kicker, lines: hook.lines, sub, status: STATUS[st], source: `KAYNAK: ${name}` },
+    // two cues of relevance and trust, both computed, neither a claim: how near Türkiye a located
+    // event is when it is within 500 km, and how many outlets carry the story
+    hook: { kicker, lines: hook.lines, sub, status: STATUS[st], source: `KAYNAK: ${name}${hosts.length > 1 ? ` +${hosts.length - 1}` : ''}`,
+      ...((pt || whole) && nearest.km <= 500 && !kicker.startsWith('TÜRKİYE') ? { badge: `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` } : {}) },
     beats,
   };
   const problems = validate(structuredClone(scene));

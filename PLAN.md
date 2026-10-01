@@ -445,3 +445,14 @@ yerleşim bakımı ve iki yerde ayrışan kurallar olmaz. Her bölüm bir kare (
 kaçıncı kare olduğu ("2/6"; kaydırarak okunan bir gönderide okur ne kadar kaldığını bilmeli) ve kapakta
 "KAYDIR →". Üretimde her videonun sürümüne eklenir; yayımlamak sahibin hesabını gerektirir.
 
+## 18. Rozetler / Badges (2026-10-01)
+
+Sahip "badgeler" istedi. Karar: iki rozet, ikisi de hesaplanmış bilgi, hiçbiri iddia değil.
+- **"TÜRKİYE'YE YAKIN · ~420 KM"**: konumu bilinen olay en yakın Türk şehrine 500 km'den yakınsa,
+  kancanın üstünde, vurgu renginde bir hap. İzleyicinin ilk sorusu "bu beni ilgilendiriyor mu?";
+  cevap ilk karede. 0. karede (kapak görseli) tam görünür. Yakınlık varyantında üst satır zaten mesafe
+  olduğu için orada çıkmaz.
+- **Kaynak sayısı**: birden çok yayın organı varsa alt bantta "KAYNAK: UKRINFORM +2". Güven işareti.
+- **Yapılmayan**: "6 SAAT ÖNCE" gibi göreli zaman rozeti. Video sonradan paylaşıldığında bayatlar ve
+  yanlış olur; olayların çoğunun saati değil yalnız günü belli. Tarih zaten üst satırda.
+

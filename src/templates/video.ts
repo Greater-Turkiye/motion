@@ -394,7 +394,7 @@ function hookMetrics(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
     const subTop = BLOCK_BOTTOM - subLines.length * 50;
     const linesTop = subTop - 40 - heights.reduce((a, b) => a + b, 0);
     const kickerY = linesTop - 30;
-    m = { subLines, sizes, heights, subTop, linesTop, kickerY, top: kickerY - 40 };
+    m = { subLines, sizes, heights, subTop, linesTop, kickerY, top: kickerY - 40 - (sc.hook.badge ? 56 : 0) };
     hookMemo.set(key, m);
   }
   return m;
@@ -405,6 +405,21 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   const lift = (1 - alpha) * 40;
   const { subLines, sizes, heights, subTop, linesTop, kickerY } = hookMetrics(ctx, sc, s);
   guard({ x: LEFT - 6, y: kickerY - 26, w: WIDTH, h: BLOCK_BOTTOM - kickerY + 26 }, 'hook');
+
+  if (sc.hook.badge) {
+    // the badge: a solid pill in the accent, so it reads as a label of the place and not as part of
+    // the headline; whole on frame 0, which is also the thumbnail, then a small settle
+    const pop = 1 + 0.06 * Math.sin(Math.min(1, t / 0.5) * Math.PI);
+    ctx.save();
+    ctx.font = `800 22px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
+    const bw = ctx.measureText(sc.hook.badge).width + 28, bh = 38, by = kickerY - 26 - 18 - bh;
+    guard({ x: LEFT - 2, y: by, w: bw, h: bh }, 'badge');
+    ctx.globalAlpha = alpha;
+    ctx.translate(LEFT - 2 + bw / 2, by + bh / 2); ctx.scale(pop, pop); ctx.translate(-(LEFT - 2 + bw / 2), -(by + bh / 2));
+    ctx.fillStyle = s.accent; ctx.beginPath(); ctx.roundRect(LEFT - 2, by, bw, bh, 6); ctx.fill();
+    ctx.fillStyle = s.flat ? '#ffffff' : '#000000'; ctx.textBaseline = 'middle'; ctx.fillText(sc.hook.badge, LEFT + 12, by + bh / 2 + 1);
+    ctx.restore();
+  }
 
   const kp = alpha;
   ctx.globalAlpha = kp; ctx.fillStyle = s.accent; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '8px';
