@@ -3,8 +3,8 @@ name: produce
 # The automatic video loop (PLAN.md section 10, milestone M7). At most every five and a half hours (the
 # gate below): pick the best recent record that has no video yet (tools/scene/select.mjs), write its
 # scene (tools/scene/generate.mjs), narrate it, render it, and publish the MP4, its first frame and its
-# metadata as a GitHub release tagged video-<record id>. The releases are the ledger: a record with a release is never picked again. The second job republishes the
-# latest twenty videos to this repository's Pages site (greater-turkiye.github.io/motion/), which the
+# metadata as a GitHub release tagged video-<record id>. The releases are the ledger: a record with a
+# release is never picked again. The second job republishes the latest twenty videos to this repository's Pages site (greater-turkiye.github.io/motion/), which the
 # platform's videos page reads from the same origin. Nobody writes or reviews anything on the way; the
 # status and the source are on screen in every frame and the release notes say it was automatic.
 #
