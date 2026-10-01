@@ -219,8 +219,14 @@ export function hookLines(title) {
   return { kind: 'fallback', lines: [TR(first), TR(tail)], used: `${first} ${tail}` };
 }
 
+/** Whether a Turkish clause ends on its verb ("…tatbikatı düzenleyeceğini duyurdu"). */
+const endsOnVerb = (s) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar)$/iu.test((s ?? '').replace(/[.!"'”’]+$/u, '').split(' ').at(-1) ?? '');
+
 /** Lines of at most `max` characters, whole words only, at most `n` lines. A title too long for
- *  that loses whole clauses from the end, never half a clause, so a line never stops mid-claim. */
+ *  that loses whole clauses from the end, never half a clause, so a line never stops mid-claim;
+ *  but only while what is left still ends on its verb: "Romanya Hava Kuvvetleri, 14-25 Eylül'de …
+ *  duyurdu" cut back to "Romanya Hava Kuvvetleri" says nothing, so such a sentence keeps its verb
+ *  and takes up to six lines instead. */
 function wrapLines(text, max = 28, n = 4) {
   const wrap = (t) => {
     const out = []; let line = '';
@@ -228,12 +234,15 @@ function wrapLines(text, max = 28, n = 4) {
     if (line) out.push(line);
     return out;
   };
+  const clean = (ls) => ls.map((l) => l.replace(/[,;:]$/, ''));
   let t = text;
   for (;;) {
     const ls = wrap(t);
+    if (ls.length <= n) return clean(ls);
     const cs = clauses(t);
-    if (ls.length <= n || cs.length <= 1) return ls.slice(0, n).map((l) => l.replace(/[,;:]$/, ''));
-    t = cs.slice(0, -1).join(', ');
+    const shorter = cs.length > 1 ? cs.slice(0, -1).join(', ') : null;
+    if (!shorter || !endsOnVerb(shorter)) return clean(ls.slice(0, 6));
+    t = shorter;
   }
 }
 
