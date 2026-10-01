@@ -64,7 +64,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 60   # published videos keep their motion blur, which can double a software render
+    timeout-minutes: 90   # motion blur can double a software render; the narration and its checks add up to 40 min
     outputs:
       id: ${{ steps.pick.outputs.id }}
     env:
@@ -105,7 +105,8 @@ jobs:
         id: voice
         if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
         continue-on-error: true
-        timeout-minutes: 20
+        # ~1 min a clip with its check; three tries for every clip of a long scene stays under 40
+        timeout-minutes: 40
         env:
           ID: ${{ steps.pick.outputs.id }}
         run: |
