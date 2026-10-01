@@ -322,7 +322,7 @@ export function generate(record, { datasets, style } = {}) {
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
   const where = pt && placeName ? placeName : region?.name ?? placeName ?? '';
-  const kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
+  let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
   const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
@@ -385,6 +385,8 @@ export function generate(record, { datasets, style } = {}) {
   const subClause = clauses(news).find((c) => (!hook.used || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72 && verbish(c.replace(/[.!]$/, '')));
   // a whole clause of at most two lines, or nothing: never a clause cut in the middle
   const sub = subClause ? subClause[0].toLocaleUpperCase('tr') + subClause.slice(1) : '';
+  // the kicker names the place unless the hook's first line already does ("KİEV BÖLGESİ" twice)
+  if (hook.lines[0] === TR(where)) kicker = kicker.split(' · ').slice(1).join(' · ') || kicker;
   // "KARADENİZ / GELİŞME" and nothing under it tells a viewer nothing in the first two seconds
   if (hook.lines[1] === 'GELİŞME' && !sub) refuse('nothing to say in the hook: no casualty, number, type or whole clause');
   // what the hook may say beyond the headline: the record's own fields (its type as we name it, its
@@ -396,7 +398,10 @@ export function generate(record, { datasets, style } = {}) {
   const hookChars = [...hook.lines, sub].join(' ').length;
   let t = secs(hookChars, 2.6, 0.4);
   const push = (b, chars, min, pad) => { beats.push({ ...b, at: round1(t) }); t += secs(chars, min, pad); };
-  const factsBeat = () => push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0);
+  // the facts block exists to say more than the hook's sub-line; when it would only say it again
+  // (a one-clause headline) it is left out: the same sentence twice is six seconds of nothing new
+  const same = (a, b) => a.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === b.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const factsBeat = () => { if (!(sub && same(facts.join(' ').replace(/\*/g, ''), sub))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
   const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
   const distanceBeat = (fromLabel) => {
     if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, fromLabel.length + nearest.name.length + 34, 3.2);
