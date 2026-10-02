@@ -1,0 +1,52 @@
+name: timer
+
+# The clock for the automatic videos. GitHub's schedule is not one: produce's three wake-ups an hour
+# ran about once in four hours on 1-2 October 2026 (17:27, 21:58, 01:39, 07:33 UTC), and the other
+# repositories' schedules slipped the same way, so a video due at 12:00 waited for a hand.
+#
+# One run of this workflow sleeps until the next video is due (the newest video-* release plus 5 h
+# 30 min, the same rule as produce's gate), then starts produce. A job may run six hours, so a run
+# never sleeps longer than 5 h 45 min; when the due time is further off it hands over to a fresh run.
+# Only the newest timer run lives (concurrency). produce starts a new timer run at the end of every
+# production, so a broken chain mends itself with the next video; the schedule stays as the second
+# line. No secret is needed: a run's own token may start workflow_dispatch runs.
+#
+# Kill switch: the repository variable MOTION_PRODUCE set to "off" stops this as it stops produce.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: timer
+  cancel-in-progress: true
+
+jobs:
+  wait:
+    if: vars.MOTION_PRODUCE != 'off'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Sleep until the next video is due, then start produce
+        run: |
+          last=$(gh release list -R "$GITHUB_REPOSITORY" --limit 20 --json tagName,publishedAt --jq '[.[]|select(.tagName|startswith("video-"))][0].publishedAt // ""')
+          now=$(date -u +%s)
+          if [ -n "$last" ]; then due=$(( $(date -u -d "$last" +%s) + 330 * 60 )); else due=$now; fi
+          wait=$(( due - now ))
+          max=$(( 345 * 60 ))
+          echo "last video: ${last:-none}; next due $(date -u -d "@$due" +%Y-%m-%dT%H:%MZ); sleeping $(( wait > 0 ? wait / 60 : 0 )) min" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$wait" -gt "$max" ]; then
+            sleep "$max"
+            gh workflow run timer.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
+            exit 0
+          fi
+          if [ "$wait" -gt 0 ]; then sleep "$wait"; fi
+          # a production the schedule already started is left to finish: its end starts the next timer
+          busy=$(gh run list -R "$GITHUB_REPOSITORY" --workflow produce.yml --limit 10 --json status --jq '[.[]|select(.status!="completed")]|length')
+          if [ "$busy" -gt 0 ]; then echo "produce is already running" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          gh workflow run produce.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
+          echo "started produce" | tee -a "$GITHUB_STEP_SUMMARY"
