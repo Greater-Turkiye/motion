@@ -52,6 +52,7 @@ const SAY = { ABD: 'Amerika Birleşik Devletleri', km: 'kilometre', 'km²': 'kil
 export function speakable(text, title = false) {
   let s = text.replace(/\*/g, '').replace(/\s+·\s+/g, ', ').replace(/\s+(-{1,2}|[–—])\s+/g, ', ');
   s = s.replace(/±\s*/g, 'artı eksi ');
+  s = s.replace(/(\p{L})\s*[-–]\s*(?=\d)/gu, '$1 ');
   // "bölgeler arasında 2." → "ikinci"; only small ranks, and only a number that ends the sentence
   s = s.replace(/(?<![\d.,])(\d{1,2})\.(?=\s*$)/g, (m, d) => ORDINAL[Number(d)] ?? m);
   // decimals with a comma ("2,5") and thousands with a dot ("1.470")
@@ -120,6 +121,9 @@ function factsOnlyRepeatHook(sc) {
   // only the source's credit after a dash: the whole sentence, read once, carries it
   const raw = f.lines.join(' ').replace(/\*/g, '').split(/\s+/).slice(sub.split(' ').length).join(' ');
   if (/^[\s,;:]*[–—-]/.test(raw)) return true;
+  // a word or two with no verb after the sentence ("\"Flash\"", a name) is a credit too
+  const tail = raw.replace(/[^\p{L}\p{N}\s']/gu, ' ').trim().split(/\s+/).filter(Boolean);
+  if (tail.length && tail.length <= 2 && !/(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş)$/u.test(tail.at(-1).toLocaleLowerCase('tr'))) return true;
   const head = norm(speakable(sc.hook.lines.join(' '), true));
   return rest.length > 0 && norm(speakable(rest)).split(' ').every((w) => head.includes(w.slice(0, 5)));
 }
