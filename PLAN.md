@@ -569,3 +569,8 @@ işin 6 saat sınırı; daha uzaksa yeni bir çalışmaya devreder), sonra `prod
 timer yaşar. Gizli anahtar yok: çalışmanın kendi jetonu workflow_dispatch başlatabilir. Bir runner
 saatlerce uyuyarak meşgul olur; açık depoda bunun maliyeti yok. Zamanlayıcı ikinci hat olarak kalır.
 `MOTION_PRODUCE=off` ikisini de durdurur.
+- **Karadeniz'e dosyalanmış diğer savaş kayıtları**: yeri olmayan ve İngilizce başlığı Rusya ya da
+  Ukrayna'yı anan ama Ukrayna kuralına girmeyen kayıtlar (Rusya'nın kayıpları, Rusya'ya yaptırımlar)
+  künyede "KARADENİZ" demez, yalnız tarih; bölge kancası "KARADENİZ" yerine başlığın andığı ülkeyi
+  yazar; "NEREDE / KARADENİZ" bölümü olmaz. Haritadaki bölge görünümü kalır; bölge kapanışı
+  ("Karadeniz'den 305 kayıt") bizim dosyalamamızı anlatır, olayın yerini değil.

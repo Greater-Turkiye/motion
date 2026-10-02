@@ -189,6 +189,12 @@ const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
 const GENERIC = new Set(['gov', 'mil', 'gouv', 'gob', 'mfa', 'co', 'com', 'net', 'org', 'ac', 'edu', 'int']);
+/** A publisher's name in lower case after its first letter: Turkish rules for a Turkish name
+ *  ("DIŞİŞLERİ BAKANLIĞI" → "Dışişleri bakanlığı"), the plain ones for a Latin one, whose I is no ı
+ *  ("UKRINFORM" → "Ukrinform", not "Ukrınform"). A name is Turkish when it has a Turkish letter;
+ *  an acronym stays as it is ("ABD savaş bakanlığı"). */
+const ACRONYM = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN']);
+const lowerName = (s) => s.split(' ').map((w) => (ACRONYM.has(w) ? w : /[İŞĞÜÖÇ]/u.test(s) ? w.toLocaleLowerCase('tr') : w.toLowerCase())).join(' ');
 const publisher = (u) => {
   const h = host(u);
   if (PUBLISHERS[h]) return PUBLISHERS[h];
@@ -228,12 +234,16 @@ const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
 /** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
-export const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
+export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
 
 /** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
  *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
  *  to "BRAİLA", not "BRĂİLA"). Turkish letters and circumflexes stay. */
-const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', Tbilisi: 'Tiflis' };
+const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', Tbilisi: 'Tiflis',
+  // the Turkish press's names for Ukrainian cities (AA, TRT): "KHARKİV" in the kicker over "Harkov'a" in the
+  // headline read as two places
+  Kharkiv: 'Harkov', Chernihiv: 'Çernihiv', Zhytomyr: 'Jitomir', Chernivtsi: 'Çernivtsi', Mykolaiv: 'Mikolayiv',
+  Zaporizhzhia: 'Zaporijya', Kherson: 'Herson', Lviv: 'Lviv', Luhansk: 'Luhansk' };
 const TURKISH = new Set('çşğöüıİÇŞĞÖÜâîûÂÎÛ');
 const FOLD = { 'ș': 'ş', 'Ș': 'Ş', 'ţ': 't', 'ț': 't', 'Ț': 'T', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'ß': 'ss' };
 export const trPlace = (s) => s.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w).replace(/./gu, (c) => (TURKISH.has(c) ? c : FOLD[c] ?? c.normalize('NFD').replace(/\p{M}/gu, '')));
@@ -318,7 +328,9 @@ function wrapLines(text, max = 28, n = 4) {
     if (line) out.push(line);
     return out;
   };
-  const clean = (ls) => ls.map((l) => l.replace(/[,;:]$/, ''));
+  // a comma or colon at a line's end stays: the lines are one sentence, and without it "İki kişi öldü /
+  // yaralı sayısı 33'e yükseldi" read, and was said, as one run-on clause
+  const clean = (ls) => ls;
   let t = text;
   for (;;) {
     const ls = wrap(t);
@@ -476,12 +488,20 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = (pt || whole) && wholeName ? wholeName : area?.name ?? region?.name ?? placeName ?? '';
+  // the rest of the feed's placeless war items (Russia's losses, sanctions on Russia, its drones) are
+  // filed under the Black Sea too, but nothing in them happened at sea: the kicker gives the date
+  // alone, and a region hook names the country the headline names instead of "KARADENİZ"
+  const warParty = !pt && !area && !whole && regionKey === 'black-sea'
+    ? partiesOf(titleEn).find((c) => c.iso3 === 'RUS' || c.iso3 === 'UKR') : null;
+  const where = (pt || whole) && wholeName ? wholeName : warParty ? '' : area?.name ?? region?.name ?? placeName ?? '';
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
   const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
-  const news = tidy(abbrev(unrubric(titleTr)));
+  // the headline's own city names in the Turkish press's spelling too ("Mykolaiv'e" → "Mikolayiv'e"),
+  // so the facts and the kicker name a city the same way
+  const exonyms = (t) => t.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w);
+  const news = exonyms(tidy(abbrev(unrubric(titleTr))));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
   const name = publisher(sources[0].url);
@@ -516,7 +536,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
-    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : name[0] + name.slice(1).toLocaleLowerCase('tr')}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
+    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : lowerName(name).replace(/^./u, (c) => c.toLocaleUpperCase('tr'))}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
 
   // ---- the hook, from the record's own fields first ------------------------------------------------
   const found = hookLines(news);
@@ -528,7 +548,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a meeting or a statement with one named country: that country speaks (the quote card)
   // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
   const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;
-  const regionWord = TR(region?.name ?? placeTitle);
+  const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
   else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
@@ -616,7 +636,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     statusBeat();
     regionClose();
   } else {
-    push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
+    // a war item filed under the Black Sea has no place to show: "NEREDE / KARADENİZ" would say it
+    if (!warParty) push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
     if (pt) distanceBeat(placeTitle);
     if (around && around.n >= 3) {
@@ -694,7 +715,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     duration,
     ...(variant !== 'standart' ? { variant } : {}),
     style: style ?? styleFor(record.event_type ?? ''),
-    source_text: [...texts, fields],
+    source_text: [...texts, news, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
     ...(family === 'strike' || family === 'exercise' || pt || area ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),

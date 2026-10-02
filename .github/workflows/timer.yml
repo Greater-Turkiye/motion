@@ -37,6 +37,10 @@ jobs:
           now=$(date -u +%s)
           if [ -n "$last" ]; then due=$(( $(date -u -d "$last" +%s) + 330 * 60 )); else due=$now; fi
           wait=$(( due - now ))
+          # a production that failed leaves the last video where it was, so the due time is already past:
+          # half an hour's pause before the next try, not a loop of failing runs a few minutes apart
+          last_run=$(gh run list -R "$GITHUB_REPOSITORY" --workflow produce.yml --limit 1 --json conclusion --jq '.[0].conclusion // ""')
+          if [ "$wait" -le 0 ] && [ "$last_run" = "failure" ]; then wait=1800; fi
           max=$(( 345 * 60 ))
           echo "last video: ${last:-none}; next due $(date -u -d "@$due" +%Y-%m-%dT%H:%MZ); sleeping $(( wait > 0 ? wait / 60 : 0 )) min" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$wait" -gt "$max" ]; then
