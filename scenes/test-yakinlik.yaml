@@ -1,0 +1,243 @@
+# Generated from evt_01m3t4v1dxf8b88d42eenc560m by tools/scene/generate.mjs; do not edit by hand.
+id: test-yakinlik
+record: evt_01m3t4v1dxf8b88d42eenc560m
+template: strike
+format: vertical
+fps: 60
+duration: 23.2
+variant: yakinlik
+style: E
+source_text:
+  - Rusya'nın Sumy'e attığı süzülme bombası altı kişiyi yaraladı
+  - Russian glide-bomb strike on Sumy leaves six injured
+  - HAVA SALDIRISI · SUMY · KARADENİZ · RUSYA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME
+camera:
+  from:
+    center: &a1
+      - 30.9
+      - 46.5
+    zoom: 0.8
+  to: &a2
+    t: 2.6
+    center:
+      - 35.1
+      - 53.3
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.8
+    - *a2
+    - t: 5.9
+      center:
+        - 35
+        - 46.5
+      zoom: 1.9
+    - t: 9.5
+      center:
+        - 33.8
+        - 51.9
+      zoom: 2.3
+    - t: 15
+      center:
+        - 33
+        - 52.5
+      zoom: 2.7
+    - t: 19.5
+      center:
+        - 34.8
+        - 51.9
+      zoom: 1.9
+    - t: 23.2
+      center: *a1
+      zoom: 0.8
+event:
+  at:
+    - 34.78
+    - 50.92
+  precision: locality
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    kind: sea
+  - text: SUMY
+    at:
+      - 34.781
+      - 50.024
+    kind: country
+hook:
+  kicker: TÜRKİYE'YE ~990 KM
+  lines:
+    - ALTI KİŞİ
+    - YARALANDI
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: distance
+    from:
+      at:
+        - 34.781
+        - 50.924
+      label: SUMY
+    to:
+      at:
+        - 35.15
+        - 42.02
+      label: SİNOP
+    text: Kuş uçuşu, en yakın Türk şehrine.
+    at: 2.6
+  - kind: place
+    title: SUMY
+    text: "Konum başlıktaki yer adından: ±20 km."
+    at: 6.1
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Rusya'nın Sumy'e attığı
+      - süzülme bombası altı kişiyi
+      - yaraladı
+    at: 9.5
+  - kind: recent
+    title: KAYITLARIMIZDA · SON 7 GÜN
+    points:
+      - at:
+          - 34.78
+          - 50.92
+        days: 7
+      - at:
+          - 36.25
+          - 50
+        days: 6
+      - at:
+          - 34.78
+          - 50.92
+        days: 5
+      - at:
+          - 34.78
+          - 50.92
+        days: 5
+      - at:
+          - 34.78
+          - 50.92
+        days: 5
+      - at:
+          - 34.78
+          - 50.92
+        days: 5
+      - at:
+          - 36.25
+          - 50
+        days: 4
+      - at:
+          - 34.78
+          - 50.92
+        days: 4
+      - at:
+          - 34.78
+          - 50.92
+        days: 4
+      - at:
+          - 36.25
+          - 50
+        days: 4
+      - at:
+          - 34.78
+          - 50.92
+        days: 4
+      - at:
+          - 36.25
+          - 50
+        days: 4
+      - at:
+          - 36.25
+          - 50
+        days: 4
+      - at:
+          - 34.78
+          - 50.92
+        days: 4
+      - at:
+          - 36.25
+          - 50
+        days: 3
+      - at:
+          - 34.78
+          - 50.92
+        days: 3
+      - at:
+          - 36.25
+          - 50
+        days: 2
+      - at:
+          - 34.78
+          - 50.92
+        days: 2
+      - at:
+          - 36.25
+          - 50
+        days: 2
+      - at:
+          - 36.25
+          - 50
+        days: 2
+      - at:
+          - 36.25
+          - 50
+        days: 2
+      - at:
+          - 34.78
+          - 50.92
+        days: 1
+      - at:
+          - 36.25
+          - 50
+        days: 1
+      - at:
+          - 34.78
+          - 50.92
+        days: 1
+      - at:
+          - 34.78
+          - 50.92
+        days: 1
+      - at:
+          - 34.78
+          - 50.92
+        days: 1
+      - at:
+          - 34.78
+          - 50.92
+        days: 0
+      - at:
+          - 34.78
+          - 50.92
+        days: 0
+    text: Sumy çevresinde, 150 km içinde.
+    at: 15
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 19.5
