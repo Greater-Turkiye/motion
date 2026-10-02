@@ -183,6 +183,9 @@ const words = (s) => s.split(/\s+/).filter(Boolean);
 const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 3 ? '' : m));
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
+/** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
+export const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
+
 /** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
  *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
  *  to "BRAİLA", not "BRĂİLA"). Turkish letters and circumflexes stay. */
@@ -394,7 +397,6 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
   const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
-  const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
   const news = tidy(abbrev(unrubric(titleTr)));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
@@ -665,7 +667,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
       // what the site's videos page shows next to the video (tools/scene/site.mjs)
       if (args.get('meta')) writeFileSync(args.get('meta'), JSON.stringify({
-        id: record.id, title: record.title.tr, title_en: record.title.en ?? null, status: scene.hook.status,
+        id: record.id, title: tidy(record.title.tr), title_en: record.title.en ?? null, status: scene.hook.status,
         date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), style: scene.style, variant: scene.variant ?? 'standart',
         sources: record.sources.map((s) => s.url),
         release: `https://github.com/Greater-Turkiye/motion/releases/tag/video-${record.id}`,
