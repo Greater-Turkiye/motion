@@ -224,7 +224,7 @@ export function hookLines(title) {
   const low = title.toLocaleLowerCase('tr');
   const at = (m) => title.slice(m.index, m.index + m[0].length);
   // casualties lead when there are any, deaths before injuries: the fact a reader would put first.
-  // "48 kişinin yaralanmasının ardından" is shown as "48 / KİŞİ YARALANDI", the source's own verb
+  // "48 kişinin yaralanmasının ardından" is shown as "48 KİŞİ / YARALANDI", the source's own verb
   // in its plain past form (the scene check still finds it in the source by its stem)
   // whole words only: "on" must not match inside "Kiev'de on…" words, nor "üç" inside "üçü"
   // "biri öldü", "birini öldürdü": one person, said the Turkish way (shown "BİRİ / ÖLDÜ")
@@ -237,8 +237,11 @@ export function hookLines(title) {
     const m = low.match(re);
     if (!m) continue;
     const n = words(at(m))[0].replace(/^(biri)ni$/iu, '$1');
-    const tail = m[4] === 'ölü' || m[4] === 'yaralı' ? TR(m[4]) : `${m[2] ? 'KİŞİ ' : ''}${verb}`;
-    return { kind: 'casualty', lines: [TR(n), tail], used: at(m) };
+    // the count stays with its noun, "3 KİŞİ / YARALANDI": a bare "3" alone on the big line is the
+    // poster-number look (CLAUDE.md section 4); "BİRİ / ÖLDÜ" already says who. "5 ölü" and "5 yaralı"
+    // read "5 KİŞİ / ÖLDÜ" and "5 KİŞİ / YARALANDI" (the check finds the verb by its stem)
+    const lines = /^biri$/iu.test(n) ? [TR(n), verb] : [`${TR(n)} KİŞİ`, verb];
+    return { kind: 'casualty', lines, used: at(m) };
   }
   // a number and what it counts; a short word after it ("112 Rus İHA") belongs to the count, and a
   // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
@@ -253,8 +256,16 @@ export function hookLines(title) {
     // and without its possessive-accusative ending: "1470 askerini" is "1470 / ASKER", "5 jet dronunu" "5 / JET DRON"
     const bare = (w) => (w.length > 6 ? w.replace(/(?<=[^aeıioöuü\s])(ını|ini|unu|ünü)$/u, '') : w);
     const modifier = /^(askeri|sivil|yabancı|ağır|hafif|toplam|balistik|seyir)$/iu.test(num[2]);
-    const noun = bare((num[2].length <= 4 || modifier) && num[3] ? `${num[2]}${num[3]}` : num[2]);
-    return { kind: 'number', lines: [num[1], TR(noun.split(' ').map((w) => w.split("'")[0]).join(' '))], used: `${num[1]} ${noun}` };
+    const two = (num[2].length <= 4 || modifier) && !!num[3];
+    // the number with what it counts and the verb that says what happened, as the source words them:
+    // "1470 ASKERİNİ / DAHA KAYBETTİ", never "1470 / ASKER", a number standing alone at poster size
+    // with its unit under it (CLAUDE.md section 4). The verb is the rest of the number's clause, at
+    // most three words ending on a finite verb; a count without one is no hook.
+    const head = `${num[1]} ${num[2]}${two ? num[3] : ''}`;
+    const from = num.index + num[1].length + 1 + num[2].length + (two ? num[3].length : 0);
+    const end = title.slice(from).search(/[,;:.–—]/);
+    const tail = title.slice(from, end < 0 ? undefined : from + end).trim();
+    if (tail && words(tail).length <= 3 && endsOnVerb(tail)) return { kind: 'number', lines: [TR(head), TR(tail)], used: `${head} ${tail}` };
   }
   const cs = clauses(title);
   // a clause of two or three words that ends the title or stands alone reads as a verdict ("kaptan öldürüldü")
