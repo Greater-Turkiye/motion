@@ -234,7 +234,7 @@ const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
 /** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
-export const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
+export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
 
 /** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
  *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
@@ -498,7 +498,10 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
   const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
-  const news = tidy(abbrev(unrubric(titleTr)));
+  // the headline's own city names in the Turkish press's spelling too ("Mykolaiv'e" → "Mikolayiv'e"),
+  // so the facts and the kicker name a city the same way
+  const exonyms = (t) => t.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w);
+  const news = exonyms(tidy(abbrev(unrubric(titleTr))));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
   const name = publisher(sources[0].url);
@@ -712,7 +715,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     duration,
     ...(variant !== 'standart' ? { variant } : {}),
     style: style ?? styleFor(record.event_type ?? ''),
-    source_text: [...texts, fields],
+    source_text: [...texts, news, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
     ...(family === 'strike' || family === 'exercise' || pt || area ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
