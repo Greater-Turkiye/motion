@@ -431,6 +431,14 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      -34/-40 LUFS'a düşüyordu (konuşma -14): ses "konuşma, sessizlik, konuşma" diye kesik kesik geliyordu;
      geçiş whoosh'u konuşmadan yüksekti (-11,7). Yatak -20 dB'den -11 dB'ye, kısma 8:1'den 3:1'e (yumuşak),
      efektler 6-8 dB aşağı. Ölçüm: aralar -22/-27 LUFS, konuşmanın 10-12 dB altında, konuşma aynı.
+   - **Haritada oranlar** (2026-10-02, sahip: "ülke isimleri, konumları orantısızdı"): amblem 200 px'ten
+     140 px'e (Ukrayna'nın iki katı bir tryzub yoktu artık); ad harf aralığı 0,4-0,45 em'den 0,22-0,3 em'e
+     (bir ad altındaki ülkeden geniş taşmıyor); halkanın çevresi 190 px etiket koymama alanı (adlar şok
+     dalgalarının üstüne binmiyordu); iki ad birbirine değerse biri tümüyle çekilir. Ülke adı başkentte
+     değil ülkenin en büyük kara parçasının ortasında; yalnız ~2 milyon km2'den büyükse (Rusya: ortası
+     Sibirya) başkentte kalır. Deniz adlarının birkaç açık su noktası var, planlayıcı en boşunu seçer.
+     Ad boyu kameranın yakınlığına bağlı (zoom^0,25, 0,85-1,25 kat): geniş açılışta küçük bir ülkenin
+     yanında iri, yakın çekimde ülkenin üstünde ufak kalmıyor.
    - **Telif** (sahip: "müziklerin bazıları YouTube'da anlaşmalı, telif konusu"): ses sentezlenmez, yalnız
      kaydı ve lisansı belgeli CC0 dosyalar kullanılır; tanınmış şarkı ya da platform kütüphanesi müziği
      yok. CC0 bir kaydı başkası Content ID'ye kaydetmiş olabilir; böyle bir itiraz gelirse önce depo
