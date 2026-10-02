@@ -5,5 +5,10 @@
  "whooshPre": 1.0,
  "tick": "assets/sound/tick-683048.mp3",
  "pop": "assets/sound/pop-653369.mp3",
- "gain": { "bed": -20, "whoosh": -16, "tick": -20, "pop": -16 }
+ "gain": {
+  "bed": -11,
+  "whoosh": -24,
+  "tick": -26,
+  "pop": -22
+ }
 }

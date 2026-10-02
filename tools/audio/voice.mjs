@@ -85,7 +85,7 @@ export function voice(dir, video, out, { kit, scene, wav } = {}) {
   if (kit?.bed) {
     const b = bedChain(n, kit.bed, D, kit.gain?.bed ?? -20);
     inputs.push(...b.inputs); n += b.used;
-    parts.push(voiced ? `${b.chain}[bed];[bed][key1]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=350[bd]` : `${b.chain}[bd]`);
+    parts.push(voiced ? `${b.chain}[bed];[bed][key1]sidechaincompress=threshold=0.05:ratio=3:attack=40:release=600[bd]` : `${b.chain}[bd]`);
     layers.push('[bd]');
   }
   if (kit && scene) {
