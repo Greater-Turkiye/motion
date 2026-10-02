@@ -239,7 +239,11 @@ export const tidy = (s) => s.replace(/(\d) '(\p{L})/gu, "$1'$2").replace(/(\p{L}
 /** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
  *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
  *  to "BRAİLA", not "BRĂİLA"). Turkish letters and circumflexes stay. */
-const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', Tbilisi: 'Tiflis' };
+const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', Tbilisi: 'Tiflis',
+  // the Turkish press's names for Ukrainian cities (AA, TRT): "KHARKİV" in the kicker over "Harkov'a" in the
+  // headline read as two places
+  Kharkiv: 'Harkov', Chernihiv: 'Çernihiv', Zhytomyr: 'Jitomir', Chernivtsi: 'Çernivtsi', Mykolaiv: 'Mikolayiv',
+  Zaporizhzhia: 'Zaporijya', Kherson: 'Herson', Lviv: 'Lviv', Luhansk: 'Luhansk' };
 const TURKISH = new Set('çşğöüıİÇŞĞÖÜâîûÂÎÛ');
 const FOLD = { 'ș': 'ş', 'Ș': 'Ş', 'ţ': 't', 'ț': 't', 'Ț': 'T', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'ß': 'ss' };
 export const trPlace = (s) => s.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w).replace(/./gu, (c) => (TURKISH.has(c) ? c : FOLD[c] ?? c.normalize('NFD').replace(/\p{M}/gu, '')));
