@@ -571,7 +571,11 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   // the map stays readable behind the card (Türkiye in it), the text block on a deeper band
   ctx.fillStyle = hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.35);
   ctx.fillRect(0, POST_WINDOW.y, W, POST_WINDOW.h);
-  const said = sc.hook.sub || sc.hook.lines.join(' ').toLocaleLowerCase('tr').replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+  // a hook in capitals, lowered for the sentence, takes its casing back from the headline it came from
+  // ("Khmara, ADF komuta …", not "adf"); a hook the headline does not hold word for word is capitalised
+  const lowered = sc.hook.lines.join(' ').toLocaleLowerCase('tr');
+  const fromTitle = (() => { const src = sc.source_text[0] ?? '', i = src.toLocaleLowerCase('tr').indexOf(lowered); return i >= 0 ? src.slice(i, i + lowered.length) : null; })();
+  const said = sc.hook.sub || fromTitle || lowered.replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
