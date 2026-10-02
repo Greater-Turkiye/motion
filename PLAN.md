@@ -525,3 +525,5 @@ CLAUDE.md bölüm 4'te. Motorda aynı ailenin izleri vardı; hepsi söküldü:
 Kalanlar ve gerekçesi: katılımcı bayrakları (kim katıldı bilgisi; dekor değil), DOĞRULANMADI
 çerçevesi (durum kuralı gereği her karede), kancanın iki satırı (olgu; ikinci satır vurgu rengi).
 Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` ile kapanır.
+- **Gönderide çağrı**: kapakta "KAYDIR →", her karede "3/7" sayacı ve kapanışta "KAYDET · TAKİP ET"
+  kaldırıldı (bölüm 17'deki karar bu bölümle değişti); Instagram kendi kare noktalarını gösterir.

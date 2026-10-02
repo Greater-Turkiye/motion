@@ -5,8 +5,8 @@
 //
 // Each slide is the frame where its block has settled (the hook 2.2 s in, every other block 2 s after
 // it starts, never past the next one), drawn with ?post=1 (no progress bar or voice note, a "2/6"
-// counter, a swipe cue on the cover) and cut to the 4:5 window POST_WINDOW in src/templates/video.ts;
-// then a closing card (?post=close): the story in one sentence, who we are, "KAYDET · TAKİP ET".
+// and cut to the 4:5 window POST_WINDOW in src/templates/video.ts;
+// then a closing card (?post=close): the story in one sentence, who we are; no swipe or follow prompt (CLAUDE.md section 4).
 // Writes <scene>-01.jpg, <scene>-02.jpg … and prints their paths.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readdirSync, rmSync } from 'node:fs';

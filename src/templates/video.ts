@@ -368,7 +368,6 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   if (sc.anim?.post === 'close') {
     drawCloseCard(ctx, sc, s);
     drawFooter(ctx, sc, s, 1);
-    drawSlideMarks(ctx, sc, s, sc.duration + 1);
     return;
   }
   // the hook: on screen from frame 0; in a full video it hands over to the first beat and returns in
@@ -380,8 +379,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
-  if (sc.anim?.post) drawSlideMarks(ctx, sc, s, t);
-  else {
+  if (!sc.anim?.post) {
     if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
     if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
   }
@@ -558,26 +556,10 @@ function lineStart(lines: string[], k: number, t0: number, mode: TextMode) {
 export const POST_WINDOW = { y: 250, h: 1350 };
 
 /**
- * A carousel slide's own marks, inside the 4:5 window: which slide of how many (top right), and on
- * the cover a swipe cue (bottom right). A feed post is read by swiping, so the reader is told there
- * is more and how much; nothing here is a claim, and the status and source stay as in the video.
- */
-function drawSlideMarks(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
-  // one slide per block and the closing card; the card is drawn with t past the end
-  const n = sc.beats.length + 2;
-  const k = t > sc.duration ? n : sc.beats.filter((b) => t >= b.at).length + 1;
-  ctx.save();
-  ctx.font = `700 24px ${s.fonts.mono}`; ctx.letterSpacing = '4px'; ctx.textBaseline = 'alphabetic';
-  ctx.textAlign = 'right'; ctx.globalAlpha = 0.9; ctx.fillStyle = s.muted;
-  ctx.fillText(`${k}/${n}`, W - 60, POST_WINDOW.y + 70);
-  if (k === 1) { ctx.fillStyle = s.accent; ctx.fillText('KAYDIR  →', W - 60, POST_WINDOW.y + POST_WINDOW.h - 40); }
-  ctx.restore();
-}
-
-/**
- * The carousel's last slide: what happened in one sentence, then who we are and what to do, over a
- * darkened map. The last swipe is where a reader decides to save or follow; nothing here is a new
- * claim (the sentence is the hook's own sub-line or lines), and the footer keeps status and source.
+ * The carousel's last slide: what happened in one sentence, then who we are, over a darkened map.
+ * Nothing here is a new claim (the sentence is the hook's own sub-line or lines), the footer keeps
+ * status and source, and there is no call to action: no "swipe", no "save, follow" (CLAUDE.md
+ * section 4); Instagram shows its own slide dots.
  */
 function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.save();
@@ -588,7 +570,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
-  const height = 30 + lines.length * 70 + 150 + 56 + 90;
+  const height = 30 + lines.length * 70 + 150 + 56;
   const top = FOOT - 80 - height;
   const band = ctx.createLinearGradient(0, top - 120, 0, FOOT + 40);
   band.addColorStop(0, hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0));
@@ -607,8 +589,6 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.fillText('GREATER TÜRKİYE', LEFT, y);
   ctx.fillStyle = s.muted; ctx.font = `500 34px ${s.fonts.text}`;
   ctx.fillText('Açık kaynaklarla bölgeyi izliyoruz.', LEFT, y + 56);
-  ctx.fillStyle = s.accent; ctx.font = `700 28px ${s.fonts.mono}`; ctx.letterSpacing = '6px';
-  ctx.fillText('KAYDET · TAKİP ET', LEFT, y + 146);
   ctx.restore();
 }
 
