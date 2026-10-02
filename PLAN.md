@@ -537,3 +537,7 @@ Kalanlar ve gerekçesi: katılımcı bayrakları (kim katıldı bilgisi; dekor d
 Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` ile kapanır.
 - **Gönderide çağrı**: kapakta "KAYDIR →", her karede "3/7" sayacı ve kapanışta "KAYDET · TAKİP ET"
   kaldırıldı (bölüm 17'deki karar bu bölümle değişti); Instagram kendi kare noktalarını gösterir.
+- **Sayı kancası**: "1470 / ASKER" ve "3 / KİŞİ YARALANDI", büyük satırda tek başına duran bir sayı ve
+  altında birimiydi: sahibin örneğindeki "826 MİLYAR ₺" kalıbı. Artık sayı saydığı şeyle ve fiille
+  aynı başlıkta, kaynağın kendi sözleriyle: "1470 ASKERİNİ / DAHA KAYBETTİ", "3 KİŞİ / YARALANDI".
+  Fiili olmayan sayı (en çok üç kelimede çekimli fiille bitmeyen) kanca olmaz; seçici başka kancaya geçer.
