@@ -182,7 +182,9 @@ const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.c
   'government.ru': 'RUSYA HÜKÜMETİ', 'war.gov': 'ABD SAVAŞ BAKANLIĞI', 'ec.europa.eu': 'AVRUPA KOMİSYONU',
   'resmigazete.gov.tr': 'RESMÎ GAZETE', 'hnhs.gr': 'YUNAN HİDROGRAFİ DAİRESİ', 'balkaninsight.com': 'BALKAN INSIGHT',
   'aljazeera.com': 'AL JAZEERA', 'themoscowtimes.com': 'MOSCOW TIMES', 'cyprus-mail.com': 'CYPRUS MAIL', 'arabnews.com': 'ARAB NEWS',
-  'caspianpost.com': 'CASPIAN POST', 'sofiaglobe.com': 'SOFIA GLOBE', 'bucurestifm.ro': 'BUCUREȘTI FM' };
+  'caspianpost.com': 'CASPIAN POST', 'sofiaglobe.com': 'SOFIA GLOBE', 'bucurestifm.ro': 'BUCUREȘTI FM',
+  'mfa.gov.tr': 'DIŞİŞLERİ BAKANLIĞI', 'gov.cy': 'GKRY HÜKÜMETİ', 'mod.gov.eg': 'MISIR SAVUNMA BAKANLIĞI',
+  'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
