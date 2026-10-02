@@ -220,7 +220,9 @@ export function hookLines(title) {
   // case ending after an apostrophe is dropped on screen ("İHA'sının" reads "İHA")
   // a number joined to a name is a model, not a count: "Geran-5 jet dronunu" is one drone, not five
   // ("Su-35", "F-16", "Geran -5" as a translation spaces it), nor is a number inside a word ("P1")
-  const num = title.match(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/u);
+  // and a day before a month is a date, not a count: "1 Ekim'de 97 Rus İHA" counts the 97
+  const MONTH = /^(ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık|january|february|march|april|may|june|july|august|september|october|november|december)/iu;
+  const num = [...title.matchAll(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/gu)].find((m) => !MONTH.test(m[2]));
   // a number whose next word is a verb counts nothing ("zayiat geçen güne göre 1.900 arttı"), so it
   // is no hook; a modifier keeps its noun ("46.230 askeri personel" is not "46.230 / ASKERİ")
   if (num && !endsOnVerb(num[2])) {
