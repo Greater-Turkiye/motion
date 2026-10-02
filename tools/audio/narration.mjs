@@ -202,8 +202,11 @@ function hookParts(sc) {
   // a GELİŞME label is no headline aloud, so then only the place
   if (sc.template !== 'digest' && factsOnlyRepeatHook(sc)) return [h.lines[1] === 'GELİŞME' ? `${T(h.lines[0])}.` : hookSentence(h.lines, sc)];
   if (/^\d/.test(h.lines[0] ?? '') && h.sub && norm(h.sub).includes(norm(h.lines[0]))) return [B(h.sub)];
-  // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
-  if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines, sc)}`];
+  // the weekly digest's hook is its own sentence: "Bu hafta Karadeniz'den iki yüz kırk kayıt derlendi."
+  if (sc.template === 'digest') {
+    const m = (h.lines[0] ?? '').match(/^BU HAFTA (.+)$/u);
+    return [m ? `Bu hafta ${name(m[1])} ${lower(T(h.lines.slice(1).join(' ')))}` : hookSentence(h.lines, sc)];
+  }
   // a hook whose label is only GELİŞME (development) says nothing aloud: the sentence is the news
   // and the place is not said first when the sentence opens with it ("Kiev. Kiev'de …")
   if (h.lines[1] === 'GELİŞME' && h.sub) return norm(h.sub).startsWith(norm(T(h.lines[0])).slice(0, 4)) ? [B(h.sub)] : [`${T(h.lines[0])}. ${B(h.sub)}`];

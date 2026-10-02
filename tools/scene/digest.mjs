@@ -65,11 +65,14 @@ export function digest(datasets, regionKey, end = new Date()) {
   const day = (d) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
   const span = from.getUTCMonth() === to.getUTCMonth() ? `${from.getUTCDate()}–${day(to)}` : `${day(from)} – ${day(to)}`;
 
-  const hookLines = [TR(region.name), `${n} KAYIT`];
+  // a sentence with its verb, not "KARADENİZ / 242 KAYIT": a count under a name at poster size is the
+  // look CLAUDE.md section 4 forbids. "Karadeniz'den", the watch region the records are filed under,
+  // not "Karadeniz'de": a Kiev strike filed there did not happen at sea
+  const hookLines = [`BU HAFTA ${TR(region.from)}`, `${n} KAYIT DERLENDİ`];
   const statusWord = unverified === n ? STATUS.unverified : `${n} KAYITTAN ${unverified}'İ DOĞRULANMADI`;
   // what the hook and the status say is our own count of our own records: it is put in source_text
   // as such, the way the single-story generator lists the record's own fields
-  const ours = `Greater Türkiye kayıtları: ${TR(region.name)} ${n} KAYIT ${points.length} ${unverified} ${outlets}`;
+  const ours = `Greater Türkiye kayıtları: ${TR(region.name)} BU HAFTA ${TR(region.from)} ${n} KAYIT DERLENDİ ${points.length} ${unverified} ${outlets}`;
 
   const beats = [];
   let t = secs(hookLines.join(' ').length + 20, 2.8, 0.5);
@@ -117,7 +120,7 @@ export function digest(datasets, regionKey, end = new Date()) {
     source_text: [...picks.map(({ r }) => r.title.tr), ...picks.map(({ r }) => r.title.en ?? ''), ours].filter(Boolean),
     camera: { from: { center: ordered[0].center, zoom: ordered[0].zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
     labels: [{ text: 'TÜRKİYE', at: [35, 39.2], kind: 'home' }, ...(region.sea ? [{ ...region.sea, kind: 'sea' }] : [])],
-    hook: { kicker: `BU HAFTA · ${span}`, lines: hookLines, sub: '', status: statusWord, source: `KAYNAK: ${outlets} YAYIN ORGANI` },
+    hook: { kicker: span, lines: hookLines, sub: '', status: statusWord, source: `KAYNAK: ${outlets} YAYIN ORGANI` },
     beats,
     sources: picks.flatMap(({ r }) => (r.sources ?? []).map((x) => x.url)).slice(0, 6),
   };
