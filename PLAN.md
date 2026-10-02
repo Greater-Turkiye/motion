@@ -439,6 +439,8 @@ tipinin (gemi saldırısı) aynı videosunun varyantı; veri setinde çok olay t
      Sibirya) başkentte kalır. Deniz adlarının birkaç açık su noktası var, planlayıcı en boşunu seçer.
      Ad boyu kameranın yakınlığına bağlı (zoom^0,25, 0,85-1,25 kat): geniş açılışta küçük bir ülkenin
      yanında iri, yakın çekimde ülkenin üstünde ufak kalmıyor.
+     Adların çevresinde kâğıt renginde ince bir hale var: küçük bir ülkenin adı komşunun dolgusuna ya da
+     sınıra taşsa da okunuyor (BULGARİSTAN, Türkiye'nin kenarında). TÜRKİYE'de hale yok, kendi dolgusunda.
    - **Telif** (sahip: "müziklerin bazıları YouTube'da anlaşmalı, telif konusu"): ses sentezlenmez, yalnız
      kaydı ve lisansı belgeli CC0 dosyalar kullanılır; tanınmış şarkı ya da platform kütüphanesi müziği
      yok. CC0 bir kaydı başkası Content ID'ye kaydetmiş olabilir; böyle bir itiraz gelirse önce depo
