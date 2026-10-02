@@ -40,6 +40,19 @@ function countryMiddle(iso3) {
   const big = polys.sort((a, b) => geoArea(b) - geoArea(a))[0];
   return geoCentroid(big).map((x) => Math.round(x * 100) / 100);
 }
+/** Where a country's name goes on the map: the middle of its largest landmass (Ukraine's name over
+ *  Ukraine, not over Kiev at its northern edge, where the event ring often is), unless the landmass is
+ *  larger than about two million km2, whose middle a regional view does not show (Russia's lies in
+ *  Siberia): then the capital, as before. */
+export function labelPoint(c) {
+  const middle = countryMiddle(c.iso3);
+  if (!middle) return c.at;
+  SHAPES ??= feature(JSON.parse(readFileSync(path.join(ROOT, 'assets/data/countries-50m.json'), 'utf8')), 'countries').features;
+  const f = SHAPES.find((x) => String(x.id) === String(c.num));
+  const polys = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates })) : [f.geometry];
+  const big = Math.max(...polys.map((g) => geoArea(g)));
+  return big < 0.05 ? middle : c.at; // 0.05 sr is about 2 million km2
+}
 const nearestTr = (p) => TR_PLACES.map(([n, at]) => ({ name: n, at, km: Math.round((geoDistance(p, at) * 6371) / 10) * 10 })).sort((a, b) => a.km - b.km)[0];
 const TR = (s) => s.toLocaleUpperCase('tr');
 
@@ -577,7 +590,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a located event names its place on the map, so an inland view is never an empty page
   if (pt && placeTitle) labels.push({ text: placeTitle, at: [pt[0], pt[1] - 0.9], kind: 'country' });
   const partyList = parties.filter((c) => c.iso3 !== 'TUR');
-  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: c.at, kind: 'country' });
+  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: labelPoint(c), kind: 'country' });
   const lead = partyList[0];
   const single = !deal && family !== 'exercise';
 
