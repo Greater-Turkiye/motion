@@ -328,7 +328,9 @@ function wrapLines(text, max = 28, n = 4) {
     if (line) out.push(line);
     return out;
   };
-  const clean = (ls) => ls.map((l) => l.replace(/[,;:]$/, ''));
+  // a comma or colon at a line's end stays: the lines are one sentence, and without it "İki kişi öldü /
+  // yaralı sayısı 33'e yükseldi" read, and was said, as one run-on clause
+  const clean = (ls) => ls;
   let t = text;
   for (;;) {
     const ls = wrap(t);
