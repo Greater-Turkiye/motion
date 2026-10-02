@@ -174,7 +174,9 @@ function blockParts(sc, b) {
     case 'close':
       return [`${kickerSaid(b.kicker)} ${B(b.lines.join(' '))}`];
     case 'link':
-      return [`${name(labelOf(0))} ve ${name(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
+      // the two names were the hook a moment ago ("Rusya, Tacikistan."): the block says only what joins them
+      const pairSaid = sc.hook.lines[0] === labelOf(0) && sc.hook.lines[1] === labelOf(1);
+      return [pairSaid ? T(b.title) : `${name(labelOf(0))} ve ${name(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
     case 'roster': {
       const names = (sc.parties ?? []).slice(0, 4).map((p) => name(p.label));
       // the exercise's name was the hook a few seconds ago: the roster goes straight to who took part
