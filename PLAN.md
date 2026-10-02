@@ -556,3 +556,14 @@ Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` il
   Ülke ve taraf adları da ad gibi okunur ("Katılanlar: Yunanistan, Mısır", "Bulgaristan, Romanya";
   önceden "yunanistan", "romanya"); tatbikatın adı kancada söylendiyse katılımcı bölümü doğrudan
   "Katılanlar: …" ile başlar ("Medusa iki bin yirmi altı" iki kez söylenmez).
+
+## 21. Saat / The clock (2026-10-02)
+
+GitHub'ın zamanlayıcısı saat değil: `produce` saatte üç kez uyanacak şekilde kuruluydu, ama 1-2 Ekim'de
+yaklaşık dört saatte bir çalıştı (17:27, 21:58, 01:39, 07:33 UTC); 12:00'de sırası gelen video elle
+başlatıldı. Diğer depoların zamanlayıcıları da aynı şekilde kaydı. Karar: saat `timer.yml`. Her üretimin
+sonunda bir timer çalışması başlar, son videodan 5 sa 30 dk sonrasına kadar uyur (en çok 5 sa 45 dk;
+işin 6 saat sınırı; daha uzaksa yeni bir çalışmaya devreder), sonra `produce`'u başlatır. Aynı anda tek
+timer yaşar. Gizli anahtar yok: çalışmanın kendi jetonu workflow_dispatch başlatabilir. Bir runner
+saatlerce uyuyarak meşgul olur; açık depoda bunun maliyeti yok. Zamanlayıcı ikinci hat olarak kalır.
+`MOTION_PRODUCE=off` ikisini de durdurur.
