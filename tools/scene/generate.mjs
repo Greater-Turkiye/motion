@@ -177,7 +177,12 @@ const TURKISH_FORCES = [
 
 const STATUS = { unverified: 'DOĞRULANMADI', 'partially-verified': 'KISMEN DOĞRULANDI', verified: 'DOĞRULANDI', disputed: 'TARTIŞMALI' };
 const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.com': 'REUTERS', 'apnews.com': 'AP', 'bbc.com': 'BBC',
-  'bbc.co.uk': 'BBC', 'timesofisrael.com': 'TIMES OF ISRAEL', 'kyivindependent.com': 'KYIV INDEPENDENT', 'msb.gov.tr': 'MSB' };
+  'bbc.co.uk': 'BBC', 'timesofisrael.com': 'TIMES OF ISRAEL', 'kyivindependent.com': 'KYIV INDEPENDENT', 'msb.gov.tr': 'MSB',
+  // names a reader knows, where the domain is no name ("GOVERNMENT", "WAR", "BALKANINSIGHT")
+  'government.ru': 'RUSYA HÜKÜMETİ', 'war.gov': 'ABD SAVAŞ BAKANLIĞI', 'ec.europa.eu': 'AVRUPA KOMİSYONU',
+  'resmigazete.gov.tr': 'RESMÎ GAZETE', 'hnhs.gr': 'YUNAN HİDROGRAFİ DAİRESİ', 'balkaninsight.com': 'BALKAN INSIGHT',
+  'aljazeera.com': 'AL JAZEERA', 'themoscowtimes.com': 'MOSCOW TIMES', 'cyprus-mail.com': 'CYPRUS MAIL', 'arabnews.com': 'ARAB NEWS',
+  'caspianpost.com': 'CASPIAN POST', 'sofiaglobe.com': 'SOFIA GLOBE', 'bucurestifm.ro': 'BUCUREȘTI FM' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
@@ -509,7 +514,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
-    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : name[0] + name.slice(1).toLowerCase()}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
+    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : name[0] + name.slice(1).toLocaleLowerCase('tr')}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
 
   // ---- the hook, from the record's own fields first ------------------------------------------------
   const found = hookLines(news);
