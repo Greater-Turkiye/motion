@@ -16,7 +16,8 @@ export interface Label { key: string; text: string; x: number; y: number; size: 
   alts?: ([number, number] | null)[] }
 
 /** Candidate spots, in units of the label's own height (dy) and width (dx). */
-const SPOTS: [number, number][] = [[0, 0], [0, -1.4], [0, 1.4], [0.35, 0], [-0.35, 0], [0, -2.6], [0, 2.6]];
+// the farthest two clear the event ring's keep-out (190 px) when a capital and the event coincide
+const SPOTS: [number, number][] = [[0, 0], [0, -1.4], [0, 1.4], [0.35, 0], [-0.35, 0], [0, -2.6], [0, 2.6], [0, -3.4], [0, 3.4]];
 
 /** How many places a label can take: its ground anchors, or the offsets around its only anchor. */
 const choices = (l: Label) => (l.alts && l.alts.length > 1 ? l.alts.length : SPOTS.length);
@@ -78,11 +79,13 @@ export function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], obst
     const area = box.w * box.h;
     const cover = (bs: Box[]) => bs.reduce((a, o) => Math.max(a, overlap(box, o) / area), 0);
     const byText = cover(obstacles);
-    const covered = Math.max(byText, cover(placed.filter((p) => (p.label.alpha ?? 1) > 0.3).map((p) => p.box)));
     // a steep fade: half-covered labels that linger read as ghosts. A sticky label (TÜRKİYE) gives way
     // to no other label, but it does give way to the text block and the emblem: the country's own
     // fill still says where Türkiye is, and "KİEV · 30 EYLÜLTÜRKİYE" reads as one broken line
-    const vis = (l.sticky ? 1 - smooth(0.02, 0.08, byText) : 1 - smooth(0.02, 0.12, covered)) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
+    // another name touching this one at all makes it give way entirely: two names stacked a few
+    // pixels apart (UKRAYNA over KARADENİZ) read as one garbled word
+    const byLabel = cover(placed.filter((p) => (p.label.alpha ?? 1) > 0.3).map((p) => p.box));
+    const vis = (l.sticky ? 1 - smooth(0.02, 0.08, byText) : (1 - smooth(0.02, 0.12, byText)) * (1 - smooth(0.0, 0.03, byLabel))) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
     const alpha = (l.alpha ?? 1) * vis;
     if (alpha <= 0.01) continue;
     placed.push({ label: { ...l, alpha, x: box.x + 6 + (box.w - 12) / 2, y: box.y + 4 + (box.h - 8) / 2 }, box });

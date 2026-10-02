@@ -103,6 +103,7 @@ function cameraAt(sc: Scene, s: Style, t: number): Camera {
 }
 
 /** When the subject's emblem leaves: after the opening, before the camera zooms in far enough to crop it. */
+const EMBLEM = 140;
 const emblemOutOf = (sc: Scene) => (sc.beats.length ? sc.beats[0].at + 0.8 : sc.duration);
 
 /**
@@ -127,7 +128,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
 
   if (sc.event) {
     const p = proj(sc.event.at);
-    if (p) obstacles.push({ x: p[0] - 60, y: p[1] - 60, w: 120, h: 120 });
+    // as wide as the ring with its shock waves (they reach ~140 px): names stood on the outer rings
+    if (p) obstacles.push({ x: p[0] - 95, y: p[1] - 95, w: 190, h: 190 });
   }
   // a digest story's own place: ringed (see drawVideo) and named under the ring while its block is on
   if (beat?.kind === 'facts' && beat.place) {
@@ -162,8 +164,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const alpha = anim(t, 0.45, 0.4) * (1 - span(t, emblemOut - 0.4, emblemOut));
     if (at && alpha > 0) {
       // the emblem stands above its country's label, which never moves
-      const size = 200 * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outBack));
-      const y = at[1] - (200 * emblemAr) / 2 - 30;
+      // 140 px: at 200 the emblem dwarfed the country it stands for (a trident over a Ukraine half its size)
+      const size = EMBLEM * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outBack));
+      const y = at[1] - (EMBLEM * emblemAr) / 2 - 30;
       emblem = { x: at[0], y, size, alpha };
       obstacles.push({ x: at[0] - size / 2, y: y - (size * emblemAr) / 2, w: size, h: size * emblemAr });
     }
@@ -183,7 +186,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const twin = beat?.kind === 'distance' && (l.text === beat.from.label || l.text === beat.to.label)
       ? 1 - anim(t, beat.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
     labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? 32 : isSubject ? 26 : 24, sticky: home,
-      color: home ? homeInk : s.label, spacing: isSubject ? 0.45 : 0.4, weight: home ? 700 : 500,
+      // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
+      color: home ? homeInk : s.label, spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
       // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
       // be the one that yields, or the two are drawn on top of each other (BRĂİLA: ROMANYA over TÜRKİYE)
       priority: home ? -0.5 : isSubject ? 0 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
