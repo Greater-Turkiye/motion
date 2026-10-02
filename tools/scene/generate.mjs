@@ -476,7 +476,12 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = (pt || whole) && wholeName ? wholeName : area?.name ?? region?.name ?? placeName ?? '';
+  // the rest of the feed's placeless war items (Russia's losses, sanctions on Russia, its drones) are
+  // filed under the Black Sea too, but nothing in them happened at sea: the kicker gives the date
+  // alone, and a region hook names the country the headline names instead of "KARADENİZ"
+  const warParty = !pt && !area && !whole && regionKey === 'black-sea'
+    ? partiesOf(titleEn).find((c) => c.iso3 === 'RUS' || c.iso3 === 'UKR') : null;
+  const where = (pt || whole) && wholeName ? wholeName : warParty ? '' : area?.name ?? region?.name ?? placeName ?? '';
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
@@ -528,7 +533,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a meeting or a statement with one named country: that country speaks (the quote card)
   // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
   const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;
-  const regionWord = TR(region?.name ?? placeTitle);
+  const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
   else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
@@ -616,7 +621,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     statusBeat();
     regionClose();
   } else {
-    push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
+    // a war item filed under the Black Sea has no place to show: "NEREDE / KARADENİZ" would say it
+    if (!warParty) push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
     if (pt) distanceBeat(placeTitle);
     if (around && around.n >= 3) {
