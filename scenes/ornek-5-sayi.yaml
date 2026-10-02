@@ -1,0 +1,104 @@
+# Generated from evt_01m3s2nfxyesy8j77mkq3wbx2h by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-5-sayi
+record: evt_01m3s2nfxyesy8j77mkq3wbx2h
+template: count
+format: vertical
+fps: 60
+duration: 19.3
+style: B
+source_text:
+  - Rus kuvvetleri Ukrayna'ya karşı savaşta 1470 askerini daha kaybetti
+  - Russian forces lose another 1,470 troops in war against Ukraine
+  - KONUŞLANMA · UKRAYNA · KARADENİZ · RUSYA · UKRAYNA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME
+camera:
+  from:
+    center: &a1
+      - 29.2
+      - 45.6
+    zoom: 0.9
+  to: &a2
+    t: 6.7
+    center:
+      - 31.6
+      - 51.6
+    zoom: 1
+  seconds: 6.7
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 10.4
+      center:
+        - 30.3
+        - 50.2
+      zoom: 2.3
+    - t: 14.1
+      center:
+        - 30.8
+        - 49.8
+      zoom: 2.2
+    - t: 19.3
+      center: *a1
+      zoom: 0.9
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+  - country: UKR
+    label: UKRAYNA
+    at:
+      - 30.52
+      - 50.45
+    emblem: UKR/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    alts:
+      - - 34.5
+        - 43.4
+      - - 37.2
+        - 42.6
+      - - 32.6
+        - 42.4
+    kind: sea
+hook:
+  kicker: UKRAYNA · 30 EYLÜL
+  lines:
+    - 1470 ASKERİNİ
+    - DAHA KAYBETTİ
+  sub: Rus kuvvetleri Ukrayna'ya karşı savaşta 1470 askerini daha kaybetti
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: place
+    title: UKRAYNA
+    text: "Kesin konum yok: halka ülkeyi gösterir."
+    at: 6.7
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 10.4
+  - kind: close
+    kicker: KAYITLARIMIZDA · EYLÜL
+    lines:
+      - "Karadeniz'den *305* kayıt:"
+      - en yoğun bölge.
+    at: 14.1
