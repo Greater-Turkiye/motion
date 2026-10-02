@@ -161,6 +161,10 @@ function blockParts(sc, b) {
       if (sub && norm(body).startsWith(sub) && !factsOnlyRepeatHook(sc)) {
         const words = sub.split(' ').length;
         body = body.split(/\s+/).slice(words).join(' ').replace(/^[,;:.\s]+/, '');
+        // and what the hook's big lines said is not said again either: "Ayrıca iki kişi öldü, …" after
+        // the hook "İki kişi öldü."
+        const head = norm(speakable(sc.hook.lines.join(' '), true));
+        if (head && norm(body).startsWith(head)) body = body.split(/\s+/).slice(head.split(' ').length).join(' ').replace(/^[,;:.\s]+/, '');
         return body ? [`Ayrıca ${B(body)}`] : [];
       }
       if (sub && norm(body) === sub) return [];
