@@ -40,15 +40,28 @@ function countryMiddle(iso3) {
   const big = polys.sort((a, b) => geoArea(b) - geoArea(a))[0];
   return geoCentroid(big).map((x) => Math.round(x * 100) / 100);
 }
+/** Where a country's name goes on the map: the middle of its largest landmass (Ukraine's name over
+ *  Ukraine, not over Kiev at its northern edge, where the event ring often is), unless the landmass is
+ *  larger than about two million km2, whose middle a regional view does not show (Russia's lies in
+ *  Siberia): then the capital, as before. */
+export function labelPoint(c) {
+  const middle = countryMiddle(c.iso3);
+  if (!middle) return c.at;
+  SHAPES ??= feature(JSON.parse(readFileSync(path.join(ROOT, 'assets/data/countries-50m.json'), 'utf8')), 'countries').features;
+  const f = SHAPES.find((x) => String(x.id) === String(c.num));
+  const polys = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates })) : [f.geometry];
+  const big = Math.max(...polys.map((g) => geoArea(g)));
+  return big < 0.05 ? middle : c.at; // 0.05 sr is about 2 million km2
+}
 const nearestTr = (p) => TR_PLACES.map(([n, at]) => ({ name: n, at, km: Math.round((geoDistance(p, at) * 6371) / 10) * 10 })).sort((a, b) => a.km - b.km)[0];
 const TR = (s) => s.toLocaleUpperCase('tr');
 
 /** Watch regions (datasets vocab/regions.yaml): where the ring goes when the record has no place,
  *  the name in the kicker, its ablative for the context line, and the sea label if it is a sea. */
 const REGIONS = {
-  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4] } },
-  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8] } },
-  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8] } },
+  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4], alts: [[34.5, 43.4], [37.2, 42.6], [32.6, 42.4]] } },
+  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8], alts: [[32.6, 33.4], [26.8, 34.6], [24.5, 34.1]] } },
+  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8], alts: [[25.1, 37.6], [24.6, 39.6], [25.8, 36.9]] } },
   cyprus: { at: [33.2, 35.1], name: 'Kıbrıs', from: "Kıbrıs'tan" },
   syria: { at: [38.5, 35.2], name: 'Suriye', from: "Suriye'den" },
   iraq: { at: [44, 33.5], name: 'Irak', from: "Irak'tan" },
@@ -654,7 +667,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a located event names its place on the map, so an inland view is never an empty page
   if (pt && placeTitle) labels.push({ text: placeTitle, at: [pt[0], pt[1] - 0.9], kind: 'country' });
   const partyList = parties.filter((c) => c.iso3 !== 'TUR');
-  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: c.at, kind: 'country' });
+  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: labelPoint(c), kind: 'country' });
   const lead = partyList[0];
   const single = !deal && family !== 'exercise';
 
