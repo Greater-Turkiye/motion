@@ -443,14 +443,20 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a record placed at country level ("ülke genelinde") is drawn on that country, not on the middle
   // of the watch region it is filed under (Burebista 26 sat on the Balkans' centre, in Serbia)
   const area = pt ? null : namedArea(loc?.place_name?.en);
-  const whole = !pt && !area && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null;
+  // a record with no place at all whose headline names Ukraine is about the war there, not about the
+  // sea its feed files it under: "Russian forces lose another 1,470 troops in war against Ukraine" read
+  // "KARADENİZ" with a ring in the open sea. The ring goes on Ukraine, said to show the country
+  const theatre = !pt && !area && !loc?.place_name && loc?.precision !== 'country' && regionKey === 'black-sea'
+    && partiesOf(titleEn).some((c) => c.iso3 === 'UKR') ? countryMiddle('UKR') : null;
+  const whole = (!pt && !area && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null) ?? theatre;
+  const wholeName = theatre ? 'Ukrayna' : placeName;
   const at = pt ?? area?.at ?? whole ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
   const precision = pt ? (loc.precision === 'exact' ? 'exact' : 'locality') : 'region';
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = (pt || whole) && placeName ? placeName : area?.name ?? region?.name ?? placeName ?? '';
+  const where = (pt || whole) && wholeName ? wholeName : area?.name ?? region?.name ?? placeName ?? '';
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
@@ -479,8 +485,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const exName = family === 'exercise' ? exerciseName(texts) : null;
 
   // a place name without coordinates is not a place on the map: then the ring and the title are the region's
-  const placeTitle = TR((pt || whole ? placeName : null) ?? area?.name ?? region?.name ?? '');
-  const placeText = whole ? 'Kesin konum yok: ülke genelinde.' : area ? 'Kesin konum yok: halka kaynağın andığı alanı gösterir.' : precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
+  const placeTitle = TR((pt || whole ? wholeName : null) ?? area?.name ?? region?.name ?? '');
+  const placeText = theatre ? 'Kesin konum yok: halka ülkeyi gösterir.' : whole ? 'Kesin konum yok: ülke genelinde.' : area ? 'Kesin konum yok: halka kaynağın andığı alanı gösterir.' : precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
   // counts take the accent colour; a model's number ("Geran -5", "Su-35", "P1") is part of a name,
@@ -510,7 +516,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
     // no casualty, no number, no place: where it happened and what it was, never a stray word pair
-    hook = { kind: 'region', lines: [pt || area ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
+    hook = { kind: 'region', lines: [pt || area || whole ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
   }
   // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
   // noktalarını ve depolarını vurdu") gives a first piece that says nothing on its own

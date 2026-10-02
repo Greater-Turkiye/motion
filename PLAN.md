@@ -541,3 +541,7 @@ Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` il
   altında birimiydi: sahibin örneğindeki "826 MİLYAR ₺" kalıbı. Artık sayı saydığı şeyle ve fiille
   aynı başlıkta, kaynağın kendi sözleriyle: "1470 ASKERİNİ / DAHA KAYBETTİ", "3 KİŞİ / YARALANDI".
   Fiili olmayan sayı (en çok üç kelimede çekimli fiille bitmeyen) kanca olmaz; seçici başka kancaya geçer.
+- **Yeri olmayan savaş kaydı**: Ukrinform akışının konumsuz kayıtları Karadeniz bölgesine dosyalanıyor;
+  "Rus kuvvetleri 1470 askerini daha kaybetti" künyede ve kancada "KARADENİZ" diyordu. İngilizce
+  başlık Ukrayna'yı anıyorsa yer Ukrayna'dır ("Kesin konum yok: halka ülkeyi gösterir."); mesafe
+  bölümü olmaz (bir ülkenin ortasından ölçülen mesafe kaydın söylediği bir şey değil).
