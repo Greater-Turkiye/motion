@@ -332,13 +332,33 @@ function pairStats(datasets, record, a, b) {
   return { n };
 }
 
-/** The name an exercise goes by, when its headline gives one in quotes ('Cyprus Arrow'). */
-function exerciseName(texts) {
+/** The name an exercise goes by: in quotes ('Cyprus Arrow'), or in capitals next to the word itself
+ *  ("MEDUSA 2026 tatbikatına", "exercise MEDUSA 2026"). English title case ("Exercise Begins") is not
+ *  a name, so the English pattern takes capitals only. */
+export function exerciseName(texts) {
   for (const t of texts) {
     const m = t.match(/['‘’"“”]([\p{L}\d][\p{L}\d\s\-/.]{2,28}[\p{L}\d])['‘’"“”]/u);
     if (m) return m[1];
   }
+  const word = '\\p{Lu}[\\p{Lu}\\d-]+';
+  const name = `\\p{Lu}{2}[\\p{Lu}\\d-]*(?:\\s(?:${word}|\\d{2,4})){0,2}`;
+  for (const t of texts) {
+    const m = t.match(new RegExp(`(?<![\\p{L}\\d])(${name})\\s+tatbikat`, 'u')) ?? t.match(new RegExp(`\\b[Ee]xercises?\\s+(${name})(?![\\p{L}\\d])`, 'u'));
+    if (m && m[1].length <= 24) return m[1];
+  }
   return null;
+}
+
+/** "Ege" -> "EGE'DE", "Irak" -> "IRAK'TA", "Balkanlar" -> "BALKANLAR'DA": where something happens,
+ *  for a hook that reads as a sentence and not as two words side by side ("EGE TATBİKAT"). A name
+ *  that ends in a possessive ("DNİPRO BÖLGESİ") takes -NDE without an apostrophe. */
+export function locative(name) {
+  const up = TR(name);
+  const v = [...up].reverse().find((ch) => 'AEIİOÖUÜ'.includes(ch)) ?? 'E';
+  const back = 'AIOU'.includes(v);
+  const last = up.split(' ').at(-1);
+  if (up.includes(' ') && /(S[IİUÜ]|L[AE]R[Iİ])$/u.test(last)) return `${up}N${back ? 'DA' : 'DE'}`;
+  return `${up}'${/[FSTHŞÇKP]$/u.test(up) ? 'T' : 'D'}${back ? 'A' : 'E'}`;
 }
 
 /** Records of the same region in the same month, and that region's rank among all regions. */
@@ -461,7 +481,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const regionWord = TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
-  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [TR(region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
+  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
