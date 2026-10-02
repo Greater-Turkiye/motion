@@ -148,7 +148,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   if (beat?.kind === 'distance') {
     const w = windowOf(sc, beatIdx, t);
     const draw = anim(t, beat.at + 0.2, 1.4, ease.inOutCubic);
-    ([['d-from', beat.from, 1], ['d-to', beat.to, draw >= 1 ? anim(t, beat.at + 1.6, 0.3, ease.outBack) : 0]] as const).forEach(([key, end, show]) => {
+    ([['d-from', beat.from, 1], ['d-to', beat.to, draw >= 1 ? anim(t, beat.at + 1.6, 0.3, ease.outCubic) : 0]] as const).forEach(([key, end, show]) => {
       const q = proj(end.at);
       if (!q || !show) return;
       obstacles.push({ x: q[0] - 24, y: q[1] - 24, w: 48, h: 48 });
@@ -165,7 +165,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     if (at && alpha > 0) {
       // the emblem stands above its country's label, which never moves
       // 140 px: at 200 the emblem dwarfed the country it stands for (a trident over a Ukraine half its size)
-      const size = EMBLEM * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outBack));
+      const size = EMBLEM * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outCubic));
       const y = at[1] - (EMBLEM * emblemAr) / 2 - 30;
       emblem = { x: at[0], y, size, alpha };
       obstacles.push({ x: at[0] - size / 2, y: y - (size * emblemAr) / 2, w: size, h: size * emblemAr });
@@ -298,7 +298,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     ctx.strokeStyle = s.accent; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.setLineDash([2, 14]);
     ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
     ctx.setLineDash([]);
-    for (const [end, show] of [[beat.from, 1], [beat.to, draw >= 1 ? anim(t, beat.at + 1.6, 0.3, ease.outBack) : 0]] as const) {
+    for (const [end, show] of [[beat.from, 1], [beat.to, draw >= 1 ? anim(t, beat.at + 1.6, 0.3, ease.outCubic) : 0]] as const) {
       const q = proj(end.at);
       if (!q || !show) continue;
       ctx.beginPath(); ctx.arc(q[0], q[1], 11 * show, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
@@ -339,7 +339,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     pts.forEach((p, k) => {
       const q = proj(p.at);
       if (!q) return;
-      const on = anim(t, beat.at + 0.3 + (1.8 * k) / Math.max(1, pts.length), 0.35, ease.outBack);
+      const on = anim(t, beat.at + 0.3 + (1.8 * k) / Math.max(1, pts.length), 0.35, ease.outCubic);
       if (on <= 0) return;
       const fresh = 1 - Math.min(1, p.days / 7); // the newer, the brighter
       ctx.globalAlpha = w.out * Math.min(1, on) * (0.35 + 0.65 * fresh);
@@ -373,7 +373,6 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   if (sc.anim?.post === 'close') {
     drawCloseCard(ctx, sc, s);
     drawFooter(ctx, sc, s, 1);
-    drawSlideMarks(ctx, sc, s, sc.duration + 1);
     return;
   }
   // the hook: on screen from frame 0; in a full video it hands over to the first beat and returns in
@@ -385,8 +384,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
-  if (sc.anim?.post) drawSlideMarks(ctx, sc, s, t);
-  else {
+  if (!sc.anim?.post) {
     if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
     if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
   }
@@ -436,17 +434,14 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   guard({ x: LEFT - 6, y: kickerY - 26, w: WIDTH, h: BLOCK_BOTTOM - kickerY + 26 }, 'hook');
 
   if (sc.hook.badge) {
-    // the badge: a solid pill in the accent, so it reads as a label of the place and not as part of
-    // the headline; whole on frame 0, which is also the thumbnail, then a small settle
-    const pop = 1 + 0.06 * Math.sin(Math.min(1, t / 0.5) * Math.PI);
+    // the badge: a plain line over the kicker, whole on frame 0 (also the thumbnail); no pill and no
+    // pop, which read as a sticker on a template reel (CLAUDE.md section 4)
     ctx.save();
     ctx.font = `800 22px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
-    const bw = ctx.measureText(sc.hook.badge).width + 28, bh = 38, by = kickerY - 26 - 18 - bh;
-    guard({ x: LEFT - 2, y: by, w: bw, h: bh }, 'badge');
-    ctx.globalAlpha = alpha;
-    ctx.translate(LEFT - 2 + bw / 2, by + bh / 2); ctx.scale(pop, pop); ctx.translate(-(LEFT - 2 + bw / 2), -(by + bh / 2));
-    ctx.fillStyle = s.accent; ctx.beginPath(); ctx.roundRect(LEFT - 2, by, bw, bh, 6); ctx.fill();
-    ctx.fillStyle = s.flat ? '#ffffff' : '#000000'; ctx.textBaseline = 'middle'; ctx.fillText(sc.hook.badge, LEFT + 12, by + bh / 2 + 1);
+    const bw = ctx.measureText(sc.hook.badge).width, bh = 38, by = kickerY - 26 - 18 - bh;
+    guard({ x: LEFT - 2, y: by, w: bw + 4, h: bh }, 'badge');
+    ctx.globalAlpha = alpha; ctx.fillStyle = s.accent; ctx.textBaseline = 'middle';
+    ctx.fillText(sc.hook.badge, LEFT, by + bh / 2 + 1);
     ctx.restore();
   }
 
@@ -535,7 +530,7 @@ function reveal(ctx: CanvasRenderingContext2D, text: string, x: number, y: numbe
       if (!wd) continue;
       const ww = ctx.measureText(wd).width;
       if (/\S/.test(wd)) {
-        const p = anim(t, t0 + 0.07 * k, 0.42, ease.outBack), a = anim(t, t0 + 0.07 * k, 0.12);
+        const p = anim(t, t0 + 0.07 * k, 0.42, ease.outCubic), a = anim(t, t0 + 0.07 * k, 0.12);
         k++;
         if (a > 0) {
           ctx.save(); ctx.globalAlpha = alpha * a;
@@ -566,26 +561,10 @@ function lineStart(lines: string[], k: number, t0: number, mode: TextMode) {
 export const POST_WINDOW = { y: 250, h: 1350 };
 
 /**
- * A carousel slide's own marks, inside the 4:5 window: which slide of how many (top right), and on
- * the cover a swipe cue (bottom right). A feed post is read by swiping, so the reader is told there
- * is more and how much; nothing here is a claim, and the status and source stay as in the video.
- */
-function drawSlideMarks(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: number) {
-  // one slide per block and the closing card; the card is drawn with t past the end
-  const n = sc.beats.length + 2;
-  const k = t > sc.duration ? n : sc.beats.filter((b) => t >= b.at).length + 1;
-  ctx.save();
-  ctx.font = `700 24px ${s.fonts.mono}`; ctx.letterSpacing = '4px'; ctx.textBaseline = 'alphabetic';
-  ctx.textAlign = 'right'; ctx.globalAlpha = 0.9; ctx.fillStyle = s.muted;
-  ctx.fillText(`${k}/${n}`, W - 60, POST_WINDOW.y + 70);
-  if (k === 1) { ctx.fillStyle = s.accent; ctx.fillText('KAYDIR  →', W - 60, POST_WINDOW.y + POST_WINDOW.h - 40); }
-  ctx.restore();
-}
-
-/**
- * The carousel's last slide: what happened in one sentence, then who we are and what to do, over a
- * darkened map. The last swipe is where a reader decides to save or follow; nothing here is a new
- * claim (the sentence is the hook's own sub-line or lines), and the footer keeps status and source.
+ * The carousel's last slide: what happened in one sentence, then who we are, over a darkened map.
+ * Nothing here is a new claim (the sentence is the hook's own sub-line or lines), the footer keeps
+ * status and source, and there is no call to action: no "swipe", no "save, follow" (CLAUDE.md
+ * section 4); Instagram shows its own slide dots.
  */
 function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.save();
@@ -596,7 +575,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
-  const height = 30 + lines.length * 70 + 150 + 56 + 90;
+  const height = 30 + lines.length * 70 + 150 + 56;
   const top = FOOT - 80 - height;
   const band = ctx.createLinearGradient(0, top - 120, 0, FOOT + 40);
   band.addColorStop(0, hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0));
@@ -615,8 +594,6 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.fillText('GREATER TÜRKİYE', LEFT, y);
   ctx.fillStyle = s.muted; ctx.font = `500 34px ${s.fonts.text}`;
   ctx.fillText('Açık kaynaklarla bölgeyi izliyoruz.', LEFT, y + 56);
-  ctx.fillStyle = s.accent; ctx.font = `700 28px ${s.fonts.mono}`; ctx.letterSpacing = '6px';
-  ctx.fillText('KAYDET · TAKİP ET', LEFT, y + 146);
   ctx.restore();
 }
 
@@ -687,24 +664,23 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       break;
     }
     case 'distance': {
+      // the distance in a line with the two places it lies between, at the size of the facts: no
+      // counter running up and no number standing alone at poster size (CLAUDE.md section 4)
       const d = km(b.from.at, b.to.at);
-      const count = anim(t, b.at + 0.2, 1.4, ease.inOutCubic);
-      const num = `~${Math.round((d * count) / 10) * 10} KM`;
-      const px = fit(ctx, [`~${d} KM`], (p) => `900 ${p}px ${s.fonts.display}`, 200, -0.03);
-      ctx.font = `600 40px ${s.fonts.text}`;
-      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
-      const top = BLOCK_BOTTOM - text.length * 50 - 64 - px * 0.9;
-      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'distance');
-      // close is close only when it is: past 700 km the beat says distance, not nearness
-      kicker(d <= 700 ? 'TÜRKİYE\'YE NE KADAR YAKIN' : 'TÜRKİYE\'YE UZAKLIK', top - 16 + rise);
-      // the counter is its own animation in every mode: a number that runs up is the point of this beat
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
-      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.03 * px}px`;
-      ctx.fillText(num, LEFT - 6, top + px * 0.9 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = `700 40px ${s.fonts.text}`;
-      reveal(ctx, `${b.from.label} → ${b.to.label}`, LEFT, top + px * 0.9 + 60 + rise, t, b.at + 0.3, mode, s.ink, s.accent, alpha, 40);
+      const name = (n: string) => n.toLocaleLowerCase('tr').replace(/(^|[\s-])(\p{L})/gu, (_, a: string, c: string) => a + c.toLocaleUpperCase('tr'));
+      const px = 64, lh = Math.round(px * 1.18);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      const main = wrap(ctx, `${name(b.from.label)} → ${name(b.to.label)}: *~${d}\u00a0km*`, WIDTH);
       ctx.font = `600 36px ${s.fonts.text}`;
-      lines(text, LEFT, top + px * 0.9 + 64 + 50 + rise, 50, b.at + 0.9, s.muted, 36);
+      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
+      const top = BLOCK_BOTTOM - 0.8 * lh - (main.length - 1) * lh - (text.length ? 60 + (text.length - 1) * 50 : 0) - 10;
+      guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'distance');
+      // close is close only when it is: past 700 km the beat says distance, not nearness
+      kicker(d <= 700 ? 'TÜRKİYE\'YE NE KADAR YAKIN' : 'TÜRKİYE\'YE UZAKLIK', top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines(main, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      ctx.font = `600 36px ${s.fonts.text}`;
+      lines(text, LEFT, top + lh * 0.8 + (main.length - 1) * lh + 60 + rise, 50, b.at + 0.9, s.muted, 36);
       break;
     }
     case 'status': {
@@ -754,27 +730,24 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const colW = (WIDTH - gap) / 2;
       parties.forEach((p, k) => {
         const x = LEFT + (k % 2) * (colW + gap), y = top + px * 0.95 + 20 + Math.floor(k / 2) * (chipH + gap) + rise;
-        chip(ctx, a, p.emblem, p.label, x, y, colW, chipH, s, alpha * anim(t, b.at + 0.3 + 0.12 * k, 0.4, ease.outBack));
+        chip(ctx, a, p.emblem, p.label, x, y, colW, chipH, s, alpha * anim(t, b.at + 0.3 + 0.12 * k, 0.4, ease.outCubic));
       });
       ctx.font = `600 38px ${s.fonts.text}`;
       lines(text, LEFT, top + px * 0.95 + 20 + rows * (chipH + gap) + 42 + rise, 50, b.at + 0.9, s.muted, 38);
       break;
     }
     case 'recent': {
+      // our records near the place, said as one sentence; the count appears whole and does not run up
+      // (CLAUDE.md section 4): the points lighting on the map show the pattern
       const n = b.points.length;
-      const count = Math.round(n * anim(t, b.at + 0.3, 1.8, ease.linear));
-      const px = fit(ctx, [String(n)], (p) => `900 ${p}px ${s.fonts.display}`, 200, -0.03);
-      ctx.font = `600 38px ${s.fonts.text}`;
-      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
-      const top = BLOCK_BOTTOM - text.length * 50 - 60 - px * 0.9;
-      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'recent');
-      kicker(b.title, top - 16 + rise);
-      // a count of our records, not of casualties: it may run up
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.accent;
-      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.03 * px}px`;
-      ctx.fillText(String(count), LEFT - 6, top + px * 0.9 + rise);
-      ctx.letterSpacing = '0px'; ctx.font = `600 38px ${s.fonts.text}`;
-      lines(text, LEFT, top + px * 0.9 + 58 + rise, 50, b.at + 0.5, s.ink, 38);
+      const px = 64, lh = Math.round(px * 1.18);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      const said = wrap(ctx, b.text ? `${b.text.replace(/[.\s]+$/, '')}: *${n}*\u00a0kayıt.` : `*${n}*\u00a0kayıt.`, WIDTH);
+      const top = BLOCK_BOTTOM - said.length * lh;
+      guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'recent');
+      kicker(b.title, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines(said, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
     }
     case 'quote': {

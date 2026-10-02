@@ -44,14 +44,14 @@ export interface Style {
 
 export const STYLES: Record<StyleId, Style> = {
   // motion: tabloid punch: words hit one by one, the camera cuts to its mark
-  A: { id: 'A', fonts: { display: 'BigShoulders', text: 'M', mono: 'Martian' }, motion: { text: 'pop', camera: 'snap', progress: true }, name: 'Gece kırmızısı', flat: false, bg: ['#1a0f10', '#030303'], sea: '#050608', land: '#1b1719', border: 'rgba(255,255,255,0.11)',
+  A: { id: 'A', fonts: { display: 'BigShoulders', text: 'M', mono: 'Martian' }, motion: { text: 'pop', camera: 'snap', progress: false }, name: 'Gece kırmızısı', flat: false, bg: ['#1a0f10', '#030303'], sea: '#050608', land: '#1b1719', border: 'rgba(255,255,255,0.11)',
     graticule: 'rgba(255,255,255,0.035)', home: '#9e0020', homeStroke: '#ff2b4a', subject: '#3a1219', subjectStroke: 'rgba(255,90,110,0.55)',
-    glow: 'rgba(200,0,42,0.55)', atmosphere: 'rgba(200,40,60,0.35)', accent: '#f4e14a', ink: '#ffffff', muted: '#b7b0a8', status: '#ff8a98',
+    glow: null, atmosphere: null, accent: '#f4e14a', ink: '#ffffff', muted: '#b7b0a8', status: '#ff8a98',
     label: 'rgba(255,255,255,0.8)', emblemMono: true, baseScale: 1400, cy: 640, grain: 0.05, relief: 0.95, limb: 0.35 },
   // motion: an operations screen: text is typed, the camera tracks smoothly
-  B: { id: 'B', fonts: { display: 'Archivo', text: 'Archivo', mono: 'JetBrains' }, motion: { text: 'type', camera: 'glide', progress: true }, name: 'Harekât lacivert', flat: false, bg: ['#06182a', '#020a12'], sea: '#061a2c', land: '#0b2740', border: 'rgba(79,208,255,0.5)',
+  B: { id: 'B', fonts: { display: 'Archivo', text: 'Archivo', mono: 'JetBrains' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Harekât lacivert', flat: false, bg: ['#06182a', '#020a12'], sea: '#061a2c', land: '#0b2740', border: 'rgba(79,208,255,0.5)',
     graticule: 'rgba(79,208,255,0.10)', home: '#0f3d5e', homeStroke: '#4fd0ff', subject: '#2a1f14', subjectStroke: '#ffb020',
-    glow: 'rgba(255,176,32,0.35)', atmosphere: 'rgba(79,208,255,0.25)', accent: '#4fd0ff', ink: '#ffffff', muted: '#7fc9ec', status: '#ffb020',
+    glow: null, atmosphere: null, accent: '#4fd0ff', ink: '#ffffff', muted: '#7fc9ec', status: '#ffb020',
     label: 'rgba(223,244,255,0.85)', emblemMono: true, baseScale: 1700, cy: 640, grain: 0.035, relief: 0.6, limb: 0.3 },
   // motion: a newspaper page: lines are drawn on, the camera moves like a hand over paper
   C: { id: 'C', fonts: { display: 'Newsreader', text: 'Schibsted', mono: 'X' }, motion: { text: 'wipe', camera: 'glide', progress: false }, name: 'Editoryal', flat: true, bg: ['#f4efe6', '#ebe4d8'], sea: '#e4ddd0', land: '#fbf8f2', border: 'rgba(20,20,20,0.5)',
@@ -61,13 +61,13 @@ export const STYLES: Record<StyleId, Style> = {
   // motion: a calm documentary from orbit: text rises, the camera flies
   D: { id: 'D', fonts: { display: 'Archivo', text: 'M', mono: 'JetBrains' }, motion: { text: 'rise', camera: 'fly', progress: false }, name: 'Uydu gecesi', flat: false, bg: ['#0e1726', '#010102'], sea: '#0a1422', land: '#1d2530', border: 'rgba(255,255,255,0.32)',
     graticule: 'rgba(255,255,255,0.04)', home: '#23303f', homeStroke: '#ffffff', subject: '#1d2530', subjectStroke: 'rgba(255,209,102,0.85)',
-    glow: 'rgba(120,170,255,0.3)', atmosphere: 'rgba(120,170,255,0.35)', accent: '#ffd166', ink: '#ffffff', muted: '#9fb4d6', status: '#ffd166',
+    glow: null, atmosphere: null, accent: '#ffd166', ink: '#ffffff', muted: '#9fb4d6', status: '#ffd166',
     label: 'rgba(255,255,255,0.85)', emblemMono: true, baseScale: 1100, cy: 640, grain: 0.04, relief: 1.0, limb: 0.45 },
   // research/03 E: a dark world in which one thing is lit (John Nelson's firefly recipe)
   // motion: a dark world lighting up: soft entrances, long flights
-  E: { id: 'E', fonts: { display: 'Unbounded', text: 'M', mono: 'Martian' }, motion: { text: 'rise', camera: 'fly', progress: true }, name: 'Ateşböceği', flat: false, bg: ['#0b0f16', '#030406'], sea: '#05070B', land: '#12161D', border: 'rgba(38,45,58,0.9)',
+  E: { id: 'E', fonts: { display: 'Unbounded', text: 'M', mono: 'Martian' }, motion: { text: 'rise', camera: 'fly', progress: false }, name: 'Ateşböceği', flat: false, bg: ['#0b0f16', '#030406'], sea: '#05070B', land: '#12161D', border: 'rgba(38,45,58,0.9)',
     graticule: 'rgba(255,255,255,0.02)', home: '#101c24', homeStroke: 'rgba(127,227,255,0.75)', subject: '#2b1606', subjectStroke: '#FFF4D6',
-    glow: 'rgba(255,106,0,0.85)', atmosphere: 'rgba(255,181,71,0.10)', accent: '#FFB547', ink: '#FFF4D6', muted: '#9aa3ad', status: '#FFB547',
+    glow: null, atmosphere: null, accent: '#FFB547', ink: '#FFF4D6', muted: '#9aa3ad', status: '#FFB547',
     label: 'rgba(255,244,214,0.75)', emblemMono: true, baseScale: 1300, cy: 640, grain: 0.04, relief: 0.1, limb: 0.55 },
   // research/03 G: Imhof's Swiss relief, hypsometric tint, blue-grey shadows and warm light
   // motion: an atlas: slow, drawn, unhurried
@@ -92,7 +92,7 @@ export const STYLES: Record<StyleId, Style> = {
     halftone: 7, speckle: 0.5, stepFps: 12 },
   // research/03 I: a printed field sheet: pale green lowland, brown contours, a one-degree grid
   // motion: a field sheet: ruled lines drawn on, decisive moves
-  I: { id: 'I', fonts: { display: 'Archivo', text: 'Archivo', mono: 'Martian' }, motion: { text: 'wipe', camera: 'snap', progress: true }, name: 'Harekât paftası', flat: true, bg: ['#F2EFE4', '#E9E5D6'], sea: '#9CC7E0', land: '#F2EFE4', border: 'rgba(29,29,29,0.7)',
+  I: { id: 'I', fonts: { display: 'Archivo', text: 'Archivo', mono: 'Martian' }, motion: { text: 'wipe', camera: 'snap', progress: false }, name: 'Harekât paftası', flat: true, bg: ['#F2EFE4', '#E9E5D6'], sea: '#9CC7E0', land: '#F2EFE4', border: 'rgba(29,29,29,0.7)',
     graticule: 'rgba(29,29,29,0.22)', home: '#E30A17', homeStroke: '#1D1D1D', subject: '#D40000', subjectStroke: '#D40000',
     glow: null, atmosphere: null, accent: '#C8102E', ink: '#1D1D1D', muted: '#4b4b43', status: '#A0703C',
     label: 'rgba(29,29,29,0.9)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.55, limb: 0,

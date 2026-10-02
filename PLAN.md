@@ -511,3 +511,29 @@ nedeni ikincisidir. Karar: her izleme bölgesi için, son yedi günde en az 15 k
   değil, duyuru. Veri şimdilik çoğunlukla Karadeniz'de (bir haftada 242 kabul edilen kayıt); diğer
   bölgeler toplayıcılar genişledikçe kendiliğinden özet alır.
 
+
+## 20. Şablon-reel görünümü yasak / No template-reel look (2026-10-02)
+
+Sahip, tipik bir haber reel'ini gösterdi (buzdağı çizimi, sayarak büyüyen "826 MİLYAR ₺", yan
+istatistik hapları, "Ama suyun altında:" kancası, "5. BÖLÜM" etiketi, parıltı ve yıldızlar) ve
+"bu tarz tasarımlar, sayaç vs. çöp tasarım; kurallara yaz, AI slop kullanman yasak" dedi. Kural
+CLAUDE.md bölüm 4'te. Motorda aynı ailenin izleri vardı; hepsi söküldü:
+
+- **Sayaç**: mesafe ve örüntü bölümlerinde 200 px'lik sayı 0'dan yukarı sayıyordu. Artık sayı
+  ölçtüğü şeyle aynı satırda, olgular boyunda ve ilk karesinden tam değeriyle: "Kiev → Sinop:
+  ~1000 km", "Kiev çevresinde, 150 km içinde: 80 kayıt." Örüntüde haritada yanan noktalar kalır
+  (veri), tik sesi gider.
+- **Parıltı**: A, B, D ve E stillerinde öznenin neon parıltısı ve kürenin atmosfer halesi kapandı;
+  ülke dolgusu ve sınır çizgisi yeterli.
+- **Zıplama**: amblem, bayrak çipleri, kelime kelime yazı ve mesafe ucu `outBack` ile hedefini
+  aşıp geri geliyordu; artık yumuşak duruş (`outCubic`).
+- **Efekt sesleri**: whoosh, tik ve pop kaldırıldı; ses yalnız seslendirme ve kısık müzik yatağı.
+- **İlerleme çubuğu**: hikâye tarzı bölüm çubuğu ("kalmak için bir sebep") hiçbir stilde yok.
+- **Rozet hapı**: "TÜRKİYE'YE YAKIN · ~460 KM" dolgu kutulu ve zıplayan bir etiketti; artık
+  künyenin üstünde düz bir satır.
+
+Kalanlar ve gerekçesi: katılımcı bayrakları (kim katıldı bilgisi; dekor değil), DOĞRULANMADI
+çerçevesi (durum kuralı gereği her karede), kancanın iki satırı (olgu; ikinci satır vurgu rengi).
+Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` ile kapanır.
+- **Gönderide çağrı**: kapakta "KAYDIR →", her karede "3/7" sayacı ve kapanışta "KAYDET · TAKİP ET"
+  kaldırıldı (bölüm 17'deki karar bu bölümle değişti); Instagram kendi kare noktalarını gösterir.
