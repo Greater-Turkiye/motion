@@ -174,6 +174,10 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // on a flat page the TÜRKİYE label sits on the home fill: white on a dark fill, ink on a light one
   const [hr, hg, hb] = rgbOf(s.home);
   const homeInk = !s.flat || 0.2126 * hr + 0.7152 * hg + 0.0722 * hb < 150 ? '#ffffff' : s.ink;
+  // names grow a little as the camera closes in and shrink a little when it pulls back: at a fixed
+  // size a name was large beside a small country in the wide opening and small over the country it
+  // filled when the camera came close (zoom 0.6 -> 0.88x, 1 -> 1x, 2.7 -> 1.25x)
+  const nameScale = Math.min(1.25, Math.max(0.85, Math.pow(cameraAt(sc, s, t).zoom, 0.25)));
   sc.labels.forEach((l, i) => {
     const home = l.kind === 'home';
     const anchors: LonLat[] = [l.at, ...(l.alts ?? []), ...(home && !l.alts ? TURKIYE_ANCHORS : [])];
@@ -185,7 +189,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     // gives way, or "TİRAN" stands twice a few pixels apart
     const twin = beat?.kind === 'distance' && (l.text === beat.from.label || l.text === beat.to.label)
       ? 1 - anim(t, beat.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
-    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? 32 : isSubject ? 26 : 24, sticky: home,
+    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home,
       // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
       color: home ? homeInk : s.label, spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
       // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
