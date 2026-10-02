@@ -519,7 +519,26 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // other hook a clause that repeats the hook's words would only say it twice
   const subClause = clauses(news).find((c) => (!hook.used || hook.kind === 'number' || (!c.includes(hook.used) && !hook.used.includes(c))) && words(c).length >= 3 && c.length <= 72 && verbish(c.replace(/[.!]$/, '')));
   // a whole clause of at most two lines, or nothing: never a clause cut in the middle
-  const sub = subClause ? subClause[0].toLocaleUpperCase('tr') + subClause.slice(1) : '';
+  let sub = subClause ? subClause[0].toLocaleUpperCase('tr') + subClause.slice(1) : '';
+  // "KİEV / GELİŞME" puts a word that says nothing in the biggest type. When the record's own sentence
+  // is short enough to be a headline (six words or fewer, ending on its verb), it becomes the hook,
+  // split so the verb closes the second line ("ADF KOMUTA NOKTALARINI / ZİYARET ETTİ"), and the place
+  // stays in the kicker
+  // a subject the headline set off with a comma comes along ("Khmara, ADF komuta noktalarını ziyaret
+  // etti"): without it the hook says something was visited and not who visited
+  const cl = clauses(news), at0 = cl.indexOf(subClause);
+  const subject = at0 > 0 && words(cl[at0 - 1]).length <= 2 && !verbish(cl[at0 - 1]) ? cl[at0 - 1] : '';
+  const headline = subClause ? `${subject ? subject + ', ' : ''}${subClause}` : '';
+  if (hook.lines[1] === 'GELİŞME' && headline && words(headline).length <= 6) {
+    const w = words(TR(headline.replace(/[.!]$/, '')));
+    let cut = 1;
+    for (let k = 1; k < w.length; k++) {
+      const worst = (j) => Math.max(w.slice(0, j).join(' ').length, w.slice(j).join(' ').length);
+      if (worst(k) < worst(cut)) cut = k;
+    }
+    hook = { kind: 'clause', lines: w.length > 1 ? [w.slice(0, cut).join(' '), w.slice(cut).join(' ')] : w, used: headline };
+    sub = '';
+  }
   // the kicker names the place unless the hook's first line already does ("KİEV BÖLGESİ" twice)
   if (hook.lines[0] === TR(where)) kicker = kicker.split(' · ').slice(1).join(' · ') || kicker;
   // "KARADENİZ / GELİŞME" and nothing under it tells a viewer nothing in the first two seconds
@@ -536,7 +555,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // the facts block exists to say more than the hook's sub-line; when it would only say it again
   // (a one-clause headline) it is left out: the same sentence twice is six seconds of nothing new
   const same = (a, b) => a.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === b.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
-  const factsBeat = () => { if (!(sub && same(facts.join(' ').replace(/\*/g, ''), sub))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
+  // the hook itself when it is the headline's clause (no sub-line under it)
+  const factsBeat = () => { const said = sub || (hook.kind === 'clause' ? hook.lines.join(' ') : ''); if (!(said && same(facts.join(' ').replace(/\*/g, ''), said))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
   const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
   const distanceBeat = (fromLabel) => {
     if (whole) return; // from the middle of a whole country, a distance measures nothing the record says

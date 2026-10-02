@@ -46,6 +46,10 @@ const cap = (s) => (s ? s[0].toLocaleUpperCase('tr') + s.slice(1) : s);
 /** In a title set in capitals every word is in capitals ("KİEV / İHA SALDIRISI"): all lowered, except
  *  known acronyms. In running text a word in capitals is an acronym ("ADF", "TPP") and stays. */
 const KEEP = new Set(['İHA', 'NATO', 'AB', 'BM']);
+/** Short capitals the scene's own headline writes as capitals ("ADF", "DTEK", "GKRY"): a hook in
+ *  capitals keeps them, where it lowers every other word ("adf" was read as a word). Set per scene
+ *  by narration(). */
+let ACRONYMS = new Set();
 const SAY = { ABD: 'Amerika Birleşik Devletleri', km: 'kilometre', 'km²': 'kilometrekare' };
 
 /** Screen text → speech: accents off, numbers in words, capitals lowered, abbreviations said. */
@@ -62,7 +66,7 @@ export function speakable(text, title = false) {
   // "yedi'ye" is read the same as "yediye", but a spelled number keeps no apostrophe
   s = s.replace(/dört'(?=[aeıioöuü])/gu, "dörd'");
   s = s.replace(/(sıfır|bir|iki|üç|dört|dörd|beş|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|elli|altmış|yetmiş|seksen|doksan|yüz|bin|milyon|milyar)'(\p{L})/gu, '$1$2');
-  s = s.replace(/[\p{L}²]+/gu, (w) => SAY[w] ?? (title && w === w.toLocaleUpperCase('tr') && /\p{Lu}/u.test(w) && !KEEP.has(w) ? lower(w) : w));
+  s = s.replace(/[\p{L}²]+/gu, (w) => SAY[w] ?? (title && w === w.toLocaleUpperCase('tr') && /\p{Lu}/u.test(w) && !KEEP.has(w) && !ACRONYMS.has(w) ? lower(w) : w));
   return s.replace(/\s+/g, ' ').replace(/\s+([,.:;!?])/g, '$1').trim();
 }
 const sentence = (s) => { const t = s.trim().replace(/[,:;]$/, ''); return t ? cap(/[.!?]$/.test(t) ? t : `${t}.`) : ''; };
@@ -93,6 +97,8 @@ function kickerSaid(k) {
 
 const T = (x) => speakable(x, true);
 const B = (x) => speakable(x);
+/** A place label in capitals as a name: "SİNOP" is "Sinop", not "sinop". */
+const name = (x) => B(lower(x).replace(/(^|[\s-])(\p{L})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr')));
 /** Sentences of a status line, each its own part: "Tek kaynak: Ukrinform." stays when "Henüz kimse
  *  incelemedi." has to go. */
 const sentences = (x) => (x ?? '').split(/(?<=\.)\s+/).filter(Boolean).map(B);
@@ -139,7 +145,9 @@ function blockParts(sc, b) {
     case 'facts': {
       // what the hook's sub-line already said is not said twice: the facts go on from there
       let body = b.lines.join(' ').replace(/\*/g, '');
-      const sub = norm(sc.hook.sub);
+      // a hook that is itself the headline's first clause ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET
+      // ETTİ", no sub-line) counts as said too
+      const sub = norm(sc.hook.sub || sc.hook.lines.join(' '));
       if (sub && norm(body).startsWith(sub) && !factsOnlyRepeatHook(sc)) {
         const words = sub.split(' ').length;
         body = body.split(/\s+/).slice(words).join(' ').replace(/^[,;:.\s]+/, '');
@@ -150,7 +158,7 @@ function blockParts(sc, b) {
       return [lead + B(body)];
     }
     case 'distance':
-      return [`${T(b.from.label)} ile ${T(b.to.label)} arası, kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre`];
+      return [`${name(b.from.label)} ile ${name(b.to.label)} arası, kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre`];
     case 'status':
       return [T(sc.hook.status), ...sentences(b.text)];
     case 'close':
@@ -181,16 +189,18 @@ function hookParts(sc) {
   // the facts will read the whole sentence, so the hook reads only its headline (see factsOnlyRepeatHook);
   // a GELİŞME label is no headline aloud, so then only the place
   if (sc.template !== 'digest' && factsOnlyRepeatHook(sc)) return [h.lines[1] === 'GELİŞME' ? `${T(h.lines[0])}.` : hookSentence(h.lines)];
-  if (/^\d/.test(h.lines[0] ?? '') && h.sub.includes(h.lines[0])) return [B(h.sub)];
+  if (/^\d/.test(h.lines[0] ?? '') && h.sub && norm(h.sub).includes(norm(h.lines[0]))) return [B(h.sub)];
   // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
   if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines)}`];
   // a hook whose label is only GELİŞME (development) says nothing aloud: the sentence is the news
-  if (h.lines[1] === 'GELİŞME' && h.sub) return [`${T(h.lines[0])}. ${B(h.sub)}`];
+  // and the place is not said first when the sentence opens with it ("Kiev. Kiev'de …")
+  if (h.lines[1] === 'GELİŞME' && h.sub) return norm(h.sub).startsWith(norm(T(h.lines[0])).slice(0, 4)) ? [B(h.sub)] : [`${T(h.lines[0])}. ${B(h.sub)}`];
   return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
 /** Segments for the whole scene: [{ at, until, text }], text already speakable. */
 export function narration(sc) {
+  ACRONYMS = new Set((sc.source_text ?? []).slice(0, 2).join(' ').match(/(?<![\p{L}\d])\p{Lu}[\p{Lu}\d]{1,3}(?![\p{L}\d])/gu) ?? []);
   const starts = [0.25, ...sc.beats.map((b) => b.at + 0.15)];
   const ends = [...sc.beats.map((b) => b.at), sc.duration - 0.3];
   const blocks = [hookParts(sc), ...sc.beats.map((b) => blockParts(sc, b))];
