@@ -13,7 +13,9 @@ name: produce
 # 18:08 on 2026-09-30; on the night of 1 October only one hourly wake-up in four ran, here and in
 # the datasets and platform repositories alike), so the schedule wakes three times an hour at
 # off-peak minutes and the gate job ends the run in seconds unless the last video is at least 5 h
-# 30 min old. A lost wake-up costs twenty minutes, and no secret or outside timer is needed.
+# 30 min old. In practice the schedule ran about once in four hours on 1-2 October, so the clock is now
+# timer.yml: every production ends by starting a timer run that sleeps until the next video is due
+# and then starts this workflow. The schedule stays as the second line. No secret is needed.
 #
 # Narration (PLAN.md section 15.7): Chatterbox reads the scene's own on-screen words; the scene then
 # says "SESLENDİRME: YAPAY SES" in every frame. If the voice fails the video goes out silent and without
@@ -160,6 +162,20 @@ jobs:
           title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/auto-'+process.env.ID+'.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker)")
           gh release create "video-$ID" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: video-$ID" >> "$GITHUB_STEP_SUMMARY"
+
+  # the clock (timer.yml): after every production, a timer run sleeps until the next video is due.
+  # The schedule above is only the second line: it ran about once in four hours on 1-2 October.
+  timer:
+    needs: [gate, produce]
+    if: always() && vars.MOTION_PRODUCE != 'off' && needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - run: gh workflow run timer.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
 
   pages:
     needs: produce
