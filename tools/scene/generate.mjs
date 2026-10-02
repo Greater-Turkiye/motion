@@ -40,28 +40,15 @@ function countryMiddle(iso3) {
   const big = polys.sort((a, b) => geoArea(b) - geoArea(a))[0];
   return geoCentroid(big).map((x) => Math.round(x * 100) / 100);
 }
-/** Where a country's name goes on the map: the middle of its largest landmass (Ukraine's name over
- *  Ukraine, not over Kiev at its northern edge, where the event ring often is), unless the landmass is
- *  larger than about two million km2, whose middle a regional view does not show (Russia's lies in
- *  Siberia): then the capital, as before. */
-export function labelPoint(c) {
-  const middle = countryMiddle(c.iso3);
-  if (!middle) return c.at;
-  SHAPES ??= feature(JSON.parse(readFileSync(path.join(ROOT, 'assets/data/countries-50m.json'), 'utf8')), 'countries').features;
-  const f = SHAPES.find((x) => String(x.id) === String(c.num));
-  const polys = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates })) : [f.geometry];
-  const big = Math.max(...polys.map((g) => geoArea(g)));
-  return big < 0.05 ? middle : c.at; // 0.05 sr is about 2 million km2
-}
 const nearestTr = (p) => TR_PLACES.map(([n, at]) => ({ name: n, at, km: Math.round((geoDistance(p, at) * 6371) / 10) * 10 })).sort((a, b) => a.km - b.km)[0];
 const TR = (s) => s.toLocaleUpperCase('tr');
 
 /** Watch regions (datasets vocab/regions.yaml): where the ring goes when the record has no place,
  *  the name in the kicker, its ablative for the context line, and the sea label if it is a sea. */
 const REGIONS = {
-  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4], alts: [[34.5, 43.4], [37.2, 42.6], [32.6, 42.4]] } },
-  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8], alts: [[32.6, 33.4], [26.8, 34.6], [24.5, 34.1]] } },
-  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8], alts: [[25.1, 37.6], [24.6, 39.6], [25.8, 36.9]] } },
+  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4] } },
+  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8] } },
+  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8] } },
   cyprus: { at: [33.2, 35.1], name: 'Kıbrıs', from: "Kıbrıs'tan" },
   syria: { at: [38.5, 35.2], name: 'Suriye', from: "Suriye'den" },
   iraq: { at: [44, 33.5], name: 'Irak', from: "Irak'tan" },
@@ -73,6 +60,30 @@ const REGIONS = {
   balkans: { at: [21, 43], name: 'Balkanlar', from: "Balkanlar'dan" },
   'central-asia': { at: [65, 42], name: 'Orta Asya', from: "Orta Asya'dan" },
 };
+
+/** Waters and coasts that records name without a point (a sea area, or a coast filed at country
+ *  level), matched on the English place name, first match wins: the ring goes over the named water,
+ *  not the middle of the watch region ("around Crete" sat in the Cyclades, "Syrian coast" in the
+ *  Syrian desert). Turkish waters are not listed: a ring there would only ever mark our own sea. */
+const NAMED_AREAS = [
+  [/\b(crete|cretan)\b/i, [24.9, 35.3], 'Girit'],
+  [/\blimassol\b/i, [33.05, 34.5], 'Leymosun açıkları'],
+  [/\b(syrian coast|tartus|hmeimim|latakia)\b/i, [35.9, 35.15], 'Suriye kıyısı'],
+  [/\bbab[ -]al[ -]mandab\b/i, [43.35, 12.6], 'Babülmendep'],
+  [/\bgulf of aden\b/i, [47.5, 12.3], 'Aden Körfezi'],
+  [/\bhormuz\b/i, [56.35, 26.55], 'Hürmüz Boğazı'],
+  [/\bgulf of oman\b/i, [58, 24.5], 'Umman Körfezi'],
+  [/\b(persian|arabian) gulf\b/i, [51.5, 26.8], 'Basra Körfezi'],
+  [/\bred sea\b/i, [38.5, 20.5], 'Kızıldeniz'],
+  [/\bkerch\b/i, [36.55, 45.3], 'Kerç Boğazı'],
+  [/\b(sea of )?azov\b/i, [36.6, 46.1], 'Azak Denizi'],
+  [/\bgulf of (sidra|sirte)\b/i, [18.5, 31.4], 'Sirte Körfezi'],
+  [/\bcaspian\b/i, [51, 41.5], 'Hazar Denizi'],
+];
+export function namedArea(name) {
+  const hit = NAMED_AREAS.find(([re]) => re.test(name ?? ''));
+  return hit ? { at: hit[1], name: hit[2] } : null;
+}
 
 /** The country table (assets/data/countries.json, tools/data/build_countries.mjs): every country a
  *  headline can name, with its Turkish name, its capital or centre, and a pattern for its names and
@@ -420,14 +431,15 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const pt = loc?.geometry?.type === 'Point' ? loc.geometry.coordinates : null;
   // a record placed at country level ("ülke genelinde") is drawn on that country, not on the middle
   // of the watch region it is filed under (Burebista 26 sat on the Balkans' centre, in Serbia)
-  const whole = !pt && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null;
-  const at = pt ?? whole ?? region?.at;
+  const area = pt ? null : namedArea(loc?.place_name?.en);
+  const whole = !pt && !area && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null;
+  const at = pt ?? area?.at ?? whole ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
   const precision = pt ? (loc.precision === 'exact' ? 'exact' : 'locality') : 'region';
 
   const date = new Date(record.time.start);
   // the place when the record has one (a Kyiv story is not "KARADENİZ" because its feed files it there)
-  const where = (pt || whole) && placeName ? placeName : region?.name ?? placeName ?? '';
+  const where = (pt || whole) && placeName ? placeName : area?.name ?? region?.name ?? placeName ?? '';
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
@@ -456,8 +468,8 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const exName = family === 'exercise' ? exerciseName(texts) : null;
 
   // a place name without coordinates is not a place on the map: then the ring and the title are the region's
-  const placeTitle = TR((pt || whole ? placeName : null) ?? region?.name ?? '');
-  const placeText = whole ? 'Kesin konum yok: ülke genelinde.' : precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
+  const placeTitle = TR((pt || whole ? placeName : null) ?? area?.name ?? region?.name ?? '');
+  const placeText = whole ? 'Kesin konum yok: ülke genelinde.' : area ? 'Kesin konum yok: halka kaynağın andığı alanı gösterir.' : precision === 'region' ? 'Kesin konum yok: halka bölgeyi gösterir.'
     : loc.method === 'inferred' ? `Konum başlıktaki yer adından: ±${Math.round((loc.uncertainty_m ?? 20000) / 1000)} km.`
       : 'Konum kaynağın verdiği yer.';
   // counts take the accent colour; a model's number ("Geran -5", "Su-35", "P1") is part of a name
@@ -481,12 +493,12 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const regionWord = TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
-  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
+  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
     // no casualty, no number, no place: where it happened and what it was, never a stray word pair
-    hook = { kind: 'region', lines: [pt ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
+    hook = { kind: 'region', lines: [pt || area ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
   }
   // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
   // noktalarını ve depolarını vurdu") gives a first piece that says nothing on its own
@@ -610,7 +622,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a located event names its place on the map, so an inland view is never an empty page
   if (pt && placeTitle) labels.push({ text: placeTitle, at: [pt[0], pt[1] - 0.9], kind: 'country' });
   const partyList = parties.filter((c) => c.iso3 !== 'TUR');
-  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: labelPoint(c), kind: 'country' });
+  for (const c of partyList.slice(0, deal || family === 'exercise' ? 6 : 1)) labels.unshift({ text: nameOf(c), at: c.at, kind: 'country' });
   const lead = partyList[0];
   const single = !deal && family !== 'exercise';
 
@@ -626,7 +638,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
-    ...(family === 'strike' || family === 'exercise' || pt ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
+    ...(family === 'strike' || family === 'exercise' || pt || area ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
     ...(parties.length ? { parties: parties.map((c) => ({ country: c.iso3, label: nameOf(c), at: c.at, ...(flag(c.iso3) ? { emblem: flag(c.iso3) } : {}) })) } : {}),
     labels,
