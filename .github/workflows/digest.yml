@@ -46,7 +46,9 @@ jobs:
         with:
           path: assets/emblems
           key: emblems-${{ hashFiles('assets/emblems/manifest.json') }}
-      - run: npm ci
+      # ffmpeg-static downloads its binary from GitHub's release storage, which answers 500 now and
+      # then (twice on 2 October): three tries a minute apart before the run fails
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
       - name: Emblems (pinned by hash in the manifest)
         run: python3 tools/data/fetch_emblems.py --sync
       - name: Scene
