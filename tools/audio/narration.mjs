@@ -105,7 +105,15 @@ const sentences = (x) => (x ?? '').split(/(?<=\.)\s+/).filter(Boolean).map(B);
 /** Two big lines as one sentence: "İKİ / KİŞİ ÖLDÜ" is read straight on, "KİEV / SALDIRI" as a
  *  place and what happened there, with a pause between. */
 const verbish = (w) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar)$/u.test(lower(w));
-function hookSentence(lines) {
+function hookSentence(lines, sc) {
+  // a line that is a country's or a party's name is said as a name ("Bulgaristan, Romanya"), where
+  // the capitals of any other line are lowered ("romanya" was the second name)
+  const names = new Set([...(sc?.parties ?? []).map((p) => p.label), ...(sc?.labels ?? []).map((l) => l.text)]);
+  if (lines.some((l) => names.has(l))) {
+    const said = lines.map((l) => (names.has(l) ? name(l) : T(l)));
+    const straight = verbish(lines.at(-1).split(' ').at(-1));
+    return said.join(straight ? ' ' : ', ');
+  }
   if (lines.length < 2) return T(lines.join(' '));
   const straight = /^\d|^(BİR|İKİ|ÜÇ|DÖRT|BEŞ|ALTI|YEDİ|SEKİZ|DOKUZ|ON)$/u.test(lines[0]) || verbish(lines[1].split(' ').at(-1));
   return T(lines.join(straight ? ' ' : ', '));
@@ -147,7 +155,9 @@ function blockParts(sc, b) {
       let body = b.lines.join(' ').replace(/\*/g, '');
       // a hook that is itself the headline's first clause ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET
       // ETTİ", no sub-line) counts as said too
-      const sub = norm(sc.hook.sub || sc.hook.lines.join(' '));
+      // (only a hook that ends on its verb: "BULGARİSTAN / ROMANYA" is no sentence, and cutting its two
+      // words off "Bulgaristan, Romanya ve İspanya …" left "Ayrıca ve İspanya …")
+      const sub = norm(sc.hook.sub || (verbish(sc.hook.lines.at(-1)?.split(' ').at(-1) ?? '') ? sc.hook.lines.join(' ') : ''));
       if (sub && norm(body).startsWith(sub) && !factsOnlyRepeatHook(sc)) {
         const words = sub.split(' ').length;
         body = body.split(/\s+/).slice(words).join(' ').replace(/^[,;:.\s]+/, '');
@@ -164,17 +174,19 @@ function blockParts(sc, b) {
     case 'close':
       return [`${kickerSaid(b.kicker)} ${B(b.lines.join(' '))}`];
     case 'link':
-      return [`${T(labelOf(0))} ve ${T(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
+      return [`${name(labelOf(0))} ve ${name(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
     case 'roster': {
-      const names = (sc.parties ?? []).slice(0, 4).map((p) => T(p.label));
-      return [T(b.title), names.length ? `Katılanlar: ${names.join(', ')}` : ''];
+      const names = (sc.parties ?? []).slice(0, 4).map((p) => name(p.label));
+      // the exercise's name was the hook a few seconds ago: the roster goes straight to who took part
+      const said = norm(sc.hook.lines.join(' ')).includes(norm(b.title));
+      return said && names.length ? [`Katılanlar: ${names.join(', ')}`] : [T(b.title), names.length ? `Katılanlar: ${names.join(', ')}` : ''];
     }
     case 'recent': {
       const where = (b.text ?? '').split(' çevresinde')[0];
       return [`Son yedi günde ${where ? `${B(where)} çevresinde ` : ''}${sayNumber(b.points.length)} kayıt`];
     }
     case 'quote':
-      return [`${b.speaker !== undefined && labelOf(b.speaker) ? `${T(labelOf(b.speaker))}: ` : ''}${B(b.lines.join(' '))}`];
+      return [`${b.speaker !== undefined && labelOf(b.speaker) ? `${name(labelOf(b.speaker))}: ` : ''}${B(b.lines.join(' '))}`];
     default:
       return [];
   }
@@ -188,14 +200,14 @@ function hookParts(sc) {
   // "Bin dört yüz yetmiş asker." and then the sentence, or only the bare number when time is short
   // the facts will read the whole sentence, so the hook reads only its headline (see factsOnlyRepeatHook);
   // a GELİŞME label is no headline aloud, so then only the place
-  if (sc.template !== 'digest' && factsOnlyRepeatHook(sc)) return [h.lines[1] === 'GELİŞME' ? `${T(h.lines[0])}.` : hookSentence(h.lines)];
+  if (sc.template !== 'digest' && factsOnlyRepeatHook(sc)) return [h.lines[1] === 'GELİŞME' ? `${T(h.lines[0])}.` : hookSentence(h.lines, sc)];
   if (/^\d/.test(h.lines[0] ?? '') && h.sub && norm(h.sub).includes(norm(h.lines[0]))) return [B(h.sub)];
   // the weekly digest says whose week it is: "Bu hafta Karadeniz, iki yüz kırk iki kayıt."
-  if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines)}`];
+  if (sc.template === 'digest') return [`Bu hafta ${hookSentence(h.lines, sc)}`];
   // a hook whose label is only GELİŞME (development) says nothing aloud: the sentence is the news
   // and the place is not said first when the sentence opens with it ("Kiev. Kiev'de …")
   if (h.lines[1] === 'GELİŞME' && h.sub) return norm(h.sub).startsWith(norm(T(h.lines[0])).slice(0, 4)) ? [B(h.sub)] : [`${T(h.lines[0])}. ${B(h.sub)}`];
-  return [hookSentence(h.lines), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
+  return [hookSentence(h.lines, sc), h.sub ? B(h.sub.replace('{km}', km0)) : ''];
 }
 
 /** Segments for the whole scene: [{ at, until, text }], text already speakable. */
