@@ -59,9 +59,9 @@ const TR = (s) => s.toLocaleUpperCase('tr');
 /** Watch regions (datasets vocab/regions.yaml): where the ring goes when the record has no place,
  *  the name in the kicker, its ablative for the context line, and the sea label if it is a sea. */
 const REGIONS = {
-  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4] } },
-  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8] } },
-  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8] } },
+  'black-sea': { at: [34, 43.3], name: 'Karadeniz', from: "Karadeniz'den", sea: { text: 'KARADENİZ', at: [31, 43.4], alts: [[34.5, 43.4], [37.2, 42.6], [32.6, 42.4]] } },
+  'east-med': { at: [31.5, 34], name: 'Doğu Akdeniz', from: "Doğu Akdeniz'den", sea: { text: 'AKDENİZ', at: [30, 33.8], alts: [[32.6, 33.4], [26.8, 34.6], [24.5, 34.1]] } },
+  aegean: { at: [25.3, 38.5], name: 'Ege', from: "Ege'den", sea: { text: 'EGE', at: [25.2, 38.8], alts: [[25.1, 37.6], [24.6, 39.6], [25.8, 36.9]] } },
   cyprus: { at: [33.2, 35.1], name: 'Kıbrıs', from: "Kıbrıs'tan" },
   syria: { at: [38.5, 35.2], name: 'Suriye', from: "Suriye'den" },
   iraq: { at: [44, 33.5], name: 'Irak', from: "Irak'tan" },
