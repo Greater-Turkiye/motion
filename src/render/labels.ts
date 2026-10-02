@@ -12,6 +12,9 @@ export interface Box { x: number; y: number; w: number; h: number }
 export interface Label { key: string; text: string; x: number; y: number; size: number; color: string; spacing: number; weight?: number; priority: number; alpha?: number;
   /** never faded by another label (TÜRKİYE): only by the text block, the emblem or leaving the frame */
   sticky?: boolean;
+  /** a thin outline in the map's paper colour, so a name stays readable where it runs over a
+   *  neighbour's fill or a border (BULGARİSTAN over the edge of Türkiye) */
+  halo?: string;
   /** screen positions of alternative anchors on the ground (null when behind the globe); x, y is the first */
   alts?: ([number, number] | null)[] }
 
@@ -102,6 +105,10 @@ export function drawLabels(ctx: CanvasRenderingContext2D, placed: { label: Label
     ctx.font = `${l.weight ?? 500} ${l.size}px X`;
     ctx.letterSpacing = `${l.spacing * l.size}px`;
     ctx.globalAlpha = l.alpha ?? 1;
+    if (l.halo) {
+      ctx.strokeStyle = l.halo; ctx.lineWidth = l.size * 0.22; ctx.lineJoin = 'round';
+      ctx.strokeText(l.text, l.x, l.y);
+    }
     ctx.fillStyle = l.color;
     ctx.fillText(l.text, l.x, l.y);
   }
