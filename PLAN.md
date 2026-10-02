@@ -497,7 +497,9 @@ Sahip "badgeler" istedi. Karar: iki rozet, ikisi de hesaplanmış bilgi, hiçbir
 Tek haber "ne oldu?" sorusunu cevaplar; hafta "yakınımızda neler oluyor?" sorusunu. Takip etmenin
 nedeni ikincisidir. Karar: her izleme bölgesi için, son yedi günde en az 15 kaydı varsa, haftada bir
 (pazartesi 06:27 UTC) bir özet videosu (`tools/scene/digest.mjs`, `digest.yml`).
-- Bloklar her videonun blokları: kanca ("BU HAFTA · 25 EYLÜL – 1 EKİM / KARADENİZ / 242 KAYIT"),
+- Bloklar her videonun blokları: kanca ("25 EYLÜL – 1 EKİM / BU HAFTA KARADENİZ'DEN / 240 KAYIT DERLENDİ";
+  önceden "KARADENİZ / 242 KAYIT", bölüm 20'deki kuralla cümleye çevrildi; "Karadeniz'de" değil "Karadeniz'den":
+  bölgeye dosyalanan bir Kiev saldırısı denizde olmadı),
   haritada yeri olan bütün kayıtlar, haftanın en önemli üç haberi (haber değeri puanı, tazelik hariç;
   üç ayrı yer ve gün), durum ("N kayıttan M'i doğrulanmadı", kaç ayrı yayın organı). Böylece
   seslendirme, ses denetimi, gönderi ve sahne denetimi aynen çalışır.
