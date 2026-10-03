@@ -475,6 +475,9 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a meeting notice or a news roundup is not an event: "Güvenlik Konseyi, 10230. Toplantı (AM)",
   // "Kısaca Dünya Haberleri: Malezya …, Myanmar …" (UN press pages the feeds carry)
   if (texts.some((t) => /\b\d+(st|nd|rd|th)? meeting \((AM|PM)\)|toplantı \((AM|PM|ÖÖ|ÖS)\)|^(kısaca dünya haberleri|world news in brief)\b/iu.test(t))) refuse('a meeting notice or a news roundup, not an event');
+  // a headline in the future tense is a forecast, not an event: "ABD seçimleri yaklaşırken Putin Ukrayna'ya
+  // yönelik saldırılarını artıracak" came out as "UKRAYNA / SALDIRI"
+  if (/(acak|ecek)(lar)?(dır|dir)?$/iu.test((titleTr.replace(/[.!"'”’]+$/u, '').split(/\s+/).at(-1) ?? ''))) refuse('a forecast, not an event');
   if (texts.some((t) => /\b(call ?sign|callsign)\b|çağrı işareti/i.test(t) || /\b[A-Z][a-z]{2,} [A-Z]\.(?=[\s,(]|$)/.test(t))) refuse('names a person (red line: no personal data)');
 
   const regionKey = record.regions?.find((g) => REGIONS[g]);
@@ -561,7 +564,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
-  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? region?.name ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
+  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? (parties.length === 1 ? parties[0].tr : region?.name) ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
@@ -601,7 +604,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   if (hook.lines[1] === 'GELİŞME' && !sub) refuse('nothing to say in the hook: no casualty, number, type or whole clause');
   // what the hook may say beyond the headline: the record's own fields (its type as we name it, its
   // place, the countries its headline names, the exercise's name), never a word from nowhere
-  const fields = [label, placeTitle, TR(region?.name ?? ''), ...parties.map(nameOf), exName ? TR(exName) : '', 'TATBİKAT TATBİKATI AÇIKLAMA GELİŞME'].filter(Boolean).join(' · ');
+  const fields = [label, placeTitle, TR(region?.name ?? ''), ...parties.map(nameOf), exName ? TR(exName) : '', 'TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ'].filter(Boolean).join(' · ');
 
   // ---- beats, by family ------------------------------------------------------------------------------
   const beats = [];
