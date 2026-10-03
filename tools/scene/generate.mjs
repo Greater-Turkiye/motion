@@ -153,6 +153,10 @@ const TYPES = {
 const ATTACK = /\b(attack(s|ed|ing)?|strikes?|struck|hit(s)?|target(s|ed)?|bomb(s|ed|ing)?|shell(s|ed|ing)?|fired)\b|saldır|vurdu|vuruldu|vurul|hedef al|bombal|ateş aç/i;
 const typeLabel = (record, texts) => {
   const t = TYPES[record.event_type];
+  // a kinetic record whose headline does not name the weapon but does say it hit ("Ukrainian forces hit
+  // Russian Buk-M3 SAM system … in Luhansk region") is an attack, said as the plain word: without a
+  // label its long single clause had nothing for the hook and the record got no video
+  if (t && !texts.some((x) => t[1].test(x)) && /^kinetic\./.test(record.event_type) && texts.some((x) => ATTACK.test(x))) return 'SALDIRI';
   if (!t || !texts.some((x) => t[1].test(x))) return null;
   if (/^kinetic\.(drone-strike|missile-strike|airstrike|shelling|attack)$/.test(record.event_type) && !texts.some((x) => ATTACK.test(x))) return null;
   return t[0];
