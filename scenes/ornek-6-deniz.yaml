@@ -1,0 +1,178 @@
+# Generated from evt_01m2c7m1w1er1srjtp3rmrgath by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-6-deniz
+record: evt_01m2c7m1w1er1srjtp3rmrgath
+template: exercise
+format: vertical
+fps: 60
+duration: 26.6
+style: I
+source_text:
+  - Yunanistan, Mısır, Fransa, İtalya ve GKRY kuvvetleri Girit açıklarında MEDUSA 2026 tatbikatına katıldı
+  - Forces from Greece, Egypt, France, Italy and the Greek Cypriot Administration took part in exercise MEDUSA 2026 off Crete
+  - Cyprus participates in Medusa military exercise south of Crete
+  - 1072/2026 - Myrtoo Sea. Activation of firing practice area Karavia. Multinational exercise MEDUSA 2026 live firing
+  - 1073/2026 - Myrtoo Sea. Multinational aeronautical exercise MEDUSA 2026
+  - 1074/2026 - North Cretan Sea. Multinational exercise MEDUSA 2026 anchorage area
+  - Yunanistan, Mısır, Fransa, İtalya ve GKRY kuvvetleri Girit açıklarında MEDUSA 2026 tatbikatına katıldı
+  - TATBİKAT · GİRİT · EGE · YUNANİSTAN · MISIR · FRANSA · İTALYA · GKRY · MEDUSA 2026 · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 26
+      - 38.7
+    zoom: 0.9
+  to: &a2
+    t: 2.6
+    center:
+      - 25.2
+      - 37.7
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 7.1
+      center:
+        - 23.9
+        - 36.3
+      zoom: 2.3
+    - t: 11.7
+      center:
+        - 23.9
+        - 36.3
+      zoom: 2.3
+    - t: 20
+      center:
+        - 23.1
+        - 36.9
+      zoom: 2.7
+    - t: 23.4
+      center:
+        - 26.2
+        - 36.2
+      zoom: 3.2
+    - t: 26.6
+      center: *a1
+      zoom: 0.9
+event:
+  at:
+    - 24.9
+    - 35.3
+  precision: region
+parties:
+  - country: GRC
+    label: YUNANİSTAN
+    at:
+      - 23.73
+      - 37.98
+    emblem: GRC/flag
+  - country: EGY
+    label: MISIR
+    at:
+      - 31.24
+      - 30.04
+    emblem: EGY/flag
+  - country: FRA
+    label: FRANSA
+    at:
+      - 2.35
+      - 48.86
+    emblem: FRA/flag
+  - country: ITA
+    label: İTALYA
+    at:
+      - 12.5
+      - 41.9
+    emblem: ITA/flag
+  - country: CYP
+    label: GKRY
+    at:
+      - 33.36
+      - 35.17
+    emblem: CYP/flag
+labels:
+  - text: GKRY
+    at:
+      - 33.01
+      - 34.92
+    kind: country
+  - text: İTALYA
+    at:
+      - 12.3
+      - 43.49
+    kind: country
+  - text: FRANSA
+    at:
+      - 2.46
+      - 46.57
+    kind: country
+  - text: MISIR
+    at:
+      - 29.88
+      - 26.46
+    kind: country
+  - text: YUNANİSTAN
+    at:
+      - 22.57
+      - 39.46
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: EGE
+    at:
+      - 25.2
+      - 38.8
+    alts:
+      - - 25.1
+        - 37.6
+      - - 24.6
+        - 39.6
+      - - 25.8
+        - 36.9
+    kind: sea
+hook:
+  kicker: GİRİT · 10 EYLÜL
+  lines:
+    - MEDUSA 2026
+    - TATBİKATI
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: CYPRUS MAIL +1"
+beats:
+  - kind: roster
+    title: MEDUSA 2026
+    at: 2.6
+  - kind: place
+    title: GİRİT
+    text: "Kesin konum yok: halka kaynağın andığı alanı gösterir."
+    at: 7.1
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Yunanistan, Mısır, Fransa,
+      - İtalya ve GKRY kuvvetleri
+      - Girit açıklarında MEDUSA
+      - 2026 tatbikatına katıldı
+    at: 11.7
+  - kind: distance
+    from:
+      at:
+        - 24.9
+        - 35.3
+      label: GİRİT
+    to:
+      at:
+        - 27.43
+        - 37.03
+      label: BODRUM
+    text: Kuş uçuşu, en yakın Türk şehrine.
+    at: 20
+  - kind: status
+    text: 2 ayrı kaynak. Bağımsız teyit yok.
+    at: 23.6
