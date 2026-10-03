@@ -578,3 +578,18 @@ saatlerce uyuyarak meşgul olur; açık depoda bunun maliyeti yok. Zamanlayıcı
   artıracak") bir öngörüdür, olay değil; video olmaz. Bu kayıt "UKRAYNA / SALDIRI" diye çıkıyordu.
 - **Adsız tatbikatın yeri**: başlık tek ülke adıyorsa bulunma eki o ülkeye gelir ("ROMANYA'DA /
   TATBİKAT"), yoksa bölgeye ("EGE'DE / TATBİKAT").
+
+## 22. Seçicide çeşitlilik ve yakınlık / Variety and proximity in the selector (2026-10-03)
+
+2-3 Ekim'de art arda dört otomatik video Ukrayna'daki kayıplardı (Harkov, Harkov, Dnipro, Kiev). Platform
+Türkiye'nin bütün çevresini izliyor, ama veri setinin kaynaklarının büyük çoğunluğu tek bir akış
+(Ukrinform: ~400 kaynaktan 322'si). Seçicide üç değişiklik (`tools/scene/select.mjs`):
+- **Yakınlık noktadan**: konumlu kaydın P'si bölge tablosundan değil, Türkiye'ye gerçek uzaklığından
+  (Harkov ~850 km → 0,66; Ege kıyısı → ~1). Bölge tablosu Harkov'u da Ege'yi de "yakın" sayıyordu.
+- **Çeşitlilik**: son üç videodan aynı izleme bölgesinde olan her biri kaydın puanını %10 düşürür
+  (üçü de aynıysa %30). Yalnız yakın puanları ayırır; yedi yaralılı bir saldırı rutin bir açıklamaya
+  kaybetmez (%40 ile denendi: Romanya'da polis tatbikatı ve Yemen'de gıda krizi öne geçti).
+- **Savunma haberi olmayanlar**: polis, isyan, jandarma, gıda güvenliği, insani yardım, mülteci geçen ve
+  can kaybı olmayan başlıkların büyüklüğü 0,3 (akışın tür kuralları bunları tatbikat ya da çatışma diye
+  dosyalıyor).
+Asıl çeşitlilik veri tarafında: Ege, Kıbrıs, Suriye, Kafkasya için daha fazla akış (datasets toplayıcıları).
