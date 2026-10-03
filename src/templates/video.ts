@@ -575,7 +575,8 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   // ("Khmara, ADF komuta …", not "adf"); a hook the headline does not hold word for word is capitalised
   const lowered = sc.hook.lines.join(' ').toLocaleLowerCase('tr');
   const fromTitle = (() => { const src = sc.source_text[0] ?? '', i = src.toLocaleLowerCase('tr').indexOf(lowered); return i >= 0 ? src.slice(i, i + lowered.length) : null; })();
-  const said = sc.hook.sub || fromTitle || lowered.replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+  // a sentence starts with a capital, also when it is taken from the middle of the headline ("üç kişi …")
+  const said = (sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
