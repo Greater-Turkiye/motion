@@ -177,6 +177,12 @@ const TURKISH_FORCES = [
   /\bTurkish (armed forces|army|navy|air force|military|troops|soldiers?|forces|frigates?|warships?|jets?|drones?|UAVs?|special forces|gendarmerie)\b/i,
   /\bTürk (Silahlı Kuvvetleri|ordusu|donanması|Hava Kuvvetleri|askerleri|askeri|savaş gemisi|jetleri|SİHA|İHA)/i,
   /\bTSK\b/, /\bMehmetçik/i, /\bMSB\b.*\b(sevk|konuşlan|intikal)/i,
+  // the country named with a base, troops or a move of forces: "Turkiye to hand over Bashiqa-Zilkan base
+  // to Iraq" (Shafaq, 3 October) named no "Turkish forces" and passed every pattern above
+  /\b(Türkiye|Turkiye|Turkey|Ankara)('s)?\b[^.]{0,60}\b(bases?|outposts?|garrisons?|troops|soldiers|forces|military presence|deploy\w*|withdraw\w*|redeploy\w*)\b/i,
+  /\b(Türkiye|Ankara)\b[^.]{0,60}(\büs(sü|sünü|leri|lerini)?\b|askerler|kuvvetler|birlikler|konuşlan|çekil|devred)/i,
+  // Turkish bases abroad, by name
+  /\b(Bashiqa|Bashika|Başika|Zilkan|Zlikan|Bamerni|Bamarni|TURKSOM|Tariq bin Ziyad|Camp Turkiye)\b/i,
 ];
 
 const STATUS = { unverified: 'DOĞRULANMADI', 'partially-verified': 'KISMEN DOĞRULANDI', verified: 'DOĞRULANDI', disputed: 'TARTIŞMALI' };
