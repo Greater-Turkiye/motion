@@ -608,3 +608,25 @@ cümleyle anlatır. Olgular aynıdır (yeni iddia yok), sözler farklıdır:
 - **Durum**: "Kaynak yalnızca Ukrinform; bilgi henüz doğrulanmadı." / "Bilgi iki ayrı kaynağa dayanıyor."
 - **Bölge kapanışı**: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge burası."
 Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Ses modeli ayrı karar: bölüm 24.
+
+## 24. Ses motoru / The voice engine (2026-10-03)
+
+The owner: the Chatterbox voice "çok yapay duruyor"; find a more realistic free one (OpenRouter and
+NVIDIA Build NIM keys were offered). Decision, after comparing what is free and allowed in a
+published, automatic pipeline:
+
+- **Gemini Flash TTS** (Google AI Studio, free tier) is the production voice when the repository
+  secret `GEMINI_API_KEY` is set: natural Turkish, 30 prebuilt voices (we use `Charon`, a calm male
+  reading; `GEMINI_VOICE` changes it), and its delivery is steered with a style note ("haber spikeri
+  gibi, sakin, abartısız"). The words are the narration's own; the note only says how to read them.
+  Every clip carries Google's SynthID watermark, and the video still says "SESLENDİRME: YAPAY SES".
+- **Chatterbox stays as the fallback**: with no key, or when any Gemini call still fails after five
+  tries (quota, outage), the whole narration is made again with Chatterbox. One video, one voice.
+- The Whisper gate is unchanged and hears every clip, whichever engine made it.
+- Not chosen: NVIDIA NIM (no Turkish voice; trial terms exclude production use), OpenRouter (no
+  free TTS), edge-tts (an unofficial use of a browser endpoint), XTTS / F5-Turkish / MMS
+  (non-commercial licences). Second choice if Gemini's free tier goes: Azure Speech F0 (free
+  500 000 characters a month, `tr-TR-AhmetNeural`), then a local open model (VoxCPM2, Supertonic).
+- One step is the owner's: create a free key at aistudio.google.com ("Get API key") and add it with
+  `gh secret set GEMINI_API_KEY -R Greater-Turkiye/motion` (the command asks for the value; it is
+  never pasted into a chat, an issue or a file).

@@ -119,7 +119,7 @@ jobs:
           {
             echo "Haftalık özet, kimse yazmadan ve okumadan üretildi (tools/scene/digest.mjs)."
             echo "Sayılar Greater Türkiye'nin otomatik kayıtlarından; öne çıkan üç haber kaynakların kendi başlıkları."
-            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; fi
+            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses ($([ "$(cat out/voice/engine.txt 2>/dev/null)" = gemini ] && echo "Gemini TTS, Google, SynthID filigranlı" || echo "Chatterbox Multilingual, MIT"); ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; fi
           } > notes.md
           gh release create "$ID" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: $ID" >> "$GITHUB_STEP_SUMMARY"
