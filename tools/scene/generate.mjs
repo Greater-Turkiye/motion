@@ -26,6 +26,13 @@ const TR_PLACES = [
   ['İSTANBUL BOĞAZI', [29.05, 41.2]], ['EDİRNE', [26.56, 41.68]], ['İZMİR', [27.14, 38.42]], ['ANTALYA', [30.71, 36.9]],
   ['MERSİN', [34.64, 36.8]], ['HATAY', [36.16, 36.2]], ['GAZİANTEP', [37.38, 37.07]], ['DİYARBAKIR', [40.23, 37.91]],
   ['VAN', [43.38, 38.49]], ['KARS', [43.1, 40.6]], ['TRABZON', [39.72, 41.0]], ['SİNOP', [35.15, 42.02]], ['ANKARA', [32.85, 39.93]],
+  // the border and the coast, where the nearest city is measured from: a Kirkuk story was "Kerkük → Van:
+  // ~350 km" with Hakkari ~240 km away, and an Aegean island would go to İzmir rather than Ayvalık or Bodrum
+  ['HAKKARİ', [43.74, 37.58]], ['ŞIRNAK', [42.46, 37.52]], ['MARDİN', [40.74, 37.31]], ['ŞANLIURFA', [38.79, 37.16]],
+  ['KİLİS', [37.12, 36.72]], ['IĞDIR', [44.04, 39.92]], ['DOĞUBAYAZIT', [44.08, 39.55]], ['ARTVİN', [41.82, 41.18]],
+  ['HOPA', [41.43, 41.39]], ['KIRKLARELİ', [27.22, 41.73]], ['ÇANAKKALE', [26.41, 40.15]], ['AYVALIK', [26.69, 39.32]],
+  ['ÇEŞME', [26.3, 38.32]], ['BODRUM', [27.43, 37.03]], ['MARMARİS', [28.27, 36.85]], ['KAŞ', [29.64, 36.2]],
+  ['ALANYA', [32.0, 36.54]], ['TAŞUCU', [33.88, 36.32]], ['İSKENDERUN', [36.17, 36.59]],
 ];
 /** The middle of a country's largest landmass (Romania, not its capital; France, not an overseas
  *  island), for a record that names only its country. */
