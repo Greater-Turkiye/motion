@@ -300,12 +300,13 @@ export function hookLines(title) {
     // the number with what it counts and the verb that says what happened, as the source words them:
     // "1470 ASKERİNİ / DAHA KAYBETTİ", never "1470 / ASKER", a number standing alone at poster size
     // with its unit under it (CLAUDE.md section 4). The verb is the rest of the number's clause, at
-    // most three words ending on a finite verb; a count without one is no hook.
+    // most four words and thirty letters ending on a finite verb ("254'ÜNÜ ETKİSİZ HALE GETİRDİ");
+    // a count without one is no hook.
     const head = `${num[1]} ${num[2]}${two ? num[3] : ''}`;
     const from = num.index + num[1].length + 1 + num[2].length + (two ? num[3].length : 0);
     const end = title.slice(from).search(/[,;:.–—]/);
     const tail = title.slice(from, end < 0 ? undefined : from + end).trim();
-    if (tail && words(tail).length <= 3 && endsOnVerb(tail)) return { kind: 'number', lines: [TR(head), TR(tail)], used: `${head} ${tail}` };
+    if (tail && words(tail).length <= 4 && tail.length <= 30 && endsOnVerb(tail)) return { kind: 'number', lines: [TR(head), TR(tail)], used: `${head} ${tail}` };
   }
   const cs = clauses(title);
   // a clause of two or three words that ends the title or stands alone reads as a verdict ("kaptan öldürüldü")
