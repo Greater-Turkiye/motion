@@ -202,7 +202,9 @@ const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.c
   'caspianpost.com': 'CASPIAN POST', 'sofiaglobe.com': 'SOFIA GLOBE', 'bucurestifm.ro': 'BUCUREȘTI FM',
   'rferl.org': 'RADYO ÖZGÜR AVRUPA', 'shafaq.com': 'SHAFAQ NEWS', 'morh.hr': 'HIRVATİSTAN SAVUNMA BAKANLIĞI',
   'mfa.gov.tr': 'DIŞİŞLERİ BAKANLIĞI', 'gov.cy': 'GKRY HÜKÜMETİ', 'mod.gov.eg': 'MISIR SAVUNMA BAKANLIĞI',
-  'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI' };
+  'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI',
+  // the US Sixth Fleet's site was "NAVY"; DVIDS carries AFRICOM's news; GOV.UK is the UK government
+  'c6f.navy.mil': 'ABD 6. FİLO', 'dvidshub.net': 'DVIDS', 'gov.uk': 'BİRLEŞİK KRALLIK HÜKÜMETİ' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
