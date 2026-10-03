@@ -248,6 +248,16 @@ const TURKISH = new Set('çşğöüıİÇŞĞÖÜâîûÂÎÛ');
 const FOLD = { 'ș': 'ş', 'Ș': 'Ş', 'ţ': 't', 'ț': 't', 'Ț': 'T', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'ß': 'ss' };
 export const trPlace = (s) => s.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w).replace(/./gu, (c) => (TURKISH.has(c) ? c : FOLD[c] ?? c.normalize('NFD').replace(/\p{M}/gu, '')));
 
+/** "insansız hava aracı" is İHA, and its case ending goes with it: "aracıyla" is "İHA'yla", not "İHA"
+ *  ("Rus kuvvetleri Molniya İHA Harkov'a saldırdı" lost its "with"). The ending is said the way İHA
+ *  is read, ending on a vowel. */
+const IHA_CASE = {
+  '': '', 'ı': '', 'ıyla': "'yla", 'ıyle': "'yla", 'ının': "'nın", 'ına': "'ya", 'ında': "'da", 'ından': "'dan", 'ını': "'yı",
+  'lar': "'lar", 'ları': "'ları", 'larla': "'larla", 'larıyla': "'larla", 'ların': "'ların", 'larının': "'ların",
+  'lara': "'lara", 'larına': "'lara", 'larda': "'larda", 'larında': "'larda", 'lardan': "'lardan", 'larından': "'lardan",
+  'larını': "'ları",
+};
+
 /** The hook: the record's own words, at most two big lines. */
 export function hookLines(title) {
   // matched on the Turkish lower case: JavaScript's /i does not fold "İ" into "i"
@@ -497,7 +507,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   let kicker = `${TR(where)} · ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`.replace(/^ · /, '');
   // the standard abbreviation İHA for "insansız hava aracı" in every case form, on screen and in the
   // words the checker accepts: the same headline, shorter, not a new claim
-  const abbrev = (s) => s.replace(/insansız hava araç(lar)?\p{L}*/giu, 'İHA').replace(/insansız hava arac\p{L}*/giu, 'İHA');
+  const abbrev = (s) => s.replace(/insansız hava ara(?:ç|c)(\p{L}*)/giu, (_, tail) => `İHA${IHA_CASE[tail.toLocaleLowerCase('tr')] ?? ''}`);
   // the headline's own city names in the Turkish press's spelling too ("Mykolaiv'e" → "Mikolayiv'e"),
   // so the facts and the kicker name a city the same way
   const exonyms = (t) => t.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w);
