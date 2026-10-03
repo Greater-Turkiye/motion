@@ -7,12 +7,14 @@
 // and the generator accepts it (red lines, a place on the map, a scene that passes its checks).
 // Candidates are ranked by the research's newsworthiness score, adapted to what our records carry:
 //
-//   S = 100 · D · (0.30 M + 0.20 P + 0.20 C + 0.15 R + 0.15 N) · (0.8 + 0.2 G)
+//   S = 100 · D · (0.30 M + 0.20 P + 0.20 C + 0.15 R + 0.15 N) · (0.8 + 0.2 G) · V
 //
 //   D recency, halving every 24 h        M magnitude, from the event type and reported casualties
-//   P proximity to Türkiye, from region  C corroboration, distinct publishers, saturating at 5
+//   P proximity to Türkiye: from the point's distance when there is one, else from the region
+//                                        C corroboration, distinct publishers, saturating at 5
 //   R reliability, from the status      N novelty: 1 minus the overlap with the last published videos
 //   G whether the record has a point on the map
+//   V variety: 10 % less for each of the last three videos from the same watch region (PLAN.md 22)
 //
 // The owner decided that unverified records are published (datasets ADR 0023), so reliability
 // lowers a record's rank instead of excluding it; the status is on screen in every frame.
@@ -22,6 +24,7 @@
 // ÇATIŞMA") holds better than a place and a type label; a label with no sentence under it least.
 //   H = 1.0 a number or a casualty · 0.92 any other hook with its sentence · 0.85 a bare label
 import { readFileSync, existsSync } from 'node:fs';
+import { geoDistance } from 'd3-geo';
 import { generate, records } from './generate.mjs';
 
 const MAGNITUDE = [
@@ -32,6 +35,12 @@ const PROXIMITY = { aegean: 1.0, cyprus: 1.0, 'east-med': 0.95, 'black-sea': 0.9
   iran: 0.85, levant: 0.8, balkans: 0.8, 'libya-north-africa': 0.7, 'gulf-red-sea': 0.6, 'central-asia': 0.7, global: 0.4 };
 // the headline reports people killed or wounded: that outranks the event type alone
 const HARM = /\b(killed|dead|died|deaths?|wounded|injured|casualties)\b/i;
+// police and riot drills, food and aid: filed under exercise or clash by the feeds' type rules, but not
+// defence news ("Police from three continents test anti-riot tactics in Romania", "fighting in Yemen
+// deepens food security crisis" outranked seven wounded in Kherson once variety was weighed)
+const SOFT = /\b(police|riot|gendarmes?|food security|famine|humanitarian|aid (convoy|deliver\w*)|refugees?)\b/i;
+// Türkiye as a disc for distances: its middle and roughly its half-width, so a point at the border is ~0 km
+const TR_CENTRE = [35, 39], TR_RADIUS = 450;
 const RELIABILITY = { verified: 1.0, 'partially-verified': 0.8, disputed: 0.4, unverified: 0.5 };
 
 const hours = (r, now) => (now - Date.parse(r.reported_at ?? r.time.start)) / 3.6e6;
@@ -48,8 +57,13 @@ export function score(r, now, recent) {
   // 24 h rather than the research's 12: our feeds arrive in six-hour batches and a record's
   // reported_at is when the feed carried it, so twelve hours punished the batch timing, not the news
   const D = Math.pow(2, -Math.max(0, hours(r, now)) / 24);
-  const M = Math.max(MAGNITUDE.find(([re]) => re.test(r.event_type ?? ''))[1], HARM.test(r.title?.en ?? '') ? 1.0 : 0);
-  const P = Math.max(0.4, ...(r.regions ?? []).map((g) => PROXIMITY[g] ?? 0.4));
+  const M = SOFT.test(r.title?.en ?? '') && !HARM.test(r.title?.en ?? '') ? 0.3
+    : Math.max(MAGNITUDE.find(([re]) => re.test(r.event_type ?? ''))[1], HARM.test(r.title?.en ?? '') ? 1.0 : 0);
+  // a located record's proximity is its own distance from Türkiye, not its region's: Kharkiv and the
+  // Aegean are both "near" by region (0.95, 1.0), but one is ~850 km from the border and the other at it
+  const pt = r.location?.geometry?.type === 'Point' ? r.location.geometry.coordinates : null;
+  const P = pt ? Math.max(0.4, Math.min(1, 1 - Math.max(0, geoDistance(pt, TR_CENTRE) * 6371 - TR_RADIUS) / 2500))
+    : Math.max(0.4, ...(r.regions ?? []).map((g) => PROXIMITY[g] ?? 0.4));
   const C = Math.min(1, Math.log2(1 + publishers(r)) / Math.log2(6));
   const R = RELIABILITY[r.assessment?.status] ?? 0.3;
   // novelty: the same type in the same region as a recent video is the same story again
@@ -58,7 +72,13 @@ export function score(r, now, recent) {
   const G = r.location?.geometry ? 1 : 0;
   // a point on the map helps the video, but less than the research's 0.6 + 0.4 G: on the first run
   // a located routine visit outranked an unlocated strike with two dead
-  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G);
+  // variety: each of the last three videos from the same watch region costs this record 10 %. On 2-3
+  // October four videos in a row were Ukrainian casualty reports, the feed with the most items, while
+  // the platform watches Türkiye's whole surroundings
+  const region = (x) => (x.regions ?? [])[0];
+  const sameRegion = recent.slice(0, 3).filter((p) => region(p) && region(p) === region(r)).length;
+  const V = 1 - 0.1 * sameRegion;
+  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G) * V;
 }
 
 if (process.argv[1]?.endsWith('select.mjs')) {
