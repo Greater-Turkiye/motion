@@ -195,7 +195,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       color: home ? homeInk : s.label, halo: home ? undefined : hexA(s.land, 0.75), spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
       // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
       // be the one that yields, or the two are drawn on top of each other (BRĂİLA: ROMANYA over TÜRKİYE)
-      priority: home ? -0.5 : isSubject ? 0 : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
+      // a sea's name gives way to any place name: the place is the story, the sea only the setting
+      priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
   });
   return { labels, obstacles, emblem };
 }
