@@ -154,6 +154,8 @@ jobs:
           # the Instagram carousel: one 4:5 slide per block, from the same renderer (tools/post/carousel.mjs)
           node tools/post/carousel.mjs "$scene" release --no-build
           cp meta.json "release/$scene.json"
+          # the words that go with it when it is posted: Instagram, YouTube Shorts, X (tools/post/captions.mjs)
+          node tools/post/captions.mjs "$scene" meta.json release
           ls -la release
       - name: Publish
         if: steps.pick.outputs.id != ''

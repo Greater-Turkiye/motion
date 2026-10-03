@@ -98,6 +98,8 @@ jobs:
           cp out/poster/*-frames/0000.jpg "release/$ID.jpg"
           node tools/post/carousel.mjs "$ID" release --no-build
           cp meta.json "release/$ID.json"
+          # the words that go with it when it is posted: Instagram, YouTube Shorts, X (tools/post/captions.mjs)
+          node tools/post/captions.mjs "$ID" meta.json release
           ls -la release
       - name: Publish
         if: steps.scene.outputs.id != ''
