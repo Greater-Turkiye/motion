@@ -488,6 +488,10 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   if (texts.some((t) => /\b\d+(st|nd|rd|th)? meeting \((AM|PM)\)|toplantı \((AM|PM|ÖÖ|ÖS)\)|^(kısaca dünya haberleri|world news in brief)\b/iu.test(t))) refuse('a meeting notice or a news roundup, not an event');
   // a headline in the future tense is a forecast, not an event: "ABD seçimleri yaklaşırken Putin Ukrayna'ya
   // yönelik saldırılarını artıracak" came out as "UKRAYNA / SALDIRI"
+  // a verdict on a trend is analysis, not an event: "Iran's Hormuz Leverage Is Fading, But It Isn't Gone"
+  // (RFE/RL) came out as "İRAN'IN HÜRMÜZ AVANTAJI / AZALIYOR AMA GEÇMİYOR"; the same cues as datasets'
+  // NOT_AN_EVENT, for the records written before it had them
+  if (/\b(is (fading|growing|shrinking|waning|slipping|eroding)|isn'?t gone|up in arms|the (case|road|race) (for|to)|(lessons|takeaways) from|what'?s next|in (focus|context))\b/i.test(titleEn)) refuse('analysis, not an event');
   if (/(acak|ecek)(lar)?(dır|dir)?$/iu.test((titleTr.replace(/[.!"'”’]+$/u, '').split(/\s+/).at(-1) ?? ''))) refuse('a forecast, not an event');
   if (texts.some((t) => /\b(call ?sign|callsign)\b|çağrı işareti/i.test(t) || /\b[A-Z][a-z]{2,} [A-Z]\.(?=[\s,(]|$)/.test(t))) refuse('names a person (red line: no personal data)');
 
