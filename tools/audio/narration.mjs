@@ -95,6 +95,22 @@ function kickerSaid(k) {
   return `${speakable(k, true)},`;
 }
 
+/** The source as a name the voice can say: "UKRINFORM" is "Ukrinform" (a Latin name keeps its i),
+ *  "RUSYA HÜKÜMETİ" is "Rusya Hükümeti"; an acronym stays as it is. */
+const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA']);
+function publisherName(sc) {
+  const raw = (sc.hook.source ?? '').replace(/^KAYNAK:\s*/, '').replace(/\s*\+\d+$/, '');
+  if (/^\d+ YAYIN ORGANI$/u.test(raw)) return '';
+  return raw.split(' ').map((w) => (ACRONYMS_KEPT.has(w) || (raw.split(' ').length === 1 && w.length <= 4) ? w
+    : (/[İŞĞÜÖÇ]/u.test(w) ? w.toLocaleLowerCase('tr') : w.toLowerCase()).replace(/^\p{Ll}/u, (c) => c.toLocaleUpperCase('tr')))).join(' ');
+}
+/** The headline as the video shows it in its facts (or quote) block: the story the voice tells first. */
+function headlineOf(sc) {
+  const b = (sc.beats ?? []).find((x) => x.kind === 'facts' || x.kind === 'quote');
+  if (b?.lines?.length) return b.lines.join(' ').replace(/\*/g, '');
+  return sc.hook.sub || '';
+}
+
 const T = (x) => speakable(x, true);
 const B = (x) => speakable(x);
 /** A place label in capitals as a name: "SİNOP" is "Sinop", not "sinop". */
@@ -147,10 +163,17 @@ function blockParts(sc, b) {
   const labelOf = (i) => sc.parties?.[i]?.label ?? '';
   switch (b.kind) {
     case 'place': {
-      const how = /^Kesin konum yok/.test(b.text ?? '') ? 'Kesin konum yok.' : /başlıktaki yer adından/.test(b.text ?? '') ? 'Konum, başlıktaki yer adından.' : '';
-      return [T(b.title), how];
+      // the screen names the place and how sure it is; the voice says it as a sentence
+      const where = name(b.title);
+      if (/ülkeyi gösterir|ülke genelinde/.test(b.text ?? '')) return [`Kaynak bir yer vermiyor; harita ${where} genelini gösteriyor.`];
+      if (/^Kesin konum yok/.test(b.text ?? '')) return [`Kesin yer bilinmiyor; harita ${where} çevresini gösteriyor.`];
+      if (/başlıktaki yer adından/.test(b.text ?? '')) return [`Olay yeri ${where}; harita, haberde geçen yer adından yaklaşık konumu gösteriyor.`];
+      return [`Olay yeri ${where}.`];
     }
     case 'facts': {
+      // the hook told this story aloud already; the block that shows it in full is read by the eye, under
+      // the music, rather than said a second time (the weekly digest's facts are its items: said)
+      if (sc.template !== 'digest') return [];
       // what the hook's sub-line already said is not said twice: the facts go on from there
       let body = b.lines.join(' ').replace(/\*/g, '');
       // a hook that is itself the headline's first clause ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET
@@ -172,24 +195,45 @@ function blockParts(sc, b) {
       return [lead + B(body)];
     }
     case 'distance':
-      return [`${name(b.from.label)} ile ${name(b.to.label)} arası, kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre`];
-    case 'status':
-      return [T(sc.hook.status), ...sentences(b.text)];
-    case 'close':
-      return [`${kickerSaid(b.kicker)} ${B(b.lines.join(' '))}`];
+      return [`Türkiye'den en yakın şehir ${name(b.to.label)}; arada kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre var`];
+    case 'status': {
+      // the screen stamps the status; the voice says what it means
+      const who = publisherName(sc);
+      const many = (b.text ?? '').match(/(\d+) ayrı kaynak/);
+      const state = { 'DOĞRULANMADI': 'henüz doğrulanmadı', 'KISMEN DOĞRULANDI': 'kısmen doğrulandı', 'DOĞRULANDI': 'iki inceleyici tarafından doğrulandı', 'TARTIŞMALI': 'tartışmalı' }[sc.hook.status] ?? lower(sc.hook.status);
+      if (many) return [`Bilgi ${sayNumber(Number(many[1]))} ayrı kaynağa dayanıyor ve ${state}.`];
+      return [who ? `Kaynak yalnızca ${who}; bilgi ${state}.` : `Tek bir kaynak var; bilgi ${state}.`];
+    }
+    case 'close': {
+      // our own count, said as ours: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge
+      // burası." rather than the screen's "Karadeniz'den 307 kayıt: en yoğun bölge."
+      const text = b.lines.join(' ').replace(/\*/g, '');
+      const m = text.match(/^(.+?'d[ae]n) (\d+) kayıt[:.]?\s*(.*)$/u);
+      if (m) {
+        const ORDINAL = { 2: 'ikinci', 3: 'üçüncü', 4: 'dördüncü', 5: 'beşinci', 6: 'altıncı', 7: 'yedinci', 8: 'sekizinci', 9: 'dokuzuncu', 10: 'onuncu' };
+        const r = m[3].match(/bölgeler arasında (\d+)\./u);
+        const rank = /en yoğun bölge/.test(m[3]) ? '; en yoğun bölge burası' : r && ORDINAL[r[1]] ? `; bölgeler arasında ${ORDINAL[r[1]]} sırada` : '';
+        const month = (b.kicker ?? '').split(/\s+·\s+/)[1];
+        const when = month && MONTHS.includes(month) ? `${cap(lower(month))} ayında ` : '';
+        return [`${when}${m[1]} ${sayNumber(Number(m[2]))} kayıt derledik${rank}`];
+      }
+      const pair = text.match(/^Son 12 ayda bu iki ülke: (\d+) kayıt\.?$/u);
+      if (pair) return [`Son on iki ayda bu iki ülke arasında ${sayNumber(Number(pair[1]))} olay kaydettik`];
+      return [`${kickerSaid(b.kicker)} ${B(text)}`];
+    }
     case 'link':
       // the two names were the hook a moment ago ("Rusya, Tacikistan."): the block says only what joins them
       const pairSaid = sc.hook.lines[0] === labelOf(0) && sc.hook.lines[1] === labelOf(1);
       return [pairSaid ? T(b.title) : `${name(labelOf(0))} ve ${name(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
     case 'roster': {
       const names = (sc.parties ?? []).slice(0, 4).map((p) => name(p.label));
-      // the exercise's name was the hook a few seconds ago: the roster goes straight to who took part
-      const said = norm(sc.hook.lines.join(' ')).includes(norm(b.title));
-      return said && names.length ? [`Katılanlar: ${names.join(', ')}`] : [T(b.title), names.length ? `Katılanlar: ${names.join(', ')}` : ''];
+      if (!names.length) return [];
+      const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} ve ${names.at(-1)}` : names[0];
+      return [`Tatbikata katılanlar ${list}.`];
     }
     case 'recent': {
       const where = (b.text ?? '').split(' çevresinde')[0];
-      return [`Son yedi günde ${where ? `${B(where)} çevresinde ` : ''}${sayNumber(b.points.length)} kayıt`];
+      return [`Kayıtlarımızda ${where ? `${B(where)} çevresinde ` : 'bu çevrede '}son bir haftada ${sayNumber(b.points.length)} olay var`];
     }
     case 'quote':
       return [`${b.speaker !== undefined && labelOf(b.speaker) ? `${name(labelOf(b.speaker))}: ` : ''}${B(b.lines.join(' '))}`];
@@ -201,6 +245,15 @@ function blockParts(sc, b) {
 /** The hook: its big lines as one sentence, then its sub-line. */
 function hookParts(sc) {
   const h = sc.hook;
+  // the voice tells the story in a sentence while the screen shows its short headline: "Ukrinform
+  // bildiriyor: Hostomel'e Rus saldırısından kaynaklanan kayıplar dörde yükseldi." under "KİEV BÖLGESİ /
+  // SALDIRI". Reading the screen's words aloud was the owner's complaint ("okunca aptal gibi oluyor").
+  // The facts block, which shows the same sentence, is then left to the music (blockParts)
+  if (sc.template !== 'digest') {
+    const story = headlineOf(sc);
+    const who = publisherName(sc);
+    if (story) return [`${who ? `${who} bildiriyor: ` : ''}${B(story)}`];
+  }
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not
   // "Bin dört yüz yetmiş asker." and then the sentence, or only the bare number when time is short

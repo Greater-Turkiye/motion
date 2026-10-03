@@ -17,7 +17,7 @@ name: produce
 # timer.yml: every production ends by starting a timer run that sleeps until the next video is due
 # and then starts this workflow. The schedule stays as the second line. No secret is needed.
 #
-# Narration (PLAN.md section 15.7): Chatterbox reads the scene's own on-screen words; the scene then
+# Narration (PLAN.md sections 15.7, 23): Chatterbox tells the scene's facts in sentences of its own; the scene then
 # says "SESLENDİRME: YAPAY SES" in every frame. If the voice fails the video goes out silent and without
 # the note; production does not stop for it. MOTION_VOICE set to "off" turns narration off.
 #
@@ -137,7 +137,7 @@ jobs:
           node tools/audio/retime.mjs "auto-$ID" out/voice
           # only now, with every clip made, does the scene carry the synthetic-voice note
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
-          { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı). Voice-over: synthetic, reading the on-screen words."; } >> notes.md
+          { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; } >> notes.md
           echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: Video and poster
         if: steps.pick.outputs.id != ''
@@ -161,6 +161,8 @@ jobs:
           # the Instagram carousel: one 4:5 slide per block, from the same renderer (tools/post/carousel.mjs)
           node tools/post/carousel.mjs "$scene" release --no-build
           cp meta.json "release/$scene.json"
+          # the words that go with it when it is posted: Instagram, YouTube Shorts, X (tools/post/captions.mjs)
+          node tools/post/captions.mjs "$scene" meta.json release
           ls -la release
       - name: Publish
         if: steps.pick.outputs.id != ''
