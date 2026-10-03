@@ -21,8 +21,12 @@ const lowerWord = (w) => (ACRONYM.has(w) ? w : /[İŞĞÜÖÇ]/u.test(w) ? w.toL
 const lower = (s) => s.split(' ').map(lowerWord).join(' ');
 /** "DNİPRO BÖLGESİ" → "Dnipro Bölgesi": a label in capitals written as a name. */
 const name = (s) => lower(s).replace(/(^|[\s-])(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'));
+/** A map label or a date is Turkish, written in Turkish capitals ("MISIR", "30 EYLÜL"): Turkish lower
+ *  case, so "MISIR" is "Mısır" (not "Misir") and a month keeps its capital ("30 Eylül"). */
+const trName = (s) => s.split(' ').map((w) => (ACRONYM.has(w) ? w : w.toLocaleLowerCase('tr')))
+  .join(' ').replace(/(^|[\s-])(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'));
 /** A hashtag from a name: one word, no apostrophe or hyphen, "#DniproBölgesi". */
-const tag = (s) => '#' + name(s).replace(/['’\s-]+/gu, '');
+const tag = (s) => '#' + trName(s).replace(/['’\s-]+/gu, '');
 const STATUS = {
   'DOĞRULANMADI': 'Doğrulanmadı',
   'KISMEN DOĞRULANDI': 'Kısmen doğrulandı',
@@ -39,7 +43,7 @@ export function captions(sc, meta) {
   const [kickPlace, kickDate] = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ') : ['', sc.hook.kicker];
   // the place: the video's own "NEREDE" block, else the kicker's; a story without a place has none
   const place = (sc.beats ?? []).find((b) => b.kind === 'place')?.title ?? kickPlace;
-  const where = [place && name(place), kickDate && lower(kickDate)].filter(Boolean).join(', ');
+  const where = [place && trName(place), kickDate && trName(kickDate)].filter(Boolean).join(', ');
   const statusBeat = (sc.beats ?? []).find((b) => b.kind === 'status')?.text ?? '';
   const status = `${STATUS[meta.status] ?? meta.status}${statusBeat ? ` · ${statusBeat}` : ''}`;
   const publisher = sc.hook.source.replace(/^KAYNAK:\s*/, '').replace(/^(\d+) YAYIN ORGANI$/u, '$1 yayın organı');
