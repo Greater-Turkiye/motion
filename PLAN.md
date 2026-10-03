@@ -574,3 +574,7 @@ saatlerce uyuyarak meşgul olur; açık depoda bunun maliyeti yok. Zamanlayıcı
   künyede "KARADENİZ" demez, yalnız tarih; bölge kancası "KARADENİZ" yerine başlığın andığı ülkeyi
   yazar; "NEREDE / KARADENİZ" bölümü olmaz. Haritadaki bölge görünümü kalır; bölge kapanışı
   ("Karadeniz'den 305 kayıt") bizim dosyalamamızı anlatır, olayın yerini değil.
+- **Tahmin haber değildir**: Türkçe başlığı gelecek zamanla biten kayıt ("Putin … saldırılarını
+  artıracak") bir öngörüdür, olay değil; video olmaz. Bu kayıt "UKRAYNA / SALDIRI" diye çıkıyordu.
+- **Adsız tatbikatın yeri**: başlık tek ülke adıyorsa bulunma eki o ülkeye gelir ("ROMANYA'DA /
+  TATBİKAT"), yoksa bölgeye ("EGE'DE / TATBİKAT").
