@@ -25,6 +25,10 @@ const SPOTS: [number, number][] = [[0, 0], [0, -1.4], [0, 1.4], [0.35, 0], [-0.3
 /** How many places a label can take: its ground anchors, or the offsets around its only anchor. */
 const choices = (l: Label) => (l.alts && l.alts.length > 1 ? l.alts.length : SPOTS.length);
 
+/** Air above and below a name: two names a few pixels apart (KİEV BÖLGESİ over KARADENİZ) read as one
+ *  block of four words, so the box a name claims reaches half a line beyond its letters. */
+const PAD_Y = 10;
+
 function boxOf(ctx: CanvasRenderingContext2D, l: Label, choice: number): Box {
   ctx.font = `${l.weight ?? 500} ${l.size}px X`;
   ctx.letterSpacing = `${l.spacing * l.size}px`;
@@ -32,10 +36,10 @@ function boxOf(ctx: CanvasRenderingContext2D, l: Label, choice: number): Box {
   ctx.letterSpacing = '0px';
   if (l.alts && l.alts.length > 1) {
     const p = l.alts[choice] ?? [-1e5, -1e5]; // behind the globe: far off the frame, so it costs and fades
-    return { x: p[0] - w / 2 - 6, y: p[1] - h / 2 - 4, w: w + 12, h: h + 8 };
+    return { x: p[0] - w / 2 - 6, y: p[1] - h / 2 - PAD_Y, w: w + 12, h: h + 2 * PAD_Y };
   }
   const [sx, sy] = SPOTS[choice];
-  return { x: l.x + sx * w - w / 2 - 6, y: l.y + sy * h - h / 2 - 4, w: w + 12, h: h + 8 };
+  return { x: l.x + sx * w - w / 2 - 6, y: l.y + sy * h - h / 2 - PAD_Y, w: w + 12, h: h + 2 * PAD_Y };
 }
 
 const overlap = (a: Box, b: Box) =>
