@@ -593,3 +593,18 @@ Türkiye'nin bütün çevresini izliyor, ama veri setinin kaynaklarının büyü
   can kaybı olmayan başlıkların büyüklüğü 0,3 (akışın tür kuralları bunları tatbikat ya da çatışma diye
   dosyalıyor).
 Asıl çeşitlilik veri tarafında: Ege, Kıbrıs, Suriye, Kafkasya için daha fazla akış (datasets toplayıcıları).
+
+## 23. Ses ekranı okumaz / The voice does not read the screen (2026-10-03)
+
+Sahip: "videodaki metinlerle anlatım metni birebir aynı olmamalı; anlatıcı farklı bir şey anlatmalı, önde
+video oynamalı; okunca aptal gibi oluyor." Karar: ekran kısa başlığı ve olguları gösterir, ses haberi
+cümleyle anlatır. Olgular aynıdır (yeni iddia yok), sözler farklıdır:
+- **Açılış**: ekranda "KİEV BÖLGESİ / SALDIRI"; seste "Ukrinform bildiriyor: Hostomel'e Rus saldırısından
+  kaynaklanan kayıplar dörde yükseldi." Kaynağın adı başta, haberin tamamı tek cümlede.
+- **Olgular bölümü** sesle tekrar edilmez; aynı cümleyi göz okur, altında müzik.
+- **Yer**: "Olay yeri Kiev Bölgesi; harita, haberde geçen yer adından yaklaşık konumu gösteriyor."
+- **Mesafe**: "Türkiye'den en yakın şehir Sinop; arada kuş uçuşu yaklaşık bin kilometre var."
+- **Örüntü**: "Kayıtlarımızda Kiev bölgesi çevresinde son bir haftada seksen olay var."
+- **Durum**: "Kaynak yalnızca Ukrinform; bilgi henüz doğrulanmadı." / "Bilgi iki ayrı kaynağa dayanıyor."
+- **Bölge kapanışı**: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge burası."
+Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Ses modeli ayrı karar: bölüm 24.
