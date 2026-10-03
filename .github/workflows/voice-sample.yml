@@ -13,9 +13,9 @@ on:
         required: false
         default: karadeniz-gemi
       engine:
-        description: "chatterbox (production) or freya (trial: FreyaTTS-small, pinned commit)"
+        description: "gemini (production, needs the GEMINI_API_KEY secret), chatterbox (fallback) or freya (trial: FreyaTTS-small, pinned commit)"
         required: false
-        default: chatterbox
+        default: gemini
 
 permissions:
   contents: read
@@ -27,6 +27,7 @@ jobs:
     env:
       SCENE: ${{ inputs.scene }}
       ENGINE: ${{ inputs.engine }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -50,6 +51,7 @@ jobs:
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           case "$ENGINE" in
+            gemini) python -m pip install --quiet faster-whisper ;;
             chatterbox) python -m pip install --quiet chatterbox-tts faster-whisper ;;
             freya)
               git clone --quiet https://github.com/freyavoiceai/FreyaTTS.git ../FreyaTTS

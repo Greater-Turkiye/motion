@@ -72,12 +72,19 @@ jobs:
         timeout-minutes: 40
         env:
           ID: ${{ steps.scene.outputs.id }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           node tools/audio/narration.mjs "$ID" out/narration.json
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet chatterbox-tts faster-whisper
-          python -u tools/audio/tts.py out/narration.json out/voice
+          python -m pip install --quiet faster-whisper
+          # the Gemini voice when the GEMINI_API_KEY secret is set (PLAN.md 24); with no key, or when it
+          # fails, the whole narration is made again with Chatterbox, so a video never mixes two voices
+          if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
+            rm -rf out/voice
+            python -m pip install --quiet chatterbox-tts
+            python -u tools/audio/tts.py out/narration.json out/voice chatterbox
+          fi
           node tools/audio/retime.mjs "$ID" out/voice
           echo "voice: synthetic" >> "scenes/auto/$ID.yaml"
           echo "ok=true" >> "$GITHUB_OUTPUT"
