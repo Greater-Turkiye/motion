@@ -244,7 +244,9 @@ const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
 /** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
-export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2');
+export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2')
+  // a model's hyphen with a stray space ("F -16", "MiG -29", "Buk - M3")
+  .replace(/(\p{Lu}) ?- ?(\d)/gu, '$1-$2');
 
 /** A place name as Turkish writes it: the Turkish exonym where the Turkish text uses one ("Kiev'de"),
  *  and letters Turkish has no key for folded to their base ("Brăila" → "Braila", so it upper-cases
@@ -302,7 +304,8 @@ export function hookLines(title) {
   const num = [...title.matchAll(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/gu)].find((m) => !MONTH.test(m[2]));
   // a number whose next word is a verb counts nothing ("zayiat geçen güne göre 1.900 arttı"), so it
   // is no hook; a modifier keeps its noun ("46.230 askeri personel" is not "46.230 / ASKERİ")
-  if (num && !endsOnVerb(num[2])) {
+  // a duration counts nothing either: "12 yıllık askeri varlığına son verdi" is a span of time
+  if (num && !endsOnVerb(num[2]) && !/^(yıl|ay|gün|hafta|saat|dakika)\p{L}*$/iu.test(num[2])) {
     // and without its possessive-accusative ending: "1470 askerini" is "1470 / ASKER", "5 jet dronunu" "5 / JET DRON"
     const bare = (w) => (w.length > 6 ? w.replace(/(?<=[^aeıioöuü\s])(ını|ini|unu|ünü)$/u, '') : w);
     const modifier = /^(askeri|sivil|yabancı|ağır|hafif|toplam|balistik|seyir)$/iu.test(num[2]);
@@ -601,9 +604,13 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a subject the headline set off with a comma comes along ("Khmara, ADF komuta noktalarını ziyaret
   // etti"): without it the hook says something was visited and not who visited
   const cl = clauses(news), at0 = cl.indexOf(subClause);
-  const subject = at0 > 0 && words(cl[at0 - 1]).length <= 2 && !verbish(cl[at0 - 1]) ? cl[at0 - 1] : '';
-  const headline = subClause ? `${subject ? subject + ', ' : ''}${subClause}` : '';
-  if (hook.lines[1] === 'GELİŞME' && headline && words(headline).length <= 6) {
+  // (and one of up to four words, "Kataib Seyyid el-Şüheda, Başbakan'ın silah taahhüdüne destek verdi"; a
+  // longer one means no clause hook at all, not "BAŞBAKAN'IN SİLAH / TAAHHÜDÜNE DESTEK VERDİ" with nobody
+  // doing it)
+  const before = at0 > 0 && !verbish(cl[at0 - 1]) ? cl[at0 - 1] : '';
+  const subject = before && words(before).length <= 4 ? before : '';
+  const headline = subClause && !(before && !subject) ? `${subject ? subject + ', ' : ''}${subClause}` : '';
+  if (hook.lines[1] === 'GELİŞME' && headline && words(headline).length <= (subject ? 8 : 6)) {
     const w = words(TR(headline.replace(/[.!]$/, '')));
     let cut = 1;
     for (let k = 1; k < w.length; k++) {
