@@ -99,8 +99,10 @@ function kickerSaid(k) {
  *  "RUSYA HÜKÜMETİ" is "Rusya Hükümeti"; an acronym stays as it is. */
 const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA', 'FM', 'TV', 'TRT', 'RFE/RL']);
 function publisherName(sc) {
-  const raw = (sc.hook.source ?? '').replace(/^KAYNAK:\s*/, '').replace(/\s*\+\d+$/, '');
+  let raw = (sc.hook.source ?? '').replace(/^KAYNAK:\s*/, '').replace(/\s*\+\d+$/, '');
   if (/^\d+ YAYIN ORGANI$/u.test(raw)) return '';
+  // an ordinal in a name is said as a word: "ABD 6. FİLO" is "ABD Altıncı Filo"
+  raw = raw.replace(/\b(\d)\. /gu, (m, d) => `${ORDINAL[d]} `);
   return raw.split(' ').map((w) => (ACRONYMS_KEPT.has(w) || (raw.split(' ').length === 1 && w.length <= 4) ? w
     : (/[İŞĞÜÖÇ]/u.test(w) ? w.toLocaleLowerCase('tr') : w.toLowerCase()).replace(/^\p{Ll}/u, (c) => c.toLocaleUpperCase('tr')))).join(' ');
 }
