@@ -211,8 +211,10 @@ const GENERIC = new Set(['gov', 'mil', 'gouv', 'gob', 'mfa', 'co', 'com', 'net',
  *  ("DIŞİŞLERİ BAKANLIĞI" → "Dışişleri bakanlığı"), the plain ones for a Latin one, whose I is no ı
  *  ("UKRINFORM" → "Ukrinform", not "Ukrınform"). A name is Turkish when it has a Turkish letter;
  *  an acronym stays as it is ("ABD savaş bakanlığı"). */
-const ACRONYM = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN']);
+const ACRONYM = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'FM', 'TV', 'TRT', 'BBC']);
 const lowerName = (s) => s.split(' ').map((w) => (ACRONYM.has(w) ? w : /[İŞĞÜÖÇ]/u.test(s) ? w.toLocaleLowerCase('tr') : w.toLowerCase())).join(' ');
+// a publisher is a proper name: every word keeps its capital ("Radyo Özgür Avrupa", not "Radyo özgür avrupa")
+const properName = (s) => lowerName(s).split(' ').map((w) => w.replace(/^\p{Ll}/u, (c) => c.toLocaleUpperCase(/[ışğüöç]/u.test(w) ? 'tr' : 'en'))).join(' ');
 const publisher = (u) => {
   const h = host(u);
   if (PUBLISHERS[h]) return PUBLISHERS[h];
@@ -575,7 +577,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
-    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : lowerName(name).replace(/^./u, (c) => c.toLocaleUpperCase('tr'))}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
+    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : properName(name)}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
 
   // ---- the hook, from the record's own fields first ------------------------------------------------
   const found = hookLines(news);
