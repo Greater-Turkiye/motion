@@ -555,6 +555,10 @@ Yapay seslendirme tek üretilmiş öğe: ekranda yazılı, `MOTION_VOICE=off` il
   "Rus kuvvetleri 1470 askerini daha kaybetti" künyede ve kancada "KARADENİZ" diyordu. İngilizce
   başlık Ukrayna'yı anıyorsa yer Ukrayna'dır ("Kesin konum yok: halka ülkeyi gösterir."); mesafe
   bölümü olmaz (bir ülkenin ortasından ölçülen mesafe kaydın söylediği bir şey değil).
+  Aynısı her bölgede (2026-10-03): yeri olmayan bir kaydın İngilizce başlığı Türkiye ve ABD dışında tek
+  bir ülke anıyorsa halka o ülkededir ("Exercise Phoenix Express 2026 begins in Tunisia": "KUZEY
+  AFRİKA" değil "TUNUS"). Kıbrıs hariç: başlıktaki "Cyprus" adadır, bölge zaten "KIBRIS" gösterir;
+  tablodaki CYP ise "GKRY", kaynağın kullanmadığı bir ad.
   Ülke ve taraf adları da ad gibi okunur ("Katılanlar: Yunanistan, Mısır", "Bulgaristan, Romanya";
   önceden "yunanistan", "romanya"); tatbikatın adı kancada söylendiyse katılımcı bölümü doğrudan
   "Katılanlar: …" ile başlar ("Medusa iki bin yirmi altı" iki kez söylenmez).

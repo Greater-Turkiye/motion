@@ -519,10 +519,18 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   // a record with no place at all whose headline names Ukraine is about the war there, not about the
   // sea its feed files it under: "Russian forces lose another 1,470 troops in war against Ukraine" read
   // "KARADENİZ" with a ring in the open sea. The ring goes on Ukraine, said to show the country
-  const theatre = !pt && !area && !loc?.place_name && loc?.precision !== 'country' && regionKey === 'black-sea'
-    && partiesOf(titleEn).some((c) => c.iso3 === 'UKR') ? countryMiddle('UKR') : null;
+  const placeless = !pt && !area && !loc?.place_name && loc?.precision !== 'country';
+  const war = placeless && regionKey === 'black-sea' && partiesOf(titleEn).some((c) => c.iso3 === 'UKR');
+  // the same for any record with no place whose headline names one country, Türkiye and the US aside:
+  // "Exercise Phoenix Express 2026 begins in Tunisia" read "KUZEY AFRİKA" with the ring on the region's
+  // middle; the ring goes on Tunisia, said to show the country
+  // "Cyprus" in a headline is the island, which the Cyprus region already shows as KIBRIS; the table's
+  // CYP is GKRY, a name the source did not use
+  const named = placeless && !war ? partiesOf(titleEn).filter((c) => !['TUR', 'USA', 'CYP'].includes(c.iso3)) : [];
+  const shownCountry = war ? COUNTRY_TABLE.find((c) => c.iso3 === 'UKR') : named.length === 1 ? named[0] : null;
+  const theatre = shownCountry ? countryMiddle(shownCountry.iso3) : null;
   const whole = (!pt && !area && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null) ?? theatre;
-  const wholeName = theatre ? 'Ukrayna' : placeName;
+  const wholeName = theatre ? shownCountry.tr : placeName;
   const at = pt ?? area?.at ?? whole ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
   const precision = pt ? (loc.precision === 'exact' ? 'exact' : 'locality') : 'region';
