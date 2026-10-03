@@ -801,7 +801,7 @@ function findRecord(datasets, id) {
 export function notes(record, scene) {
   const d = String(record.time.start).slice(0, 10);
   return [
-    `**${record.title.tr}**`,
+    `**${tidy(record.title.tr)}**`,  // as the screen and the posting text write it ("40'tan", not "40 'tan")
     record.title.en ? `_${record.title.en}_` : '',
     '',
     `- Durum / status: **${scene.hook.status}**`,
