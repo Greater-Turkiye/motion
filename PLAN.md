@@ -602,6 +602,9 @@ cümleyle anlatır. Olgular aynıdır (yeni iddia yok), sözler farklıdır:
 - **Açılış**: ekranda "KİEV BÖLGESİ / SALDIRI"; seste "Ukrinform bildiriyor: Hostomel'e Rus saldırısından
   kaynaklanan kayıplar dörde yükseldi." Kaynağın adı başta, haberin tamamı tek cümlede.
 - **Olgular bölümü** sesle tekrar edilmez; aynı cümleyi göz okur, altında müzik.
+  Olgular bölümü olmayan kısa sahnede açılış cümlesi kaydın Türkçe başlığının tamamıdır (ekranda iki
+  satıra kısalmış hali). Tırnak işaretleri okunmaz ("'Burebista 26'tatbikatı" → "Burebista 26 tatbikatı").
+- **Katılanlar** yalnızca haber cümlesinin saymadığı bir ülke varsa söylenir; tek taraf (düzenleyen) söylenmez.
 - **Yer**: "Olay yeri Kiev Bölgesi; harita, haberde geçen yer adından yaklaşık konumu gösteriyor."
 - **Mesafe**: "Türkiye'den en yakın şehir Sinop; arada kuş uçuşu yaklaşık bin kilometre var."
 - **Örüntü**: "Kayıtlarımızda Kiev bölgesi çevresinde son bir haftada seksen olay var."

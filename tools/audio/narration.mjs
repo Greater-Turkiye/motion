@@ -97,7 +97,7 @@ function kickerSaid(k) {
 
 /** The source as a name the voice can say: "UKRINFORM" is "Ukrinform" (a Latin name keeps its i),
  *  "RUSYA HÜKÜMETİ" is "Rusya Hükümeti"; an acronym stays as it is. */
-const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA']);
+const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA', 'FM', 'TV', 'TRT', 'RFE/RL']);
 function publisherName(sc) {
   const raw = (sc.hook.source ?? '').replace(/^KAYNAK:\s*/, '').replace(/\s*\+\d+$/, '');
   if (/^\d+ YAYIN ORGANI$/u.test(raw)) return '';
@@ -107,8 +107,20 @@ function publisherName(sc) {
 /** The headline as the video shows it in its facts (or quote) block: the story the voice tells first. */
 function headlineOf(sc) {
   const b = (sc.beats ?? []).find((x) => x.kind === 'facts' || x.kind === 'quote');
-  if (b?.lines?.length) return b.lines.join(' ').replace(/\*/g, '');
-  return sc.hook.sub || '';
+  if (b?.lines?.length) return unquote(b.lines.join(' ').replace(/\*/g, ''));
+  if (sc.hook.sub) return unquote(sc.hook.sub);
+  // no facts block (a short scene): the record's Turkish title, which the screen shows only cut to the
+  // hook's two lines ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET ETTİ" over "…, Kiev'in katmanlı
+  // savunmasının nasıl güçlendirileceğini tartıştı"); an English-only title is not read
+  const title = sc.source_text?.[0] ?? '';
+  return /[çğıöşüÇĞİÖŞÜ]/u.test(title) ? unquote(title) : '';
+}
+/** Quotation marks are not spoken: "'Burebista 26'tatbikatı" (as a translation wrote it) is said
+ *  "Burebista 26 tatbikatı"; a suffix after the closing mark stays on with its apostrophe
+ *  ("'Medusa'ya" is "Medusa'ya"). A word of five letters or more after the mark is a new word. */
+function unquote(text) {
+  return text.replace(/(^|[\s(])['‘"“]([^'’"”]{2,60}?)['’"”](\p{L}*)/gu, (m, before, inner, after) =>
+    `${before}${inner}${after.length >= 5 ? ` ${after}` : after ? `'${after}` : ''}`);
 }
 
 const T = (x) => speakable(x, true);
@@ -227,7 +239,9 @@ function blockParts(sc, b) {
       return [pairSaid ? T(b.title) : `${name(labelOf(0))} ve ${name(labelOf(1))}: ${T(b.title)}`, b.text ? B(b.text) : ''];
     case 'roster': {
       const names = (sc.parties ?? []).slice(0, 4).map((p) => name(p.label));
-      if (!names.length) return [];
+      // one party is the organiser the story named; names the story already said are not said twice
+      const story = headlineOf(sc).toLocaleLowerCase('tr');
+      if (names.length < 2 || names.every((n) => story.includes(n.toLocaleLowerCase('tr')))) return [];
       const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} ve ${names.at(-1)}` : names[0];
       return [`Tatbikata katılanlar ${list}.`];
     }
