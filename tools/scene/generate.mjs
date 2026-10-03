@@ -200,6 +200,7 @@ const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.c
   'resmigazete.gov.tr': 'RESMÎ GAZETE', 'hnhs.gr': 'YUNAN HİDROGRAFİ DAİRESİ', 'balkaninsight.com': 'BALKAN INSIGHT',
   'aljazeera.com': 'AL JAZEERA', 'themoscowtimes.com': 'MOSCOW TIMES', 'cyprus-mail.com': 'CYPRUS MAIL', 'arabnews.com': 'ARAB NEWS',
   'caspianpost.com': 'CASPIAN POST', 'sofiaglobe.com': 'SOFIA GLOBE', 'bucurestifm.ro': 'BUCUREȘTI FM',
+  'rferl.org': 'RADYO ÖZGÜR AVRUPA', 'shafaq.com': 'SHAFAQ NEWS', 'morh.hr': 'HIRVATİSTAN SAVUNMA BAKANLIĞI',
   'mfa.gov.tr': 'DIŞİŞLERİ BAKANLIĞI', 'gov.cy': 'GKRY HÜKÜMETİ', 'mod.gov.eg': 'MISIR SAVUNMA BAKANLIĞI',
   'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
@@ -589,7 +590,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
   if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
-  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? (parties.length === 1 ? parties[0].tr : region?.name) ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
+  else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? (pt && placeName ? placeName : null) ?? (parties.length === 1 ? parties[0].tr : region?.name) ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
   else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
