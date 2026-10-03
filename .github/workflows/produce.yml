@@ -130,7 +130,7 @@ jobs:
           node tools/audio/retime.mjs "auto-$ID" out/voice
           # only now, with every clip made, does the scene carry the synthetic-voice note
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
-          { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı)."; } >> notes.md
+          { echo; echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı). Voice-over: synthetic, reading the on-screen words."; } >> notes.md
           echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: Video and poster
         if: steps.pick.outputs.id != ''

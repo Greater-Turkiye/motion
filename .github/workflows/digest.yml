@@ -110,7 +110,7 @@ jobs:
           {
             echo "Haftalık özet, kimse yazmadan ve okumadan üretildi (tools/scene/digest.mjs)."
             echo "Sayılar Greater Türkiye'nin otomatik kayıtlarından; öne çıkan üç haber kaynakların kendi başlıkları."
-            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı)."; fi
+            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki metnin aynısı). Voice-over: synthetic, reading the on-screen words."; fi
           } > notes.md
           gh release create "$ID" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: $ID" >> "$GITHUB_STEP_SUMMARY"
