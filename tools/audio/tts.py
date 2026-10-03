@@ -1,8 +1,14 @@
 """The narrator: one clip per segment of tools/audio/narration.mjs, in Turkish.
 
-    python -u tools/audio/tts.py <narration.json> <out dir> [chatterbox|freya]
+    python -u tools/audio/tts.py <narration.json> <out dir> [gemini|chatterbox|freya]
 
-chatterbox (production): Chatterbox Multilingual (Resemble AI, MIT licence), its default voice, on
+gemini (production when the GEMINI_API_KEY secret is set, PLAN.md 24): Google's Gemini Flash TTS on
+the free AI Studio tier, a human-sounding Turkish news reading in one of its prebuilt voices
+(GEMINI_VOICE, default Charon). Every clip carries Google's SynthID watermark and the video says it
+is synthetic on screen. With no key the run uses chatterbox; a call that still fails after its
+retries (quota, outage) ends the run with code 3; on any failure the workflow makes the whole
+narration again with chatterbox, so a video never mixes two voices.
+chatterbox (the fallback): Chatterbox Multilingual (Resemble AI, MIT licence), its default voice, on
 the CPU. Every clip carries Resemble's PerTh watermark, so a clip can be shown to be synthetic, and
 the video says so on screen (the "YAPAY SES" line).
 freya (trial only, PLAN.md 15.7): FreyaTTS-small (Apache-2.0 code and weights, Turkish first, one
@@ -23,7 +29,7 @@ its sentence, which Whisper ignored, so the letters still matched:
 - a clip longer than its text could take to say (1.2 s plus one second per 7.5 characters; the
   slowest real reading so far was 6.6 a second, with its pauses) counts as a failed try.
 """
-import json, re, sys, time, pathlib
+import json, os, re, sys, time, pathlib
 import numpy as np
 import torch, torchaudio
 from faster_whisper import WhisperModel
@@ -128,7 +134,72 @@ out.mkdir(parents=True, exist_ok=True)
 segments = json.loads(src.read_text(encoding="utf-8"))["segments"]
 
 t0 = time.time()
-if engine == "freya":
+if engine == "gemini" and not os.environ.get("GEMINI_API_KEY"):
+    print("no GEMINI_API_KEY: chatterbox instead", flush=True)
+    engine = "chatterbox"
+if engine == "gemini":
+    import base64, io, urllib.error, urllib.request, wave
+    URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
+    MODEL = os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts")
+    VOICE = os.environ.get("GEMINI_VOICE", "Charon")
+    # how it is read, never what: the words are the narration's own
+    STYLE = ("Türkçe bir haber spikeri gibi oku: sakin, net, ölçülü bir tempoyla, abartısız ve heyecansız; "
+             "rakamları ve yer adlarını açık söyle.")
+    def audio_in(node):
+        """The base64 audio of an answer: interaction.output_audio.data, or the first audio part anywhere."""
+        if isinstance(node, dict):
+            for key, v in node.items():
+                if "audio" in key and isinstance(v, dict) and isinstance(v.get("data"), str):
+                    return v["data"]
+            if str(node.get("type", "")).startswith("audio") or str(node.get("mime_type", "")).startswith("audio"):
+                if isinstance(node.get("data"), str):
+                    return node["data"]
+            node = list(node.values())
+        if isinstance(node, list):
+            for v in node:
+                found = audio_in(v)
+                if found:
+                    return found
+        return None
+    def speak(text):
+        body = json.dumps({
+            "model": MODEL,
+            "input": [{"type": "user_input", "content": [{"type": "text", "text": text,
+                       "annotations": [{"type": "speech_metadata", "style": STYLE}]}]}],
+            "response_format": {"type": "audio"},
+            "generation_config": {"speech_config": [{"voice": VOICE}]},
+        }).encode()
+        for k in range(5):
+            req = urllib.request.Request(URL, body, {"Content-Type": "application/json",
+                                                     "x-goog-api-key": os.environ["GEMINI_API_KEY"]})
+            try:
+                with urllib.request.urlopen(req, timeout=120) as r:
+                    data = json.load(r)
+                break
+            except urllib.error.HTTPError as e:
+                # the free tier allows a few requests a minute: a 429 or a 5xx waits and tries again
+                if e.code not in (429, 500, 502, 503, 504) or k == 4:
+                    print(f"gemini: HTTP {e.code} {e.read()[:300]!r}", flush=True)
+                    sys.exit(3)
+                time.sleep(15 * (k + 1))
+            except (urllib.error.URLError, TimeoutError) as e:
+                if k == 4:
+                    print(f"gemini: {e}", flush=True)
+                    sys.exit(3)
+                time.sleep(15 * (k + 1))
+        audio = audio_in(data)
+        if not audio:
+            print(f"gemini: no audio in the answer: {json.dumps(data)[:300]}", flush=True)
+            sys.exit(3)
+        raw = base64.b64decode(audio)
+        if raw[:4] == b"RIFF":
+            with wave.open(io.BytesIO(raw)) as w:
+                sr, raw = w.getframerate(), w.readframes(w.getnframes())
+        else:
+            sr = 24000  # bare PCM: 16-bit mono at 24 kHz
+        pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
+        return torch.from_numpy(pcm.copy()).reshape(1, -1), sr
+elif engine == "freya":
     from freyatts import FreyaTTS
     model = FreyaTTS.from_pretrained("freyavoice/freya-tts", device="cpu")
     def speak(text):
@@ -195,6 +266,7 @@ for i, seg in enumerate(segments):
     torchaudio.save(str(out / name), wav, sr)
     print(f"{name} at {seg['at']:5.2f}s  CER {c:.2f}  {seg['text']}", flush=True)
     clips.append({**seg, "file": name, "cer": round(c, 3)})
+(out / "engine.txt").write_text(engine, encoding="utf-8")  # the notes name the voice that spoke
 (out / "clips.json").write_text(json.dumps(clips, ensure_ascii=False, indent=1), encoding="utf-8")
 if len(bad) * 2 > len(segments):
     sys.exit(f"most of the narration is not clear: {', '.join(bad)} left out of {len(segments)}")

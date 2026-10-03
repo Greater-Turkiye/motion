@@ -72,12 +72,19 @@ jobs:
         timeout-minutes: 40
         env:
           ID: ${{ steps.scene.outputs.id }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           node tools/audio/narration.mjs "$ID" out/narration.json
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet chatterbox-tts faster-whisper
-          python -u tools/audio/tts.py out/narration.json out/voice
+          python -m pip install --quiet faster-whisper
+          # the Gemini voice when the GEMINI_API_KEY secret is set (PLAN.md 24); with no key, or when it
+          # fails, the whole narration is made again with Chatterbox, so a video never mixes two voices
+          if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
+            rm -rf out/voice
+            python -m pip install --quiet chatterbox-tts
+            python -u tools/audio/tts.py out/narration.json out/voice chatterbox
+          fi
           node tools/audio/retime.mjs "$ID" out/voice
           echo "voice: synthetic" >> "scenes/auto/$ID.yaml"
           echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -112,7 +119,7 @@ jobs:
           {
             echo "Haftalık özet, kimse yazmadan ve okumadan üretildi (tools/scene/digest.mjs)."
             echo "Sayılar Greater Türkiye'nin otomatik kayıtlarından; öne çıkan üç haber kaynakların kendi başlıkları."
-            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses (Chatterbox Multilingual, MIT; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; fi
+            if [ "$VOICE" = "true" ]; then echo "Seslendirme: yapay ses ($([ "$(cat out/voice/engine.txt 2>/dev/null)" = gemini ] && echo "Gemini TTS, Google, SynthID filigranlı" || echo "Chatterbox Multilingual, MIT"); ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; fi
           } > notes.md
           gh release create "$ID" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: $ID" >> "$GITHUB_STEP_SUMMARY"
