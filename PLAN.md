@@ -681,6 +681,12 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
   Ukrayna Savunma Bakanlığı ve ArmyInform (CC BY 4.0). Görsel yalnız kaydın kendi haberine aitse
   kullanılır; başka bir olayın fotoğrafı bu olayınmış gibi gösterilmez. Ukrinform, Reuters, AP
   fotoğrafları kullanılmaz (telif).
+  **Denendi, durduruldu (2026-10-04):** 6. Filo haberlerinin DVIDS'teki kendi fotoğrafı başlıkla
+  eşleşip indirilebiliyor (media.defense.gov her istemciye 403 veriyor; DVIDS'in görsel sunucusu 1000
+  px veriyor). Ama örnek iki fotoğrafın ikisi de tanınabilir yüz gösteriyordu (yakın planda bir
+  denizci, toplantıdaki subaylar); askeri basın fotoğraflarının çoğu insan. Yüz kişisel veridir
+  (CLAUDE.md bölüm 2) ve bölüm 4 resimde yüzü açıkça yasaklar; yüzsüz fotoğrafı otomatik seçmek
+  güvenilir değil. Fotoğraf eklenmez; sahibin kuralı değişirse yeniden açılır.
 - **YouTube "özgün olmayan içerik" riski** (Temmuz 2025'ten beri şablon hissi veren seri üretim para
   kazanamıyor): her videonun kendi hikâyesi, kendi kamera yolu ve kendi "neden önemli" cümlesi
   (yakınlık) olmalı; yalnız metni değişen videolar riskli.
