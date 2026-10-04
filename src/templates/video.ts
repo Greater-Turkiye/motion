@@ -352,20 +352,42 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     ctx.globalAlpha = 1;
   }
 
-  // satellite heat detections: small squares, unlike our records' round points, so the two are never
-  // read as the same thing; all appear together, as the satellite saw them (no order to tell)
-  if (beat?.kind === 'satellite') {
+  // satellite heat detections in a magnified circle over the place: 25 km is a few pixels at any zoom
+  // the relief can stand, so the circle draws that radius at a readable scale, with the detections at
+  // their true offsets inside it and its scale written on its edge. Small squares, unlike our records'
+  // round points, so the two are never read as the same thing; all appear together, as the satellite
+  // saw them (no order to tell)
+  if (beat?.kind === 'satellite' && sc.event) {
     const w = windowOf(sc, beatIdx, t);
-    const on = anim(t, beat.at + 0.3, 0.5, ease.outCubic);
-    if (on > 0) {
+    const on = anim(t, beat.at + 0.2, 0.5, ease.outCubic);
+    const c = proj(sc.event.at);
+    if (on > 0 && c) {
+      const R = 230, KM = 25;
+      const [lon0, lat0] = sc.event.at;
+      const kx = 111.32 * Math.cos((lat0 * Math.PI) / 180), ky = 110.57;
+      ctx.save();
       ctx.globalAlpha = w.out * Math.min(1, on);
-      ctx.fillStyle = s.accent;
-      for (const p of beat.points) {
-        const q = proj(p.at);
-        if (!q) continue;
-        ctx.fillRect(q[0] - 5, q[1] - 5, 10, 10);
+      ctx.beginPath(); ctx.arc(c[0], c[1], R * on, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = s.muted; ctx.stroke();
+      // the place itself: a cross, as in the record (its precision is the scene's, not the satellite's)
+      ctx.strokeStyle = s.ink; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(c[0] - 12, c[1]); ctx.lineTo(c[0] + 12, c[1]); ctx.moveTo(c[0], c[1] - 12); ctx.lineTo(c[0], c[1] + 12); ctx.stroke();
+      const dots = anim(t, beat.at + 0.6, 0.4, ease.outCubic);
+      if (dots > 0) {
+        ctx.globalAlpha = w.out * Math.min(1, dots);
+        ctx.fillStyle = s.accent;
+        for (const p of beat.points) {
+          const dx = ((p.at[0] - lon0) * kx) / KM, dy = ((p.at[1] - lat0) * ky) / KM;
+          if (dx * dx + dy * dy > 1) continue;
+          ctx.fillRect(c[0] + dx * R - 7, c[1] - dy * R - 7, 14, 14);
+        }
       }
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = w.out * Math.min(1, on);
+      ctx.font = `600 26px ${s.fonts.mono}`;
+      ctx.fillStyle = s.muted; ctx.textAlign = 'center';
+      ctx.fillText(`${KM} KM`, c[0], c[1] + R + 34);
+      ctx.restore();
     }
   }
 

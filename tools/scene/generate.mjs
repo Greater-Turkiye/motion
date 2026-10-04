@@ -794,7 +794,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     if (b.kind === 'place' || b.kind === 'roster') keys.push({ t: end, ...near(-1.0, 1.0, 2.3) });
     if (b.kind === 'facts') keys.push({ t: end, ...near(-1.8, 1.6, 2.7) });
     if (b.kind === 'recent') keys.push({ t: end, ...near(0, 1.0, 1.9) });
-    if (b.kind === 'satellite') keys.push({ t: end, ...near(0, 0.3, 3.0) });
+    if (b.kind === 'satellite') keys.push({ t: end, ...near(0, -0.6, 2.4) });
     if (b.kind === 'distance') {
       const to = b.to.at;
       const mid = [(at[0] + to[0]) / 2, (at[1] + to[1]) / 2];
