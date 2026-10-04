@@ -294,18 +294,22 @@ export function hookLines(title) {
   // whole words only: "on" must not match inside "Kiev'de on…" words, nor "üç" inside "üçü"
   // "biri öldü", "birini öldürdü": one person, said the Turkish way (shown "BİRİ / ÖLDÜ")
   const N = '(?<![\\p{L}\\d])(\\d+|birini|biri|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
+  // who they were, when the source says it: "iki askeri öldürdü" is "İKİ ASKER / ÖLDÜ" (it was "IRAK /
+  // GELİŞME": only "kişi" was read), with the noun's case ending dropped on screen
+  const WHO = '(kişi|asker|sivil|çocuk|polis|kadın|gazeteci)(nin|yi|i|ı|in|ın|ler|leri|lar|ları)?';
   for (const [re, verb] of [
     // the active voice too: "bomba altı kişiyi yaraladı" is six wounded, said the source's way round
-    [new RegExp(`${N}\\s+(kişi(nin|yi)?\\s+)?(öldürdü|öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
-    [new RegExp(`${N}\\s+(kişi(nin|yi)?\\s+)?(yaraladı|yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
+    [new RegExp(`${N}\\s+(${WHO}\\s+)?(öldürdü|öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
+    [new RegExp(`${N}\\s+(${WHO}\\s+)?(yaraladı|yaralandı|yaralı|yaralanması|yaralandığı)`, 'u'), 'YARALANDI'],
   ]) {
     const m = low.match(re);
     if (!m) continue;
     const n = words(at(m))[0].replace(/^(biri)ni$/iu, '$1');
+    const who = (m[3] ?? 'kişi').toLocaleUpperCase('tr');
     // the count stays with its noun, "3 KİŞİ / YARALANDI": a bare "3" alone on the big line is the
     // poster-number look (CLAUDE.md section 4); "BİRİ / ÖLDÜ" already says who. "5 ölü" and "5 yaralı"
     // read "5 KİŞİ / ÖLDÜ" and "5 KİŞİ / YARALANDI" (the check finds the verb by its stem)
-    const lines = /^biri$/iu.test(n) ? [TR(n), verb] : [`${TR(n)} KİŞİ`, verb];
+    const lines = /^biri$/iu.test(n) ? [TR(n), verb] : [`${TR(n)} ${who}`, verb];
     return { kind: 'casualty', lines, used: at(m) };
   }
   // a number and what it counts; a short word after it ("112 Rus İHA") belongs to the count, and a
