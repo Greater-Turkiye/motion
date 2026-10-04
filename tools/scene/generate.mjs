@@ -661,7 +661,9 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
   const distanceBeat = (fromLabel) => {
     if (whole) return; // from the middle of a whole country, a distance measures nothing the record says
-    if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: 'Kuş uçuşu, en yakın Türk şehrine.' }, fromLabel.length + nearest.name.length + 34, 3.2);
+    // the Bosphorus is a strait, not a city
+    const toText = /BOĞAZI$/u.test(nearest.name) ? "Kuş uçuşu, Türkiye'nin en yakın noktasına." : 'Kuş uçuşu, en yakın Türk şehrine.';
+    if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: toText }, fromLabel.length + nearest.name.length + toText.length + 1, 3.2);
   };
   const regionClose = () => {
     if (!(stats && region && stats.n > 0)) return;
