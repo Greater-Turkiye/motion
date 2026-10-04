@@ -25,3 +25,7 @@
 Amblem kullanım kuralı (PLAN.md bölüm 6, ADR 0026): yalnızca haber bağlamında, konusunun üstünde,
 logomuzun yanında değil ve onay izlenimi vermeden. CC BY ve CC BY-SA dosyalar kullanıldığında
 yazar, videonun açıklamasında manifest'teki `author` alanıyla anılır.
+
+## NASA FIRMS (uydu ısı tespitleri / satellite heat detections)
+
+VIIRS NOAA-20 active fire data, LANCE FIRMS, NASA. Public domain (NASA Earthdata data use guidance). Downloaded without a key from the regional 7-day CSV files at firms.modaps.eosdis.nasa.gov. Credited in the release notes and the posting text of every video that shows it; the scene says a detection is not a confirmed fire, as FIRMS asks.

@@ -352,6 +352,45 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     ctx.globalAlpha = 1;
   }
 
+  // satellite heat detections in a magnified circle over the place: 25 km is a few pixels at any zoom
+  // the relief can stand, so the circle draws that radius at a readable scale, with the detections at
+  // their true offsets inside it and its scale written on its edge. Small squares, unlike our records'
+  // round points, so the two are never read as the same thing; all appear together, as the satellite
+  // saw them (no order to tell)
+  if (beat?.kind === 'satellite' && sc.event) {
+    const w = windowOf(sc, beatIdx, t);
+    const on = anim(t, beat.at + 0.2, 0.5, ease.outCubic);
+    const c = proj(sc.event.at);
+    if (on > 0 && c) {
+      const R = 230, KM = 25;
+      const [lon0, lat0] = sc.event.at;
+      const kx = 111.32 * Math.cos((lat0 * Math.PI) / 180), ky = 110.57;
+      ctx.save();
+      ctx.globalAlpha = w.out * Math.min(1, on);
+      ctx.beginPath(); ctx.arc(c[0], c[1], R * on, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = s.muted; ctx.stroke();
+      // the place itself: a cross, as in the record (its precision is the scene's, not the satellite's)
+      ctx.strokeStyle = s.ink; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(c[0] - 12, c[1]); ctx.lineTo(c[0] + 12, c[1]); ctx.moveTo(c[0], c[1] - 12); ctx.lineTo(c[0], c[1] + 12); ctx.stroke();
+      const dots = anim(t, beat.at + 0.6, 0.4, ease.outCubic);
+      if (dots > 0) {
+        ctx.globalAlpha = w.out * Math.min(1, dots);
+        ctx.fillStyle = s.accent;
+        for (const p of beat.points) {
+          const dx = ((p.at[0] - lon0) * kx) / KM, dy = ((p.at[1] - lat0) * ky) / KM;
+          if (dx * dx + dy * dy > 1) continue;
+          ctx.fillRect(c[0] + dx * R - 7, c[1] - dy * R - 7, 14, 14);
+        }
+      }
+      ctx.globalAlpha = w.out * Math.min(1, on);
+      ctx.font = `600 26px ${s.fonts.mono}`;
+      ctx.fillStyle = s.muted; ctx.textAlign = 'center';
+      ctx.fillText(`${KM} KM`, c[0], c[1] + R + 34);
+      ctx.restore();
+    }
+  }
+
   // the subject's emblem over its own territory (ADR 0026: news context, never beside our mark);
   // it belongs to the opening and leaves before the camera zooms in far enough to crop it
   if (emblemImg && lay.emblem) {
@@ -754,6 +793,30 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       kicker(b.title, top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(said, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      break;
+    }
+    case 'satellite': {
+      // the count stands in its sentence at the size of the facts (CLAUDE.md section 4); the note under
+      // it says what a detection is not, in the muted colour
+      const n = b.points.length;
+      const px = 60, lh = Math.round(px * 1.18);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      // the satellite sees one fire on several passes: the squares fall on one another, so the sentence
+      // says in how many places ("1 noktada 3 ısı tespiti"), and the circle shows what it says
+      const where = b.spots && b.spots < n ? `${b.spots}\u00a0noktada ` : '';
+      const said = wrap(ctx, `${(b.text ?? '').replace(/[.\s]+$/, '')}: ${where}*${n}*\u00a0ısı tespiti.`, WIDTH);
+      ctx.font = `600 36px ${s.fonts.text}`;
+      const note = b.note ? wrap(ctx, b.note, WIDTH) : [];
+      const noteH = note.length * 44;
+      const top = BLOCK_BOTTOM - said.length * lh - noteH - (note.length ? 18 : 0);
+      guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'satellite');
+      kicker(b.title, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines(said, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      if (note.length) {
+        ctx.font = `600 36px ${s.fonts.text}`;
+        lines(note, LEFT, top + said.length * lh + 18 + 36 + rise, 44, b.at + 0.6, s.muted, 36);
+      }
       break;
     }
     case 'quote': {

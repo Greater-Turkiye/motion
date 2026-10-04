@@ -53,6 +53,8 @@ export function captions(sc, meta) {
   const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
     .filter((x) => x && x !== 'TÜRKİYE').map(tag)), '#OSINT', '#GreaterTürkiye'];
   const note = 'Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi başlığıdır, kimse okumadan yayımlandı.';
+  // the satellite block's data, credited where the source is (PLAN.md section 25)
+  const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Uydu verisi: NASA FIRMS (VIIRS, NOAA-20), kamu malı. Isı tespiti yangın olduğu doğrulanmış bir olay değildir.' : '';
 
   const instagram = [
     headline,
@@ -60,6 +62,7 @@ export function captions(sc, meta) {
     where ? `${where}.` : '',
     `Durum: ${status}`,
     sourceLine,
+    satellite,
     '',
     note,
     '',
@@ -77,6 +80,7 @@ export function captions(sc, meta) {
     '',
     `Durum: ${status}`,
     sourceLine,
+    satellite,
     '',
     note,
     'Veri ve içerik CC BY 4.0, Greater Türkiye.',
