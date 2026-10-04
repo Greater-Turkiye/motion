@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { sceneFile } from '../../export/score.mjs';
+import { dative, likeness } from '../scene/likeness.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 /** Characters a second the voice reads at (Chatterbox, Turkish, sped up 1.15 by the mixer): measured
@@ -97,7 +98,7 @@ function kickerSaid(k) {
 
 /** The source as a name the voice can say: "UKRINFORM" is "Ukrinform" (a Latin name keeps its i),
  *  "RUSYA HÜKÜMETİ" is "Rusya Hükümeti"; an acronym stays as it is. */
-const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA', 'FM', 'TV', 'TRT', 'RFE/RL']);
+const ACRONYMS_KEPT = new Set(['ABD', 'AB', 'BM', 'GKRY', 'NATO', 'UN', 'BBC', 'AP', 'AA', 'FM', 'TV', 'TRT', 'RFE/RL', 'DVIDS']);
 function publisherName(sc) {
   let raw = (sc.hook.source ?? '').replace(/^KAYNAK:\s*/, '').replace(/\s*\+\d+$/, '');
   if (/^\d+ YAYIN ORGANI$/u.test(raw)) return '';
@@ -177,7 +178,11 @@ function blockParts(sc, b) {
   const labelOf = (i) => sc.parties?.[i]?.label ?? '';
   switch (b.kind) {
     case 'place': {
-      // the screen names the place and how sure it is; the voice says it as a sentence
+      // the place's distance from Türkiye, beside one the viewer knows, is what the voice says here: the
+      // screen already names the place and how sure it is ("Konum başlıktaki yer adından: ±20 km"), and
+      // "Olay yeri Odesa; harita, haberde geçen yer adından…" spent the third second on the map's method
+      if (saysDistance(sc, 'place')) return [distanceSentence((sc.beats ?? []).find((x) => x.kind === 'distance'))];
+      if ((sc.beats ?? []).some((x) => x.kind === 'distance')) return [];
       const where = name(b.title);
       if (/ülkeyi gösterir|ülke genelinde/.test(b.text ?? '')) return [`Kaynak bir yer vermiyor; harita ${where} genelini gösteriyor.`];
       if (/^Kesin konum yok/.test(b.text ?? '')) return [`Kesin yer bilinmiyor; harita ${where} çevresini gösteriyor.`];
@@ -209,9 +214,8 @@ function blockParts(sc, b) {
       return [lead + B(body)];
     }
     case 'distance':
-      // the Bosphorus is a strait, not a city: "Türkiye'den en yakın şehir İstanbul Boğazı" (an Odesa scene)
-      const what = /BOĞAZI$/u.test(b.to.label) ? "Türkiye'nin en yakın noktası" : "Türkiye'den en yakın şehir";
-      return [`${what} ${name(b.to.label)}; arada kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre var`];
+      // said at the place block already: the block that draws the line is left to the eye
+      return saysDistance(sc, 'distance') ? [distanceSentence(b)] : [];
     case 'status': {
       // the screen stamps the status; the voice says what it means
       const who = publisherName(sc);
@@ -261,16 +265,36 @@ function blockParts(sc, b) {
 }
 
 /** The hook: its big lines as one sentence, then its sub-line. */
+/** "Türkiye'ye uzaklığı: Sinop'a kuş uçuşu yaklaşık yedi yüz kilometre, Ankara ile Diyarbakır arası kadar."
+ *  The nearest place may be the Bosphorus, a strait: "İstanbul Boğazı'na", never "en yakın şehir". */
+function distanceSentence(b) {
+  const d = km(b.from.at, b.to.at);
+  const like = likeness(d);
+  return `Türkiye'ye uzaklığı: ${dative(name(b.to.label))} kuş uçuşu yaklaşık ${sayNumber(spokenKm(d))} kilometre${like ? `, ${like}` : ''}`;
+}
+/** The distance is said once, by whichever of the place and distance blocks comes first. */
+function saysDistance(sc, kind) {
+  const kinds = (sc.beats ?? []).map((x) => x.kind);
+  const d = kinds.indexOf('distance'), p = kinds.indexOf('place');
+  if (d < 0) return false;
+  return kind === 'place' ? p >= 0 && p < d : p < 0 || d < p;
+}
+
 function hookParts(sc) {
   const h = sc.hook;
   // the voice tells the story in a sentence while the screen shows its short headline: "Ukrinform
   // bildiriyor: Hostomel'e Rus saldırısından kaynaklanan kayıplar dörde yükseldi." under "KİEV BÖLGESİ /
   // SALDIRI". Reading the screen's words aloud was the owner's complaint ("okunca aptal gibi oluyor").
   // The facts block, which shows the same sentence, is then left to the music (blockParts)
+  // The fact comes first: the first seconds decide whether a viewer stays (Reuters Institute, 2023,
+  // "literally the most crucial"), and "Ukrinform bildiriyor:" spent the first of them on a name. The
+  // source follows in the same sentence ("…; Ukrinform'a göre."), and the screen shows it throughout.
+  // The distance from Türkiye follows at the place block (see 'place'), a few seconds in rather than
+  // twelve: for a Turkish viewer it is why the story matters (PLAN.md section 25)
   if (sc.template !== 'digest') {
     const story = headlineOf(sc);
     const who = publisherName(sc);
-    if (story) return [`${who ? `${who} bildiriyor: ` : ''}${B(story)}`];
+    if (story) return [`${B(story).replace(/[.!]$/u, '')}${who ? `; ${dative(who)} göre` : ''}.`];
   }
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not

@@ -637,3 +637,41 @@ published, automatic pipeline:
 - One step is the owner's: create a free key at aistudio.google.com ("Get API key") and add it with
   `gh secret set GEMINI_API_KEY -R Greater-Turkiye/motion` (the command asks for the value; it is
   never pasted into a chat, an issue or a file).
+
+## 25. İzlenme süresi / Watch time (2026-10-04)
+
+Sahip: "internette adamlar çok güzel haber sunumları yapıyor … psikolojiye oyna, amaç izlenme süresi,
+viral olmak; bazı haberlerde video, resim kaynağı da eklenebilir." Araştırma (Reuters Institute 2023
+yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. CHI 2016, Molyneux ve Coddington
+2019) ve kendi videolarımız üzerine kararlar:
+
+**Yapılanlar (bu bölümle):**
+- **İlk saniye olgu**: ses haberle açılır, kaynak cümlenin sonundadır ("Rus kuvvetleri Odesa'ya saldırdı,
+  altyapı hasar gördü; Ukrinform'a göre."). "Ukrinform bildiriyor:" ilk saniyeyi bir ada harcıyordu;
+  yayıncılar ilk üç saniyeyi "en kritik" sayıyor. Kaynak ekranda baştan sona yazılı kalır.
+- **Yakınlık üçüncü saniyede, tanıdık bir mesafeyle**: "Türkiye'ye uzaklığı: İstanbul Boğazı'na kuş uçuşu
+  yaklaşık altı yüz kilometre, Ankara ile Trabzon arası kadar." Türk izleyici için haberin "beni ne
+  ilgilendirir" cevabı bu; önce on ikinci saniyedeydi. Sayı tanıdık bir şeyin yanında daha iyi
+  anlaşılıp hatırlanıyor (Barrio vd.). Karşılaştırma iki Türk şehrinin kuş uçuşu mesafesinden
+  hesaplanır (`tools/scene/likeness.mjs`), %12 içinde uyan yoksa söylenmez. Ekrandaki mesafe satırı da
+  aynısını yazar (sessiz izleyen için). Mesafe bir kez söylenir: yer ve mesafe bölümlerinden önce gelen.
+
+**Sırada:**
+- **Gerçek uydu verisi**: NASA FIRMS yangın tespitleri (CC0) saldırı haberlerinde haritada nokta olarak,
+  "uydu tespiti; yangın olduğu doğrulanmadı" notuyla. Yalnız Karadeniz/Ukrayna kayıtlarında; Irak ve
+  Suriye'de değil (Türk kuvvetlerinin harekât alanı, kırmızı çizgi). Copernicus Sentinel öncesi/sonrası
+  görüntüsü ikinci adım ("Contains modified Copernicus Sentinel data [yıl]"); hedefleme görünümü
+  kuralına karşı her sahne denetlenir.
+- **Gerçek görseller**: yalnız telifsiz ya da açık lisanslı kaynaklar: ABD savunma görselleri (DVIDS,
+  kamu malı; "The appearance of U.S. Department of War (DoW) visual information does not imply or
+  constitute DoW endorsement." notu), AB görsel-işitsel servisi (CC BY 4.0, "© European Union"),
+  Ukrayna Savunma Bakanlığı ve ArmyInform (CC BY 4.0). Görsel yalnız kaydın kendi haberine aitse
+  kullanılır; başka bir olayın fotoğrafı bu olayınmış gibi gösterilmez. Ukrinform, Reuters, AP
+  fotoğrafları kullanılmaz (telif).
+- **YouTube "özgün olmayan içerik" riski** (Temmuz 2025'ten beri şablon hissi veren seri üretim para
+  kazanamıyor): her videonun kendi hikâyesi, kendi kamera yolu ve kendi "neden önemli" cümlesi
+  (yakınlık) olmalı; yalnız metni değişen videolar riskli.
+
+**Kuralla çatışan popüler teknikler (sahibin kararı, CLAUDE.md bölüm 4 geçerli):** soru ya da merak
+kancası (araştırma güvenilirliği düşürdüğünü gösteriyor, yasak doğru), sunucu yüzü (gerçek fotoğrafla
+kısmen karşılanabilir), trend müzik (lisans sorunu), hızlı kesme + efekt sesi (yayımlanmış ölçüm yok).
