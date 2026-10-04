@@ -19,6 +19,9 @@ export type Beat =
   | { kind: 'link'; at: number; title: string; text?: string }
   /** our own records around the place in the last days, lit one by one, with their count */
   | { kind: 'recent'; at: number; title: string; points: { at: LonLat; days: number }[]; text?: string }
+  /** satellite heat detections around the place (NASA FIRMS), drawn as points with their count; text
+   *  says when and how far, note says what they are not (PLAN.md section 25) */
+  | { kind: 'satellite'; at: number; title: string; points: { at: LonLat }[]; text?: string; note?: string }
   /** the parties as a list of flags and names (an exercise's participants) */
   | { kind: 'roster'; at: number; title: string; text?: string }
   /** what a party said, in the source's own words, under its flag */
@@ -134,6 +137,7 @@ export function beatText(b: Beat): string[] {
     case 'close': return [b.kicker ?? '', ...b.lines];
     case 'link': return [b.title, b.text ?? ''];
     case 'recent': return [b.title, b.text ?? ''];
+    case 'satellite': return [b.title, b.text ?? '', b.note ?? ''];
     case 'roster': return [b.title, b.text ?? ''];
     case 'quote': return b.lines;
   }

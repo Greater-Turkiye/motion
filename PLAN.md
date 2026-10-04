@@ -656,12 +656,22 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
   hesaplanır (`tools/scene/likeness.mjs`), %12 içinde uyan yoksa söylenmez. Ekrandaki mesafe satırı da
   aynısını yazar (sessiz izleyen için). Mesafe bir kez söylenir: yer ve mesafe bölümlerinden önce gelen.
 
+- **Uydu bölümü (NASA FIRMS)**: saldırı haberinde, olay yerinin 25 km çevresinde o gün ve ertesi gün
+  NASA uydusunun gördüğü ısı noktaları haritada küçük kareler olarak (kayıtlarımızın yuvarlak
+  noktalarından ayrı), sayısı cümlesinde ("30 Eylül–1 Ekim, Kiev çevresinde 25 km içinde: 4 ısı
+  tespiti.") ve altında "Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı." Ses:
+  "NASA uydusu bu çevrede o gün ve ertesi gün dört ısı noktası tespit etti; saldırıyla bağı
+  doğrulanmadı." Veri VIIRS NOAA-20, son yedi gün, anahtarsız indirilen bölge dosyaları (Europe ve
+  Russia_Asia; ikisi Ukrayna'yı kapsar), kamu malı; künyede ve paylaşım metninde anılır. Koşullar:
+  yalnız Karadeniz bölgesi (Irak ve Suriye'de asla: Türk kuvvetlerinin harekât alanı), yalnız saldırı
+  ailesi, yer en az 25 km kesinlikte (bir bölgenin ortası değil), en az iki tespit, ve askeri bir
+  nesneye (depo, mühimmat, fırlatma alanı, hava savunma, radar, üs, havaalanı, komuta, rafineri)
+  yapılan saldırıda hiç: ısı noktaları orayı işaretler, bu bir hedefleme görünümüdür (CLAUDE.md
+  bölüm 2). Son haftanın 268 sahnesinden 26'sında çıkıyor.
+
 **Sırada:**
-- **Gerçek uydu verisi**: NASA FIRMS yangın tespitleri (CC0) saldırı haberlerinde haritada nokta olarak,
-  "uydu tespiti; yangın olduğu doğrulanmadı" notuyla. Yalnız Karadeniz/Ukrayna kayıtlarında; Irak ve
-  Suriye'de değil (Türk kuvvetlerinin harekât alanı, kırmızı çizgi). Copernicus Sentinel öncesi/sonrası
-  görüntüsü ikinci adım ("Contains modified Copernicus Sentinel data [yıl]"); hedefleme görünümü
-  kuralına karşı her sahne denetlenir.
+- Copernicus Sentinel öncesi/sonrası görüntüsü ("Contains modified Copernicus Sentinel data [yıl]");
+  hedefleme görünümü kuralına karşı her sahne denetlenir.
 - **Gerçek görseller**: yalnız telifsiz ya da açık lisanslı kaynaklar: ABD savunma görselleri (DVIDS,
   kamu malı; "The appearance of U.S. Department of War (DoW) visual information does not imply or
   constitute DoW endorsement." notu), AB görsel-işitsel servisi (CC BY 4.0, "© European Union"),

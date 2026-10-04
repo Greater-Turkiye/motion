@@ -487,7 +487,34 @@ function arrange(beats, variant) {
   return { beats: out, end: t };
 }
 
-export function generate(record, { datasets, style, variant = 'standart' } = {}) {
+/** NASA FIRMS active-fire rows (VIIRS, NOAA-20) from the CSV files the workflow downloads. */
+const MONTHS_TR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+/** FIRMS detections within 25 km of a place on the record's day and the next (UTC), at nominal or
+ *  high confidence. */
+function firmsNear(rows, at, start) {
+  const d0 = String(start).slice(0, 10);
+  const d1 = new Date(Date.parse(`${d0}T00:00Z`) + 86400000).toISOString().slice(0, 10);
+  return rows.filter((r) => (r.date === d0 || r.date === d1) && r.conf !== 'low' && r.conf !== 'l'
+    && geoDistance(r.at, at) * 6371 <= 25);
+}
+export function readFirms(files) {
+  const rows = [];
+  for (const f of files) {
+    if (!existsSync(f)) continue;
+    const [head, ...lines] = readFileSync(f, 'utf8').trim().split(/\r?\n/);
+    const cols = head.split(',');
+    const ix = (k) => cols.indexOf(k);
+    for (const line of lines) {
+      const c = line.split(',');
+      rows.push({ at: [Number(c[ix('longitude')]), Number(c[ix('latitude')])], date: c[ix('acq_date')], time: c[ix('acq_time')], conf: c[ix('confidence')] });
+    }
+  }
+  // the regional files overlap (Europe and Russia_Asia meet at 26-35° E): one row per detection
+  const seen = new Set();
+  return rows.filter((r) => { const k = `${r.at}|${r.date}|${r.time}`; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
+export function generate(record, { datasets, style, variant = 'standart', firms = null } = {}) {
   if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
   const titleTr = record.title?.tr, titleEn = record.title?.en ?? '';
@@ -701,6 +728,29 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     if (!warParty) push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
     if (pt) distanceBeat(placeTitle);
+    // what a satellite saw: heat detections (NASA FIRMS) within 25 km of a war item's place, on its day
+    // and the next. Only in the Black Sea theatre, never in Iraq or Syria, where Turkish forces operate
+    // (red line), and only with a place from the record, not a region's middle. A detection is not a
+    // confirmed fire and nothing ties it to the attack: the block says so under the count
+    // The place must be known to within 25 km: a region's middle ("Dnipro bölgesi", ±100 km) with a
+    // 25 km ring round it says nothing. A strike on a military object (a depot, a launch site, an air
+    // defence system) is left out: heat points there would mark the site itself, which is a targeting
+    // view (CLAUDE.md section 2), whoever's it is
+    // (word stems: Turkish suffixes follow them, "depoyu", "mühimmatı")
+    const military = /\b(depo\w*|depot\w*|mühimmat\w*|ammunition|fırlatma\w*|launch (site|pad)\w*|SAM|hava savunma\w*|air defen[cs]e|radar\w*|üs(sü|te|sünü|lere)?|bases?|airfield\w*|havaalan\w*|komuta\w*|command post\w*|karargâh\w*|headquarters|rafineri\w*|refiner\w*)(?![\p{L}])/iu;
+    const sharp = (loc?.uncertainty_m ?? Infinity) <= 25000;
+    const sat = firms && pt && sharp && regionKey === 'black-sea' && family === 'strike' && !military.test(`${titleTr} ${titleEn}`)
+      ? firmsNear(firms, pt, record.time.start) : [];
+    if (sat.length >= 2) {
+      const d0 = new Date(`${String(record.time.start).slice(0, 10)}T12:00Z`);
+      const d1 = new Date(d0.getTime() + 86400000);
+      const span = d0.getUTCMonth() === d1.getUTCMonth()
+        ? `${d0.getUTCDate()}-${d1.getUTCDate()} ${MONTHS_TR[d0.getUTCMonth()]}`
+        : `${d0.getUTCDate()} ${MONTHS_TR[d0.getUTCMonth()]}–${d1.getUTCDate()} ${MONTHS_TR[d1.getUTCMonth()]}`;
+      const text = `${span}, ${placeName ?? placeTitle} çevresinde 25 km içinde`;
+      const note = 'Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı.';
+      push({ kind: 'satellite', title: 'UYDU · NASA FIRMS', points: sat.map((r) => ({ at: r.at })), text, note }, text.length + note.length + 20, 4.2);
+    }
     if (around && around.n >= 3) {
       const text = `${placeName} çevresinde, 150 km içinde.`;
       push({ kind: 'recent', title: 'KAYITLARIMIZDA · SON 7 GÜN', points: around.points, text }, 28 + text.length, 3.6);
@@ -744,6 +794,7 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
     if (b.kind === 'place' || b.kind === 'roster') keys.push({ t: end, ...near(-1.0, 1.0, 2.3) });
     if (b.kind === 'facts') keys.push({ t: end, ...near(-1.8, 1.6, 2.7) });
     if (b.kind === 'recent') keys.push({ t: end, ...near(0, 1.0, 1.9) });
+    if (b.kind === 'satellite') keys.push({ t: end, ...near(0, 0.3, 3.0) });
     if (b.kind === 'distance') {
       const to = b.to.at;
       const mid = [(at[0] + to[0]) / 2, (at[1] + to[1]) / 2];
@@ -814,6 +865,8 @@ export function notes(record, scene) {
     `- Tarih / date: ${d}`,
     `- Kayıt / record: \`${record.id}\``,
     ...record.sources.map((s) => `- Kaynak / source: ${s.url}`),
+    // the satellite block's data and what it is not (FIRMS asks that detections are not called fires)
+    ...(scene.beats.some((b) => b.kind === 'satellite') ? ['- Uydu verisi / satellite data: NASA FIRMS (VIIRS, NOAA-20), kamu malı / public domain. Isı tespiti doğrulanmış bir yangın değildir; hotspots are fire detections, not confirmed fires.'] : []),
     '',
     'Bu video, Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi',
     'başlığıdır (çevirisi makine çevirisi olabilir) ve kimse okumadan yayımlandı.',
@@ -851,7 +904,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const file = args.get('record') ?? findRecord(datasets, args.get('id'));
     const record = parse(readFileSync(file, 'utf8'));
     try {
-      const scene = generate(record, { datasets, style, variant });
+      const firms = args.get('firms') ? readFirms(args.get('firms').split(',')) : null;
+      const scene = generate(record, { datasets, style, variant, firms });
       write(scene, record, args.get('out'));
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
       // what the site's videos page shows next to the video (tools/scene/site.mjs)

@@ -257,6 +257,11 @@ function blockParts(sc, b) {
       const where = (b.text ?? '').split(' çevresinde')[0];
       return [`Kayıtlarımızda ${where ? `${B(where)} çevresinde ` : 'bu çevrede '}son bir haftada ${sayNumber(b.points.length)} olay var`];
     }
+    case 'satellite': {
+      // what the satellite saw, and what it does not show, in one sentence
+      const n = b.points.length;
+      return [`NASA uydusu bu çevrede o gün ve ertesi gün ${sayNumber(n)} ısı noktası tespit etti; saldırıyla bağı doğrulanmadı`];
+    }
     case 'quote':
       return [`${b.speaker !== undefined && labelOf(b.speaker) ? `${name(labelOf(b.speaker))}: ` : ''}${B(b.lines.join(' '))}`];
     default:

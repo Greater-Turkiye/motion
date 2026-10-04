@@ -352,6 +352,23 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     ctx.globalAlpha = 1;
   }
 
+  // satellite heat detections: small squares, unlike our records' round points, so the two are never
+  // read as the same thing; all appear together, as the satellite saw them (no order to tell)
+  if (beat?.kind === 'satellite') {
+    const w = windowOf(sc, beatIdx, t);
+    const on = anim(t, beat.at + 0.3, 0.5, ease.outCubic);
+    if (on > 0) {
+      ctx.globalAlpha = w.out * Math.min(1, on);
+      ctx.fillStyle = s.accent;
+      for (const p of beat.points) {
+        const q = proj(p.at);
+        if (!q) continue;
+        ctx.fillRect(q[0] - 5, q[1] - 5, 10, 10);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
   // the subject's emblem over its own territory (ADR 0026: news context, never beside our mark);
   // it belongs to the opening and leaves before the camera zooms in far enough to crop it
   if (emblemImg && lay.emblem) {
@@ -754,6 +771,27 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       kicker(b.title, top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(said, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      break;
+    }
+    case 'satellite': {
+      // the count stands in its sentence at the size of the facts (CLAUDE.md section 4); the note under
+      // it says what a detection is not, in the muted colour
+      const n = b.points.length;
+      const px = 60, lh = Math.round(px * 1.18);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      const said = wrap(ctx, `${(b.text ?? '').replace(/[.\s]+$/, '')}: *${n}*\u00a0ısı tespiti.`, WIDTH);
+      ctx.font = `600 36px ${s.fonts.text}`;
+      const note = b.note ? wrap(ctx, b.note, WIDTH) : [];
+      const noteH = note.length * 44;
+      const top = BLOCK_BOTTOM - said.length * lh - noteH - (note.length ? 18 : 0);
+      guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'satellite');
+      kicker(b.title, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines(said, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
+      if (note.length) {
+        ctx.font = `600 36px ${s.fonts.text}`;
+        lines(note, LEFT, top + said.length * lh + 18 + 36 + rise, 44, b.at + 0.6, s.muted, 36);
+      }
       break;
     }
     case 'quote': {
