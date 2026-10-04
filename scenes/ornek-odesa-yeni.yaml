@@ -1,0 +1,214 @@
+# Generated from evt_01m41jz0d5fjfbxjwhpgmhtw1y by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-odesa-yeni
+record: evt_01m41jz0d5fjfbxjwhpgmhtw1y
+template: strike
+format: vertical
+fps: 60
+duration: 27
+style: A
+source_text:
+  - Rus kuvvetleri Odesa'ya saldırdı, altyapı hasar gördü
+  - Russian forces attack Odesa, infrastructure damaged
+  - Rus kuvvetleri Odesa'ya saldırdı, altyapı hasar gördü
+  - SALDIRI · ODESA · KARADENİZ · RUSYA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 28.9
+      - 44.2
+    zoom: 0.9
+  to: &a2
+    t: 3.5
+    center:
+      - 31
+      - 48.9
+    zoom: 1
+  seconds: 3.5
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 7
+      center:
+        - 29.7
+        - 47.5
+      zoom: 2.3
+    - t: 12
+      center:
+        - 28.9
+        - 48.1
+      zoom: 2.7
+    - t: 18.5
+      center:
+        - 29.9
+        - 43.8
+      zoom: 3.2
+    - t: 23.3
+      center:
+        - 30.7
+        - 47.5
+      zoom: 1.9
+    - t: 27
+      center: *a1
+      zoom: 0.9
+event:
+  at:
+    - 30.71
+    - 46.49
+  precision: locality
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    alts:
+      - - 34.5
+        - 43.4
+      - - 37.2
+        - 42.6
+      - - 32.6
+        - 42.4
+    kind: sea
+  - text: ODESA
+    at:
+      - 30.708
+      - 45.592
+    kind: country
+hook:
+  kicker: 3 EKİM
+  lines:
+    - ODESA
+    - SALDIRI
+  sub: Rus kuvvetleri Odesa'ya saldırdı
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: place
+    title: ODESA
+    text: "Konum başlıktaki yer adından: ±20 km."
+    at: 3.5
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Rus kuvvetleri Odesa'ya
+      - saldırdı, altyapı hasar
+      - gördü
+    at: 7
+  - kind: distance
+    from:
+      at:
+        - 30.708
+        - 46.492
+      label: ODESA
+    to:
+      at:
+        - 29.05
+        - 41.2
+      label: İSTANBUL BOĞAZI
+    text: "Kuş uçuşu, Türkiye'nin en yakın noktasına: Ankara–Trabzon arası kadar."
+    at: 12
+  - kind: recent
+    title: KAYITLARIMIZDA · SON 7 GÜN
+    points:
+      - at:
+          - 30.71
+          - 46.49
+        days: 7
+      - at:
+          - 30.71
+          - 46.49
+        days: 6
+      - at:
+          - 30.71
+          - 46.49
+        days: 6
+      - at:
+          - 30.71
+          - 46.49
+        days: 6
+      - at:
+          - 30.71
+          - 46.49
+        days: 5
+      - at:
+          - 30.71
+          - 46.49
+        days: 5
+      - at:
+          - 32.6
+          - 46.63
+        days: 4
+      - at:
+          - 30.71
+          - 46.49
+        days: 4
+      - at:
+          - 30.71
+          - 46.49
+        days: 4
+      - at:
+          - 32.6
+          - 46.63
+        days: 3
+      - at:
+          - 30.71
+          - 46.49
+        days: 2
+      - at:
+          - 30.71
+          - 46.49
+        days: 2
+      - at:
+          - 31.98
+          - 46.97
+        days: 2
+      - at:
+          - 32.6
+          - 46.63
+        days: 1
+      - at:
+          - 31.98
+          - 46.97
+        days: 1
+      - at:
+          - 32.6
+          - 46.63
+        days: 3
+      - at:
+          - 32.6
+          - 46.63
+        days: 0
+      - at:
+          - 30.71
+          - 46.49
+        days: 0
+      - at:
+          - 30.71
+          - 46.49
+        days: 0
+    text: Odesa çevresinde, 150 km içinde.
+    at: 18.7
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 23.3
