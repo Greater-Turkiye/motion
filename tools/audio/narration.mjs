@@ -209,7 +209,9 @@ function blockParts(sc, b) {
       return [lead + B(body)];
     }
     case 'distance':
-      return [`Türkiye'den en yakın şehir ${name(b.to.label)}; arada kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre var`];
+      // the Bosphorus is a strait, not a city: "Türkiye'den en yakın şehir İstanbul Boğazı" (an Odesa scene)
+      const what = /BOĞAZI$/u.test(b.to.label) ? "Türkiye'nin en yakın noktası" : "Türkiye'den en yakın şehir";
+      return [`${what} ${name(b.to.label)}; arada kuş uçuşu yaklaşık ${sayNumber(spokenKm(km(b.from.at, b.to.at)))} kilometre var`];
     case 'status': {
       // the screen stamps the status; the voice says what it means
       const who = publisherName(sc);
