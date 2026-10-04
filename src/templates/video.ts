@@ -159,7 +159,11 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       const q = proj(end.at);
       if (!q || !show) return;
       obstacles.push({ x: q[0] - 24, y: q[1] - 24, w: 48, h: 48 });
-      labels.push({ key, text: end.label, x: q[0], y: q[1] - 46, size: 28, color: s.ink, spacing: 0.3, weight: 700, priority: -1, alpha: w.out * show });
+      // each end's name on the side away from the other end: above Cyprus lies Türkiye, and "KIBRIS"
+      // stood inside it when every name went above its point
+      const other = proj((end === beat.from ? beat.to : beat.from).at);
+      const below = !!other && other[1] < q[1];
+      labels.push({ key, text: end.label, x: q[0], y: q[1] + (below ? 52 : -46), size: 28, color: s.ink, spacing: 0.3, weight: 700, priority: -1, alpha: w.out * show });
     });
   }
 
