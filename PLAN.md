@@ -614,7 +614,7 @@ cümleyle anlatır. Olgular aynıdır (yeni iddia yok), sözler farklıdır:
 - **Örüntü**: "Kayıtlarımızda Kiev bölgesi çevresinde son bir haftada seksen olay var."
 - **Durum**: "Kaynak yalnızca Ukrinform; bilgi henüz doğrulanmadı." / "Bilgi iki ayrı kaynağa dayanıyor."
 - **Bölge kapanışı**: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge burası."
-Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Ses modeli ayrı karar: bölüm 24.
+Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Özetin haritası haftanın yeri olan kayıtlarını gösterir, açılıştaki sayıdan azdır: ses "Haritada bunlardan yeri belli olan yüz beş kayıt görünüyor" der ("yüz beş olay var" açılıştaki "yüz elli üç kayıt" ile çelişiyordu); durum "Kayıtlar dört ayrı yayın organından; hiçbiri henüz doğrulanmadı" (önce yanlışlıkla "Tek bir kaynak var"). Ses modeli ayrı karar: bölüm 24.
 
 ## 24. Ses motoru / The voice engine (2026-10-03)
 
