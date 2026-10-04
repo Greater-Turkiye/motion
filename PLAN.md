@@ -614,7 +614,7 @@ cümleyle anlatır. Olgular aynıdır (yeni iddia yok), sözler farklıdır:
 - **Örüntü**: "Kayıtlarımızda Kiev bölgesi çevresinde son bir haftada seksen olay var."
 - **Durum**: "Kaynak yalnızca Ukrinform; bilgi henüz doğrulanmadı." / "Bilgi iki ayrı kaynağa dayanıyor."
 - **Bölge kapanışı**: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge burası."
-Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Ses modeli ayrı karar: bölüm 24.
+Haftalık özet aynı kalır (maddeleri zaten sesle anlatılır). Özetin haritası haftanın yeri olan kayıtlarını gösterir, açılıştaki sayıdan azdır: ses "Haritada bunlardan yeri belli olan yüz beş kayıt görünüyor" der ("yüz beş olay var" açılıştaki "yüz elli üç kayıt" ile çelişiyordu); durum "Kayıtlar dört ayrı yayın organından; hiçbiri henüz doğrulanmadı" (önce yanlışlıkla "Tek bir kaynak var"). Ses modeli ayrı karar: bölüm 24.
 
 ## 24. Ses motoru / The voice engine (2026-10-03)
 
@@ -657,10 +657,13 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
   aynısını yazar (sessiz izleyen için). Mesafe bir kez söylenir: yer ve mesafe bölümlerinden önce gelen.
 
 - **Uydu bölümü (NASA FIRMS)**: saldırı haberinde, olay yerinin 25 km çevresinde o gün ve ertesi gün
-  NASA uydusunun gördüğü ısı noktaları haritada küçük kareler olarak (kayıtlarımızın yuvarlak
-  noktalarından ayrı), sayısı cümlesinde ("30 Eylül–1 Ekim, Kiev çevresinde 25 km içinde: 4 ısı
-  tespiti.") ve altında "Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı." Ses:
-  "NASA uydusu bu çevrede o gün ve ertesi gün dört ısı noktası tespit etti; saldırıyla bağı
+  NASA uydusunun gördüğü ısı noktaları. 25 km haritanın her yakınlığında birkaç piksel, bu yüzden olay
+  yerinin üstünde 25 km'yi okunur ölçekte çizen bir büyüteç dairesi: yer artı işareti, tespitler
+  gerçek uzaklıklarında küçük kareler (kayıtlarımızın yuvarlak noktalarından ayrı), kenarında "25 KM".
+  Uydu aynı yangını birkaç geçişte görür, kareler üst üste düşer; 1,5 km içindeki tespitler tek yer
+  sayılır ve cümle kaç yerde olduğunu söyler ("2-3 Ekim, Dnipro çevresinde 25 km içinde: 1 noktada
+  3 ısı tespiti."), altında "Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı." Ses:
+  "NASA uydusu bu çevrede o gün ve ertesi gün bir noktada üç ısı tespit etti; saldırıyla bağı
   doğrulanmadı." Veri VIIRS NOAA-20, son yedi gün, anahtarsız indirilen bölge dosyaları (Europe ve
   Russia_Asia; ikisi Ukrayna'yı kapsar), kamu malı; künyede ve paylaşım metninde anılır. Koşullar:
   yalnız Karadeniz bölgesi (Irak ve Suriye'de asla: Türk kuvvetlerinin harekât alanı), yalnız saldırı

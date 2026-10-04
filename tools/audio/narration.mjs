@@ -222,6 +222,10 @@ function blockParts(sc, b) {
       const many = (b.text ?? '').match(/(\d+) ayrı kaynak/);
       const state = { 'DOĞRULANMADI': 'henüz doğrulanmadı', 'KISMEN DOĞRULANDI': 'kısmen doğrulandı', 'DOĞRULANDI': 'iki inceleyici tarafından doğrulandı', 'TARTIŞMALI': 'tartışmalı' }[sc.hook.status] ?? lower(sc.hook.status);
       if (many) return [`Bilgi ${sayNumber(Number(many[1]))} ayrı kaynağa dayanıyor ve ${state}.`];
+      // the weekly digest: its items come from several outlets ("4 ayrı yayın organı"); it said "Tek bir
+      // kaynak var" because neither the line above nor a publisher name matched
+      const outlets = (b.text ?? '').match(/(\d+) ayrı yayın organı/u);
+      if (outlets) return [`Kayıtlar ${sayNumber(Number(outlets[1]))} ayrı yayın organından; ${state === 'henüz doğrulanmadı' ? 'hiçbiri henüz doğrulanmadı' : `bilgi ${state}`}.`];
       return [who ? `Kaynak yalnızca ${who}; bilgi ${state}.` : `Tek bir kaynak var; bilgi ${state}.`];
     }
     case 'close': {
@@ -254,6 +258,9 @@ function blockParts(sc, b) {
       return [`Tatbikata katılanlar ${list}.`];
     }
     case 'recent': {
+      // the digest's map shows the week's records that have a place, fewer than the week's count it
+      // opened with: "yüz elli üç kayıt" then "yüz beş olay" read as a contradiction
+      if (/haritada yeri olan/u.test(b.text ?? '')) return [`Haritada bunlardan yeri belli olan ${sayNumber(b.points.length)} kayıt görünüyor`];
       const where = (b.text ?? '').split(' çevresinde')[0];
       return [`Kayıtlarımızda ${where ? `${B(where)} çevresinde ` : 'bu çevrede '}son bir haftada ${sayNumber(b.points.length)} olay var`];
     }
