@@ -1,0 +1,277 @@
+# Generated from evt_01m3z9f8bcezjrtwffmvehqmhq by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-dnipro-uydu
+record: evt_01m3z9f8bcezjrtwffmvehqmhq
+template: strike
+format: vertical
+fps: 60
+duration: 34.3
+style: A
+source_text:
+  - Ruslar Dnipro'ya saldırdı, apartman alev aldı
+  - Russians attack Dnipro, apartment building catches fire
+  - Ruslar Dnipro'ya saldırdı, apartman alev aldı
+  - SALDIRI · DNİPRO · KARADENİZ · RUSYA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 31
+      - 45.2
+    zoom: 0.9
+  to: &a2
+    t: 3.1
+    center:
+      - 35.3
+      - 50.9
+    zoom: 1
+  seconds: 3.1
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 6.6
+      center:
+        - 34
+        - 49.5
+      zoom: 2.3
+    - t: 11.1
+      center:
+        - 33.2
+        - 50.1
+      zoom: 2.7
+    - t: 16.6
+      center:
+        - 35.1
+        - 45.3
+      zoom: 2.7
+    - t: 25.9
+      center:
+        - 35
+        - 47.9
+      zoom: 2.4
+    - t: 30.6
+      center:
+        - 35
+        - 49.5
+      zoom: 1.9
+    - t: 34.3
+      center: *a1
+      zoom: 0.9
+event:
+  at:
+    - 35
+    - 48.48
+  precision: locality
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    alts:
+      - - 34.5
+        - 43.4
+      - - 37.2
+        - 42.6
+      - - 32.6
+        - 42.4
+    kind: sea
+  - text: DNİPRO
+    at:
+      - 34.998
+      - 47.582
+    kind: country
+hook:
+  kicker: 2 EKİM
+  lines:
+    - DNİPRO
+    - SALDIRI
+  sub: Ruslar Dnipro'ya saldırdı
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: place
+    title: DNİPRO
+    text: "Konum başlıktaki yer adından: ±20 km."
+    at: 3.1
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - Ruslar Dnipro'ya saldırdı,
+      - apartman alev aldı
+    at: 6.6
+  - kind: distance
+    from:
+      at:
+        - 34.998
+        - 48.482
+      label: DNİPRO
+    to:
+      at:
+        - 35.15
+        - 42.02
+      label: SİNOP
+    text: "Kuş uçuşu, en yakın Türk şehrine: Ankara–Diyarbakır arası kadar."
+    at: 11.1
+  - kind: satellite
+    title: UYDU · NASA FIRMS
+    points:
+      - at:
+          - 34.87381
+          - 48.58802
+      - at:
+          - 34.86844
+          - 48.58706
+      - at:
+          - 34.86173
+          - 48.58941
+    text: 2-3 Ekim, Dnipro çevresinde 25 km içinde
+    note: Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı.
+    at: 16.8
+  - kind: recent
+    title: KAYITLARIMIZDA · SON 7 GÜN
+    points:
+      - at:
+          - 35.17
+          - 47.86
+        days: 7
+      - at:
+          - 34.57
+          - 49.57
+        days: 7
+      - at:
+          - 35
+          - 48.48
+        days: 7
+      - at:
+          - 35
+          - 48.48
+        days: 6
+      - at:
+          - 34.41
+          - 47.57
+        days: 6
+      - at:
+          - 35.17
+          - 47.86
+        days: 5
+      - at:
+          - 35
+          - 48.48
+        days: 5
+      - at:
+          - 34.57
+          - 49.57
+        days: 5
+      - at:
+          - 35.17
+          - 47.86
+        days: 5
+      - at:
+          - 35.17
+          - 47.86
+        days: 5
+      - at:
+          - 35
+          - 48.48
+        days: 5
+      - at:
+          - 35
+          - 48.48
+        days: 5
+      - at:
+          - 35
+          - 48.48
+        days: 5
+      - at:
+          - 35.17
+          - 47.86
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 4
+      - at:
+          - 35.17
+          - 47.86
+        days: 4
+      - at:
+          - 35
+          - 48.48
+        days: 3
+      - at:
+          - 35
+          - 48.48
+        days: 2
+      - at:
+          - 35
+          - 48.48
+        days: 2
+      - at:
+          - 35
+          - 48.48
+        days: 1
+      - at:
+          - 35
+          - 48.48
+        days: 1
+      - at:
+          - 35
+          - 48.48
+        days: 1
+      - at:
+          - 35.17
+          - 47.86
+        days: 0
+      - at:
+          - 34.57
+          - 49.57
+        days: 0
+      - at:
+          - 35
+          - 48.48
+        days: 0
+      - at:
+          - 35
+          - 48.48
+        days: 0
+    text: Dnipro çevresinde, 150 km içinde.
+    at: 25.9
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 30.6
