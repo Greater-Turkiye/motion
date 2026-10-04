@@ -11,6 +11,13 @@ import type { Style } from '../styles';
 const BOSPHORUS: LonLat = [29.05, 41.2];
 /** Where TÜRKİYE may be written: the centre, the Black Sea side, the west, the east, all on land. */
 const TURKIYE_ANCHORS: LonLat[] = [[33.6, 40.7], [30.6, 39.4], [38.8, 38.6], [36.5, 39.8]];
+/** Points inside Türkiye, coast to coast and Thrace to Hakkari: a foreign emblem never stands on them. */
+const TURKIYE_INSIDE: LonLat[] = [
+  [26.7, 41.6], [28.0, 41.2], [27.3, 40.2], [27.4, 38.6], [28.2, 37.3], [30.2, 37.0], [31.5, 36.9], [33.5, 36.6],
+  [35.3, 37.0], [36.3, 36.4], [37.4, 37.1], [39.0, 37.2], [41.0, 37.4], [43.5, 37.6], [44.0, 39.6], [42.7, 41.1],
+  [40.0, 40.9], [37.5, 41.0], [35.5, 41.7], [33.0, 41.9], [31.0, 41.1], [29.5, 40.0], [32.5, 39.0], [35.0, 38.5],
+  [37.0, 39.5], [39.5, 39.5], [41.5, 39.0], [34.0, 37.8],
+];
 
 /** Great-circle distance, rounded to 10 km: the scale the viewer can feel ("Boğaz'a 430 km"). */
 export const km = (a: LonLat, b: LonLat) => Math.round((geoDistance(a, b) * 6371) / 10) * 10;
@@ -167,8 +174,17 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // 140 px: at 200 the emblem dwarfed the country it stands for (a trident over a Ukraine half its size)
       const size = EMBLEM * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outCubic));
       const y = at[1] - (EMBLEM * emblemAr) / 2 - 30;
-      emblem = { x: at[0], y, size, alpha };
-      obstacles.push({ x: at[0] - size / 2, y: y - (size * emblemAr) / 2, w: size, h: size * emblemAr });
+      const box = { x: at[0] - size / 2 - 20, y: y - (size * emblemAr) / 2 - 20, w: size + 40, h: size * emblemAr + 40 };
+      // a small country beside Türkiye puts the emblem above it onto Turkish ground (GKRY's arms stood on
+      // Anatolia in a Cyprus video): then there is no emblem at all, the map's label names the country
+      const onTurkiye = sc.subject?.country !== 'TUR' && TURKIYE_INSIDE.some((ll) => {
+        const q = proj(ll);
+        return !!q && q[0] >= box.x && q[0] <= box.x + box.w && q[1] >= box.y && q[1] <= box.y + box.h;
+      });
+      if (!onTurkiye) {
+        emblem = { x: at[0], y, size, alpha };
+        obstacles.push({ x: at[0] - size / 2, y: y - (size * emblemAr) / 2, w: size, h: size * emblemAr });
+      }
     }
   }
   // on a flat page the TÜRKİYE label sits on the home fill: white on a dark fill, ink on a light one
