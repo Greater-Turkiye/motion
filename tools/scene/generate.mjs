@@ -13,6 +13,7 @@ import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync } from 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { geoDistance, geoCentroid, geoArea } from 'd3-geo';
+import { likeness } from './likeness.mjs';
 import { feature } from 'topojson-client';
 import { parse, stringify } from 'yaml';
 import { validate, CPS } from '../../src/engine/scene.ts';
@@ -662,7 +663,10 @@ export function generate(record, { datasets, style, variant = 'standart' } = {})
   const distanceBeat = (fromLabel) => {
     if (whole) return; // from the middle of a whole country, a distance measures nothing the record says
     // the Bosphorus is a strait, not a city
-    const toText = /BOĞAZI$/u.test(nearest.name) ? "Kuş uçuşu, Türkiye'nin en yakın noktasına." : 'Kuş uçuşu, en yakın Türk şehrine.';
+    // the distance beside one a Turkish viewer knows, for the viewer who watches with the sound off
+    const like = likeness(nearest.km);
+    const toText = (/BOĞAZI$/u.test(nearest.name) ? "Kuş uçuşu, Türkiye'nin en yakın noktasına" : 'Kuş uçuşu, en yakın Türk şehrine')
+      + (like ? `: ${like.replace(/ ile /u, '–')}.` : '.');
     if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: toText }, fromLabel.length + nearest.name.length + toText.length + 1, 3.2);
   };
   const regionClose = () => {
