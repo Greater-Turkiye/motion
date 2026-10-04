@@ -43,7 +43,12 @@ export function captions(sc, meta) {
   const [kickPlace, kickDate] = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ') : ['', sc.hook.kicker];
   // the place: the video's own "NEREDE" block, else the kicker's; a story without a place has none
   const place = (sc.beats ?? []).find((b) => b.kind === 'place')?.title ?? kickPlace;
-  const where = [place && trName(place), kickDate && trName(kickDate)].filter(Boolean).join(', ');
+  // the date from the record, not from the kicker: the proximity variant's kicker is "TÜRKİYE'YE ~150 KM",
+  // which read "Kıbrıs, Türkiye'ye ~150 Km." (a digest's kicker is its week, said as it is)
+  const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  const day = /^\d{4}-\d{2}-\d{2}/.test(meta.date ?? '') ? `${Number(meta.date.slice(8, 10))} ${MONTHS[Number(meta.date.slice(5, 7)) - 1]}` : '';
+  const when = digest ? kickDate && trName(kickDate) : day || (/\d/.test(kickDate) && !/KM$/u.test(kickDate) ? trName(kickDate) : '');
+  const where = [place && trName(place), when].filter(Boolean).join(', ');
   const statusBeat = (sc.beats ?? []).find((b) => b.kind === 'status')?.text ?? '';
   const status = `${STATUS[meta.status] ?? meta.status}${statusBeat ? ` · ${statusBeat}` : ''}`;
   const publisher = sc.hook.source.replace(/^KAYNAK:\s*/, '').replace(/^(\d+) YAYIN ORGANI$/u, '$1 yayın organı');
