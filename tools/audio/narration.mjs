@@ -260,7 +260,8 @@ function blockParts(sc, b) {
     case 'satellite': {
       // what the satellite saw, and what it does not show, in one sentence
       const n = b.points.length;
-      return [`NASA uydusu bu çevrede o gün ve ertesi gün ${sayNumber(n)} ısı noktası tespit etti; saldırıyla bağı doğrulanmadı`];
+      const where = b.spots && b.spots < n ? `${sayNumber(b.spots)} noktada ` : '';
+      return [`NASA uydusu bu çevrede o gün ve ertesi gün ${where}${sayNumber(n)} ısı tespit etti; saldırıyla bağı doğrulanmadı`];
     }
     case 'quote':
       return [`${b.speaker !== undefined && labelOf(b.speaker) ? `${name(labelOf(b.speaker))}: ` : ''}${B(b.lines.join(' '))}`];

@@ -749,7 +749,10 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
         : `${d0.getUTCDate()} ${MONTHS_TR[d0.getUTCMonth()]}–${d1.getUTCDate()} ${MONTHS_TR[d1.getUTCMonth()]}`;
       const text = `${span}, ${placeName ?? placeTitle} çevresinde 25 km içinde`;
       const note = 'Uydu ısı tespiti; yangın olduğu ya da saldırıyla bağı doğrulanmadı.';
-      push({ kind: 'satellite', title: 'UYDU · NASA FIRMS', points: sat.map((r) => ({ at: r.at })), text, note }, text.length + note.length + 20, 4.2);
+      // places, not passes: detections within 1.5 km of one another are one place on the screen
+      const spots = [];
+      for (const r of sat) if (!spots.some((q) => geoDistance(q, r.at) * 6371 <= 1.5)) spots.push(r.at);
+      push({ kind: 'satellite', title: 'UYDU · NASA FIRMS', points: sat.map((r) => ({ at: r.at })), spots: spots.length, text, note }, text.length + note.length + 30, 4.2);
     }
     if (around && around.n >= 3) {
       const text = `${placeName} çevresinde, 150 km içinde.`;

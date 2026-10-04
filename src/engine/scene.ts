@@ -21,7 +21,7 @@ export type Beat =
   | { kind: 'recent'; at: number; title: string; points: { at: LonLat; days: number }[]; text?: string }
   /** satellite heat detections around the place (NASA FIRMS), drawn as points with their count; text
    *  says when and how far, note says what they are not (PLAN.md section 25) */
-  | { kind: 'satellite'; at: number; title: string; points: { at: LonLat }[]; text?: string; note?: string }
+  | { kind: 'satellite'; at: number; title: string; points: { at: LonLat }[]; spots?: number; text?: string; note?: string }
   /** the parties as a list of flags and names (an exercise's participants) */
   | { kind: 'roster'; at: number; title: string; text?: string }
   /** what a party said, in the source's own words, under its flag */

@@ -801,7 +801,10 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const n = b.points.length;
       const px = 60, lh = Math.round(px * 1.18);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
-      const said = wrap(ctx, `${(b.text ?? '').replace(/[.\s]+$/, '')}: *${n}*\u00a0ısı tespiti.`, WIDTH);
+      // the satellite sees one fire on several passes: the squares fall on one another, so the sentence
+      // says in how many places ("1 noktada 3 ısı tespiti"), and the circle shows what it says
+      const where = b.spots && b.spots < n ? `${b.spots}\u00a0noktada ` : '';
+      const said = wrap(ctx, `${(b.text ?? '').replace(/[.\s]+$/, '')}: ${where}*${n}*\u00a0ısı tespiti.`, WIDTH);
       ctx.font = `600 36px ${s.fonts.text}`;
       const note = b.note ? wrap(ctx, b.note, WIDTH) : [];
       const noteH = note.length * 44;
