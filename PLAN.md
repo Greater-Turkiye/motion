@@ -655,6 +655,10 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
   anlaşılıp hatırlanıyor (Barrio vd.). Karşılaştırma iki Türk şehrinin kuş uçuşu mesafesinden
   hesaplanır (`tools/scene/likeness.mjs`), %12 içinde uyan yoksa söylenmez. Ekrandaki mesafe satırı da
   aynısını yazar (sessiz izleyen için). Mesafe bir kez söylenir: yer ve mesafe bölümlerinden önce gelen.
+  Noktası olmayan Kıbrıs kaydında da mesafe söylenir: bölge adanın kendisidir, ortasından Türkiye'ye
+  ölçülen mesafe doğru bir şey söyler ("Taşucu'ya kuş uçuşu yaklaşık yüz elli kilometre"); büyük bir
+  bölgenin ortası için söylenmez. Bölge kapanışı ("Kıbrıs'tan bir kayıt") en az üç kayıtla çıkar: bir
+  ya da iki kayıt örüntü değildir.
 
 - **Uydu bölümü (NASA FIRMS)**: saldırı haberinde, olay yerinin 25 km çevresinde o gün ve ertesi gün
   NASA uydusunun gördüğü ısı noktaları. 25 km haritanın her yakınlığında birkaç piksel, bu yüzden olay

@@ -697,7 +697,8 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     if (nearest.km >= 100) push({ kind: 'distance', from: { at, label: fromLabel }, to: { at: nearest.at, label: nearest.name }, text: toText }, fromLabel.length + nearest.name.length + toText.length + 1, 3.2);
   };
   const regionClose = () => {
-    if (!(stats && region && stats.n > 0)) return;
+    // one or two records are no pattern: "Ekim ayında kayıtlarımızda, Kıbrıs'tan bir kayıt" said nothing
+    if (!(stats && region && stats.n >= 3)) return;
     // a rank means something only with enough records behind it
     const lines = stats.n >= 10 ? [`${region.from} *${stats.n}* kayıt:`, stats.rank === 1 ? 'en yoğun bölge.' : `bölgeler arasında ${stats.rank}.`] : [`${region.from} *${stats.n}* kayıt.`];
     const kick = `KAYITLARIMIZDA · ${stats.month}`;
@@ -727,7 +728,9 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     // a war item filed under the Black Sea has no place to show: "NEREDE / KARADENİZ" would say it
     if (!warParty) push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
-    if (pt) distanceBeat(placeTitle);
+    // a Cyprus record without a point is still on the island, a hundred-odd km off Türkiye: the island's
+    // middle measures something true, unlike a large region's
+    if (pt || regionKey === 'cyprus') distanceBeat(placeTitle);
     // what a satellite saw: heat detections (NASA FIRMS) within 25 km of a war item's place, on its day
     // and the next. Only in the Black Sea theatre, never in Iraq or Syria, where Turkish forces operate
     // (red line), and only with a place from the record, not a region's middle. A detection is not a
