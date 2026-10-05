@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { sceneFile } from '../../export/score.mjs';
 import { dative, likeness } from '../scene/likeness.mjs';
+import { exonyms, tidy } from '../scene/generate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 /** Characters a second the voice reads at (Chatterbox, Turkish, sped up 1.15 by the mixer): measured
@@ -117,7 +118,8 @@ function headlineOf(sc) {
   // and the voice then told "…altyapıya zarar verdi" under "BİRİ / ÖLDÜ" without the death. An
   // English-only title is not read; then the sub-line is the story
   const title = sc.source_text?.[0] ?? '';
-  if (/[çğıöşüÇĞİÖŞÜ]/u.test(title)) return unquote(title);
+  // the screen's spelling of a place ("Jitomir", not the translation's "Zhytomyr") and its tidy numbers
+  if (/[çğıöşüÇĞİÖŞÜ]/u.test(title)) return unquote(exonyms(tidy(title)));
   return sc.hook.sub ? unquote(sc.hook.sub) : '';
 }
 /** Quotation marks are not spoken: "'Burebista 26'tatbikatı" (as a translation wrote it) is said
