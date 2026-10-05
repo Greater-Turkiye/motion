@@ -271,6 +271,9 @@ const EXONYM = { Kyiv: 'Kiev', Chisinau: 'Kişinev', 'Chișinău': 'Kişinev', T
   Zaporizhzhia: 'Zaporijya', Kherson: 'Herson', Lviv: 'Lviv', Luhansk: 'Luhansk' };
 const TURKISH = new Set('çşğöüıİÇŞĞÖÜâîûÂÎÛ');
 const FOLD = { 'ș': 'ş', 'Ș': 'Ş', 'ţ': 't', 'ț': 't', 'Ț': 'T', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'ß': 'ss' };
+/** A headline's city names in the Turkish press's spelling ("Zhytomyr" → "Jitomir"); the screen and the
+ *  voice name a place the same way (tools/audio/narration.mjs tells the title with it). */
+export const exonyms = (t) => t.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w);
 export const trPlace = (s) => s.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w).replace(/./gu, (c) => (TURKISH.has(c) ? c : FOLD[c] ?? c.normalize('NFD').replace(/\p{M}/gu, '')));
 
 /** "insansız hava aracı" is İHA, and its case ending goes with it: "aracıyla" is "İHA'yla", not "İHA"
@@ -583,7 +586,6 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   const abbrev = (s) => s.replace(/insansız hava ara(?:ç|c)(\p{L}*)/giu, (_, tail) => `İHA${IHA_CASE[tail.toLocaleLowerCase('tr')] ?? ''}`);
   // the headline's own city names in the Turkish press's spelling too ("Mykolaiv'e" → "Mikolayiv'e"),
   // so the facts and the kicker name a city the same way
-  const exonyms = (t) => t.replace(/\p{L}+/gu, (w) => EXONYM[w] ?? w);
   const news = exonyms(tidy(abbrev(unrubric(titleTr))));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
