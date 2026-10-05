@@ -636,7 +636,12 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   const lowered = sc.hook.lines.join(' ').toLocaleLowerCase('tr');
   const fromTitle = (() => { const src = sc.source_text[0] ?? '', i = src.toLocaleLowerCase('tr').indexOf(lowered); return i >= 0 ? src.slice(i, i + lowered.length) : null; })();
   // a sentence starts with a capital, also when it is taken from the middle of the headline ("üç kişi …")
-  const said = (sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+  // the weekly digest's hook is its own sentence, with the region a name: "Bu hafta Karadeniz'den 177 kayıt
+  // derlendi" (lowered whole, it read "karadeniz'den")
+  const week = sc.hook.lines[0].match(/^BU HAFTA (.+)$/u);
+  const said = week
+    ? `Bu hafta ${week[1].toLocaleLowerCase('tr').replace(/(^|\s)(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'))} ${sc.hook.lines.slice(1).join(' ').toLocaleLowerCase('tr')}`
+    : (sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
