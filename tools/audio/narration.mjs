@@ -111,12 +111,14 @@ function publisherName(sc) {
 function headlineOf(sc) {
   const b = (sc.beats ?? []).find((x) => x.kind === 'facts' || x.kind === 'quote');
   if (b?.lines?.length) return unquote(b.lines.join(' ').replace(/\*/g, ''));
-  if (sc.hook.sub) return unquote(sc.hook.sub);
-  // no facts block (a short scene): the record's Turkish title, which the screen shows only cut to the
-  // hook's two lines ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET ETTİ" over "…, Kiev'in katmanlı
-  // savunmasının nasıl güçlendirileceğini tartıştı"); an English-only title is not read
+  // no facts block (a short scene): the record's whole Turkish title, which the screen shows only cut to
+  // the hook ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET ETTİ" over "…, Kiev'in katmanlı savunmasının nasıl
+  // güçlendirileceğini tartıştı"). Before the sub-line: a casualty hook takes its clause out of the sub,
+  // and the voice then told "…altyapıya zarar verdi" under "BİRİ / ÖLDÜ" without the death. An
+  // English-only title is not read; then the sub-line is the story
   const title = sc.source_text?.[0] ?? '';
-  return /[çğıöşüÇĞİÖŞÜ]/u.test(title) ? unquote(title) : '';
+  if (/[çğıöşüÇĞİÖŞÜ]/u.test(title)) return unquote(title);
+  return sc.hook.sub ? unquote(sc.hook.sub) : '';
 }
 /** Quotation marks are not spoken: "'Burebista 26'tatbikatı" (as a translation wrote it) is said
  *  "Burebista 26 tatbikatı"; a suffix after the closing mark stays on with its apostrophe
