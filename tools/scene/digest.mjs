@@ -137,7 +137,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   writeFileSync(out, stringify(sc, { flowLevel: 3, lineWidth: 0 }));
   // what the site's videos page shows next to it (tools/scene/site.mjs), as for a single story
   if (args.get('meta')) writeFileSync(args.get('meta'), JSON.stringify({
-    id: sc.id, title: `Bu hafta ${sc.hook.lines[0].toLocaleLowerCase('tr').replace(/^./u, (c) => c.toLocaleUpperCase('tr'))}: ${sc.hook.lines[1].toLocaleLowerCase('tr')}`,
+    // "Bu hafta Karadeniz'den 177 kayıt derlendi": the hook's first line already says "BU HAFTA" (the title
+    // read "Bu hafta Bu hafta karadeniz'den: …"), and the region is a name
+    id: sc.id, title: `Bu hafta ${sc.hook.lines[0].replace(/^BU HAFTA /u, '').toLocaleLowerCase('tr').replace(/(^|\s)(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'))} ${sc.hook.lines[1].toLocaleLowerCase('tr')}`,
     title_en: null, status: sc.hook.status, date: (args.get('end') ? new Date(args.get('end')) : new Date()).toISOString().slice(0, 10),
     published: new Date().toISOString(), style: sc.style, variant: 'digest', sources: sc.sources ?? [],
     release: `https://github.com/Greater-Turkiye/motion/releases/tag/${sc.id}`,
