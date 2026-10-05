@@ -49,7 +49,13 @@ const publishers = (r) => new Set((r.sources ?? []).map((s) => { try { return ne
 /** How strongly a scene opens (see the header): the generator's hook, weighed. */
 export function hookWeight(scene) {
   const first = scene.hook.lines[0] ?? '';
-  if (/^\d|^(BİR|İKİ|ÜÇ|DÖRT|BEŞ|ALTI|YEDİ|SEKİZ|DOKUZ|ON)$/u.test(first)) return 1.0;
+  // a count leads its line since the casualty hook says who ("YEDİ KİŞİ", "İKİ ASKER", "BİRİ"): the
+  // number word starts the line, it no longer stands alone on it
+  if (/^\d|^(BİRİ|BİR|İKİ|ÜÇ|DÖRT|BEŞ|ALTI|YEDİ|SEKİZ|DOKUZ|ON)(\s|$)/u.test(first)) return 1.0;
+  // "KARADENİZ / GELİŞME" names no event in the biggest type: the video leans on its sub-line alone, and
+  // a clear hook elsewhere should go first ("Başkan: Savunma Kuvvetleri iki başarılı taarruz operasyonu
+  // gerçekleştirdi" was the pick on 5 October with no place and no type to show)
+  if (scene.hook.lines[1] === 'GELİŞME') return 0.65;
   return scene.hook.sub ? 0.92 : 0.85;
 }
 
