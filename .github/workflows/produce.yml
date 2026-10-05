@@ -197,6 +197,15 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - run: gh workflow run timer.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
+      # the weekly digest's own schedule (Mondays 06:27) is GitHub's, which ran late or not at all
+      # (5 October: nothing by 06:52): on a Monday a production starts the digest when no digest run
+      # has started that day; the digest itself skips a week already published
+      - name: The weekly digest, if its schedule has not run
+        run: |
+          [ "$(date -u +%u)" = 1 ] || exit 0
+          today=$(date -u +%F)
+          ran=$(gh run list -R "$GITHUB_REPOSITORY" --workflow digest.yml --limit 10 --json createdAt --jq "[.[]|select(.createdAt|startswith(\"$today\"))]|length")
+          if [ "$ran" = 0 ]; then gh workflow run digest.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"; echo "digest started"; else echo "digest already ran today"; fi
 
   pages:
     needs: produce
