@@ -639,9 +639,14 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   // the weekly digest's hook is its own sentence, with the region a name: "Bu hafta Karadeniz'den 177 kayıt
   // derlendi" (lowered whole, it read "karadeniz'den")
   const week = sc.hook.lines[0].match(/^BU HAFTA (.+)$/u);
+  // the summary is the whole story, as the voice tells it: a casualty hook takes its clause out of the
+  // sub-line, and the card read "Gaz şebekelerine ve iş tesisine zarar verdi" under a story of seven
+  // wounded. The record's Turkish title when it fits the card (four lines); else the sub-line
+  const head = sc.source_text[0] ?? '';
+  const title = /[çğıöşüÇĞİÖŞÜ]/u.test(head) && head.length <= 120 ? head.replace(/\s+/g, ' ').replace(/(\d) '/gu, "$1'") : '';
   const said = week
     ? `Bu hafta ${week[1].toLocaleLowerCase('tr').replace(/(^|\s)(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'))} ${sc.hook.lines.slice(1).join(' ').toLocaleLowerCase('tr')}`
-    : (sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+    : (title || sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
