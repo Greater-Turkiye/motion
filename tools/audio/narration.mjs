@@ -236,7 +236,8 @@ function blockParts(sc, b) {
       // our own count, said as ours: "Eylül ayında Karadeniz'den üç yüz yedi kayıt derledik; en yoğun bölge
       // burası." rather than the screen's "Karadeniz'den 307 kayıt: en yoğun bölge."
       const text = b.lines.join(' ').replace(/\*/g, '');
-      const m = text.match(/^(.+?'d[ae]n) (\d+) kayıt[:.]?\s*(.*)$/u);
+      // the ablative after a voiceless consonant is -tan/-ten: "Irak'tan 8 kayıt." was read as it stood
+      const m = text.match(/^(.+?'[dt][ae]n) (\d+) kayıt[:.]?\s*(.*)$/u);
       if (m) {
         const ORDINAL = { 2: 'ikinci', 3: 'üçüncü', 4: 'dördüncü', 5: 'beşinci', 6: 'altıncı', 7: 'yedinci', 8: 'sekizinci', 9: 'dokuzuncu', 10: 'onuncu' };
         const r = m[3].match(/bölgeler arasında (\d+)\./u);
@@ -311,7 +312,11 @@ function hookParts(sc) {
   if (sc.template !== 'digest') {
     const story = headlineOf(sc);
     const who = publisherName(sc);
-    if (story) return [`${B(story).replace(/[.!]$/u, '')}${who ? `; ${dative(who)} göre` : ''}.`];
+    // where it happened, when the story does not say it: "Kerkük: IŞİD saldırısı …" loses its rubric on
+    // the way to the facts, and the voice told an attack without its city
+    const kp = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ')[0] : '';
+    const placeSaid = !kp || /^\d/.test(kp) || /^TÜRKİYE/u.test(kp) || norm(story).includes(norm(T(kp)).slice(0, 5));
+    if (story) return [`${placeSaid ? '' : `${name(kp)}. `}${B(story).replace(/[.!]$/u, '')}${who ? `; ${dative(who)} göre` : ''}.`];
   }
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not

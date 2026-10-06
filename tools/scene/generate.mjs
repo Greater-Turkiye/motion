@@ -299,7 +299,8 @@ export function hookLines(title) {
   const N = '(?<![\\p{L}\\d])(\\d+|birini|biri|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)';
   // who they were, when the source says it: "iki askeri öldürdü" is "İKİ ASKER / ÖLDÜ" (it was "IRAK /
   // GELİŞME": only "kişi" was read), with the noun's case ending dropped on screen
-  const WHO = '(kişi|asker|sivil|çocuk|polis|kadın|gazeteci)(nin|yi|i|ı|in|ın|ler|leri|lar|ları)?';
+  // "bir polis memurunu öldürdü" (Kirkuk, 5 October) is a policeman: "BİR POLİS / ÖLDÜ"
+  const WHO = '(kişi|asker|sivil|çocuk|polis(?:\\s+memur(?:u|unu|ları|larını)?)?|kadın|gazeteci)(nin|yi|i|ı|in|ın|ler|leri|lar|ları)?';
   for (const [re, verb] of [
     // the active voice too: "bomba altı kişiyi yaraladı" is six wounded, said the source's way round
     [new RegExp(`${N}\\s+(${WHO}\\s+)?(öldürdü|öldü|ölü|öldürüldü|ölmesi|öldüğü|hayatını kaybet)`, 'u'), 'ÖLDÜ'],
@@ -308,7 +309,7 @@ export function hookLines(title) {
     const m = low.match(re);
     if (!m) continue;
     const n = words(at(m))[0].replace(/^(biri)ni$/iu, '$1');
-    const who = (m[3] ?? 'kişi').toLocaleUpperCase('tr');
+    const who = (m[3] ?? 'kişi').replace(/\s+memur.*$/u, '').toLocaleUpperCase('tr');
     // the count stays with its noun, "3 KİŞİ / YARALANDI": a bare "3" alone on the big line is the
     // poster-number look (CLAUDE.md section 4); "BİRİ / ÖLDÜ" already says who. "5 ölü" and "5 yaralı"
     // read "5 KİŞİ / ÖLDÜ" and "5 KİŞİ / YARALANDI" (the check finds the verb by its stem)
