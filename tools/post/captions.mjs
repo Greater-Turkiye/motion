@@ -61,6 +61,7 @@ export function captions(sc, meta) {
   // the satellite block's data, credited where the source is (PLAN.md section 25)
   // the voice is declared here, not on screen (the corner carries our address)
   const voiceLine = sc.voice === 'synthetic' ? 'Seslendirme: yapay ses.' : '';
+  const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
   const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Uydu verisi: NASA FIRMS (VIIRS, NOAA-20), kamu malı. Isı tespiti yangın olduğu doğrulanmış bir olay değildir.' : '';
 
   const instagram = [
@@ -71,6 +72,7 @@ export function captions(sc, meta) {
     sourceLine,
     satellite,
     voiceLine,
+    photoLine,
     '',
     note,
     '',
@@ -90,6 +92,7 @@ export function captions(sc, meta) {
     sourceLine,
     satellite,
     voiceLine,
+    photoLine,
     '',
     note,
     'Veri ve içerik CC BY 4.0, Greater Türkiye.',

@@ -475,6 +475,27 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     }
   }
 
+  // the story's own photograph over the map's upper part, cropped to fill it, fading into the page above
+  // the text block; no frame, no filter, no motion on the picture itself (PLAN.md section 29)
+  if (beat?.kind === 'photo') {
+    const img = a.photos.get(beat.file);
+    const w = windowOf(sc, beatIdx, t);
+    const on = anim(t, beat.at, 0.4, ease.outCubic);
+    if (img && on > 0) {
+      const boxH = BLOCK_BOTTOM - 330;
+      const k = Math.max(W / img.naturalWidth, boxH / img.naturalHeight);
+      const dw = img.naturalWidth * k, dh = img.naturalHeight * k;
+      ctx.save();
+      ctx.globalAlpha = w.out * Math.min(1, on);
+      ctx.beginPath(); ctx.rect(0, 0, W, boxH); ctx.clip();
+      ctx.drawImage(img, (W - dw) / 2, (boxH - dh) / 2, dw, dh);
+      const g = ctx.createLinearGradient(0, boxH - 260, 0, boxH);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, s.bg[1]);
+      ctx.fillStyle = g; ctx.fillRect(0, boxH - 260, W, 260);
+      ctx.restore();
+    }
+  }
+
   // the subject's emblem over its own territory (ADR 0026: news context, never beside our mark);
   // it belongs to the opening and leaves before the camera zooms in far enough to crop it
   if (emblemImg && lay.emblem) {
@@ -970,6 +991,13 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
         ctx.font = `600 36px ${s.fonts.text}`;
         lines(note, LEFT, top + said.length * lh + 18 + 36 + rise, 44, b.at + 0.6, s.muted, 36);
       }
+      break;
+    }
+    case 'photo': {
+      // whose photograph and under what terms, at the size of a kicker
+      kicker('KAYNAĞIN FOTOĞRAFI', BLOCK_BOTTOM - 70 + rise);
+      ctx.font = `600 36px ${s.fonts.text}`;
+      lines(wrap(ctx, b.credit, WIDTH), LEFT, BLOCK_BOTTOM - 10 + rise, 44, b.at + 0.3, s.muted, 36);
       break;
     }
     case 'quote': {

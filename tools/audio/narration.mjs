@@ -269,6 +269,9 @@ function blockParts(sc, b) {
       const where = (b.text ?? '').split(' çevresinde')[0];
       return [`Kayıtlarımızda ${where ? `${B(where)} çevresinde ` : 'bu çevrede '}son bir haftada ${sayNumber(b.points.length)} olay var`];
     }
+    case 'photo':
+      // the picture speaks for itself; the voice waits
+      return [];
     case 'satellite': {
       // what the satellite saw, and what it does not show, in one sentence
       const n = b.points.length;

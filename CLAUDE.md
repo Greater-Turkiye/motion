@@ -29,6 +29,9 @@ stat pills, "Ama suyun altında:"): rubbish design. None of it in any video, fra
   the size of the facts ("Kiev → Sinop: ~1000 km", "… 150 km içinde: 80 kayıt.").
 - **No generated, stock or metaphor imagery**: no icebergs, chessboards, puzzles, hourglasses, faces,
   no image or video from a generative model. The picture is the map, the data and official emblems.
+  One exception (owner, 2026-10-06): the story's own photograph, when its source publishes it in the
+  public domain or under an open licence and it shows no recognisable face (tools/scene/faces.py),
+  with its credit on screen; never a photograph of another event, never a copyrighted one.
 - **No decoration**: no glow, neon or atmosphere halo, particles or stars, light rays, lens flares, gradient
   decor, low-poly lines, fake HUD or scanlines; no bounce or overshoot in motion; no whoosh, tick,
   pop or riser effects; no Stories-style progress bar.

@@ -22,6 +22,9 @@ export type Beat =
   /** satellite heat detections around the place (NASA FIRMS), drawn as points with their count; text
    *  says when and how far, note says what they are not (PLAN.md section 25) */
   | { kind: 'satellite'; at: number; title: string; points: { at: LonLat }[]; spots?: number; text?: string; note?: string }
+  /** the story's own photograph (public domain or open licence, no recognisable face), file under
+   *  assets/, with its credit (PLAN.md section 29) */
+  | { kind: 'photo'; at: number; file: string; credit: string }
   /** the parties as a list of flags and names (an exercise's participants) */
   | { kind: 'roster'; at: number; title: string; text?: string }
   /** what a party said, in the source's own words, under its flag */
@@ -144,6 +147,7 @@ export function beatText(b: Beat): string[] {
     case 'close': return [b.kicker ?? '', ...b.lines];
     case 'link': return [b.title, b.text ?? ''];
     case 'recent': return [b.title, b.text ?? ''];
+    case 'photo': return [b.credit];
     case 'satellite': return [b.title, b.text ?? '', b.note ?? ''];
     case 'roster': return [b.title, b.text ?? ''];
     case 'quote': return b.lines;
