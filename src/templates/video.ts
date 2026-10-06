@@ -294,16 +294,30 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     if (p) {
       const [x, y] = p;
       ctx.globalAlpha = 1;
-      for (let n = 0; n < 3; n++) {
-        const w = (t - 0.5 - n * 0.37) / 1.1;
-        if (w < 0) continue;
-        const ph = w - Math.floor(w);
-        ctx.beginPath(); ctx.arc(x, y, 18 + ph * 120, 0, Math.PI * 2);
-        ctx.strokeStyle = s.accent; ctx.globalAlpha = (1 - ph) * 0.9 * dim * tail; ctx.lineWidth = 3 * (1 - ph) + 0.5; ctx.stroke();
+      // what happened decides how the place moves: a strike sends short, quick waves; a ship's sea
+      // slow, wide ones; an aircraft, an exercise or a meeting none (PLAN.md section 26)
+      const kind = own ? 'ring' : sc.event?.kind ?? 'ring';
+      const waves = { drone: [3, 1.1, 120], missile: [2, 0.7, 150], artillery: [3, 1.1, 110], ground: [2, 1.4, 90], sea: [2, 2.2, 170], ring: [3, 1.1, 120] }[kind as string] as [number, number, number] | undefined;
+      if (waves) {
+        const [count, period, reach] = waves;
+        for (let n = 0; n < count; n++) {
+          const w = (t - 0.5 - n * (period / count)) / period;
+          if (w < 0) continue;
+          const ph = w - Math.floor(w);
+          ctx.beginPath();
+          // the sea's waves are flattened, as water spreads; the others round
+          if (kind === 'sea') ctx.ellipse(x, y, 18 + ph * reach, (18 + ph * reach) * 0.45, 0, 0, Math.PI * 2);
+          else ctx.arc(x, y, 18 + ph * reach, 0, Math.PI * 2);
+          ctx.strokeStyle = s.accent; ctx.globalAlpha = (1 - ph) * 0.9 * dim * tail; ctx.lineWidth = 3 * (1 - ph) + 0.5; ctx.stroke();
+        }
       }
       ctx.globalAlpha = anim(t, 0.35, 0.4) * dim * tail;
       ctx.beginPath(); ctx.arc(x, y, 44, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 3; ctx.stroke();
-      ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
+      if (kind === 'ring') {
+        ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
+      } else {
+        drawSymbol(ctx, kind, x, y, 30, s.accent);
+      }
       ctx.globalAlpha = 1;
     }
   }
@@ -673,6 +687,51 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
 }
 
 /** Where the synthetic-voice note sits: top left inside the safe area, under the progress bar. */
+/** Map symbols, flat and one colour like a printed map's legend: no glow, no shading. Drawn about
+ *  `size` px across, centred on (x, y), heading up (north) where they have a heading. */
+function drawSymbol(ctx: CanvasRenderingContext2D, kind: string, x: number, y: number, size: number, color: string) {
+  const u = size / 2;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.beginPath();
+  switch (kind) {
+    case 'drone': // a delta wing, as the one-way attack drones are drawn
+      ctx.moveTo(0, -u); ctx.lineTo(u, u * 0.7); ctx.lineTo(0, u * 0.35); ctx.lineTo(-u, u * 0.7); ctx.closePath(); ctx.fill();
+      break;
+    case 'missile': // a body with its fins
+      ctx.moveTo(0, -u); ctx.lineTo(u * 0.2, -u * 0.6); ctx.lineTo(u * 0.2, u * 0.45); ctx.lineTo(u * 0.5, u); ctx.lineTo(-u * 0.5, u);
+      ctx.lineTo(-u * 0.2, u * 0.45); ctx.lineTo(-u * 0.2, -u * 0.6); ctx.closePath(); ctx.fill();
+      break;
+    case 'air': // an aircraft seen from above
+      ctx.moveTo(0, -u); ctx.lineTo(u * 0.12, -u * 0.2); ctx.lineTo(u, u * 0.15); ctx.lineTo(u, u * 0.32); ctx.lineTo(u * 0.12, u * 0.15);
+      ctx.lineTo(u * 0.1, u * 0.7); ctx.lineTo(u * 0.4, u); ctx.lineTo(-u * 0.4, u); ctx.lineTo(-u * 0.1, u * 0.7); ctx.lineTo(-u * 0.12, u * 0.15);
+      ctx.lineTo(-u, u * 0.32); ctx.lineTo(-u, u * 0.15); ctx.lineTo(-u * 0.12, -u * 0.2); ctx.closePath(); ctx.fill();
+      break;
+    case 'sea': // a hull seen from above, bow up
+      ctx.moveTo(0, -u); ctx.quadraticCurveTo(u * 0.45, -u * 0.4, u * 0.38, u * 0.85); ctx.lineTo(-u * 0.38, u * 0.85);
+      ctx.quadraticCurveTo(-u * 0.45, -u * 0.4, 0, -u); ctx.closePath(); ctx.fill();
+      break;
+    case 'artillery': // the military map's artillery sign: a filled dot in a ring
+      ctx.arc(0, 0, u * 0.9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, u * 0.35, 0, Math.PI * 2); ctx.fill();
+      break;
+    case 'ground': // crossed lines: a clash on the ground
+      ctx.moveTo(-u * 0.75, -u * 0.75); ctx.lineTo(u * 0.75, u * 0.75); ctx.moveTo(u * 0.75, -u * 0.75); ctx.lineTo(-u * 0.75, u * 0.75);
+      ctx.lineWidth = 5; ctx.stroke();
+      break;
+    case 'exercise': // a diamond, open
+      ctx.moveTo(0, -u); ctx.lineTo(u, 0); ctx.lineTo(0, u); ctx.lineTo(-u, 0); ctx.closePath(); ctx.stroke();
+      break;
+    case 'meeting': // two points joined
+      ctx.arc(-u * 0.55, 0, u * 0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(u * 0.55, 0, u * 0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-u * 0.3, 0); ctx.lineTo(u * 0.3, 0); ctx.stroke();
+      break;
+  }
+  ctx.restore();
+}
+
 const VOICE_NOTE = { x: LEFT, y: SAFE.top + 22, text: 'SESLENDİRME: YAPAY SES' };
 
 /** A narrated video says, in every frame, that the voice is synthetic (TikTok, YouTube and Meta ask
