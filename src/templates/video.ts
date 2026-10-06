@@ -1,7 +1,7 @@
 import { geoDistance, geoInterpolate } from 'd3-geo';
 import type { Assets } from '../assets';
 import { anim, ease, lerp, rng, span } from '../engine/time';
-import type { Beat, Camera, LonLat, Scene } from '../engine/scene';
+import type { Beat, Camera, Key, LonLat, Scene } from '../engine/scene';
 import { H, W } from '../render/globe';
 import type { MapRenderer } from '../render/map';
 import { makeProject, type Project } from '../gl/globe-gl';
@@ -81,27 +81,53 @@ function guard(box: Box, what: string) {
 /** The camera at `t`: the legacy from/to move, or a path through keys; zoom moves in log space so a
  *  zoom from 1 to 3 feels as even as one from 3 to 9. A slow periodic sway keeps it alive between
  *  keys and returns to zero at the end, so the loop has no seam. */
+/** The whole Earth in the frame: a disc this wide (px), or on a flat map a third of the world across. */
+const GLOBE_R = 420;
+const globeZoom = (s: Style) => (s.flat ? 0.33 : GLOBE_R / s.baseScale);
+/** The camera's keys with the opening and the loop's last key pulled back to the whole globe, when the
+ *  scene asks: the first frame (the thumbnail) shows the Earth, Türkiye and the place on it, and the
+ *  camera dives in during the hook; the last frame is the first again, so the loop has no seam
+ *  (research/02, format 2 "konum zoom'u"; PLAN.md section 31) */
+const globeMemo = new Map<string, Key[]>();
+function keysOf(sc: Scene, s: Style): Key[] | undefined {
+  const ks = sc.camera.keys;
+  if (!ks || !sc.camera.globe) return ks;
+  const memo = `${sc.id}|${s.id}|${sc.duration}|${ks.length}`;
+  let out = globeMemo.get(memo);
+  if (!out) {
+    const z = globeZoom(s);
+    out = ks.map((k, i) => (i === 0 || (i === ks.length - 1 && k.t >= sc.duration - 1e-6) ? { ...k, zoom: Math.min(k.zoom, z) } : k));
+    globeMemo.set(memo, out);
+  }
+  return out;
+}
+
 function cameraAt(sc: Scene, s: Style, t: number): Camera {
   const cam = sc.camera;
+  const keys = keysOf(sc, s);
   const mode = sc.anim?.camera ?? s.motion.camera;
   const sway = Math.sin((2 * Math.PI * t) / sc.duration);
-  if (!cam.keys) {
+  if (!keys) {
     const k = (ease[cam.ease] || ease.outCubic)(span(t, 0, cam.seconds));
     const drift = t * 0.35;
     return { center: [lerp(cam.from.center[0], cam.to.center[0], k) + drift * 0.3, lerp(cam.from.center[1], cam.to.center[1], k)],
       zoom: lerp(cam.from.zoom, cam.to.zoom, k) * (1 + 0.012 * t) };
   }
-  const ks = cam.keys;
+  const ks = keys;
   let i = 0;
   while (i < ks.length - 2 && t >= ks[i + 1].t) i++;
   const a = ks[i], b = ks[i + 1];
   // glide: one smooth move across the whole gap between keys
   // snap: the move happens in the first third, fast and decisive, then the frame holds
   // fly: like glide, but a long move rises and comes down (van Wijk and Nuij's zoom-out-then-in)
-  const k = mode === 'snap' ? ease.outExpo(span(t, a.t, a.t + Math.min(1.2, (b.t - a.t) * 0.35)))
+  // the dive from the globe is one even move in every style, over the hook's first two seconds: a snap
+  // left the Earth after a quarter of a second, too soon to be seen
+  const dive = !!cam.globe && i === 0;
+  const k = dive ? ease.inOutCubic(span(t, 0.15, Math.min(2.0, b.t)))
+    : mode === 'snap' ? ease.outExpo(span(t, a.t, a.t + Math.min(1.2, (b.t - a.t) * 0.35)))
     : ease.inOutCubic(span(t, a.t, b.t));
   const far = Math.hypot(b.center[0] - a.center[0], b.center[1] - a.center[1]);
-  const rise = mode === 'fly' ? 1 + Math.min(1.2, far / 6) * Math.sin(Math.PI * k) : 1;
+  const rise = mode === 'fly' && !dive ? 1 + Math.min(1.2, far / 6) * Math.sin(Math.PI * k) : 1;
   return {
     center: [lerp(a.center[0], b.center[0], k) + 0.5 * sway, lerp(a.center[1], b.center[1], k)],
     zoom: (Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), k)) * (1 + 0.015 * sway)) / rise,
@@ -211,6 +237,11 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     // gives way, or "TİRAN" stands twice a few pixels apart
     const twin = beat?.kind === 'distance' && (l.text === beat.from.label || l.text === beat.to.label)
       ? 1 - anim(t, beat.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
+    // TÜRKİYE, which never moves, gives way to the distance's Turkish end when they meet: the line's end
+    // point and "SİNOP" stood on its letters ("TÜRK•YE"); the end's own name says where in Türkiye
+    const q = beat?.kind === 'distance' ? proj(beat.to.at) : null;
+    const meets = home && !!q && Math.abs(q[0] - p[0]) < 200 && Math.abs(q[1] - p[1]) < 90
+      ? 1 - anim(t, beat!.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
     labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home,
       // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
       // TÜRKİYE stands on its own fill, where a paper-coloured outline would read as a box
@@ -218,7 +249,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
       // be the one that yields, or the two are drawn on top of each other (BRĂİLA: ROMANYA over TÜRKİYE)
       // a sea's name gives way to any place name: the place is the story, the sea only the setting
-      priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin });
+      priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin * meets });
   });
   return { labels, obstacles, emblem };
 }
@@ -286,6 +317,21 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const emblemAr = emblemImg ? emblemImg.naturalHeight / emblemImg.naturalWidth || 1 : 1;
   const lay = layout(sc, s, proj, t, emblemAr, hookMetrics(ctx, sc, s).top);
 
+  // the Earth's edge as a plain line while the whole globe is in the frame: on a dark page the dark disc
+  // was hard to tell from the night around it. A line, not a glow or an atmosphere (CLAUDE.md section 4)
+  if (sc.camera.globe && !s.flat) {
+    const r = s.baseScale * cameraAt(sc, s, t).zoom;
+    const show = 1 - span(r, 520, 700);
+    if (show > 0) {
+      ctx.save();
+      ctx.globalAlpha = show * 0.9; ctx.strokeStyle = s.label; ctx.lineWidth = 1.5;
+      // above the text block only: the arc ran through the hook's kicker
+      ctx.beginPath(); ctx.rect(0, 0, W, 930); ctx.clip();
+      ctx.beginPath(); ctx.arc(W / 2, s.cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   // the event: a region-level ring, never a pin, with shock waves every 1.1 s; a facts block with a
   // place of its own (a digest's story) rings that place while it is on
   const own = beat?.kind === 'facts' && beat.place ? beat.place : null;
@@ -313,7 +359,9 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
           ctx.strokeStyle = s.accent; ctx.globalAlpha = (1 - ph) * 0.9 * dim * tail; ctx.lineWidth = 3 * (1 - ph) + 0.5; ctx.stroke();
         }
       }
-      ctx.globalAlpha = anim(t, 0.35, 0.4) * dim * tail;
+      // on the globe opening the place is marked from frame 0: the thumbnail shows where, not only Türkiye
+      // and it stays to the last frame, which is the first again (the loop)
+      ctx.globalAlpha = (sc.camera.globe && !own ? 1 : anim(t, 0.35, 0.4) * tail) * dim;
       ctx.beginPath(); ctx.arc(x, y, 44, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 3; ctx.stroke();
       if (kind === 'ring') {
         ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
@@ -548,15 +596,24 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
 function drawFooter(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, alpha: number) {
   if (alpha <= 0) return;
   ctx.globalAlpha = alpha;
-  ctx.font = `700 22px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
+  // 28 px where it was 22: on a phone the frame is about a third of its size, and 22 px came out at
+  // 7-8 pt, too small to read the status and the source the rules keep on screen (research/02: 32-36 px
+  // for the source line). A long pair shrinks to the width, never below 22
   const status = sc.hook.status, source = sc.hook.source;
-  const sw = ctx.measureText(status).width;
+  const sizeAt = (px: number) => {
+    ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.13)}px`;
+    return ctx.measureText(status).width + 46 + ctx.measureText(source).width;
+  };
+  let px = 28;
+  while (px > 22 && sizeAt(px) > WIDTH) px--;
+  sizeAt(px);
+  const sw = ctx.measureText(status).width, bh = Math.round(px * 1.7), pad = Math.round(px * 0.5);
   // the status as a pill, so it reads as a label of the whole video and not as part of a sentence
   ctx.fillStyle = hexA(s.status, 0.16); ctx.strokeStyle = s.status; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.roundRect(LEFT - 2, FOOT - 27, sw + 26, 38, 6); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = s.status; ctx.fillText(status, LEFT + 11, FOOT);
-  ctx.fillStyle = s.muted; ctx.fillText(source, LEFT + sw + 46, FOOT);
-  guard({ x: LEFT - 2, y: FOOT - 27, w: sw + 46 + ctx.measureText(source).width, h: 38 }, 'footer');
+  ctx.beginPath(); ctx.roundRect(LEFT - 2, FOOT - bh + 11, sw + 2 * pad + 4, bh, 6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = s.status; ctx.fillText(status, LEFT + pad, FOOT);
+  ctx.fillStyle = s.muted; ctx.fillText(source, LEFT + sw + 2 * pad + 24, FOOT);
+  guard({ x: LEFT - 2, y: FOOT - bh + 11, w: sw + 2 * pad + 24 + ctx.measureText(source).width, h: bh }, 'footer');
   ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
 }
 
