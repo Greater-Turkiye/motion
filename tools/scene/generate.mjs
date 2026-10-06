@@ -505,6 +505,20 @@ function firmsNear(rows, at, start) {
   return rows.filter((r) => (r.date === d0 || r.date === d1) && r.conf !== 'low' && r.conf !== 'l'
     && geoDistance(r.at, at) * 6371 <= 25);
 }
+/** The map symbol for an event type (PLAN.md section 26): every video drew the same pulsing ring,
+ *  whether a ship was struck, an aircraft came down or troops exercised. */
+export function eventKind(type = '') {
+  if (/^kinetic\.drone/.test(type)) return 'drone';
+  if (/^(kinetic\.missile|test\.missile)/.test(type)) return 'missile';
+  if (/^(kinetic\.airstrike|air\.)/.test(type)) return 'air';
+  if (/^maritime\./.test(type) || /^exercise\.naval/.test(type)) return 'sea';
+  if (/^kinetic\.shelling/.test(type)) return 'artillery';
+  if (/^kinetic\.(clash|attack)/.test(type)) return 'ground';
+  if (/^exercise\./.test(type)) return 'exercise';
+  if (/^(diplomatic|basing\.agreement)/.test(type)) return 'meeting';
+  return 'ring';
+}
+
 export function readFirms(files) {
   const rows = [];
   for (const f of files) {
@@ -850,7 +864,8 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, news, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
-    ...(family === 'strike' || family === 'exercise' || pt || area ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision } } : {}),
+    // an event at sea is drawn even when only its sea or island is known: the hull is the story
+    ...(family === 'strike' || family === 'exercise' || pt || area || eventKind(record.event_type) === 'sea' ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision, kind: eventKind(record.event_type) } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
     ...(parties.length ? { parties: parties.map((c) => ({ country: c.iso3, label: nameOf(c), at: c.at, ...(flag(c.iso3) ? { emblem: flag(c.iso3) } : {}) })) } : {}),
     labels,

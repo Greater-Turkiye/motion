@@ -30,6 +30,10 @@ export type Beat =
   /** what a party said, in the source's own words, under its flag */
   | { kind: 'quote'; at: number; speaker?: number; lines: string[] };
 
+/** The map symbol of an event, by its type: a drone, a missile, an aircraft, a ship, artillery, a
+ *  clash on the ground, an exercise or a meeting; 'ring' when the type says none of these. */
+export type EventKind = 'drone' | 'missile' | 'air' | 'sea' | 'artillery' | 'ground' | 'exercise' | 'meeting' | 'ring';
+
 export interface Scene {
   id: string;
   format: 'vertical';
@@ -41,7 +45,8 @@ export interface Scene {
    *  hook and the facts must be found here, so a hook can never say what the source does not. */
   source_text: string[];
   camera: { from: Camera; to: Camera; seconds: number; ease: string; keys?: Key[] };
-  event?: { at: LonLat; precision: 'region' | 'locality' | 'exact' };
+  /** kind: what happened there, drawn as a map symbol at the place (PLAN.md section 26) */
+  event?: { at: LonLat; precision: 'region' | 'locality' | 'exact'; kind?: EventKind };
   subject?: { country: string; emblem?: string; label?: string };
   /** the countries of a two- or many-sided story (talks, an agreement, an exercise): lit together, linked, listed */
   parties?: { country: string; label: string; at: LonLat; emblem?: string }[];
