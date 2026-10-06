@@ -18,6 +18,7 @@ export interface Assets {
   countryTable: CountryRow[];
   nums: Map<string, string>;         // ISO3 → the map's numeric id
   mark: HTMLImageElement | null;     // assets/brand/mark.png, our mark in the corner of every frame
+  photos: Map<string, HTMLImageElement>;  // a story's own photographs, by file under assets/
 }
 
 export interface CountryRow { iso3: string; iso2: string; num: string; tr: string; en: string; at: [number, number]; match: string }
@@ -69,7 +70,7 @@ function image(src: string): Promise<HTMLImageElement> {
 }
 
 /** `key` is "<ISO3 or org>/<kind>", e.g. "RUS/arms-eagle", "nato/emblem"; see assets/emblems/manifest.json. */
-export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
+export async function loadAssets(emblemKeys: string[], photoFiles: string[] = []): Promise<Assets> {
   const [topo, disputed, manifest, countryTable] = await Promise.all([
     fetch('data/countries-50m.json').then((r) => r.json()),
     fetch('data/disputed-tur-view.geojson').then((r) => r.json()),
@@ -98,5 +99,7 @@ export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
   }
   const relief = await image('data/relief.png').catch(() => null); // optional: the map renders without it
   const mark = await image('brand/mark.png').catch(() => null);
-  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief, countryTable, nums: new Map(countryTable.map((c) => [c.iso3, c.num])), mark };
+  const photos = new Map<string, HTMLImageElement>();
+  for (const f of photoFiles) photos.set(f, await image(f));
+  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief, countryTable, nums: new Map(countryTable.map((c) => [c.iso3, c.num])), mark, photos };
 }

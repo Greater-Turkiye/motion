@@ -703,3 +703,16 @@ kısmen karşılanabilir), trend müzik (lisans sorunu), hızlı kesme + efekt s
 (organizasyonun GitHub simgesi) ve "greaterturkiye.org"; yapay ses beyanı paylaşım metnine ve sürüm
 notuna taşındı. TÜRKİYE adı artık hep ortasında: başka bir ad ya da halka ona değince kaymak yerine
 öteki ad çekilir.
+
+## 29. Haberin fotoğrafı / The story's own photograph (2026-10-06)
+
+Sahip ikinci kez: "habere görsel, video kaynağı da eklemeni istedim; bazılarında ekleyebilirsin." İlk
+deneme (4 Ekim) yüzler yüzünden durmuştu. Şimdi bir yüz denetimi var: `tools/scene/faces.py` (OpenCV
+yüz ve profil dedektörü) bir yüzün kutusu görüntü genişliğinin %4'ünü geçerse fotoğrafı kullanmaz.
+Denendi: yakın plan denizci, brifing salonu, grup fotoğrafı reddedildi; açık denizde gemiler kabul
+edildi. `tools/scene/photo.mjs` kaynağın aynı habere iliştirdiği fotoğrafı bulur (6. Filo ve AFRICOM
+haberleri, DVIDS'te başlıkla ya da bağlantıyla eşleşir; ABD federal eseri, kamu malı), indirir, yüz
+denetiminden geçirir; sahne kancanın hemen ardından 3,4 saniyelik bir fotoğraf bölümü alır ("KAYNAĞIN
+FOTOĞRAFI", altında kaynağı ve lisansı), ses o sırada susar. Künye ve paylaşım metni fotoğrafı anar.
+Ukrinform, Shafaq, Reuters, AP fotoğrafları telifli, hiç kullanılmaz; bu yüzden fotoğraf yalnız bir
+kısım haberde çıkar. CLAUDE.md bölüm 4'e istisna olarak yazıldı.
