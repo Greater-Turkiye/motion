@@ -344,7 +344,12 @@ export function narration(sc) {
   const blocks = [hookParts(sc), ...sc.beats.map((b) => blockParts(sc, b))];
   const out = [];
   blocks.forEach((parts, i) => {
-    const window = ends[i] - starts[i];
+    // a block the voice leaves to the eye (the facts after the hook told them) is room for the block
+    // before it: the story read at the hook runs on under the block that shows it, rather than holding
+    // the hook on screen until it ends (tools/audio/retime.mjs; PLAN.md section 30)
+    let j = i;
+    while (j + 1 < blocks.length && !blocks[j + 1].some(Boolean)) j++;
+    const window = ends[j] - starts[i];
     let keep = parts.filter(Boolean).map(sentence);
     // a block that opens with exactly what the voice has just said drops that ("Karadeniz." then
     // "Karadeniz. Kesin konum yok." reads "Kesin konum yok."), as long as something is left
@@ -353,7 +358,7 @@ export function narration(sc) {
     // the first part always stays; optional parts go while the words would overrun the window
     while (keep.length > 1 && keep.join(' ').length / SPEECH_CPS > window) keep = keep.slice(0, -1);
     const text = keep.join(' ');
-    if (text) out.push({ at: Math.round(starts[i] * 100) / 100, until: Math.round(ends[i] * 100) / 100, text });
+    if (text) out.push({ at: Math.round(starts[i] * 100) / 100, until: Math.round(ends[j] * 100) / 100, text });
   });
   return out;
 }
