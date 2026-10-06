@@ -44,7 +44,9 @@ export interface Scene {
   /** The source's own words (the record's title, the headlines it cites): every content word of the
    *  hook and the facts must be found here, so a hook can never say what the source does not. */
   source_text: string[];
-  camera: { from: Camera; to: Camera; seconds: number; ease: string; keys?: Key[] };
+  /** globe: the first and the last frame show the whole Earth, and the camera dives from it to the
+   *  place during the hook (PLAN.md section 31) */
+  camera: { from: Camera; to: Camera; seconds: number; ease: string; keys?: Key[]; globe?: boolean };
   /** kind: what happened there, drawn as a map symbol at the place (PLAN.md section 26) */
   event?: { at: LonLat; precision: 'region' | 'locality' | 'exact'; kind?: EventKind };
   subject?: { country: string; emblem?: string; label?: string };
