@@ -205,7 +205,9 @@ const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.c
   'mfa.gov.tr': 'DIŞİŞLERİ BAKANLIĞI', 'gov.cy': 'GKRY HÜKÜMETİ', 'mod.gov.eg': 'MISIR SAVUNMA BAKANLIĞI',
   'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI',
   // the US Sixth Fleet's site was "NAVY"; DVIDS carries AFRICOM's news; GOV.UK is the UK government
-  'c6f.navy.mil': 'ABD 6. FİLO', 'dvidshub.net': 'DVIDS', 'gov.uk': 'BİRLEŞİK KRALLIK HÜKÜMETİ' };
+  'c6f.navy.mil': 'ABD 6. FİLO', 'dvidshub.net': 'DVIDS', 'gov.uk': 'BİRLEŞİK KRALLIK HÜKÜMETİ',
+  // Armenia's news.am was "NEWS": the domain's last part is part of the name
+  'news.am': 'NEWS.AM' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
@@ -907,8 +909,9 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     hook: { kicker, lines: hook.lines, sub, status: STATUS[st], source: `KAYNAK: ${name}${hosts.length > 1 ? ` +${hosts.length - 1}` : ''}`,
       // every located story says how far from Türkiye on its first frame, not only the near ones: it is the
       // question a Turkish viewer asks first, and the one line no other channel's video carries (PLAN.md
-      // section 32). "YAKIN" only where it is near
-      ...((pt || whole) && nearest.km <= 2000 && !kicker.startsWith('TÜRKİYE')
+      // section 32). "YAKIN" only where it is near. A whole country without a point is measured from its
+      // middle, which says little far away ("~1500 KM" for anywhere in Saudi Arabia): only a near one
+      ...(((pt && nearest.km <= 2000) || (whole && nearest.km <= 500)) && !kicker.startsWith('TÜRKİYE')
         ? { badge: nearest.km <= 500 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
     beats,
   };
