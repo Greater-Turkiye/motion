@@ -322,7 +322,13 @@ export function hookLines(title) {
   // ("Su-35", "F-16", "Geran -5" as a translation spaces it), nor is a number inside a word ("P1")
   // and a day before a month is a date, not a count: "1 Ekim'de 97 Rus İHA" counts the 97
   const MONTH = /^(ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık|january|february|march|april|may|june|july|august|september|october|november|december)/iu;
-  const num = [...title.matchAll(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/gu)].find((m) => !MONTH.test(m[2]));
+  // and a year is no count: "Phoenix Express 2026 sırasında denize açıldı" became the hook "2026
+  // SIRASINDA / DENİZE AÇILDI" (6 October). A year-like number is a year after a name ("Express 2026",
+  // "MEDUSA 2026") or before a word of time ("2026 sırasında", "2025 yılında")
+  const YEAR_AFTER = /^(sırasında|yılında|yılı\p{L}*|boyunca|başında|sonunda|itibarıyla|itibaren)$/iu;
+  const isYear = (m) => /^(19|20)\d\d$/.test(m[1])
+    && (YEAR_AFTER.test(m[2]) || /\p{Lu}[\p{L}-]*\s+$/u.test(title.slice(Math.max(0, m.index - 30), m.index)));
+  const num = [...title.matchAll(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)\s+(\p{L}[\p{L}']*)(\s+\p{L}[\p{L}']*)?/gu)].find((m) => !MONTH.test(m[2]) && !isYear(m));
   // a number whose next word is a verb counts nothing ("zayiat geçen güne göre 1.900 arttı"), so it
   // is no hook; a modifier keeps its noun ("46.230 askeri personel" is not "46.230 / ASKERİ")
   // a duration counts nothing either: "12 yıllık askeri varlığına son verdi" is a span of time
