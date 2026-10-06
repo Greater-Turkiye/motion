@@ -127,7 +127,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // the text block and its wash; the hook's kicker can stand higher than the beats' blocks
   const top = t < (sc.beats[0]?.at ?? D) ? Math.min(960, hookTop) : 960;
   const obstacles: Box[] = [{ x: 0, y: top, w: W, h: H - top }];
-  if (sc.voice === 'synthetic') obstacles.push({ x: LEFT - 10, y: SAFE.top - 6, w: 400, h: 40 });
+  // our mark and address in the corner: map names keep clear of it
+  obstacles.push({ x: LEFT - 10, y: SAFE.top, w: 360, h: 46 });
   // the progress bar: a name drawn across it reads as a broken bar
   if (full && (sc.anim?.progress ?? s.motion.progress)) obstacles.push({ x: 0, y: SAFE.top - 50, w: W, h: 30 });
   const labels: Label[] = [];
@@ -674,7 +675,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
 }
 
 /** Where the synthetic-voice note sits: top left inside the safe area, under the progress bar. */
-const BRAND = { x: LEFT, y: SAFE.top + 22, text: 'greaterturkiye.org', mark: 34 };
+const BRAND = { x: LEFT, y: SAFE.top + 32, text: 'greaterturkiye.org', mark: 34 };
 
 /** Our mark and our address, small, in the top corner: who made the video, in every frame. The
  *  synthetic voice is declared in the posting text and the release notes instead (owner, 6 October). */
