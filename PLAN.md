@@ -787,6 +787,50 @@ FOTOĞRAFI", altında kaynağı ve lisansı), ses o sırada susar. Künye ve pay
 Ukrinform, Shafaq, Reuters, AP fotoğrafları telifli, hiç kullanılmaz; bu yüzden fotoğraf yalnız bir
 kısım haberde çıkar. CLAUDE.md bölüm 4'e istisna olarak yazıldı.
 
+
+
+## 31. Tasarım incelemesi: küreden açılış / Design review: the globe opening (2026-10-06)
+
+Sahip: "Tasarımdaki detayları da düşün, viral olmalıyız; global dünyayı da mı görsek bilmiyorum, ince
+düşün her detayı." Sonra: "Viral olabilecek ne yenilik ekleyebilirsin, sana bırakıyorum kararları."
+Son örneklerin 2 sn'lik kare dizileri incelendi. Bulgular:
+- İlk kare (kapak) karanlık bir bölge haritasıydı; olay işareti 0,35 sn'de beliriyordu, kapakta yoktu.
+  Akışta duran parmağı tutacak tanıdık bir şekil yoktu.
+- Kaynak ve durum satırı 22 px: telefonda karenin üçte biri boyutunda 7-8 punto, okunmuyor (araştırma
+  02: 32-36 px).
+- Mesafe bölümünde çizginin Türkiye ucu ve "SİNOP" adı TÜRKİYE yazısının harflerinin üstüne düşüyordu.
+- Bloklar 4-8 sn aynı kareyle duruyordu (bölüm 30 kısalttı).
+Kararlar:
+- **Küreden açılış.** İlk kare bütün dünya küresi (koyu stillerde 420 px'lik disk, ince bir kenar
+  çizgisiyle; düz haritalı stillerde dünyanın üçte biri), üstünde kırmızı Türkiye ve olay işareti.
+  Kamera kancanın ilk iki saniyesinde olay yerine iner; son kare yine küre, döngü dikişsiz. Dayanak:
+  araştırma 01 (ilk 0,5 sn'de hareket, beklenmedik kilitlenme), araştırma 02 format 2 "konum zoom'u".
+  Kenar bir çizgi; parıltı ya da atmosfer yok (CLAUDE.md bölüm 4).
+- **"Global dünya" sorusu: görüntüde evet, kapsamda hayır.** Her video dünyadan başlar ve Türkiye'ye
+  göre yerini gösterir; ama kanal küresel haber kanalı olmaz. Küresel gündemde büyük kanallarla
+  yarışılmaz; ayırt edici olan Türkiye'nin çevresi ve Türkiye'ye uzaklık. Küresel bir olay ancak
+  Türkiye'ye ya da komşularına dokunuyorsa girer (NATO kararı, Doğu Akdeniz'e gelen uçak gemisi,
+  İsrail–İran). Asıl sorun kapsam değil tekdüzelik: son 7 günün 235/290 kaydı Karadeniz (Ukrayna).
+  Bölge çeşitliliği seçicide ağırlaştırılır (ayrı PR).
+- Kaynak ve durum satırı 28 px (uzun çiftte en az 22 px'e küçülür).
+- Mesafe bölümünde çizginin Türkiye ucu TÜRKİYE yazısına 200 × 90 px'ten yakınsa yazı çekilir; ucun
+  kendi adı (SİNOP) yeri söyler.
+- `export/render.mjs` sayfa hazır olmazsa nedenini yazar (eksik amblem, sahne denetimi); önceden
+  40 sn bekleyip yalnız "page never became ready" diyordu.
+
+## 32. Her kapakta Türkiye'ye uzaklık / Distance from Türkiye on every cover (2026-10-06)
+
+Bölüm 18'in yakınlık rozeti yalnız 500 km içindeki olaylarda çıkıyordu; videoların çoğu (Ukrayna,
+700-1000 km) kapakta Türkiye'yle bağını göstermiyordu. Türk izleyicinin ilk sorusu "bu beni ilgilendiriyor
+mu?"; ve bu satır başka hiçbir kanalın videosunda yok, bizim imzamız. Karar: konumu bilinen her olay
+2000 km'ye kadar kancanın üstünde uzaklığı taşır; "YAKIN" yalnız 500 km içinde ("TÜRKİYE'YE ~720 KM").
+Hesaplanmış bilgi, iddia değil (bölüm 18'in kuralı).
+Seçicide bölge çeşitliliği cezası %10'dan %15'e çıkarılarak denendi: son 48 saatin havuzunda aynı altı
+seçim çıktı, çünkü havuz neredeyse bütünüyle Karadeniz. Tekdüzeliğin kaynağı seçici değil veri: son
+7 günün 290 kaydının 207'si tek yayın organından (Ukrinform). Değişiklik geri alındı; çözüm yeni
+kaynaklar (platform deposu, Türkiye'nin çevresinden: Ege, Kıbrıs, Doğu Akdeniz, Kafkasya, İran–İsrail,
+deniz kuvvetleri haberleri).
+
 ## 33. Başlıkta da uzaklık / The distance in the title too (2026-10-06)
 
 Kapaktaki uzaklık (bölüm 32) YouTube'da arama ve önerilerde başlıkla görünür. Başlık kaydın kendi

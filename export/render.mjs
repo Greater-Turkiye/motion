@@ -129,9 +129,11 @@ async function openScene(style) {
   if (style) q.set('style', style);
   for (const [k, v] of new URLSearchParams(process.env.MOTION_QUERY || '')) q.set(k, v); // extra page parameters, e.g. MOTION_QUERY='renderer=canvas2d'
   await p.send('Page.navigate', { url: base + '?' + q });
-  let info = null;
-  for (let i = 0; i < 160 && !info; i++) { await sleep(250); try { info = await evaluate(p, 'window.motion && window.motion.ready'); } catch { /* not yet */ } }
-  if (!info) throw new Error('page never became ready: ' + p.errors.join('; '));
+  let info = null, last = '';
+  // a ready promise that rejects throws here on every try: its reason is the error to report, where the
+  // run used to wait forty seconds and say only "page never became ready"
+  for (let i = 0; i < 160 && !info; i++) { await sleep(250); try { info = await evaluate(p, 'window.motion && window.motion.ready'); } catch (e) { last = e.message; } }
+  if (!info) throw new Error('page never became ready: ' + [...p.errors, last].filter(Boolean).join('; '));
   return { p, info };
 }
 

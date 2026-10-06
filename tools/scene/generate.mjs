@@ -896,7 +896,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     ...(variant !== 'standart' ? { variant } : {}),
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, news, fields],
-    camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
+    camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered, globe: true },
     // an event at sea is drawn even when only its sea or island is known: the hull is the story
     ...(family === 'strike' || family === 'exercise' || pt || area || eventKind(record.event_type) === 'sea' ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision, kind: eventKind(record.event_type) } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
@@ -905,7 +905,11 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     // two cues of relevance and trust, both computed, neither a claim: how near Türkiye a located
     // event is when it is within 500 km, and how many outlets carry the story
     hook: { kicker, lines: hook.lines, sub, status: STATUS[st], source: `KAYNAK: ${name}${hosts.length > 1 ? ` +${hosts.length - 1}` : ''}`,
-      ...((pt || whole) && nearest.km <= 500 && !kicker.startsWith('TÜRKİYE') ? { badge: `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` } : {}) },
+      // every located story says how far from Türkiye on its first frame, not only the near ones: it is the
+      // question a Turkish viewer asks first, and the one line no other channel's video carries (PLAN.md
+      // section 32). "YAKIN" only where it is near
+      ...((pt || whole) && nearest.km <= 2000 && !kicker.startsWith('TÜRKİYE')
+        ? { badge: nearest.km <= 500 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
     beats,
   };
   const problems = validate(structuredClone(scene));
