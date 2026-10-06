@@ -745,3 +745,16 @@ Yapılanlar:
 - Kancanın alt satırı 0,95 sn'de belirmek yerine ilk karede tam: kapak karesi başlığın tamamını taşır.
 Sonuç (aynı dört kayıt, ses dahil tahmini): Poltava 35 → ~22 sn, Sumy 30 → ~21, Dnipro 31 → ~21,
 Kerkük 24 → ~20.
+
+## 32. Her kapakta Türkiye'ye uzaklık / Distance from Türkiye on every cover (2026-10-06)
+
+Bölüm 18'in yakınlık rozeti yalnız 500 km içindeki olaylarda çıkıyordu; videoların çoğu (Ukrayna,
+700-1000 km) kapakta Türkiye'yle bağını göstermiyordu. Türk izleyicinin ilk sorusu "bu beni ilgilendiriyor
+mu?"; ve bu satır başka hiçbir kanalın videosunda yok, bizim imzamız. Karar: konumu bilinen her olay
+2000 km'ye kadar kancanın üstünde uzaklığı taşır; "YAKIN" yalnız 500 km içinde ("TÜRKİYE'YE ~720 KM").
+Hesaplanmış bilgi, iddia değil (bölüm 18'in kuralı).
+Seçicide bölge çeşitliliği cezası %10'dan %15'e çıkarılarak denendi: son 48 saatin havuzunda aynı altı
+seçim çıktı, çünkü havuz neredeyse bütünüyle Karadeniz. Tekdüzeliğin kaynağı seçici değil veri: son
+7 günün 290 kaydının 207'si tek yayın organından (Ukrinform). Değişiklik geri alındı; çözüm yeni
+kaynaklar (platform deposu, Türkiye'nin çevresinden: Ege, Kıbrıs, Doğu Akdeniz, Kafkasya, İran–İsrail,
+deniz kuvvetleri haberleri).
