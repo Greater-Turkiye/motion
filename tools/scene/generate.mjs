@@ -856,7 +856,8 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, news, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered },
-    ...(family === 'strike' || family === 'exercise' || pt || area ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision, kind: eventKind(record.event_type) } } : {}),
+    // an event at sea is drawn even when only its sea or island is known: the hull is the story
+    ...(family === 'strike' || family === 'exercise' || pt || area || eventKind(record.event_type) === 'sea' ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision, kind: eventKind(record.event_type) } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
     ...(parties.length ? { parties: parties.map((c) => ({ country: c.iso3, label: nameOf(c), at: c.at, ...(flag(c.iso3) ? { emblem: flag(c.iso3) } : {}) })) } : {}),
     labels,

@@ -43,6 +43,12 @@ camera:
     - t: 13.9
       center: *a1
       zoom: 1
+event:
+  at:
+    - 33.2
+    - 35.1
+  precision: region
+  kind: sea
 subject:
   country: CYP
   emblem: CYP/arms
