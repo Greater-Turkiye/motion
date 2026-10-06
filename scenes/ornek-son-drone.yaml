@@ -1,0 +1,420 @@
+# Generated from evt_01m464dfkpfhyr2dmsystng27x by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-son-drone
+record: evt_01m464dfkpfhyr2dmsystng27x
+template: strike
+format: vertical
+fps: 60
+duration: 26.4
+style: E
+source_text:
+  - Rus insansız hava aracı saldırısı Zhytomyr bölgesindeki yüksek binayı hedef alıyor
+  - Russian drone attack targets high-rise building in Zhytomyr region
+  - Rus İHA saldırısı Jitomir bölgesindeki yüksek binayı hedef alıyor
+  - Rus İHA saldırısı Jitomir bölgesindeki yüksek binayı hedef alıyor
+  - İHA SALDIRISI · JİTOMİR BÖLGESİ · KARADENİZ · RUSYA · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 27.8
+      - 46.1
+    zoom: 0.8
+  to: &a2
+    t: 6.7
+    center:
+      - 29
+      - 52.6
+    zoom: 1
+  seconds: 6.7
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.8
+    - *a2
+    - t: 10.9
+      center:
+        - 27.7
+        - 51.2
+      zoom: 2.3
+    - t: 17.2
+      center:
+        - 27.9
+        - 46
+      zoom: 2
+    - t: 22.7
+      center:
+        - 28.7
+        - 51.2
+      zoom: 1.9
+    - t: 26.4
+      center: *a1
+      zoom: 0.8
+event:
+  at:
+    - 28.66
+    - 50.25
+  precision: locality
+  kind: drone
+subject:
+  country: RUS
+  emblem: RUS/arms-eagle
+  label: RUSYA
+parties:
+  - country: RUS
+    label: RUSYA
+    at: &a3
+      - 37.62
+      - 55.75
+    emblem: RUS/flag
+labels:
+  - text: RUSYA
+    at: *a3
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KARADENİZ
+    at:
+      - 31
+      - 43.4
+    alts:
+      - - 34.5
+        - 43.4
+      - - 37.2
+        - 42.6
+      - - 32.6
+        - 42.4
+    kind: sea
+  - text: JİTOMİR BÖLGESİ
+    at:
+      - 28.662
+      - 49.346000000000004
+    kind: country
+hook:
+  kicker: 5 EKİM
+  lines:
+    - JİTOMİR BÖLGESİ
+    - İHA SALDIRISI
+  sub: Rus İHA saldırısı Jitomir bölgesindeki yüksek binayı hedef alıyor
+  status: DOĞRULANMADI
+  source: "KAYNAK: UKRINFORM"
+beats:
+  - kind: place
+    title: JİTOMİR BÖLGESİ
+    text: "Konum başlıktaki yer adından: ±100 km."
+    at: 6.7
+  - kind: distance
+    from:
+      at:
+        - 28.662
+        - 50.246
+      label: JİTOMİR BÖLGESİ
+    to:
+      at:
+        - 27.22
+        - 41.73
+      label: KIRKLARELİ
+    text: "Kuş uçuşu, en yakın Türk şehrine: İstanbul–Trabzon arası kadar."
+    at: 10.9
+  - kind: recent
+    title: KAYITLARIMIZDA · SON 7 GÜN
+    points:
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 28.66
+          - 50.25
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 7
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 6
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 28.66
+          - 50.25
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 5
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 4
+      - at:
+          - 30.52
+          - 50.44
+        days: 3
+      - at:
+          - 30.52
+          - 50.44
+        days: 3
+      - at:
+          - 30.52
+          - 50.44
+        days: 3
+      - at:
+          - 30.52
+          - 50.44
+        days: 3
+      - at:
+          - 30.52
+          - 50.44
+        days: 3
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 2
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 30.52
+          - 50.44
+        days: 1
+      - at:
+          - 28.66
+          - 50.25
+        days: 0
+      - at:
+          - 28.66
+          - 50.25
+        days: 0
+      - at:
+          - 30.52
+          - 50.44
+        days: 0
+    text: Jitomir bölgesi çevresinde, 150 km içinde.
+    at: 17.4
+  - kind: status
+    text: "Tek kaynak: Ukrinform. Henüz kimse incelemedi."
+    at: 22.7
