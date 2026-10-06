@@ -316,7 +316,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       if (kind === 'ring') {
         ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
       } else {
-        drawSymbol(ctx, kind, x, y, 30, s.accent);
+        drawSymbol(ctx, kind, x, y, 44, s.accent);
       }
       ctx.globalAlpha = 1;
     }
