@@ -699,6 +699,11 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
 kancası (araştırma güvenilirliği düşürdüğünü gösteriyor, yasak doğru), sunucu yüzü (gerçek fotoğrafla
 kısmen karşılanabilir), trend müzik (lisans sorunu), hızlı kesme + efekt sesi (yayımlanmış ölçüm yok).
 
+**Köşe ve TÜRKİYE adı (2026-10-06, sahip):** sol üstteki "SESLENDİRME: YAPAY SES" yerine işaretimiz
+(organizasyonun GitHub simgesi) ve "greaterturkiye.org"; yapay ses beyanı paylaşım metnine ve sürüm
+notuna taşındı. TÜRKİYE adı artık hep ortasında: başka bir ad ya da halka ona değince kaymak yerine
+öteki ad çekilir.
+
 ## 27. Viral müzik / Trending music (2026-10-06)
 
 Sahip: "YouTube'da telifsiz viral müzikler ekleyebilir miyiz? Viral müzik diyorum." Karar: trend

@@ -17,6 +17,7 @@ export interface Assets {
   /** assets/data/countries.json (tools/data/build_countries.mjs): ISO codes, names, label points */
   countryTable: CountryRow[];
   nums: Map<string, string>;         // ISO3 → the map's numeric id
+  mark: HTMLImageElement | null;     // assets/brand/mark.png, our mark in the corner of every frame
 }
 
 export interface CountryRow { iso3: string; iso2: string; num: string; tr: string; en: string; at: [number, number]; match: string }
@@ -96,5 +97,6 @@ export async function loadAssets(emblemKeys: string[]): Promise<Assets> {
     emblems.set(key, await image('emblems/' + it.file));
   }
   const relief = await image('data/relief.png').catch(() => null); // optional: the map renders without it
-  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief, countryTable, nums: new Map(countryTable.map((c) => [c.iso3, c.num])) };
+  const mark = await image('brand/mark.png').catch(() => null);
+  return { countries, borders, borderLines: mls, coastLines, disputed, emblems, relief, countryTable, nums: new Map(countryTable.map((c) => [c.iso3, c.num])), mark };
 }
