@@ -65,7 +65,13 @@ jobs:
         run: |
           case "$SCENE" in *[!a-z0-9_-]*) echo "not a scene id: $SCENE"; exit 1 ;; esac
           node tools/audio/narration.mjs "$SCENE" out/narration.json
-          python -u tools/audio/tts.py out/narration.json out/voice "$ENGINE"
+          # as in production: when Gemini refuses (a blocked project answers 403), Chatterbox speaks instead
+          if ! python -u tools/audio/tts.py out/narration.json out/voice "$ENGINE"; then
+            [ "$ENGINE" = gemini ] || exit 1
+            rm -rf out/voice
+            python -m pip install --quiet chatterbox-tts
+            python -u tools/audio/tts.py out/narration.json out/voice chatterbox
+          fi
           f="scenes/$SCENE.yaml"; [ -f "$f" ] || f="scenes/auto/$SCENE.yaml"
           node tools/audio/retime.mjs "$f" out/voice
           echo "voice: synthetic" >> "$f"
