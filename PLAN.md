@@ -595,7 +595,9 @@ Türkiye'nin bütün çevresini izliyor, ama veri setinin kaynaklarının büyü
   kaybetmez (%40 ile denendi: Romanya'da polis tatbikatı ve Yemen'de gıda krizi öne geçti).
 - **Savunma haberi olmayanlar**: polis, isyan, jandarma, gıda güvenliği, insani yardım, mülteci geçen ve
   can kaybı olmayan başlıkların büyüklüğü 0,3 (akışın tür kuralları bunları tatbikat ya da çatışma diye
-  dosyalıyor).
+  dosyalıyor). 6 Ekim'de siber saldırı, casus yazılım, korsan (hack) ve dava da eklendi: "Casus yazılım
+  saldırısına uğrayan Sırp öğrenci yetkililere dava açtı" silahlı saldırı diye dosyalanmış, sıradaki
+  video olacaktı (datasets #56 türünü de düzeltir).
 Asıl çeşitlilik veri tarafında: Ege, Kıbrıs, Suriye, Kafkasya için daha fazla akış (datasets toplayıcıları).
 
 ## 23. Ses ekranı okumaz / The voice does not read the screen (2026-10-03)
