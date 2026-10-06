@@ -746,6 +746,16 @@ Yapılanlar:
 Sonuç (aynı dört kayıt, ses dahil tahmini): Poltava 35 → ~22 sn, Sumy 30 → ~21, Dnipro 31 → ~21,
 Kerkük 24 → ~20.
 
+## 27. Viral müzik / Trending music (2026-10-06)
+
+Sahip: "YouTube'da telifsiz viral müzikler ekleyebilir miyiz? Viral müzik diyorum." Karar: trend
+şarkılar telifli; videonun içine otomatik konursa YouTube Content ID sesi kısar ya da hak talep eder,
+tekrarı hesaba ihtar getirir. Yasal yol, paylaşırken uygulamanın kendi ses kütüphanesinden eklemek
+(Reels, TikTok, Shorts bu müziklerin lisansını kendisi alır). Bunun için her seslendirilmiş üretimin
+sürümünde ikinci bir kopya var: `<sahne>-muziksiz.mp4`, yalnız seslendirme, müzik yatağı yok;
+uygulamada eklenen trend ses bizim yatağımızla çakışmaz. Müzikli kopya (CC0 yatak) aynen kalır; site
+müzikli kopyayı gösterir.
+
 ## 29. Haberin fotoğrafı / The story's own photograph (2026-10-06)
 
 Sahip ikinci kez: "habere görsel, video kaynağı da eklemeni istedim; bazılarında ekleyebilirsin." İlk
