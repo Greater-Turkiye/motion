@@ -786,3 +786,9 @@ denetiminden geçirir; sahne kancanın hemen ardından 3,4 saniyelik bir fotoğr
 FOTOĞRAFI", altında kaynağı ve lisansı), ses o sırada susar. Künye ve paylaşım metni fotoğrafı anar.
 Ukrinform, Shafaq, Reuters, AP fotoğrafları telifli, hiç kullanılmaz; bu yüzden fotoğraf yalnız bir
 kısım haberde çıkar. CLAUDE.md bölüm 4'e istisna olarak yazıldı.
+
+## 33. Başlıkta da uzaklık / The distance in the title too (2026-10-06)
+
+Kapaktaki uzaklık (bölüm 32) YouTube'da arama ve önerilerde başlıkla görünür. Başlık kaydın kendi
+cümlesi kalır; sonuna, 92 karakteri aşmıyorsa mesafe bölümünün değeri eklenir: "Kerkük: IŞİD
+saldırısı bir polis memurunu öldürdü | Türkiye'ye ~240 km #Shorts". Sığmazsa yalnız başlık.
