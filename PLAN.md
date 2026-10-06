@@ -755,3 +755,34 @@ tekrarı hesaba ihtar getirir. Yasal yol, paylaşırken uygulamanın kendi ses k
 sürümünde ikinci bir kopya var: `<sahne>-muziksiz.mp4`, yalnız seslendirme, müzik yatağı yok;
 uygulamada eklenen trend ses bizim yatağımızla çakışmaz. Müzikli kopya (CC0 yatak) aynen kalır; site
 müzikli kopyayı gösterir.
+
+
+
+## 28. Son araştırma / Final research check (2026-10-06)
+
+Sahip: "kanıtla, videolar viral olacak mı? Son araştırma, son kontrol." Bulgular (kaynaklar PR'da):
+Instagram ve YouTube 2026'da özgün içeriği öne çıkarıyor (Mosseri 24 Eylül; YouTube Shorts 1 Ekim);
+izlenme oranı, tamamlama, tekrar izleme ve paylaşım (DM) başlıca sinyaller; Meta gerçekçi yapay sesi
+etiketsiz paylaşmayı cezalandırabiliyor; YouTube'un Temmuz 2025 "özgün olmayan içerik" kuralı şablon
+hissi veren seri üretimi para kazanmadan çıkarıyor; Instagram ağırlıklı yazı olan reel'leri ve siyasi
+içeriği takip etmeyenlere daha az gösteriyor (savaş haberinin sayılıp sayılmadığı belirsiz); Türkiye'de
+büyük YouTube kanalları RTÜK lisansına tabi.
+Yapılanlar: paylaşım metninin başına paylaşan için bir kontrol listesi (Instagram yapay zekâ etiketi,
+YouTube "değiştirilmiş içerik" sorusu, trend müzik için müziksiz kopya); paylaşılmaz.
+Sırada: her videoya şablonun ötesinde yazılmış bir bağlam cümlesi (çalışan bir dil modeli anahtarıyla),
+Instagram için daha az yazılı bir sürüm, Trial Reels ile kanca denemesi.
+Gerçekçi beklenti (ölçüm değil, tahmin): ilk 1–3 ayda çoğu Shorts 50–1000 izlenme, haber dalgasına denk
+gelen birkaç video 5–50 bin; viral olma bir plan değil, şans.
+
+## 29. Haberin fotoğrafı / The story's own photograph (2026-10-06)
+
+Sahip ikinci kez: "habere görsel, video kaynağı da eklemeni istedim; bazılarında ekleyebilirsin." İlk
+deneme (4 Ekim) yüzler yüzünden durmuştu. Şimdi bir yüz denetimi var: `tools/scene/faces.py` (OpenCV
+yüz ve profil dedektörü) bir yüzün kutusu görüntü genişliğinin %4'ünü geçerse fotoğrafı kullanmaz.
+Denendi: yakın plan denizci, brifing salonu, grup fotoğrafı reddedildi; açık denizde gemiler kabul
+edildi. `tools/scene/photo.mjs` kaynağın aynı habere iliştirdiği fotoğrafı bulur (6. Filo ve AFRICOM
+haberleri, DVIDS'te başlıkla ya da bağlantıyla eşleşir; ABD federal eseri, kamu malı), indirir, yüz
+denetiminden geçirir; sahne kancanın hemen ardından 3,4 saniyelik bir fotoğraf bölümü alır ("KAYNAĞIN
+FOTOĞRAFI", altında kaynağı ve lisansı), ses o sırada susar. Künye ve paylaşım metni fotoğrafı anar.
+Ukrinform, Shafaq, Reuters, AP fotoğrafları telifli, hiç kullanılmaz; bu yüzden fotoğraf yalnız bir
+kısım haberde çıkar. CLAUDE.md bölüm 4'e istisna olarak yazıldı.

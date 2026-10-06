@@ -61,6 +61,7 @@ export function captions(sc, meta) {
   // the satellite block's data, credited where the source is (PLAN.md section 25)
   // the voice is declared here, not on screen (the corner carries our address)
   const voiceLine = sc.voice === 'synthetic' ? 'Seslendirme: yapay ses.' : '';
+  const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
   const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Uydu verisi: NASA FIRMS (VIIRS, NOAA-20), kamu malı. Isı tespiti yangın olduğu doğrulanmış bir olay değildir.' : '';
 
   const instagram = [
@@ -71,6 +72,7 @@ export function captions(sc, meta) {
     sourceLine,
     satellite,
     voiceLine,
+    photoLine,
     '',
     note,
     '',
@@ -90,6 +92,7 @@ export function captions(sc, meta) {
     sourceLine,
     satellite,
     voiceLine,
+    photoLine,
     '',
     note,
     'Veri ve içerik CC BY 4.0, Greater Türkiye.',
@@ -103,7 +106,20 @@ export function captions(sc, meta) {
   const xHead = headline.length <= room ? headline.replace(/\.$/, '') : headline.slice(0, room - 1).replace(/\s+\S*$/, '') + '…';
   const x = `${xHead}${tail}${url}`;
 
+  // for whoever posts, not for the post: what the platforms ask of a synthetic voice, and the copy to
+  // use for trending music (PLAN.md sections 27 and 28)
+  const checklist = [
+    '=== PAYLAŞIRKEN (bu bölüm paylaşılmaz) ===',
+    ...(sc.voice === 'synthetic' ? [
+      '- Instagram: paylaşmadan önce "Yapay zekâ etiketi"ni aç (seslendirme yapay; Meta etiketsiz gerçekçi yapay sesi cezalandırabiliyor).',
+      '- YouTube: yüklerken "Değiştirilmiş ya da sentetik içerik" sorusuna "Evet" de.',
+    ] : []),
+    '- Trend müzik eklemek için müziksiz kopyayı kullan (-muziksiz.mp4, varsa); müziği uygulamanın kendi kütüphanesinden ekle.',
+    '',
+  ];
+
   return [
+    ...checklist,
     '=== INSTAGRAM (Reels ve kaydırmalı gönderi) ===',
     instagram,
     '',

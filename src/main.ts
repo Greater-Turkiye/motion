@@ -37,7 +37,8 @@ const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false })
 
 const frames = Math.round(scene.duration * scene.fps);
 // every emblem the scene names: the subject's, and the parties' (an agreement, an exercise)
-const ready = loadAssets([...new Set([scene.subject?.emblem, ...(scene.parties ?? []).map((p) => p.emblem)].filter((e): e is string => !!e))]);
+const ready = loadAssets([...new Set([scene.subject?.emblem, ...(scene.parties ?? []).map((p) => p.emblem)].filter((e): e is string => !!e))],
+  scene.beats.flatMap((b) => (b.kind === 'photo' ? [b.file] : [])));
 // the countries the story is about, lit on the map
 const subjects = [scene.subject?.country, ...(scene.parties ?? []).map((p) => p.country)].filter((c): c is string => !!c);
 
