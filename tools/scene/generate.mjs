@@ -473,22 +473,49 @@ function regionStats(datasets, record) {
 /**
  * Variants of one story's order, for testing what holds viewers (PLAN.md section 16). The facts are
  * the same in every variant; only what comes first and how much follows changes.
- *   standart  hook, place, what happened, distance or pattern, status (the control)
+ * Every order opens on what happened and keeps within BUDGET (PLAN.md section 30).
+ *   standart  hook, what happened, distance or pattern, status (the control)
  *   yakinlik  self-relevance first: the kicker says how far from Türkiye, the distance comes next
  *   kisa      one idea, 12-15 s: the hook, what happened (or the family's own beat), the status
  *   oruntu    the pattern first: the last seven days around the place (or the month's count) next
  */
 export const VARIANTS = ['standart', 'yakinlik', 'kisa', 'oruntu'];
+/** How long a story video may run before its least valuable blocks go (PLAN.md section 30): 20-35 s is
+ *  where shorts are watched to the end, and the shorter ones loop; ours ran 24-35 s with the voice. */
+export const BUDGET = 22;
 function arrange(beats, variant) {
   const len = (i) => (beats[i + 1]?.at ?? beats.end) - beats[i].at;
   let list = beats.map((b, i) => ({ b, d: len(i) }));
   const first = (kinds) => { const k = list.findIndex((x) => kinds.includes(x.b.kind)); if (k > 0) list.unshift(...list.splice(k, 1)); };
+  const drop = (kind) => { const k = list.findIndex((x) => x.b.kind === kind); if (k >= 0) list.splice(k, 1); };
+  const has = (kind) => list.some((x) => x.b.kind === kind);
+  // the place block only said where and how sure: the distance or the last seven days show the same
+  // place on the map a moment later, so it goes and its line on how sure the place is ("±100 km")
+  // follows below (a place with no point, "Kesin konum yok", keeps its own block)
+  const place = list.find((x) => x.b.kind === 'place');
+  const sure = place?.b.text?.match(/±(\d+) km/u);
+  const note = sure ? `Konum yaklaşık: ±${sure[1]} km.` : '';
+  if (place && !/^Kesin konum yok/u.test(place.b.text ?? '') && (has('distance') || has('recent'))) drop('place');
   if (variant === 'yakinlik') first(['distance']);
   if (variant === 'oruntu') first(['recent']);
   if (variant === 'oruntu' && list[0].b.kind !== 'recent') first(['close']);
+  // what happened comes straight after the hook in every order: the voice tells the story from the
+  // first frame (tools/audio/narration.mjs) and runs on under the block that shows it, where it once
+  // held the hook on screen for eight seconds and then showed the same sentence in silence
+  first(['facts']);
   if (variant === 'kisa') {
     const core = list.find((x) => ['facts', 'quote', 'link', 'roster'].includes(x.b.kind)) ?? list.find((x) => ['distance', 'recent', 'place'].includes(x.b.kind));
     list = [core, list.find((x) => x.b.kind === 'status')].filter(Boolean);
+  }
+  // over the budget, the counts of our own records go first (the month's, then the last seven days'),
+  // except in the pattern order, whose point they are: there the distance goes. What happened, the
+  // satellite's view and the status always stay
+  const total = () => beats[0].at + list.reduce((s, x) => s + x.d, 0);
+  for (const kind of variant === 'oruntu' ? ['distance'] : ['close', 'recent']) if (total() > BUDGET && list.length > 2) drop(kind);
+  if (place && note && !has('place')) {
+    const k = list.findIndex((x) => x.b.kind === 'distance');
+    const at = k >= 0 ? k : list.findIndex((x) => x.b.kind === 'status');
+    if (at >= 0) list[at] = { b: { ...list[at].b, text: [list[at].b.text, note].filter(Boolean).join(' ') }, d: round1(list[at].d + (note.length + 1) / CPS + 0.05) };
   }
   let t = beats[0].at;
   const out = list.map(({ b, d }) => { const o = { ...b, at: Math.round(t * 10) / 10 }; t += d; return o; });
@@ -786,7 +813,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     if (!(around && around.n >= 3)) regionClose();
   }
   // the variant's order, before the camera, which follows the beats by kind
-  if (variant !== 'standart' && beats.length) {
+  if (beats.length) {
     beats.end = t;
     const a = arrange(beats, variant);
     beats.splice(0, beats.length, ...a.beats);
