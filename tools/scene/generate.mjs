@@ -205,9 +205,13 @@ const PUBLISHERS = { 'ukrinform.net': 'UKRINFORM', 'aa.com.tr': 'AA', 'reuters.c
   'mfa.gov.tr': 'DIŞİŞLERİ BAKANLIĞI', 'gov.cy': 'GKRY HÜKÜMETİ', 'mod.gov.eg': 'MISIR SAVUNMA BAKANLIĞI',
   'mil.am': 'ERMENİSTAN SAVUNMA BAKANLIĞI', 'lebarmy.gov.lb': 'LÜBNAN ORDUSU', 'mod.gov.ua': 'UKRAYNA SAVUNMA BAKANLIĞI',
   // the US Sixth Fleet's site was "NAVY"; DVIDS carries AFRICOM's news; GOV.UK is the UK government
-  'c6f.navy.mil': 'ABD 6. FİLO', 'dvidshub.net': 'DVIDS', 'gov.uk': 'BİRLEŞİK KRALLIK HÜKÜMETİ',
+  'c6f.navy.mil': 'ABD 6. FİLOSU', 'dvidshub.net': 'DVIDS', 'gov.uk': 'BİRLEŞİK KRALLIK HÜKÜMETİ',
   // Armenia's news.am was "NEWS": the domain's last part is part of the name
   'news.am': 'NEWS.AM' };
+/** The command behind a DVIDS feed (platform collectors/config/feeds.yaml): "DVIDS" is the hosting
+ *  service, not who speaks. */
+const FEED_NAMES = { 'rss-usa-centcom-dvids': 'ABD MERKEZ KOMUTANLIĞI', 'rss-usa-navcent-dvids': 'ABD 5. FİLOSU',
+  'rss-usa-africom-dvids': 'ABD AFRİKA KOMUTANLIĞI' };
 const host = (u) => new URL(u).hostname.replace(/^www\./, '');
 /** The name on the source line: a known publisher, else its domain name; a government domain
  *  ("gov.uk") keeps its whole host, since "GOV" names nobody. */
@@ -639,7 +643,9 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   const news = exonyms(tidy(abbrev(unrubric(titleTr))));
   if (news !== unrubric(titleTr)) texts.push(news);
   const hosts = [...new Set(sources.map((s) => host(s.url)))];
-  const name = publisher(sources[0].url);
+  // DVIDS carries several commands' news under one host: the automatic record's note names its feed
+  const feed = (record.assessment?.note?.en ?? '').match(/\bFeed: ([\w-]+)/)?.[1];
+  const name = (host(sources[0].url) === 'dvidshub.net' && FEED_NAMES[feed]) || publisher(sources[0].url);
   const auto = (record.tags ?? []).includes('otomatik');
 
   const family = familyOf(record.event_type);
