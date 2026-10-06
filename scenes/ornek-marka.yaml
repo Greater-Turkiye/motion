@@ -1,0 +1,112 @@
+# Generated from evt_01m47784yffe0bdsxwyke9ntfy by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-marka
+record: evt_01m47784yffe0bdsxwyke9ntfy
+template: strike
+format: vertical
+fps: 60
+duration: 21.4
+style: A
+source_text:
+  - "Kerkük: IŞİD saldırısı bir polis memurunu öldürdü"
+  - "Kirkuk: ISIS attack kills a police officer"
+  - IŞİD saldırısı bir polis memurunu öldürdü
+  - SALDIRI · KERKÜK · IRAK · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 35.7
+      - 38.7
+    zoom: 0.9
+  to: &a2
+    t: 2.6
+    center:
+      - 44.7
+      - 37.9
+    zoom: 1
+  seconds: 2.6
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.9
+    - *a2
+    - t: 6.1
+      center:
+        - 43.4
+        - 36.5
+      zoom: 2.3
+    - t: 10.3
+      center:
+        - 42.6
+        - 37.1
+      zoom: 2.7
+    - t: 13.8
+      center:
+        - 44.1
+        - 36.5
+      zoom: 3.2
+    - t: 17.8
+      center:
+        - 43.9
+        - 36.1
+      zoom: 2.2
+    - t: 21.4
+      center: *a1
+      zoom: 0.9
+event:
+  at:
+    - 44.39
+    - 35.47
+  precision: locality
+labels:
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+  - text: KERKÜK
+    at:
+      - 44.392
+      - 34.572
+    kind: country
+hook:
+  kicker: KERKÜK · 5 EKİM
+  lines:
+    - BİR POLİS
+    - ÖLDÜ
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: SHAFAQ NEWS"
+  badge: TÜRKİYE'YE YAKIN · ~240 KM
+beats:
+  - kind: place
+    title: KERKÜK
+    text: "Konum başlıktaki yer adından: ±20 km."
+    at: 2.6
+  - kind: facts
+    kicker: KAYNAĞA GÖRE
+    lines:
+      - IŞİD saldırısı bir polis
+      - memurunu öldürdü
+    at: 6.1
+  - kind: distance
+    from:
+      at:
+        - 44.392
+        - 35.472
+      label: KERKÜK
+    to:
+      at:
+        - 43.74
+        - 37.58
+      label: HAKKARİ
+    text: Kuş uçuşu, en yakın Türk şehrine.
+    at: 10.3
+  - kind: status
+    text: "Tek kaynak: Shafaq News. Henüz kimse incelemedi."
+    at: 14
+  - kind: close
+    kicker: KAYITLARIMIZDA · EKİM
+    lines:
+      - Irak'tan *8* kayıt.
+    at: 17.8
