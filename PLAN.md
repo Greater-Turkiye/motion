@@ -724,3 +724,32 @@ haritanın lejantı gibi düz, tek renk; parıltı, gölge yok, CLAUDE.md bölü
 
 Sırada: türe göre sahne akışı (deniz olayında deniz alanı ve kıyıya uzaklık, hava olayında hava
 sahası), türe göre kamera.
+
+## 31. Tasarım incelemesi: küreden açılış / Design review: the globe opening (2026-10-06)
+
+Sahip: "Tasarımdaki detayları da düşün, viral olmalıyız; global dünyayı da mı görsek bilmiyorum, ince
+düşün her detayı." Sonra: "Viral olabilecek ne yenilik ekleyebilirsin, sana bırakıyorum kararları."
+Son örneklerin 2 sn'lik kare dizileri incelendi. Bulgular:
+- İlk kare (kapak) karanlık bir bölge haritasıydı; olay işareti 0,35 sn'de beliriyordu, kapakta yoktu.
+  Akışta duran parmağı tutacak tanıdık bir şekil yoktu.
+- Kaynak ve durum satırı 22 px: telefonda karenin üçte biri boyutunda 7-8 punto, okunmuyor (araştırma
+  02: 32-36 px).
+- Mesafe bölümünde çizginin Türkiye ucu ve "SİNOP" adı TÜRKİYE yazısının harflerinin üstüne düşüyordu.
+- Bloklar 4-8 sn aynı kareyle duruyordu (bölüm 30 kısalttı).
+Kararlar:
+- **Küreden açılış.** İlk kare bütün dünya küresi (koyu stillerde 420 px'lik disk, ince bir kenar
+  çizgisiyle; düz haritalı stillerde dünyanın üçte biri), üstünde kırmızı Türkiye ve olay işareti.
+  Kamera kancanın ilk iki saniyesinde olay yerine iner; son kare yine küre, döngü dikişsiz. Dayanak:
+  araştırma 01 (ilk 0,5 sn'de hareket, beklenmedik kilitlenme), araştırma 02 format 2 "konum zoom'u".
+  Kenar bir çizgi; parıltı ya da atmosfer yok (CLAUDE.md bölüm 4).
+- **"Global dünya" sorusu: görüntüde evet, kapsamda hayır.** Her video dünyadan başlar ve Türkiye'ye
+  göre yerini gösterir; ama kanal küresel haber kanalı olmaz. Küresel gündemde büyük kanallarla
+  yarışılmaz; ayırt edici olan Türkiye'nin çevresi ve Türkiye'ye uzaklık. Küresel bir olay ancak
+  Türkiye'ye ya da komşularına dokunuyorsa girer (NATO kararı, Doğu Akdeniz'e gelen uçak gemisi,
+  İsrail–İran). Asıl sorun kapsam değil tekdüzelik: son 7 günün 235/290 kaydı Karadeniz (Ukrayna).
+  Bölge çeşitliliği seçicide ağırlaştırılır (ayrı PR).
+- Kaynak ve durum satırı 28 px (uzun çiftte en az 22 px'e küçülür).
+- Mesafe bölümünde çizginin Türkiye ucu TÜRKİYE yazısına 200 × 90 px'ten yakınsa yazı çekilir; ucun
+  kendi adı (SİNOP) yeri söyler.
+- `export/render.mjs` sayfa hazır olmazsa nedenini yazar (eksik amblem, sahne denetimi); önceden
+  40 sn bekleyip yalnız "page never became ready" diyordu.
