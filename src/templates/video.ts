@@ -587,9 +587,10 @@ function drawHookBlock(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, t: nu
   });
   ctx.letterSpacing = '0px';
 
-  const sp = anim(t, 0.95, 0.45);
-  ctx.globalAlpha = sp * alpha; ctx.fillStyle = s.ink; ctx.font = `600 40px ${s.fonts.text}`;
-  subLines.forEach((l, i) => ctx.fillText(l, LEFT, subTop + 40 + i * 50 + (1 - sp) * 18 - lift));
+  // the sub-line is there on frame 0 too: the thumbnail and the first second carry the whole headline,
+  // where it once faded in at 0.95 s, after most scrolling thumbs had decided (PLAN.md section 30)
+  ctx.globalAlpha = alpha; ctx.fillStyle = s.ink; ctx.font = `600 40px ${s.fonts.text}`;
+  subLines.forEach((l, i) => ctx.fillText(l, LEFT, subTop + 40 + i * 50 - lift));
   ctx.globalAlpha = 1;
 }
 
