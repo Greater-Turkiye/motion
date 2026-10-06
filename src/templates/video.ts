@@ -10,7 +10,6 @@ import type { Style } from '../styles';
 
 const BOSPHORUS: LonLat = [29.05, 41.2];
 /** Where TÜRKİYE may be written: the centre, the Black Sea side, the west, the east, all on land. */
-const TURKIYE_ANCHORS: LonLat[] = [[33.6, 40.7], [30.6, 39.4], [38.8, 38.6], [36.5, 39.8]];
 /** Points inside Türkiye, coast to coast and Thrace to Hakkari: a foreign emblem never stands on them. */
 const TURKIYE_INSIDE: LonLat[] = [
   [26.7, 41.6], [28.0, 41.2], [27.3, 40.2], [27.4, 38.6], [28.2, 37.3], [30.2, 37.0], [31.5, 36.9], [33.5, 36.6],
@@ -200,7 +199,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   const nameScale = Math.min(1.25, Math.max(0.85, Math.pow(cameraAt(sc, s, t).zoom, 0.25)));
   sc.labels.forEach((l, i) => {
     const home = l.kind === 'home';
-    const anchors: LonLat[] = [l.at, ...(l.alts ?? []), ...(home && !l.alts ? TURKIYE_ANCHORS : [])];
+    // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,
+    // and as the first, sticky label every other name gives way to it
+    const anchors: LonLat[] = home ? [l.at] : [l.at, ...(l.alts ?? [])];
     const alts = anchors.map((x) => proj(x));
     const p = alts[0] ?? alts.find(Boolean);
     if (!p) return;
@@ -444,10 +445,10 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // status and source: from the first second to the last frame, never only at the end (research/01, rules 9–10)
   drawFooter(ctx, sc, s, full ? 1 : anim(t, 1.3, 0.4));
-  if (!sc.anim?.post) {
-    if (full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
-    if (sc.voice === 'synthetic') drawVoiceNote(ctx, s);
-  }
+  if (!sc.anim?.post && full && (sc.anim?.progress ?? s.motion.progress)) drawProgress(ctx, sc, s, t);
+  // our mark and address in the corner of every frame and every slide (the owner's call, 6 October);
+  // the synthetic voice is said in the posting text and the release notes (CLAUDE.md section 4)
+  drawBrand(ctx, s, a);
 
   // vignette and grain
   if (!s.flat) {
@@ -673,16 +674,21 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
 }
 
 /** Where the synthetic-voice note sits: top left inside the safe area, under the progress bar. */
-const VOICE_NOTE = { x: LEFT, y: SAFE.top + 22, text: 'SESLENDİRME: YAPAY SES' };
+const BRAND = { x: LEFT, y: SAFE.top + 22, text: 'greaterturkiye.org', mark: 34 };
 
-/** A narrated video says, in every frame, that the voice is synthetic (TikTok, YouTube and Meta ask
- *  for AI-made realistic audio to be labelled; the viewer should not have to find it in a caption). */
-function drawVoiceNote(ctx: CanvasRenderingContext2D, s: Style) {
-  ctx.globalAlpha = 0.85;
-  ctx.font = `700 18px ${s.fonts.mono}`; ctx.letterSpacing = '3px';
+/** Our mark and our address, small, in the top corner: who made the video, in every frame. The
+ *  synthetic voice is declared in the posting text and the release notes instead (owner, 6 October). */
+function drawBrand(ctx: CanvasRenderingContext2D, s: Style, a: Assets) {
+  ctx.globalAlpha = 0.9;
+  let x = BRAND.x;
+  if (a.mark) {
+    ctx.drawImage(a.mark, x, BRAND.y - BRAND.mark + 8, BRAND.mark, BRAND.mark);
+    x += BRAND.mark + 12;
+  }
+  ctx.font = `700 20px ${s.fonts.mono}`; ctx.letterSpacing = '1px';
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = s.muted; ctx.fillText(VOICE_NOTE.text, VOICE_NOTE.x, VOICE_NOTE.y);
-  guard({ x: VOICE_NOTE.x, y: VOICE_NOTE.y - 18, w: ctx.measureText(VOICE_NOTE.text).width, h: 24 }, 'voice note');
+  ctx.fillStyle = s.muted; ctx.fillText(BRAND.text, x, BRAND.y);
+  guard({ x: BRAND.x, y: BRAND.y - BRAND.mark + 8, w: x - BRAND.x + ctx.measureText(BRAND.text).width, h: BRAND.mark }, 'brand');
   ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
 }
 
