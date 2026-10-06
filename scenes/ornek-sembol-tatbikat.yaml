@@ -1,0 +1,88 @@
+# Generated from evt_01m41jyaxpfk5v4atarz6t6gx3 by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-sembol-tatbikat
+record: evt_01m41jyaxpfk5v4atarz6t6gx3
+template: exercise
+format: vertical
+fps: 60
+duration: 15.6
+style: I
+source_text:
+  - Phoenix Express 2026 tatbikatı Tunus'ta başlıyor
+  - Exercise Phoenix Express 2026 begins in Tunisia
+  - Phoenix Express 2026 tatbikatı Tunus'ta başlıyor
+  - TATBİKAT · TUNUS · KUZEY AFRİKA · TUNUS · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 18.3
+      - 38
+    zoom: 0.6
+  to: &a2
+    t: 4.8
+    center:
+      - 9.9
+      - 36.5
+    zoom: 1
+  seconds: 4.8
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 0.6
+    - *a2
+    - t: 8.2
+      center:
+        - 8.6
+        - 35.1
+      zoom: 2.3
+    - t: 11.8
+      center:
+        - 8.6
+        - 35.1
+      zoom: 2.3
+    - t: 15.6
+      center: *a1
+      zoom: 0.6
+event:
+  at:
+    - 9.55
+    - 34.09
+  precision: region
+  kind: exercise
+parties:
+  - country: TUN
+    label: TUNUS
+    at:
+      - 10.18
+      - 36.81
+    emblem: TUN/flag
+labels:
+  - text: TUNUS
+    at:
+      - 9.55
+      - 34.09
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+hook:
+  kicker: TUNUS · 7 EYLÜL
+  lines:
+    - TUNUS'TA
+    - TATBİKAT
+  sub: Phoenix Express 2026 tatbikatı Tunus'ta başlıyor
+  status: DOĞRULANMADI
+  source: "KAYNAK: ABD 6. FİLO"
+beats:
+  - kind: roster
+    title: TATBİKAT
+    at: 4.8
+  - kind: place
+    title: TUNUS
+    text: "Kesin konum yok: halka ülkeyi gösterir."
+    at: 8.2
+  - kind: status
+    text: "Tek kaynak: ABD 6. Filo. Henüz kimse incelemedi."
+    at: 11.8

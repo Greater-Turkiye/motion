@@ -1,0 +1,96 @@
+# Generated from evt_01m41jynprfh6vpggs0cv7cxdr by tools/scene/generate.mjs; do not edit by hand.
+id: ornek-sembol-deniz
+record: evt_01m41jynprfh6vpggs0cv7cxdr
+template: statement
+format: vertical
+fps: 60
+duration: 13.9
+style: A
+source_text:
+  - USS Roosevelt Kıbrıs'tan ayrılıyor
+  - USS Roosevelt departs Cyprus
+  - USS Roosevelt Kıbrıs'tan ayrılıyor
+  - KIBRIS · KIBRIS · GKRY · TATBİKAT TATBİKATI AÇIKLAMA GELİŞME KİŞİ
+camera:
+  from:
+    center: &a1
+      - 30.1
+      - 38.6
+    zoom: 1
+  to: &a2
+    t: 2.7
+    center:
+      - 33.5
+      - 37.5
+    zoom: 1
+  seconds: 2.7
+  ease: outCubic
+  keys:
+    - t: 0
+      center: *a1
+      zoom: 1
+    - *a2
+    - t: 6.4
+      center:
+        - 32.2
+        - 36.1
+      zoom: 2.3
+    - t: 9.9
+      center:
+        - 33.5
+        - 35.7
+      zoom: 3.2
+    - t: 13.9
+      center: *a1
+      zoom: 1
+subject:
+  country: CYP
+  emblem: CYP/arms
+  label: GKRY
+parties:
+  - country: CYP
+    label: GKRY
+    at:
+      - 33.36
+      - 35.17
+    emblem: CYP/flag
+labels:
+  - text: GKRY
+    at:
+      - 33.01
+      - 34.92
+    kind: country
+  - text: TÜRKİYE
+    at:
+      - 35
+      - 39.2
+    kind: home
+hook:
+  kicker: KIBRIS · 3 EKİM
+  lines:
+    - USS ROOSEVELT
+    - KIBRIS'TAN AYRILIYOR
+  sub: ""
+  status: DOĞRULANMADI
+  source: "KAYNAK: ABD 6. FİLO"
+beats:
+  - kind: place
+    title: KIBRIS
+    text: "Kesin konum yok: halka bölgeyi gösterir."
+    at: 2.7
+  - kind: distance
+    from:
+      at:
+        - 33.2
+        - 35.1
+      label: KIBRIS
+    to:
+      at:
+        - 33.88
+        - 36.32
+      label: TAŞUCU
+    text: Kuş uçuşu, en yakın Türk şehrine.
+    at: 6.4
+  - kind: status
+    text: "Tek kaynak: ABD 6. Filo. Henüz kimse incelemedi."
+    at: 10.1
