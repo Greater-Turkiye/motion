@@ -38,7 +38,9 @@ const HARM = /\b(killed|dead|died|deaths?|wounded|injured|casualties)\b/i;
 // police and riot drills, food and aid: filed under exercise or clash by the feeds' type rules, but not
 // defence news ("Police from three continents test anti-riot tactics in Romania", "fighting in Yemen
 // deepens food security crisis" outranked seven wounded in Kherson once variety was weighed)
-const SOFT = /\b(police|riot|gendarmes?|food security|famine|humanitarian|aid (convoy|deliver\w*)|refugees?)\b/i;
+// and an attack by software or a lawsuit is no armed attack, whatever type the feed gave it ("Serbian
+// Student Targeted by Spyware Attack Sues Authorities" was the next pick on 6 October)
+const SOFT = /\b(police|riot|gendarmes?|food security|famine|humanitarian|aid (convoy|deliver\w*)|refugees?|cyber\w*|spyware|malware|ransomware|hack(s|ed|ers?|ing)?|sues?|lawsuit)\b/i;
 // Türkiye as a disc for distances: its middle and roughly its half-width, so a point at the border is ~0 km
 const TR_CENTRE = [35, 39], TR_RADIUS = 450;
 const RELIABILITY = { verified: 1.0, 'partially-verified': 0.8, disputed: 0.4, unverified: 0.5 };
