@@ -563,7 +563,7 @@ export function readFirms(files) {
   return rows.filter((r) => { const k = `${r.at}|${r.date}|${r.time}`; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
-export function generate(record, { datasets, style, variant = 'standart', firms = null } = {}) {
+export function generate(record, { datasets, style, variant = 'standart', firms = null, photo = null } = {}) {
   if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
   const titleTr = record.title?.tr, titleEn = record.title?.en ?? '';
@@ -821,6 +821,14 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     const dist = beats.find((b) => b.kind === 'distance');
     if (variant === 'yakinlik' && dist) kicker = `TÜRKİYE'YE ~${km(dist.from.at, dist.to.at)} KM`;
   }
+  // the story's own photograph (tools/scene/photo.mjs), right after the hook: every later block moves on
+  if (photo && beats.length) {
+    const PH = 3.4;
+    const at0 = beats[0].at;
+    for (const b of beats) b.at = round1(b.at + PH);
+    beats.unshift({ kind: 'photo', at: at0, file: photo.file, credit: photo.credit });
+    t += PH;
+  }
   const duration = round1(t);
 
   // ---- camera ----------------------------------------------------------------------------------------
@@ -903,7 +911,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   return scene;
 }
 
-function findRecord(datasets, id) {
+export function findRecord(datasets, id) {
   const base = path.join(datasets, 'data', 'events');
   for (const y of readdirSync(base)) for (const m of readdirSync(path.join(base, y))) {
     const f = path.join(base, y, m, `${id}.yaml`);
@@ -925,6 +933,7 @@ export function notes(record, scene) {
     `- Kayıt / record: \`${record.id}\``,
     ...record.sources.map((s) => `- Kaynak / source: ${s.url}`),
     // the satellite block's data and what it is not (FIRMS asks that detections are not called fires)
+    ...scene.beats.filter((b) => b.kind === 'photo').map((b) => `- ${b.credit} / photograph: public domain (DVIDS); its appearance does not imply endorsement.`),
     ...(scene.beats.some((b) => b.kind === 'satellite') ? ['- Uydu verisi / satellite data: NASA FIRMS (VIIRS, NOAA-20), kamu malı / public domain. Isı tespiti doğrulanmış bir yangın değildir; hotspots are fire detections, not confirmed fires.'] : []),
     '',
     'Bu video, Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi',
@@ -964,7 +973,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const record = parse(readFileSync(file, 'utf8'));
     try {
       const firms = args.get('firms') ? readFirms(args.get('firms').split(',')) : null;
-      const scene = generate(record, { datasets, style, variant, firms });
+      const photo = args.get('photo') ? JSON.parse(readFileSync(args.get('photo'), 'utf8')) : null;
+      const scene = generate(record, { datasets, style, variant, firms, photo });
       write(scene, record, args.get('out'));
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
       // what the site's videos page shows next to the video (tools/scene/site.mjs)

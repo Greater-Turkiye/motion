@@ -117,7 +117,12 @@ jobs:
               firms="${firms:+$firms,}firms-$r.csv"
             else echo "FIRMS $r unavailable: no satellite block"; fi
           done
-          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant "$variant" --notes notes.md --meta meta.json ${firms:+--firms "$firms"}
+          # the story's own photograph when its source publishes one in the public domain and it shows
+          # no recognisable face (tools/scene/photo.mjs, tools/scene/faces.py; PLAN.md section 29)
+          python3 -m pip install --quiet "opencv-python-headless<5" || echo "no OpenCV: no photograph"
+          node tools/scene/photo.mjs ../datasets "$ID" assets/photos > photo.json || true
+          photo=(); [ -s photo.json ] && photo=(--photo photo.json) && echo "photo: $(cat photo.json)" >> "$GITHUB_STEP_SUMMARY"
+          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant "$variant" --notes notes.md --meta meta.json ${firms:+--firms "$firms"} "${photo[@]}"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
         with:
