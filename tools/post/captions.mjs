@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
+import { geoDistance } from 'd3-geo';
 import { sceneFile } from '../../export/score.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -80,7 +81,13 @@ export function captions(sc, meta) {
   ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
 
   // YouTube: a title of at most 100 characters, the headline when it fits, then the place
-  const ytTitle = (headline.length <= 92 ? headline.replace(/\.$/, '') : headline.slice(0, 89).replace(/\s+\S*$/, '') + '…') + ' #Shorts';
+  // and how far from Türkiye, as the cover says it, when the title has room: the one line no other
+  // channel's title carries (PLAN.md section 33)
+  const dist = (sc.beats ?? []).find((b) => b.kind === 'distance');
+  const far = dist ? ` | Türkiye'ye ~${Math.round((geoDistance(dist.from.at, dist.to.at) * 6371) / 10) * 10} km` : '';
+  const base = headline.replace(/\.$/, '');
+  const ytTitle = (base.length + far.length <= 92 ? base + far
+    : headline.length <= 92 ? base : headline.slice(0, 89).replace(/\s+\S*$/, '') + '…') + ' #Shorts';
   const youtube = [
     `Başlık: ${ytTitle}`,
     '',

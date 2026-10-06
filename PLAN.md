@@ -830,3 +830,9 @@ seçim çıktı, çünkü havuz neredeyse bütünüyle Karadeniz. Tekdüzeliğin
 7 günün 290 kaydının 207'si tek yayın organından (Ukrinform). Değişiklik geri alındı; çözüm yeni
 kaynaklar (platform deposu, Türkiye'nin çevresinden: Ege, Kıbrıs, Doğu Akdeniz, Kafkasya, İran–İsrail,
 deniz kuvvetleri haberleri).
+
+## 33. Başlıkta da uzaklık / The distance in the title too (2026-10-06)
+
+Kapaktaki uzaklık (bölüm 32) YouTube'da arama ve önerilerde başlıkla görünür. Başlık kaydın kendi
+cümlesi kalır; sonuna, 92 karakteri aşmıyorsa mesafe bölümünün değeri eklenir: "Kerkük: IŞİD
+saldırısı bir polis memurunu öldürdü | Türkiye'ye ~240 km #Shorts". Sığmazsa yalnız başlık.
