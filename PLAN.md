@@ -787,6 +787,8 @@ FOTOĞRAFI", altında kaynağı ve lisansı), ses o sırada susar. Künye ve pay
 Ukrinform, Shafaq, Reuters, AP fotoğrafları telifli, hiç kullanılmaz; bu yüzden fotoğraf yalnız bir
 kısım haberde çıkar. CLAUDE.md bölüm 4'e istisna olarak yazıldı.
 
+
+
 ## 31. Tasarım incelemesi: küreden açılış / Design review: the globe opening (2026-10-06)
 
 Sahip: "Tasarımdaki detayları da düşün, viral olmalıyız; global dünyayı da mı görsek bilmiyorum, ince
