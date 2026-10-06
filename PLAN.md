@@ -704,6 +704,27 @@ kısmen karşılanabilir), trend müzik (lisans sorunu), hızlı kesme + efekt s
 notuna taşındı. TÜRKİYE adı artık hep ortasında: başka bir ad ya da halka ona değince kaymak yerine
 öteki ad çekilir.
 
+## 26. Olay türüne göre görsel dil / A visual language by event kind (2026-10-06)
+
+Sahip: "hep aynı tür videolar yapmışsın; haberler farklı farklı, bazen rotasında giden gemi bombalanıyor,
+bazen uçak düşüyor, bazen silahlı saldırı, ama anlatım tarzı, animasyon hep aynı." Her olay aynı
+nabız atan halkayla çiziliyordu. İlk adım: olayın yerinde, türüne göre bir harita işareti (basılı
+haritanın lejantı gibi düz, tek renk; parıltı, gölge yok, CLAUDE.md bölüm 4) ve türüne göre hareket:
+
+| Tür | İşaret | Yerin hareketi |
+|---|---|---|
+| İHA saldırısı | delta kanat | kısa dalgalar |
+| Füze | füze gövdesi ve kanatçıkları | hızlı, keskin dalga |
+| Hava saldırısı, hava olayı | uçak (üstten) | dalga yok |
+| Deniz | gövde (üstten, pruva yukarı) | yavaş, geniş, yassı dalga (yalnız denizi ya da adası bilinen olayda da çizilir) |
+| Topçu atışı | askeri haritanın topçu işareti (halkada dolu nokta) | kısa dalgalar |
+| Çatışma, saldırı | çapraz çizgi | seyrek dalga |
+| Tatbikat | açık baklava | dalga yok |
+| Görüşme, anlaşma | birleşik iki nokta | dalga yok |
+
+Sırada: türe göre sahne akışı (deniz olayında deniz alanı ve kıyıya uzaklık, hava olayında hava
+sahası), türe göre kamera.
+
 ## 28. Son araştırma / Final research check (2026-10-06)
 
 Sahip: "kanıtla, videolar viral olacak mı? Son araştırma, son kontrol." Bulgular (kaynaklar PR'da):
