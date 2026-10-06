@@ -756,6 +756,8 @@ sürümünde ikinci bir kopya var: `<sahne>-muziksiz.mp4`, yalnız seslendirme, 
 uygulamada eklenen trend ses bizim yatağımızla çakışmaz. Müzikli kopya (CC0 yatak) aynen kalır; site
 müzikli kopyayı gösterir.
 
+
+
 ## 28. Son araştırma / Final research check (2026-10-06)
 
 Sahip: "kanıtla, videolar viral olacak mı? Son araştırma, son kontrol." Bulgular (kaynaklar PR'da):
