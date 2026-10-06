@@ -938,9 +938,14 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
     }
     case 'photo': {
       // whose photograph and under what terms, at the size of a kicker
-      kicker('KAYNAĞIN FOTOĞRAFI', BLOCK_BOTTOM - 70 + rise);
+      // the block grows upwards: a credit on two lines put its second line on the footer
       ctx.font = `600 36px ${s.fonts.text}`;
-      lines(wrap(ctx, b.credit, WIDTH), LEFT, BLOCK_BOTTOM - 10 + rise, 44, b.at + 0.3, s.muted, 36);
+      const credit = wrap(ctx, b.credit, WIDTH);
+      const y0 = BLOCK_BOTTOM - 10 - (credit.length - 1) * 44;
+      guard({ x: LEFT, y: y0 - 96, w: WIDTH, h: BLOCK_BOTTOM - y0 + 96 }, 'photo');
+      kicker('KAYNAĞIN FOTOĞRAFI', y0 - 60 + rise);
+      ctx.font = `600 36px ${s.fonts.text}`;
+      lines(credit, LEFT, y0 + rise, 44, b.at + 0.3, s.muted, 36);
       break;
     }
     case 'quote': {
