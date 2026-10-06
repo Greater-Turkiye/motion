@@ -41,12 +41,17 @@ export function retime(sceneFile, dir) {
   const edges = [0, ...sc.beats.map((b) => b.at), sc.duration];
   // which block each clip belongs to: the last block starting at or before it
   const blockOf = (at) => edges.slice(0, -1).reduce((k, e, i) => (at + 1e-6 >= e ? i : k), 0);
+  // and the last block it may run into: a clip whose window reaches over silent blocks (narration.mjs)
+  const lastOf = (c) => Math.max(blockOf(c.at), blockOf(c.until - 0.01));
   const needs = [];
   for (const c of clips) {
-    const k = blockOf(c.at);
+    const k = blockOf(c.at), k2 = lastOf(c);
     const len = duration(trimmed(path.join(dir, c.file))) / TEMPO;
     // the last block also holds the loop's fade (0.9 s) after the voice
-    needs[k] = (k === 0 ? LEAD_HOOK : LEAD) + len + TAIL + GAP + (k === edges.length - 2 ? 0.9 : 0);
+    const need = (k === 0 ? LEAD_HOOK : LEAD) + len + TAIL + GAP + (k2 === edges.length - 2 ? 0.9 : 0);
+    // what the blocks before the last one already give, the last one need not
+    needs[k2] = Math.max(needs[k2] ?? 0, need - (edges[k2] - edges[k]));
+    c.last = k2;
   }
   const next = stretch(edges, needs);
   const map = (t) => mapTime(t, edges, next);
@@ -57,7 +62,9 @@ export function retime(sceneFile, dir) {
   for (const c of clips) {
     const k = blockOf(c.at);
     c.at = r2(next[k] + (k === 0 ? LEAD_HOOK : LEAD));
-    c.until = r2(k + 1 === next.length - 1 ? next[k + 1] - 0.3 : next[k + 1]);
+    const k2 = c.last ?? k;
+    delete c.last;
+    c.until = r2(k2 + 1 === next.length - 1 ? next[k2 + 1] - 0.3 : next[k2 + 1]);
   }
   writeFileSync(sceneFile, stringify(sc, { lineWidth: 0 }));
   writeFileSync(path.join(dir, 'clips.json'), JSON.stringify(clips, null, 1));
