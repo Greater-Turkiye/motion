@@ -725,6 +725,27 @@ haritanın lejantı gibi düz, tek renk; parıltı, gölge yok, CLAUDE.md bölü
 Sırada: türe göre sahne akışı (deniz olayında deniz alanı ve kıyıya uzaklık, hava olayında hava
 sahası), türe göre kamera.
 
+## 30. Kısa video ve ilk kare / Shorter videos and the first frame (2026-10-06)
+
+Sahip: "viral viral viral". Araştırmanın en güçlü iki bulgusu (bölüm 25, 28): ilk kare ve ilk saniye
+kalmayı belirler; 20–35 sn'lik kısa videolar sonuna kadar izlenir, kısa olan döngüye girer.
+Ölçüm: son on haber videosu 14–35 sn, saldırı haberleri 26–35 sn. Neden: ses haberin tamamını kancada
+okuyordu, `retime.mjs` kancayı sesin sonuna kadar (7–8 sn) ekranda tutuyordu; ardından aynı cümle
+"KAYNAĞA GÖRE" bölümünde sessiz 7–8 sn daha duruyordu. Yer bölümü ("Konum başlıktaki yer adından:
+±100 km", 4 sn) aynı yeri birazdan gösterecek mesafe bölümünden önce geliyordu.
+Yapılanlar:
+- Her sırada olgular kancanın hemen ardından gelir; sesin bir bölümü ardındaki sessiz bölümleri de
+  kapsar (`narration.mjs`), `retime.mjs` yalnız sesin bittiği bölümü gerekiyorsa uzatır: haber sesi
+  kancada başlar, olguların altında biter.
+- Mesafe ya da son 7 gün bölümü varsa ayrı yer bölümü kalkar; konumun ne kadar kesin olduğu satırı
+  ("Konum yaklaşık: ±100 km.") mesafenin altına, mesafe yoksa durumun altına geçer. Kesin konumu
+  olmayan kayıt ("Kesin konum yok…") yer bölümünü korur.
+- Süre sınırı 22 sn (`BUDGET`): aşan video önce ayın sayısını, sonra son 7 günü bırakır; örüntü
+  sırasında son 7 gün kalır, mesafe gider. Olgular, uydu ve durum hep kalır.
+- Kancanın alt satırı 0,95 sn'de belirmek yerine ilk karede tam: kapak karesi başlığın tamamını taşır.
+Sonuç (aynı dört kayıt, ses dahil tahmini): Poltava 35 → ~22 sn, Sumy 30 → ~21, Dnipro 31 → ~21,
+Kerkük 24 → ~20.
+
 ## 28. Son araştırma / Final research check (2026-10-06)
 
 Sahip: "kanıtla, videolar viral olacak mı? Son araştırma, son kontrol." Bulgular (kaynaklar PR'da):
