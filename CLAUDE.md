@@ -35,8 +35,10 @@ stat pills, "Ama suyun altında:"): rubbish design. None of it in any video, fra
 - **No sticker furniture**: no pills of side statistics, no "BÖLÜM 5" series tags, no swipe-bait.
 - **No teaser or bait copy**: no "Ama…", "Peki ya…?", "İşte…", "Şok", "Bomba", no question hooks,
   no emoji. Every word on screen is the record's own fact, status or source.
-The one generated element is the narration voice, labelled on screen ("SESLENDİRME: YAPAY SES") and
-switched off with `MOTION_VOICE=off`. Check every new template, style or post against this list.
+The one generated element is the narration voice: it is declared in every posting text and release
+note ("Seslendirme: yapay ses"), and switched off with `MOTION_VOICE=off`. The top corner of every frame
+carries our mark and address, "greaterturkiye.org" (owner, 2026-10-06; it replaced the on-screen
+"SESLENDİRME: YAPAY SES").
 
 ## 5. Closing a task
 - End with a short factual summary and numbered next steps, recommendation marked; name anything
