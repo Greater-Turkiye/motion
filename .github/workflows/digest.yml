@@ -102,6 +102,10 @@ jobs:
           kit=(--kit assets/sound/kit.json --scene "$ID"); [ "$MUSIC" = "off" ] && kit=()
           if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp out/video/*.mp4 "release/$ID.mp4"
           else node tools/audio/voice.mjs "$voice" out/video/*.mp4 "release/$ID.mp4" "${kit[@]}"; fi
+          # a copy without the music bed, the voice alone: the platforms' own sound libraries (Reels,
+          # TikTok, Shorts) license trending music added in the app when posting, which our bed would
+          # clash with (owner, 6 October; PLAN.md section 27)
+          if [ "$voice" != "-" ] && [ ${#kit[@]} -gt 0 ]; then node tools/audio/voice.mjs "$voice" out/video/*.mp4 "release/$ID-muziksiz.mp4"; fi
           cp out/poster/*-frames/0000.jpg "release/$ID.jpg"
           node tools/post/carousel.mjs "$ID" release --no-build
           cp meta.json "release/$ID.json"

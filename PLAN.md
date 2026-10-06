@@ -698,3 +698,13 @@ yayıncı görüşmeleri, YouTube ve Meta yaratıcı kılavuzları, Barrio vd. C
 **Kuralla çatışan popüler teknikler (sahibin kararı, CLAUDE.md bölüm 4 geçerli):** soru ya da merak
 kancası (araştırma güvenilirliği düşürdüğünü gösteriyor, yasak doğru), sunucu yüzü (gerçek fotoğrafla
 kısmen karşılanabilir), trend müzik (lisans sorunu), hızlı kesme + efekt sesi (yayımlanmış ölçüm yok).
+
+## 27. Viral müzik / Trending music (2026-10-06)
+
+Sahip: "YouTube'da telifsiz viral müzikler ekleyebilir miyiz? Viral müzik diyorum." Karar: trend
+şarkılar telifli; videonun içine otomatik konursa YouTube Content ID sesi kısar ya da hak talep eder,
+tekrarı hesaba ihtar getirir. Yasal yol, paylaşırken uygulamanın kendi ses kütüphanesinden eklemek
+(Reels, TikTok, Shorts bu müziklerin lisansını kendisi alır). Bunun için her seslendirilmiş üretimin
+sürümünde ikinci bir kopya var: `<sahne>-muziksiz.mp4`, yalnız seslendirme, müzik yatağı yok;
+uygulamada eklenen trend ses bizim yatağımızla çakışmaz. Müzikli kopya (CC0 yatak) aynen kalır; site
+müzikli kopyayı gösterir.
