@@ -92,7 +92,9 @@ export function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], obst
     // another name touching this one at all makes it give way entirely: two names stacked a few
     // pixels apart (UKRAYNA over KARADENİZ) read as one garbled word
     const byLabel = cover(placed.filter((p) => (p.label.alpha ?? 1) > 0.3).map((p) => p.box));
-    const vis = (l.sticky ? 1 - smooth(0.02, 0.08, byText) : (1 - smooth(0.02, 0.12, byText)) * (1 - smooth(0.0, 0.03, byLabel))) * (1 - smooth(0.0, 0.45, offFrame(box, W, H)));
+    // a name running off the frame goes within its first tenth: "ÜRKİYE" cut at the left edge read as a
+    // misspelling (the distance beat's close camera, 6 October)
+    const vis = (l.sticky ? 1 - smooth(0.02, 0.08, byText) : (1 - smooth(0.02, 0.12, byText)) * (1 - smooth(0.0, 0.03, byLabel))) * (1 - smooth(0.0, 0.1, offFrame(box, W, H)));
     const alpha = (l.alpha ?? 1) * vis;
     if (alpha <= 0.01) continue;
     placed.push({ label: { ...l, alpha, x: box.x + 6 + (box.w - 12) / 2, y: box.y + 4 + (box.h - 8) / 2 }, box });
