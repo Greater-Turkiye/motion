@@ -1,7 +1,14 @@
 {
- "about": "The production sound kit (PLAN.md 15.8, 20): the music bed only. Whoosh, tick and pop effects were removed as template-reel decoration (CLAUDE.md section 4). CC0 from Freesound; sources in LICENSES.md.",
+ "about": "CC0 Freesound music bed and restrained transition/map cues; sources in LICENSES.md.",
  "bed": "assets/sound/bed-452999.mp3",
+ "whoosh": "assets/sound/whoosh-169867.mp3",
+ "whooshPre": 1.0,
+ "tick": "assets/sound/tick-683048.mp3",
+ "pop": "assets/sound/pop-653369.mp3",
  "gain": {
-  "bed": -11
+  "bed": -11,
+  "whoosh": -16,
+  "tick": -20,
+  "pop": -16
  }
 }

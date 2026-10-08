@@ -1,6 +1,6 @@
 """The narrator: one clip per segment of tools/audio/narration.mjs, in Turkish.
 
-    python -u tools/audio/tts.py <narration.json> <out dir> [gemini|chatterbox|freya]
+    python -u tools/audio/tts.py <narration.json> <out dir> [omnivoice|edge|gemini|chatterbox|freya]
 
 gemini (production when the GEMINI_API_KEY secret is set, PLAN.md 24): Google's Gemini Flash TTS on
 the free AI Studio tier, a human-sounding Turkish news reading in one of its prebuilt voices
@@ -29,7 +29,8 @@ its sentence, which Whisper ignored, so the letters still matched:
 - a clip longer than its text could take to say (1.2 s plus one second per 7.5 characters; the
   slowest real reading so far was 6.6 a second, with its pauses) counts as a failed try.
 """
-import json, os, re, sys, time, pathlib
+import json, os, re, sys, time, pathlib, subprocess, tempfile
+import base64, io, wave, urllib.error, urllib.request
 import numpy as np
 import torch, torchaudio
 from faster_whisper import WhisperModel
@@ -199,6 +200,143 @@ if engine == "gemini":
             sr = 24000  # bare PCM: 16-bit mono at 24 kHz
         pcm = np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
         return torch.from_numpy(pcm.copy()).reshape(1, -1), sr
+elif engine == "azure":
+    raise SystemExit("azure TTS was removed; choose hf-edge, gemini, or chatterbox")
+elif engine == "omnivoice":
+    from gradio_client import Client, handle_file
+    OMNIVOICE_SPACE = os.environ.get("OMNIVOICE_SPACE", "k2-fsa/OmniVoice").strip()
+    OMNIVOICE_REFERENCE = pathlib.Path(os.environ.get(
+        "HF_TTS_REFERENCE_AUDIO", pathlib.Path(__file__).resolve().parents[2] / "referans.wav"
+    )).resolve()
+    OMNIVOICE_LANGUAGE = os.environ.get("OMNIVOICE_LANGUAGE", "Turkish").strip()
+    OMNIVOICE_REFERENCE_TEXT = os.environ.get("OMNIVOICE_REFERENCE_TEXT", "").strip() or None
+    OMNIVOICE_INSTRUCT = os.environ.get(
+        "OMNIVOICE_INSTRUCT", "female, middle-aged, moderate pitch"
+    ).strip()
+    OMNIVOICE_STEPS = int(os.environ.get("OMNIVOICE_STEPS", "").strip() or "48")
+    OMNIVOICE_GUIDANCE = float(os.environ.get("OMNIVOICE_GUIDANCE", "").strip() or "2.0")
+    OMNIVOICE_SPEED = float(os.environ.get("OMNIVOICE_SPEED", "").strip() or "0.92")
+    OMNIVOICE_DENOISE = os.environ.get("OMNIVOICE_DENOISE", "true").lower() == "true"
+    OMNIVOICE_PREPROCESS = os.environ.get("OMNIVOICE_PREPROCESS", "true").lower() == "true"
+    OMNIVOICE_POSTPROCESS = os.environ.get("OMNIVOICE_POSTPROCESS", "true").lower() == "true"
+    if os.environ.get("HF_TTS_LICENSE_ACCEPTED", "").lower() != "true":
+        raise RuntimeError("set HF_TTS_LICENSE_ACCEPTED=true to enable the selected OmniVoice model")
+    if not OMNIVOICE_REFERENCE.is_file():
+        reference_repo = os.environ.get("HF_TTS_REFERENCE_REPO", "").strip()
+        reference_file = os.environ.get("HF_TTS_REFERENCE_FILE", "").strip()
+        if not reference_repo or not reference_file:
+            raise RuntimeError("reference WAV not found; configure HF_TTS_REFERENCE_REPO and HF_TTS_REFERENCE_FILE for a private dataset")
+        from huggingface_hub import hf_hub_download
+        OMNIVOICE_REFERENCE = pathlib.Path(hf_hub_download(
+            repo_id=reference_repo,
+            filename=reference_file,
+            repo_type="dataset",
+            token=os.environ.get("HF_TOKEN") or None,
+        ))
+    if not 4 <= OMNIVOICE_STEPS <= 64:
+        raise RuntimeError("OMNIVOICE_STEPS must be between 4 and 64")
+    if not 0.5 <= OMNIVOICE_SPEED <= 1.5:
+        raise RuntimeError("OMNIVOICE_SPEED must be between 0.5 and 1.5")
+    client = Client(
+        OMNIVOICE_SPACE,
+        token=os.environ.get("HF_TOKEN") or None,
+        verbose=False,
+        httpx_kwargs={"timeout": 180},
+    )
+    def speak(text):
+        result = client.predict(
+            text,
+            OMNIVOICE_LANGUAGE,
+            handle_file(str(OMNIVOICE_REFERENCE)),
+            OMNIVOICE_REFERENCE_TEXT,
+            OMNIVOICE_INSTRUCT,
+            OMNIVOICE_STEPS,
+            OMNIVOICE_GUIDANCE,
+            OMNIVOICE_DENOISE,
+            OMNIVOICE_SPEED,
+            0,
+            OMNIVOICE_PREPROCESS,
+            OMNIVOICE_POSTPROCESS,
+            api_name="/_clone_fn",
+        )
+        if not isinstance(result, (tuple, list)) or len(result) < 2:
+            raise RuntimeError("OmniVoice Space returned an unexpected response")
+        audio, status = result[0], result[1]
+        if isinstance(status, str) and status.startswith("Error:"):
+            raise RuntimeError(status[:1000])
+        if isinstance(audio, dict):
+            audio = audio.get("path") or audio.get("name")
+        if not audio or not pathlib.Path(audio).is_file():
+            raise RuntimeError("OmniVoice Space did not return a downloadable WAV")
+        return torchaudio.load(str(audio))
+elif engine == "hf":
+    from gradio_client import Client, handle_file
+    HF_SPACE = os.environ.get("HF_TTS_SPACE", "").strip()
+    HF_REFERENCE = os.environ.get("HF_TTS_REFERENCE_AUDIO", "").strip()
+    HF_REFERENCE_REPO = os.environ.get("HF_TTS_REFERENCE_REPO", "").strip()
+    HF_REFERENCE_FILE = os.environ.get("HF_TTS_REFERENCE_FILE", "").strip()
+    HF_LICENSE_ACCEPTED = os.environ.get("HF_TTS_LICENSE_ACCEPTED", "").lower() == "true"
+    if not HF_SPACE:
+        raise RuntimeError("HF_TTS_SPACE is unset; refusing to upload speaker audio to an unreviewed public Space")
+    if HF_SPACE.lower() == "coqui/xtts":
+        raise RuntimeError("coqui/xtts is disabled: it is currently failing to start and may publish reference audio on errors")
+    if not HF_LICENSE_ACCEPTED:
+        raise RuntimeError("review the XTTS model license, then set HF_TTS_LICENSE_ACCEPTED=true to enable HF synthesis")
+    if not HF_REFERENCE and HF_REFERENCE_REPO and HF_REFERENCE_FILE:
+        from huggingface_hub import hf_hub_download
+        HF_REFERENCE = hf_hub_download(
+            repo_id=HF_REFERENCE_REPO,
+            filename=HF_REFERENCE_FILE,
+            repo_type="dataset",
+            token=os.environ.get("HF_TOKEN"),
+        )
+    if not HF_REFERENCE or not pathlib.Path(HF_REFERENCE).is_file():
+        raise RuntimeError("provide an authorized reference via HF_TTS_REFERENCE_AUDIO or a private HF dataset")
+    client = Client(
+        HF_SPACE,
+        hf_token=os.environ.get("HF_TOKEN") or None,
+        verbose=False,
+        httpx_kwargs={"timeout": 180},
+    )
+    def speak(text):
+        if len(text) > 200:
+            raise RuntimeError("XTTS Space accepts at most 200 characters per request")
+        result = client.predict(
+            text,
+            "tr",
+            handle_file(HF_REFERENCE),
+            None,
+            False,
+            False,
+            True,
+            HF_LICENSE_ACCEPTED,
+            api_name="/predict",
+        )
+        if not isinstance(result, (tuple, list)) or len(result) < 2:
+            raise RuntimeError("HF Space returned an unexpected response")
+        audio = result[1]
+        if isinstance(audio, dict):
+            audio = audio.get("path") or audio.get("name")
+        if not audio or not pathlib.Path(audio).is_file():
+            raise RuntimeError("HF Space response did not include a downloadable audio file")
+        return torchaudio.load(str(audio))
+elif engine == "edge":
+    EDGE_VOICE = os.environ.get("EDGE_TTS_VOICE", "").strip() or "tr-TR-EmelNeural"
+    if EDGE_VOICE not in ("tr-TR-EmelNeural", "tr-TR-AhmetNeural"):
+        raise SystemExit("EDGE_TTS_VOICE must be tr-TR-EmelNeural or tr-TR-AhmetNeural")
+    def speak(text):
+        with tempfile.TemporaryDirectory(prefix="gt-edge-tts-") as temp_dir:
+            mp3 = pathlib.Path(temp_dir) / "speech.mp3"
+            wav = pathlib.Path(temp_dir) / "speech.wav"
+            subprocess.run([
+                sys.executable, "-m", "edge_tts", "--voice", EDGE_VOICE,
+                "--text", text, "--write-media", str(mp3),
+            ], check=True, capture_output=True, text=True, timeout=180)
+            subprocess.run([
+                os.environ.get("FFMPEG_PATH", "ffmpeg"), "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
+                "-i", str(mp3), "-ac", "1", "-ar", "24000", str(wav),
+            ], check=True, capture_output=True, text=True, timeout=90)
+            return torchaudio.load(str(wav))
 elif engine == "freya":
     from freyatts import FreyaTTS
     model = FreyaTTS.from_pretrained("freyavoice/freya-tts", device="cpu")
@@ -268,5 +406,7 @@ for i, seg in enumerate(segments):
     clips.append({**seg, "file": name, "cer": round(c, 3)})
 (out / "engine.txt").write_text(engine, encoding="utf-8")  # the notes name the voice that spoke
 (out / "clips.json").write_text(json.dumps(clips, ensure_ascii=False, indent=1), encoding="utf-8")
+if engine in ("hf", "omnivoice") and bad:
+    sys.exit(f"{engine} voice quality check failed for {len(bad)} clips; restart the whole narration with Edge TTS")
 if len(bad) * 2 > len(segments):
     sys.exit(f"most of the narration is not clear: {', '.join(bad)} left out of {len(segments)}")

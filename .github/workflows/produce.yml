@@ -136,23 +136,72 @@ jobs:
         env:
           ID: ${{ steps.pick.outputs.id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_VOICE: ${{ vars.GEMINI_VOICE }}
+          MOTION_TTS_ENGINE: ${{ vars.MOTION_TTS_ENGINE }}
+          EDGE_TTS_VOICE: ${{ vars.EDGE_TTS_VOICE }}
+          HF_TTS_SPACE: ${{ vars.HF_TTS_SPACE }}
+          HF_TTS_REFERENCE_REPO: ${{ vars.HF_TTS_REFERENCE_REPO }}
+          HF_TTS_REFERENCE_FILE: ${{ vars.HF_TTS_REFERENCE_FILE }}
+          HF_TTS_LICENSE_ACCEPTED: ${{ vars.HF_TTS_LICENSE_ACCEPTED }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TTS_REFERENCE_AUDIO: referans.wav
+          OMNIVOICE_SPACE: k2-fsa/OmniVoice
+          OMNIVOICE_LANGUAGE: Turkish
+          OMNIVOICE_INSTRUCT: ${{ vars.OMNIVOICE_INSTRUCT }}
+          OMNIVOICE_STEPS: ${{ vars.OMNIVOICE_STEPS }}
+          OMNIVOICE_GUIDANCE: ${{ vars.OMNIVOICE_GUIDANCE }}
+          OMNIVOICE_SPEED: ${{ vars.OMNIVOICE_SPEED }}
         run: |
           node tools/audio/narration.mjs "auto-$ID" out/narration.json
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           python -m pip install --quiet faster-whisper
-          # the Gemini voice when the GEMINI_API_KEY secret is set (PLAN.md 24); with no key, or when it
-          # fails, the whole narration is made again with Chatterbox, so a video never mixes two voices
-          if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
+          python -m pip install --quiet gradio_client edge-tts
+          fallback_chatterbox() {
             rm -rf out/voice
             python -m pip install --quiet chatterbox-tts
             python -u tools/audio/tts.py out/narration.json out/voice chatterbox
-          fi
+          }
+          selected="${MOTION_TTS_ENGINE:-omnivoice-edge}"
+          case "$selected" in
+            omnivoice|omnivoice-edge)
+              if ! python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
+                echo "OmniVoice unavailable or failed; using Edge TTS for the whole narration"
+                rm -rf out/voice
+                python -u tools/audio/tts.py out/narration.json out/voice edge
+              fi
+              ;;
+            edge)
+              python -u tools/audio/tts.py out/narration.json out/voice edge
+              ;;
+            gemini)
+              if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
+                echo "Gemini unavailable or failed; using Chatterbox for the whole narration"
+                fallback_chatterbox
+              fi
+              ;;
+            chatterbox)
+              fallback_chatterbox
+              ;;
+            *)
+              echo "Unknown MOTION_TTS_ENGINE=$selected; using Chatterbox"
+              fallback_chatterbox
+              ;;
+          esac
           # the picture waits for the voice: blocks lengthen until each clip fits
           node tools/audio/retime.mjs "auto-$ID" out/voice
           # only now, with every clip made, does the scene carry the synthetic-voice note
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
-          { echo; echo "Seslendirme: yapay ses ($([ "$(cat out/voice/engine.txt 2>/dev/null)" = gemini ] && echo "Gemini TTS, Google, SynthID filigranlı" || echo "Chatterbox Multilingual, MIT"); ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; } >> notes.md
+          engine=$(cat out/voice/engine.txt 2>/dev/null || echo chatterbox)
+          case "$engine" in
+            omnivoice) voice_label="OmniVoice, Hugging Face Space (reference-conditioned synthetic voice)" ;;
+            hf) voice_label="Hugging Face XTTS Space" ;;
+            edge) voice_label="Edge TTS ($EDGE_TTS_VOICE)" ;;
+            gemini) voice_label="Gemini TTS, Google, SynthID filigranlı" ;;
+            *) voice_label="Chatterbox Multilingual, MIT" ;;
+          esac
+          { echo; echo "Seslendirme: yapay ses ($voice_label; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; } >> notes.md
           echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: Video and poster
         if: steps.pick.outputs.id != ''
@@ -192,6 +241,17 @@ jobs:
           title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/auto-'+process.env.ID+'.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker)")
           gh release create "video-$ID" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: video-$ID" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload to YouTube Shorts
+        if: steps.pick.outputs.id != ''
+        continue-on-error: true
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+        run: node tools/post/youtube-upload.mjs "auto-$ID" meta.json "release/auto-$ID.mp4"
 
   # the clock (timer.yml): after every production, a timer run sleeps until the next video is due.
   # The schedule above is only the second line: it ran about once in four hours on 1-2 October.

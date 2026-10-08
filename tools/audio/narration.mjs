@@ -52,7 +52,7 @@ const KEEP = new Set(['İHA', 'NATO', 'AB', 'BM']);
  *  capitals keeps them, where it lowers every other word ("adf" was read as a word). Set per scene
  *  by narration(). */
 let ACRONYMS = new Set();
-const SAY = { ABD: 'Amerika Birleşik Devletleri', km: 'kilometre', 'km²': 'kilometrekare' };
+const SAY = { ABD: 'Amerika Birleşik Devletleri', BM: 'Birleşmiş Milletler', km: 'kilometre', 'km²': 'kilometrekare' };
 
 /** Screen text → speech: accents off, numbers in words, capitals lowered, abbreviations said. */
 export function speakable(text, title = false) {
@@ -186,12 +186,7 @@ function blockParts(sc, b) {
       // screen already names the place and how sure it is ("Konum başlıktaki yer adından: ±20 km"), and
       // "Olay yeri Odesa; harita, haberde geçen yer adından…" spent the third second on the map's method
       if (saysDistance(sc, 'place')) return [distanceSentence((sc.beats ?? []).find((x) => x.kind === 'distance'))];
-      if ((sc.beats ?? []).some((x) => x.kind === 'distance')) return [];
-      const where = name(b.title);
-      if (/ülkeyi gösterir|ülke genelinde/.test(b.text ?? '')) return [`Kaynak bir yer vermiyor; harita ${where} genelini gösteriyor.`];
-      if (/^Kesin konum yok/.test(b.text ?? '')) return [`Kesin yer bilinmiyor; harita ${where} çevresini gösteriyor.`];
-      if (/başlıktaki yer adından/.test(b.text ?? '')) return [`Olay yeri ${where}; harita, haberde geçen yer adından yaklaşık konumu gösteriyor.`];
-      return [`Olay yeri ${where}.`];
+      return [];
     }
     case 'facts': {
       // the hook told this story aloud already; the block that shows it in full is read by the eye, under
@@ -221,6 +216,7 @@ function blockParts(sc, b) {
       // said at the place block already: the block that draws the line is left to the eye
       return saysDistance(sc, 'distance') ? [distanceSentence(b)] : [];
     case 'status': {
+      if (sc.template !== 'digest') return [];
       // the screen stamps the status; the voice says what it means
       const who = publisherName(sc);
       const many = (b.text ?? '').match(/(\d+) ayrı kaynak/);
@@ -307,19 +303,16 @@ function hookParts(sc) {
   // bildiriyor: Hostomel'e Rus saldırısından kaynaklanan kayıplar dörde yükseldi." under "KİEV BÖLGESİ /
   // SALDIRI". Reading the screen's words aloud was the owner's complaint ("okunca aptal gibi oluyor").
   // The facts block, which shows the same sentence, is then left to the music (blockParts)
-  // The fact comes first: the first seconds decide whether a viewer stays (Reuters Institute, 2023,
-  // "literally the most crucial"), and "Ukrinform bildiriyor:" spent the first of them on a name. The
-  // source follows in the same sentence ("…; Ukrinform'a göre."), and the screen shows it throughout.
+  // The fact leads. The source label stays visible on screen instead of being appended to the spoken sentence.
   // The distance from Türkiye follows at the place block (see 'place'), a few seconds in rather than
   // twelve: for a Turkish viewer it is why the story matters (PLAN.md section 25)
   if (sc.template !== 'digest') {
     const story = headlineOf(sc);
-    const who = publisherName(sc);
     // where it happened, when the story does not say it: "Kerkük: IŞİD saldırısı …" loses its rubric on
     // the way to the facts, and the voice told an attack without its city
     const kp = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ')[0] : '';
     const placeSaid = !kp || /^\d/.test(kp) || /^TÜRKİYE/u.test(kp) || norm(story).includes(norm(T(kp)).slice(0, 5));
-    if (story) return [`${placeSaid ? '' : `${name(kp)}. `}${B(story).replace(/[.!]$/u, '')}${who ? `; ${dative(who)} göre` : ''}.`];
+    if (story) return [`${placeSaid ? '' : `${name(kp)}. `}${B(story).replace(/[.!]$/u, '')}.`];
   }
   const km0 = sc.event ? String(km(sc.event.at, [29.05, 41.2])) : '';
   // a number hook's sub-line is its whole sentence ("…1470 askerini daha kaybetti"): read that, not
