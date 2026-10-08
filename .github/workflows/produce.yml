@@ -137,6 +137,8 @@ jobs:
           ID: ${{ steps.pick.outputs.id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_VOICE: ${{ vars.GEMINI_VOICE }}
+          NVAPI: ${{ secrets.NVAPI }}
+          NVIDIA_NIM_MODEL: ${{ vars.NVIDIA_NIM_MODEL }}
           MOTION_TTS_ENGINE: ${{ vars.MOTION_TTS_ENGINE }}
           EDGE_TTS_VOICE: ${{ vars.EDGE_TTS_VOICE }}
           HF_TTS_SPACE: ${{ vars.HF_TTS_SPACE }}
@@ -153,6 +155,7 @@ jobs:
           OMNIVOICE_SPEED: ${{ vars.OMNIVOICE_SPEED }}
         run: |
           node tools/audio/narration.mjs "auto-$ID" out/narration.json
+          node tools/scene/nim-copy.mjs "scenes/auto/auto-$ID.yaml" out/narration.json
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
