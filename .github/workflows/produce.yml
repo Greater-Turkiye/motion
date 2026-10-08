@@ -17,9 +17,10 @@ name: produce
 # timer.yml: every production ends by starting a timer run that sleeps until the next video is due
 # and then starts this workflow. The schedule stays as the second line. No secret is needed.
 #
-# Narration (PLAN.md sections 15.7, 23): Chatterbox tells the scene's facts in sentences of its own; the scene then
-# says "SESLENDİRME: YAPAY SES" in every frame. If the voice fails the video goes out silent and without
-# the note; production does not stop for it. MOTION_VOICE set to "off" turns narration off.
+# Narration (PLAN.md sections 15.7, 23): the voice tells the scene's facts in sentences of its own. When
+# narration is wanted and every engine fails, the run stops with an error rather than publishing a silent
+# video (owner, 8 October): a video is never shipped without its voice. MOTION_VOICE set to "off" is the
+# one deliberate exception — it skips narration and publishes silent on purpose.
 #
 # Kill switch: set the repository variable MOTION_PRODUCE to "off".
 on:
@@ -130,7 +131,10 @@ jobs:
       - name: Narration
         id: voice
         if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
-        continue-on-error: true
+        # No continue-on-error: when narration is wanted (MOTION_VOICE != off) and every engine fails,
+        # this step fails and the job stops here. The later steps carry an implicit success() with their
+        # own `if:`, so none of them run and no silent video is ever published. The only silent video is
+        # the deliberate one, MOTION_VOICE=off, which skips this step rather than failing it.
         # ~1 min a clip with its check; three tries for every clip of a long scene stays under 40
         timeout-minutes: 40
         env:
@@ -159,9 +163,10 @@ jobs:
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet torchcodec
           python -m pip install --quiet faster-whisper
-          python -m pip install --quiet gradio_client edge-tts
+          # soundfile (libsndfile), not torchcodec, is tts.py's audio I/O backend: the CPU runner has no
+          # CUDA, and torchcodec failed to load (libnvrtc.so.13), which crashed every TTS engine.
+          python -m pip install --quiet gradio_client edge-tts soundfile
           fallback_chatterbox() {
             rm -rf out/voice
             python -m pip install --quiet chatterbox-tts
@@ -173,7 +178,10 @@ jobs:
               if ! python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
                 echo "OmniVoice unavailable or failed; using Edge TTS for the whole narration"
                 rm -rf out/voice
-                python -u tools/audio/tts.py out/narration.json out/voice edge
+                if ! python -u tools/audio/tts.py out/narration.json out/voice edge; then
+                  echo "::error::both OmniVoice and Edge TTS failed; stopping the run instead of publishing a silent video"
+                  exit 1
+                fi
               fi
               ;;
             edge)
@@ -212,14 +220,21 @@ jobs:
         env:
           ID: ${{ steps.pick.outputs.id }}
           VOICE: ${{ steps.voice.outputs.ok }}
+          VOICEON: ${{ vars.MOTION_VOICE }}
           MUSIC: ${{ vars.MOTION_MUSIC }}
         run: |
           scene="auto-$ID"
-          node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video
+          # --encoder ffmpeg: a software, frame-by-frame H.264 encode at a constant 30 fps (export/render.mjs),
+          # not the browser's WebCodecs path, so the output plays back smoothly on the GPU-less runner.
+          node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video
           node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster
           mkdir -p release
           # the sound: the narration when it was made, and the kit (bed and effects) either way
-          if [ "$VOICE" = "true" ]; then voice=out/voice; else voice=-; fi
+          # A failed narration already stopped the job, so reaching here with no voice is only valid when
+          # voice is deliberately off; otherwise refuse rather than publish a silent video.
+          if [ "$VOICE" = "true" ]; then voice=out/voice
+          elif [ "$VOICEON" = "off" ]; then voice=-
+          else echo "::error::narration is missing but MOTION_VOICE is not off; refusing to publish a silent video"; exit 1; fi
           # MOTION_MUSIC=off drops the kit (bed and effects): the first answer to a copyright claim on a
           # platform, until the claim is disputed with the CC0 record in LICENSES.md
           kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()

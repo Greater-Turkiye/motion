@@ -77,7 +77,8 @@ jobs:
           node tools/audio/narration.mjs "$ID" out/narration.json
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet faster-whisper
+          # soundfile is tts.py's audio I/O backend (not torchcodec, which has no CPU-runner build)
+          python -m pip install --quiet faster-whisper soundfile
           # the Gemini voice when the GEMINI_API_KEY secret is set (PLAN.md 24); with no key, or when it
           # fails, the whole narration is made again with Chatterbox, so a video never mixes two voices
           if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then

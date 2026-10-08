@@ -33,7 +33,22 @@ import json, os, re, sys, time, pathlib, subprocess, tempfile
 import base64, io, wave, urllib.error, urllib.request
 import numpy as np
 import torch, torchaudio
+import soundfile as sf
 from faster_whisper import WhisperModel
+
+# Audio file I/O goes through soundfile (libsndfile), not torchaudio.load/save: on the
+# CPU-only Actions runner torchaudio's default I/O backend pulls in torchcodec, whose
+# library load fails ("libnvrtc.so.13: cannot open shared object file"), which crashed
+# every engine here — OmniVoice and the Edge fallback alike — before a clip was written.
+# torchaudio stays only for functional.resample, which is pure tensor maths.
+def load_wav(path):
+    data, sr = sf.read(str(path), dtype="float32", always_2d=True)  # (frames, channels)
+    return torch.from_numpy(np.ascontiguousarray(data.T)), sr       # (channels, frames)
+def save_wav(path, wav, sr):
+    data = wav.detach().cpu().numpy()
+    if data.ndim == 1:
+        data = data[None, :]
+    sf.write(str(path), data.T, int(sr))                            # soundfile wants (frames, channels)
 
 RETRY, FAIL, TRIES = 0.20, 0.30, 3
 ONES = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"]
@@ -268,7 +283,7 @@ elif engine == "omnivoice":
             audio = audio.get("path") or audio.get("name")
         if not audio or not pathlib.Path(audio).is_file():
             raise RuntimeError("OmniVoice Space did not return a downloadable WAV")
-        return torchaudio.load(str(audio))
+        return load_wav(audio)
 elif engine == "hf":
     from gradio_client import Client, handle_file
     HF_SPACE = os.environ.get("HF_TTS_SPACE", "").strip()
@@ -319,7 +334,7 @@ elif engine == "hf":
             audio = audio.get("path") or audio.get("name")
         if not audio or not pathlib.Path(audio).is_file():
             raise RuntimeError("HF Space response did not include a downloadable audio file")
-        return torchaudio.load(str(audio))
+        return load_wav(audio)
 elif engine == "edge":
     EDGE_VOICE = os.environ.get("EDGE_TTS_VOICE", "").strip() or "tr-TR-EmelNeural"
     if EDGE_VOICE not in ("tr-TR-EmelNeural", "tr-TR-AhmetNeural"):
@@ -336,7 +351,7 @@ elif engine == "edge":
                 os.environ.get("FFMPEG_PATH", "ffmpeg"), "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
                 "-i", str(mp3), "-ac", "1", "-ar", "24000", str(wav),
             ], check=True, capture_output=True, text=True, timeout=90)
-            return torchaudio.load(str(wav))
+            return load_wav(wav)
 elif engine == "freya":
     from freyatts import FreyaTTS
     model = FreyaTTS.from_pretrained("freyavoice/freya-tts", device="cpu")
@@ -401,7 +416,7 @@ for i, seg in enumerate(segments):
         print(f"{name} left out: not clear after {tries} tries (best {c:.2f})  {seg['text']}", flush=True)
         bad.append(name)
         continue
-    torchaudio.save(str(out / name), wav, sr)
+    save_wav(out / name, wav, sr)
     print(f"{name} at {seg['at']:5.2f}s  CER {c:.2f}  {seg['text']}", flush=True)
     clips.append({**seg, "file": name, "cer": round(c, 3)})
 (out / "engine.txt").write_text(engine, encoding="utf-8")  # the notes name the voice that spoke
