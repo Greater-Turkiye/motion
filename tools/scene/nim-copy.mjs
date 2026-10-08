@@ -65,7 +65,7 @@ try {
   const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-    signal: AbortSignal.timeout(45_000),
+    signal: AbortSignal.timeout(120_000),
     body: JSON.stringify({
       model: process.env.NVIDIA_NIM_MODEL || 'google/gemma-4-31b-it',
       messages: [{ role: 'user', content: prompt }],
