@@ -35,10 +35,16 @@ Akıcılığın sırrı gerçek zamanda hızlı çizmek değil, **her kareyi zam
   N. Her kare tam çizilir, yakalanır, ffmpeg'e verilir. Makine ne kadar yavaş olursa olsun çıktı
   **kusursuz 60 fps** olur; hiçbir kare düşmez, hiçbir kare iki kez gelmez.
 - Aynı kod önizlemede gerçek zamanda çalışır; önizleme ile çıktı piksel piksel aynı sahneyi gösterir.
+- Üretim kodlaması (`produce.yml` → `--encoder ffmpeg`) kareleri yazılımla, **sabit 30 fps** H.264'e
+  yazar (`-preset slower -crf 23 -r 30`, kare kare, değişken kare hızı yok). Kareler sahnenin kendi
+  hızında (60 fps) üretilir, dosya 30 fps'e sabitlenir: GPU'suz runner'ın çıktısı oynatmada takılmaz
+  (sahibin kuralı, 8 Ekim).
 
 Rendering is a pure function of time. Export steps a virtual clock frame by frame in headless
 Chrome and pipes each finished frame to ffmpeg, so the output is a perfect 60 fps however slow the
-machine is. The live preview runs the same code on the real clock.
+machine is. The live preview runs the same code on the real clock. Production (`produce.yml`) forces
+the software ffmpeg encoder and writes a constant 30 fps file (`-preset slower -crf 23 -r 30`) so the
+delivered video plays back without judder on the GPU-less runner.
 
 ## 3. Teknik yığın / Stack
 

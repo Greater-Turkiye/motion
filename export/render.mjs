@@ -186,8 +186,12 @@ for (const style of STYLES) {
   const info = pages[0].info;
   const name = `${info.id}-${info.style}`;
   const video = path.join(OUT, `${name}.mp4`);
+  // Frames arrive one per video frame at the scene's own rate (info.fps); the encode is a constant
+  // 30 fps H.264 (-r 30, no variable frame rate), so the file plays back smoothly on any device even
+  // though the GPU-less runner draws each frame slowly. -preset slower/-crf 23: quality over size and
+  // encode time, which the owner accepts for a judder-free result (owner, 8 October).
   const ff = FRAMES_ONLY ? null : spawn(ffmpegPath, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(info.fps), '-c:v', FORMAT === 'png' ? 'png' : 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', video], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-c:v', 'libx264', '-preset', 'slower', '-crf', '23', '-pix_fmt', 'yuv420p', '-r', '30', '-fps_mode', 'cfr', '-movflags', '+faststart', video], { stdio: ['pipe', 'inherit', 'inherit'] });
   const wanted = [];
   if (PICK) wanted.push(...PICK.filter((i) => i < info.frames));
   else for (let i = 0; i < info.frames; i += FRAMES_ONLY ? EVERY : 1) wanted.push(i);
