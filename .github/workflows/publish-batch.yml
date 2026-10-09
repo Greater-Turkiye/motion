@@ -47,7 +47,7 @@ jobs:
             echo "Only $picked distinct eligible stories are available; refusing to duplicate stories to reach $count." >&2
             exit 1
           fi
-          records=$(jq -Rsc 'split("\n") | map(select(startswith("evt_"))) | map({id:.}) | {include:.}' candidates.txt)
+          records=$(jq -Rsc 'split("\n") | map(select(startswith("evt_"))) | to_entries | group_by(.key % 4) | map({shard:.[0].key % 4, ids:map(.value)}) | {include:.}' candidates.txt)
           echo "records=$records" >> "$GITHUB_OUTPUT"
           printf 'Selected %s distinct recent records for live publication.\n' "$picked" | tee -a "$GITHUB_STEP_SUMMARY"
 
@@ -61,7 +61,7 @@ jobs:
       matrix: ${{ fromJson(needs.select.outputs.records) }}
     env:
       GH_TOKEN: ${{ github.token }}
-      ID: ${{ matrix.id }}
+      IDS: ${{ join(matrix.ids, ',') }}
       NVAPI: ${{ secrets.NVAPI }}
       NVIDIA_NIM_MODEL: ${{ vars.NVIDIA_NIM_MODEL }}
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -95,61 +95,63 @@ jobs:
           echo "FFMPEG_PATH=$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')" >> "$GITHUB_ENV"
           python3 tools/data/fetch_emblems.py --sync
           git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
-      - name: Generate source-backed scene
-        run: |
-          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant standart --notes notes.md --meta meta.json
-      - name: Generate NIM copy and synthetic narration
+      - name: Generate and publish this shard's videos
         id: voice
-        continue-on-error: true
-        timeout-minutes: 40
+        timeout-minutes: 85
         run: |
-          scene="auto-$ID"
-          node tools/audio/narration.mjs "$scene" out/narration.json
-          node tools/scene/nim-copy.mjs "scenes/auto/$scene.yaml" out/narration.json
-          selected="${MOTION_TTS_ENGINE:-omnivoice-edge}"
-          case "$selected" in
-            omnivoice|omnivoice-edge)
-              if ! python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
-                echo "OmniVoice unavailable or failed for $ID; using Edge TTS for the whole narration"
-                rm -rf out/voice
-                python -u tools/audio/tts.py out/narration.json out/voice edge
-              fi
-              ;;
-            edge) python -u tools/audio/tts.py out/narration.json out/voice edge ;;
-            *)
-              if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
-                echo "Selected TTS unavailable; using Edge TTS for the whole narration"
-                rm -rf out/voice
-                python -u tools/audio/tts.py out/narration.json out/voice edge
-              fi
-              ;;
-          esac
-          node tools/audio/retime.mjs "$scene" out/voice
-          echo "voice: synthetic" >> "scenes/auto/$scene.yaml"
-          engine=$(cat out/voice/engine.txt 2>/dev/null || echo edge)
-          echo "voice: synthetic ($engine; every spoken segment checked with Whisper)." >> notes.md
-          echo "ok=true" >> "$GITHUB_OUTPUT"
-      - name: Render and publish release
+        timeout-minutes: 85
         env:
-          VOICE: ${{ steps.voice.outputs.ok }}
           VOICEON: ${{ vars.MOTION_VOICE }}
           MUSIC: ${{ vars.MOTION_MUSIC }}
         run: |
-          scene="auto-$ID"
-          node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video
-          node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster
-          mkdir -p release
-          if [ "$VOICE" = "true" ]; then voice=out/voice
-          elif [ "$VOICEON" = "off" ]; then voice=-
-          else echo "::error::narration is missing; refusing to publish a silent video"; exit 1; fi
-          kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
-          if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp out/video/*.mp4 "release/$scene.mp4"
-          else node tools/audio/voice.mjs "$voice" out/video/*.mp4 "release/$scene.mp4" "${kit[@]}"; fi
-          cp out/poster/*-frames/0000.jpg "release/$scene.jpg"
-          cp meta.json "release/$scene.json"
-          title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/'+process.env.ID+'.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker)")
-          gh release create "video-$ID" release/* --title "$title" --notes-file notes.md --latest=false
-          echo "Published video-$ID from a distinct source record." >> "$GITHUB_STEP_SUMMARY"
+          process_record() {
+            local id="$1" scene="auto-$1" voice
+            export ID="$id"
+            rm -rf out/voice release
+            node tools/scene/generate.mjs --datasets ../datasets --id "$id" --variant standart --notes notes.md --meta meta.json || return 1
+            node tools/audio/narration.mjs "$scene" out/narration.json || return 1
+            node tools/scene/nim-copy.mjs "scenes/auto/$scene.yaml" out/narration.json || return 1
+            if [ "$VOICEON" = "off" ]; then
+              voice=-
+            else
+              selected="${MOTION_TTS_ENGINE:-omnivoice-edge}"
+              case "$selected" in
+                omnivoice|omnivoice-edge)
+                  if python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
+                    voice=out/voice
+                  else
+                    echo "OmniVoice unavailable for $id; regenerating the whole narration with Edge"
+                    rm -rf out/voice
+                    python -u tools/audio/tts.py out/narration.json out/voice edge || return 1
+                    voice=out/voice
+                  fi
+                  ;;
+                *) python -u tools/audio/tts.py out/narration.json out/voice edge || return 1; voice=out/voice ;;
+              esac
+              node tools/audio/retime.mjs "$scene" "$voice" || return 1
+              echo "voice: synthetic" >> "scenes/auto/$scene.yaml"
+              engine=$(cat out/voice/engine.txt 2>/dev/null || echo edge)
+              echo "Seslendirme: yapay ses ($engine; Whisper ile kontrol edildi). Voice-over: synthetic, Whisper-checked." >> notes.md
+            fi
+            node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video || return 1
+            node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster || return 1
+            mkdir -p release
+            kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+            if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp "out/video/$scene-"*.mp4 "release/$scene.mp4"
+            else node tools/audio/voice.mjs "$voice" "out/video/$scene-"*.mp4 "release/$scene.mp4" "${kit[@]}" || return 1; fi
+            cp out/poster/"$scene-"*-frames/0000.jpg "release/$scene.jpg" || return 1
+            cp meta.json "release/$scene.json" || return 1
+            title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/'+process.env.ID+'.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker)") || return 1
+            gh release create "video-$id" release/* --title "$title" --notes-file notes.md --latest=false || return 1
+            echo "Published video-$id from a distinct source record." | tee -a "$GITHUB_STEP_SUMMARY"
+          }
+          failed=0
+          IFS=',' read -r -a ids <<< "$IDS"
+          for id in "${ids[@]}"; do
+            [ -n "$id" ] || continue
+            if ! process_record "$id"; then echo "Failed video-$id; continuing with this shard's remaining records."; failed=1; fi
+          done
+          exit "$failed"
 
   pages:
     needs: render
