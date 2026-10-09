@@ -135,8 +135,8 @@ jobs:
         # this step fails and the job stops here. The later steps carry an implicit success() with their
         # own `if:`, so none of them run and no silent video is ever published. The only silent video is
         # the deliberate one, MOTION_VOICE=off, which skips this step rather than failing it.
-        # ~1 min a clip with its check; three tries for every clip of a long scene stays under 40
-        timeout-minutes: 40
+        # Kaggle Fish S2 Pro may spend several minutes starting a GPU and loading its reference prompt.
+        timeout-minutes: 70
         env:
           ID: ${{ steps.pick.outputs.id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -150,6 +150,7 @@ jobs:
           HF_TTS_REFERENCE_FILE: ${{ vars.HF_TTS_REFERENCE_FILE }}
           HF_TTS_LICENSE_ACCEPTED: ${{ vars.HF_TTS_LICENSE_ACCEPTED }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           HF_TTS_REFERENCE_AUDIO: referans.wav
           OMNIVOICE_SPACE: k2-fsa/OmniVoice
           OMNIVOICE_LANGUAGE: Turkish
@@ -166,7 +167,7 @@ jobs:
           python -m pip install --quiet faster-whisper
           # soundfile (libsndfile), not torchcodec, is tts.py's audio I/O backend: the CPU runner has no
           # CUDA, and torchcodec failed to load (libnvrtc.so.13), which crashed every TTS engine.
-          python -m pip install --quiet gradio_client edge-tts soundfile
+          python -m pip install --quiet gradio_client edge-tts soundfile kaggle==2.2.4
           fallback_chatterbox() {
             rm -rf out/voice
             python -m pip install --quiet chatterbox-tts
@@ -186,6 +187,9 @@ jobs:
               ;;
             edge)
               python -u tools/audio/tts.py out/narration.json out/voice edge
+              ;;
+            kaggle-fish)
+              python -u tools/voice-lab/kaggle_submit.py out/narration.json out/voice --reference referans.wav --reference-text assets/voice/reference-transcript.txt
               ;;
             gemini)
               if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
@@ -211,6 +215,7 @@ jobs:
             hf) voice_label="Hugging Face XTTS Space" ;;
             edge) voice_label="Edge TTS ($EDGE_TTS_VOICE)" ;;
             gemini) voice_label="Gemini TTS, Google, SynthID filigranlı" ;;
+            fish-s2-pro) voice_label="Fish Audio S2 Pro, Kaggle GPU (reference-conditioned synthetic voice)" ;;
             *) voice_label="Chatterbox Multilingual, MIT" ;;
           esac
           { echo; echo "Seslendirme: yapay ses ($voice_label; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; } >> notes.md

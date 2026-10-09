@@ -38,6 +38,15 @@ node tools/scene/generate.mjs --datasets ../datasets --id evt_…     # tek kay�
 npm test                                      # iki ayrı işlemede aynı kareler (tolerans: 2/255)
 ```
 
+### Voice approval
+
+The non-production Fish Speech audition gate is documented in [docs/voice-lab.md](docs/voice-lab.md).
+It writes four listening candidates only; it does not change the production TTS path or publish a video.
+
+### Kaggle Fish S2 Pro
+
+Set `MOTION_TTS_ENGINE=kaggle-fish` to produce the narration with Fish Audio S2 Pro on Kaggle GPU and return its WAV files to the normal release pipeline. The organization secret `KAGGLE_API_TOKEN` authenticates the official Kaggle CLI; the client derives the token owner's dataset and kernel slugs on its first run, then versions the private input dataset for each story, pushes the kernel, downloads `voice-artifact.zip`, then renders and publishes normally. The notebook is [tools/voice-lab/kaggle-fish-s2-pro.ipynb](tools/voice-lab/kaggle-fish-s2-pro.ipynb); it refuses GPUs below 24 GB VRAM.
+
 | | |
 |---|---|
 | Sahneler | `scenes/*.yaml` — kayıt kimliği, kaynak metni, kamera anahtarları, olay, konu ülke ve amblemi, etiketler, kanca, bölümler (`place`, `facts`, `distance`, `status`, `close`) |
