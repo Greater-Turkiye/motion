@@ -119,6 +119,11 @@ def main():
     missing = [str(path.name) for path in expected if not path.is_file() or path.stat().st_size < 1024]
     if missing:
         raise SystemExit(f"Kaggle artifact is missing usable clips: {', '.join(missing)}")
+    # retime.mjs reads clips.json to lengthen each block to its voice clip, the
+    # same manifest tools/audio/tts.py writes for the other engines. Fish runs on
+    # Kaggle without the ASR check, so the clarity error (cer) is recorded as 0.
+    clips = [{**segment, "file": f"seg{index}.wav", "cer": 0.0} for index, segment in enumerate(segments)]
+    (args.output / "clips.json").write_text(json.dumps(clips, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (args.output / "engine.txt").write_text("fish-s2-pro\n", encoding="utf-8")
     print(f"Kaggle Fish S2 Pro wrote {len(expected)} clips to {args.output}")
 
