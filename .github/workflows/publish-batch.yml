@@ -47,7 +47,7 @@ jobs:
             echo "Only $picked distinct eligible stories are available; refusing to duplicate stories to reach $count." >&2
             exit 1
           fi
-          records=$(jq -Rsc 'split("\n") | map(select(startswith("evt_"))) | to_entries | group_by(.key % 4) | map({shard:.[0].key % 4, ids:map(.value)}) | {include:.}' candidates.txt)
+          records=$(jq -Rsc 'split("\n") | map(select(startswith("evt_"))) as $ids | [range(0;4) as $shard | {shard:$shard,ids:[range($shard;($ids|length);4) as $i | $ids[$i]]}] | {include:.}' candidates.txt)
           echo "records=$records" >> "$GITHUB_OUTPUT"
           printf 'Selected %s distinct recent records for live publication.\n' "$picked" | tee -a "$GITHUB_STEP_SUMMARY"
 
