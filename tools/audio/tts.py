@@ -50,7 +50,11 @@ def save_wav(path, wav, sr):
         data = data[None, :]
     sf.write(str(path), data.T, int(sr))                            # soundfile wants (frames, channels)
 
-RETRY, FAIL, TRIES = 0.20, 0.30, 3
+RETRY, FAIL = 0.20, 0.30
+TRIES = int(os.environ.get("TTS_TRIES", "3"))
+NUMBER_EXTRA_TRIES = int(os.environ.get("TTS_NUMBER_EXTRA_TRIES", "2"))
+if TRIES < 1 or NUMBER_EXTRA_TRIES < 0:
+    raise SystemExit("TTS_TRIES must be positive and TTS_NUMBER_EXTRA_TRIES cannot be negative")
 ONES = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"]
 TENS = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"]
 def u1000(n):
@@ -385,7 +389,7 @@ def longest(text):
 clips, bad = [], []
 for i, seg in enumerate(segments):
     best = None
-    tries = TRIES + 2 if numbers(seg["text"]) else TRIES
+    tries = TRIES + NUMBER_EXTRA_TRIES if numbers(seg["text"]) else TRIES
     for k in range(tries):
         t1 = time.time()
         wav, sr = speak(seg["text"])
