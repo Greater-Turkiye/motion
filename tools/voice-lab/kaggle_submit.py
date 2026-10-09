@@ -108,6 +108,10 @@ def main():
         with zipfile.ZipFile(archive) as artifact:
             artifact.extractall(args.output)
     expected = [args.output / f"seg{index}.wav" for index in range(len(segments))]
+    for index, target in enumerate(expected):
+        numbered = args.output / f"{index:03d}.wav"
+        if not target.is_file() and numbered.is_file():
+            numbered.rename(target)
     missing = [str(path.name) for path in expected if not path.is_file() or path.stat().st_size < 1024]
     if missing:
         raise SystemExit(f"Kaggle artifact is missing usable clips: {', '.join(missing)}")
