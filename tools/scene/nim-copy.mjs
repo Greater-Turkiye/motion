@@ -4,7 +4,9 @@ import { validate, words } from '../../src/engine/scene.ts';
 
 const [scenePath, narrationPath] = process.argv.slice(2);
 const apiKey = process.env.NVAPI?.trim();
+const timeoutSeconds = Number(process.env.NVIDIA_NIM_TIMEOUT || 90);
 if (!scenePath || !narrationPath) throw new Error('usage: node tools/scene/nim-copy.mjs <scene.yaml> <narration.json>');
+if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 10 || timeoutSeconds > 120) throw new Error('NVIDIA_NIM_TIMEOUT must be 10-120 seconds');
 if (!apiKey) {
   console.log('NVAPI is not configured; keeping deterministic source copy.');
   process.exit(0);
@@ -65,7 +67,7 @@ try {
   const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-    signal: AbortSignal.timeout(90_000),
+    signal: AbortSignal.timeout(timeoutSeconds * 1000),
     body: JSON.stringify({
       model: process.env.NVIDIA_NIM_MODEL || 'google/gemma-4-31b-it',
       messages: [{ role: 'user', content: prompt }],

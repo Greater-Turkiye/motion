@@ -64,6 +64,7 @@ jobs:
       IDS: ${{ join(matrix.ids, ',') }}
       NVAPI: ${{ secrets.NVAPI }}
       NVIDIA_NIM_MODEL: ${{ vars.NVIDIA_NIM_MODEL }}
+      NVIDIA_NIM_TIMEOUT: "30"
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       HF_TTS_LICENSE_ACCEPTED: ${{ vars.HF_TTS_LICENSE_ACCEPTED }}
       HF_TTS_REFERENCE_AUDIO: referans.wav
@@ -76,7 +77,7 @@ jobs:
       OMNIVOICE_TIMEOUT: "60"
       TTS_TRIES: "2"
       TTS_NUMBER_EXTRA_TRIES: "0"
-      MOTION_TTS_ENGINE: ${{ vars.MOTION_TTS_ENGINE }}
+      MOTION_TTS_ENGINE: edge
       MOTION_VOICE: ${{ vars.MOTION_VOICE }}
       EDGE_TTS_VOICE: ${{ vars.EDGE_TTS_VOICE }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -119,7 +120,7 @@ jobs:
             if [ "$VOICEON" = "off" ]; then
               voice=-
             else
-              selected="${MOTION_TTS_ENGINE:-omnivoice-edge}"
+              selected="${MOTION_TTS_ENGINE:-edge}"
               case "$selected" in
                 omnivoice|omnivoice-edge)
                   if python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
