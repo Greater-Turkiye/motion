@@ -98,8 +98,6 @@ jobs:
       - name: Generate and publish this shard's videos
         id: voice
         timeout-minutes: 85
-        run: |
-        timeout-minutes: 85
         env:
           VOICEON: ${{ vars.MOTION_VOICE }}
           MUSIC: ${{ vars.MOTION_MUSIC }}
