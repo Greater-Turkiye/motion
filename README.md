@@ -45,7 +45,7 @@ It writes four listening candidates only; it does not change the production TTS 
 
 ### Kaggle Fish S2 Pro
 
-Set `MOTION_TTS_ENGINE=kaggle-fish` to produce the narration with Fish Audio S2 Pro on Kaggle GPU and return its WAV files to the normal release pipeline. The organization secret `KAGGLE_API_TOKEN` authenticates the official Kaggle CLI; the client derives the token owner's dataset and kernel slugs on its first run, then versions the private input dataset for each story, pushes the kernel, downloads `voice-artifact.zip`, then renders and publishes normally. The notebook is [tools/voice-lab/kaggle-fish-s2-pro.ipynb](tools/voice-lab/kaggle-fish-s2-pro.ipynb); it refuses GPUs below 14 GB VRAM.
+Set `MOTION_TTS_ENGINE=kaggle-fish` to produce the narration with Fish Audio S2 Pro on Kaggle GPU and return its WAV files to the normal release pipeline. The organization secret `KAGGLE_API_TOKEN` authenticates the official Kaggle CLI; the client derives the token owner's dataset and kernel slugs on its first run, then versions the private input dataset for each story, pushes the kernel, downloads `voice-artifact.zip`, then renders and publishes normally. The kernel is a Kaggle *script* [tools/voice-lab/kaggle-fish-s2-pro.py](tools/voice-lab/kaggle-fish-s2-pro.py) (a notebook loses its kernelspec on push and papermill then refuses to start it); it refuses GPUs below 14 GB VRAM. The GPU accelerator must be enabled on the Kaggle account, which requires phone verification — otherwise Kaggle ignores the GPU toggle, runs the kernel on CPU, and the job fails its CUDA check.
 
 | | |
 |---|---|

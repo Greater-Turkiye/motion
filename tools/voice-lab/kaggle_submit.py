@@ -29,7 +29,7 @@ def arguments():
     parser.add_argument("output", type=Path)
     parser.add_argument("--reference", type=Path, default=Path("referans.wav"))
     parser.add_argument("--reference-text", type=Path, required=True)
-    parser.add_argument("--notebook", type=Path, default=Path("tools/voice-lab/kaggle-fish-s2-pro.ipynb"))
+    parser.add_argument("--notebook", type=Path, default=Path("tools/voice-lab/kaggle-fish-s2-pro.py"))
     parser.add_argument("--timeout", type=int, default=3300)
     return parser.parse_args()
 
@@ -82,7 +82,7 @@ def main():
             "title": "Motion Fish S2 Pro",
             "code_file": args.notebook.name,
             "language": "python",
-            "kernel_type": "notebook",
+            "kernel_type": "script",
             "is_private": True,
             "enable_gpu": True,
             "enable_internet": True,
