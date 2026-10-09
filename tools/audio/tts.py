@@ -231,6 +231,7 @@ elif engine == "omnivoice":
     OMNIVOICE_STEPS = int(os.environ.get("OMNIVOICE_STEPS", "").strip() or "48")
     OMNIVOICE_GUIDANCE = float(os.environ.get("OMNIVOICE_GUIDANCE", "").strip() or "2.0")
     OMNIVOICE_SPEED = float(os.environ.get("OMNIVOICE_SPEED", "").strip() or "0.92")
+    OMNIVOICE_TIMEOUT = int(os.environ.get("OMNIVOICE_TIMEOUT", "180").strip() or "180")
     OMNIVOICE_DENOISE = os.environ.get("OMNIVOICE_DENOISE", "true").lower() == "true"
     OMNIVOICE_PREPROCESS = os.environ.get("OMNIVOICE_PREPROCESS", "true").lower() == "true"
     OMNIVOICE_POSTPROCESS = os.environ.get("OMNIVOICE_POSTPROCESS", "true").lower() == "true"
@@ -252,11 +253,13 @@ elif engine == "omnivoice":
         raise RuntimeError("OMNIVOICE_STEPS must be between 4 and 64")
     if not 0.5 <= OMNIVOICE_SPEED <= 1.5:
         raise RuntimeError("OMNIVOICE_SPEED must be between 0.5 and 1.5")
+    if not 15 <= OMNIVOICE_TIMEOUT <= 300:
+        raise RuntimeError("OMNIVOICE_TIMEOUT must be between 15 and 300 seconds")
     client = Client(
         OMNIVOICE_SPACE,
         token=os.environ.get("HF_TOKEN") or None,
         verbose=False,
-        httpx_kwargs={"timeout": 180},
+        httpx_kwargs={"timeout": OMNIVOICE_TIMEOUT},
     )
     def speak(text):
         result = client.predict(
