@@ -57,8 +57,11 @@ def main():
         kernel_metadata_path = kernel_dir / "kernel-metadata.json"
         dataset_metadata = json.loads(dataset_metadata_path.read_text(encoding="utf-8"))
         kernel_metadata = json.loads(kernel_metadata_path.read_text(encoding="utf-8"))
-        dataset = dataset_metadata["id"]
-        kernel = kernel_metadata["id"]
+        owner, separator, _ = kernel_metadata.get("id", "").partition("/")
+        if not separator or not owner or owner == "USERNAME":
+            raise SystemExit("Kaggle could not determine the authenticated account name.")
+        dataset = f"{owner}/motion-fish-s2-voice-job"
+        kernel = f"{owner}/motion-fish-s2-pro"
         job = {
             "reference_audio": "referans.wav",
             "reference_text": args.reference_text.read_text(encoding="utf-8").strip(),
@@ -66,15 +69,16 @@ def main():
         }
         (input_dir / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         shutil.copyfile(args.reference, input_dir / "referans.wav")
-        dataset_metadata.update({"title": "Motion Fish S2 voice job", "licenses": [{"name": "other"}]})
+        dataset_metadata.update({"id": dataset, "title": "Motion Fish S2 voice job", "licenses": [{"name": "other"}]})
         dataset_metadata_path.write_text(json.dumps(dataset_metadata, indent=2) + "\n", encoding="utf-8")
         try:
             command("datasets", "version", "-p", input_dir, "-m", "Update daily Motion voice job")
         except subprocess.CalledProcessError:
-            command("datasets", "create", "-p", input_dir, "--private")
+            command("datasets", "create", "-p", input_dir)
 
         shutil.copyfile(args.notebook, kernel_dir / args.notebook.name)
         kernel_metadata.update({
+            "id": kernel,
             "title": "Motion Fish S2 Pro",
             "code_file": args.notebook.name,
             "language": "python",
