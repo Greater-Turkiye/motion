@@ -1,0 +1,18 @@
+{
+  "license": "Greater Türkiye own recording; rights reserved to Greater Türkiye.",
+  "note": "Reference voice clips for Fish S2 Pro cloning (owner's 'airy and soft' recording). tools/voice-lab/kaggle_submit.py ships every clip whose WAV exists under assets/voice/ to the Kaggle job and passes each as a --prompt-audio/--prompt-text pair; the transcript of each clip must match its audio exactly, so it is never run through the Turkish pre-processor. If no listed WAV is present yet, the pipeline falls back to the single root referans.wav, so adding the WAVs is the only step needed to switch the voice.",
+  "clips": [
+    {
+      "audio": "references/ref_1_japonticarethacmi.wav",
+      "text": "Dışişleri Bakanlığından yapılan açıklamaya göre, Türkiye ile Japonya arasındaki ticaret hacmi geçen yıl yüzde on iki artarak altı milyar doları aştı. Bakanlık yetkilileri, önümüzdeki ay Tokyo’da yapılacak toplantıda enerji ve savunma sanayii alanlarında yeni anlaşmaların imzalanmasının beklendiğini söyledi."
+    },
+    {
+      "audio": "references/ref_2_tanklar.wav",
+      "text": "Birleşmiş Milletler Sudan'daki insani kriz için uyarırken, Avrupa'nın ana gündeminde Kiyev var. Almanya ve Fransa, bölgeye acil yardım gönderme kararı aldı. Amerika Birleşik Devletleri'nin hibe edeceği Eyb-rıms tanklarının ise, önümüzdeki hafta bölgeye ulaşması bekleniyor."
+    },
+    {
+      "audio": "references/ref_3_ihasaldirisi.wav",
+      "text": "Meteoroloji Genel Müdürlüğü, Ege ve Akdeniz için yağış uyarısı yaparken, bölgede sıcak bir ekonomik gelişme yaşandı. Dünyaca ünlü teknoloji devi ve Amerikalı tay-kun, kıyı şeridinde dev bir enerji yatırımına imza atmaya hazırlanıyor. Yapılan İ-HA saldırısında her zamanki gibi birileri hayatını kaybetmiş durumda."
+    }
+  ]
+}

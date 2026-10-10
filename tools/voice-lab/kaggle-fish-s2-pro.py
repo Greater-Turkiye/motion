@@ -36,14 +36,23 @@ inputs = list(Path("/kaggle/input").rglob("job.json"))
 if len(inputs) != 1:
     raise RuntimeError(f"Expected exactly one job.json input, found {inputs!r}.")
 job_path = inputs[0]
-reference_audio = job_path.with_name("referans.wav")
-if not reference_audio.is_file():
-    raise RuntimeError("Reference WAV is missing from the Kaggle dataset.")
 job = json.loads(job_path.read_text(encoding="utf-8"))
 segments = job.get("segments")
-reference_text = job.get("reference_text", "").strip()
-if not isinstance(segments, list) or not segments or not reference_text:
-    raise RuntimeError("The Kaggle voice job is missing segments or reference text.")
+# Fish clones the voice from one or more reference clips. New jobs carry a
+# "references" list of {audio, text}; fall back to the single reference_audio/
+# reference_text keys for an older job. Each audio sits beside job.json.
+prompts = job.get("references") or [{"audio": job.get("reference_audio", "referans.wav"), "text": job.get("reference_text", "")}]
+reference_pairs = []
+for prompt in prompts:
+    audio = job_path.with_name(prompt.get("audio", ""))
+    text = str(prompt.get("text", "")).strip()
+    if not audio.is_file():
+        raise RuntimeError(f"Reference WAV {audio.name!r} is missing from the Kaggle dataset.")
+    if not text:
+        raise RuntimeError(f"Reference clip {audio.name!r} has no transcript.")
+    reference_pairs.append((audio, text))
+if not isinstance(segments, list) or not segments or not reference_pairs:
+    raise RuntimeError("The Kaggle voice job is missing segments or reference clips.")
 
 workspace = Path("/kaggle/working")
 repository = workspace / "fish-speech"
@@ -124,6 +133,12 @@ temperature = os.environ.get("FISH_TEMPERATURE", "0.7")
 top_p = os.environ.get("FISH_TOP_P", "0.7")
 top_k = os.environ.get("FISH_TOP_K", "20")
 seed = os.environ.get("FISH_SEED", "42")
+# Repeat --prompt-text/--prompt-audio once per reference clip; Fish accepts the
+# multiple pairs and clones the voice from all of them.
+prompt_args = []
+for audio, text in reference_pairs:
+    prompt_args += ["--prompt-text", text, "--prompt-audio", str(audio)]
+print(f"Cloning from {len(reference_pairs)} reference clip(s).")
 for index, segment in enumerate(segments):
     text = segment.get("text", "").strip() if isinstance(segment, dict) else str(segment).strip()
     if not text:
@@ -132,8 +147,7 @@ for index, segment in enumerate(segments):
     subprocess.run([
         sys.executable, str(inference),
         "--text", text,
-        "--prompt-text", reference_text,
-        "--prompt-audio", str(reference_audio),
+        *prompt_args,
         "--checkpoint-path", str(checkpoint_path),
         "--output", str(target),
         "--device", "cuda",

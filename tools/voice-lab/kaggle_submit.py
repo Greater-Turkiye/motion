@@ -25,12 +25,40 @@ def command(*args, cwd=None, capture=False):
     )
 
 
+def references(args):
+    """The voice-cloning prompt clips, as (wav_path, transcript) pairs.
+
+    Fish S2 Pro accepts several reference pairs and clones the voice from all of
+    them, so the owner's recording is given as the clips listed in
+    assets/voice/references.json. Only clips whose WAV is actually present are
+    used, which lets the manifest and transcripts be committed before the audio
+    lands; until any WAV exists the single root referans.wav is the fallback, so
+    nothing breaks (CLAUDE.md section 1). Transcripts must match their audio, so
+    they are never run through the Turkish pre-processor.
+    """
+    if args.references.is_file():
+        manifest = json.loads(args.references.read_text(encoding="utf-8"))
+        base = args.references.parent
+        pairs = []
+        for clip in manifest.get("clips", []):
+            audio = base / clip.get("audio", "")
+            text = str(clip.get("text", "")).strip()
+            if audio.is_file() and text:
+                pairs.append((audio, text))
+        if pairs:
+            return pairs
+    if args.reference.is_file() and args.reference_text.is_file():
+        return [(args.reference, args.reference_text.read_text(encoding="utf-8").strip())]
+    raise SystemExit("No reference voice clip is available (checked references.json and referans.wav).")
+
+
 def arguments():
     parser = argparse.ArgumentParser(description="Produce Fish S2 Pro narration through Kaggle.")
     parser.add_argument("narration", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--reference", type=Path, default=Path("referans.wav"))
     parser.add_argument("--reference-text", type=Path, required=True)
+    parser.add_argument("--references", type=Path, default=Path("assets/voice/references.json"))
     parser.add_argument("--notebook", type=Path, default=Path("tools/voice-lab/kaggle-fish-s2-pro.py"))
     parser.add_argument("--timeout", type=int, default=3300)
     return parser.parse_args()
@@ -40,8 +68,9 @@ def main():
     args = arguments()
     if not os.environ.get("KAGGLE_API_TOKEN", "").strip():
         raise SystemExit("KAGGLE_API_TOKEN is required.")
-    if not args.narration.is_file() or not args.reference.is_file() or not args.reference_text.is_file():
-        raise SystemExit("Narration, reference WAV, or reference transcript is missing.")
+    if not args.narration.is_file():
+        raise SystemExit("Narration is missing.")
+    reference_clips = references(args)
     narration = json.loads(args.narration.read_text(encoding="utf-8"))
     segments = narration.get("segments")
     if not isinstance(segments, list) or not segments:
@@ -70,13 +99,21 @@ def main():
         # changes pronunciation only, never a fact (CLAUDE.md section 2). The
         # original segments keep driving clips.json and the on-screen scene.
         spoken = [{**segment, "text": tr_tts_prep.prepare(segment.get("text", ""))} for segment in segments]
+        # Ship each reference clip under a stable name and record its transcript
+        # alongside; the kernel passes every pair to Fish as a prompt. The first
+        # pair is also kept under the legacy single-reference keys.
+        prompts = []
+        for index, (audio, text) in enumerate(reference_clips):
+            name = f"referans{'' if index == 0 else index}.wav"
+            shutil.copyfile(audio, input_dir / name)
+            prompts.append({"audio": name, "text": text})
         job = {
-            "reference_audio": "referans.wav",
-            "reference_text": args.reference_text.read_text(encoding="utf-8").strip(),
+            "reference_audio": prompts[0]["audio"],
+            "reference_text": prompts[0]["text"],
+            "references": prompts,
             "segments": spoken,
         }
         (input_dir / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        shutil.copyfile(args.reference, input_dir / "referans.wav")
         dataset_metadata.update({"id": dataset, "title": "Motion Fish S2 voice job", "licenses": [{"name": "other"}]})
         dataset_metadata_path.write_text(json.dumps(dataset_metadata, indent=2) + "\n", encoding="utf-8")
         try:
