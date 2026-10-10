@@ -50,6 +50,21 @@ repository = workspace / "fish-speech"
 outputs = workspace / "voice"
 outputs.mkdir(exist_ok=True)
 subprocess.run(["git", "clone", "--depth", "1", "https://github.com/fishaudio/fish-speech.git", str(repository)], check=True)
+
+# The ~11 GiB s2-pro weights are the expensive part of every run. When the
+# operator has attached the pre-converted bf16 weights as a Kaggle input dataset
+# (built once by tools/voice-lab/kaggle_model_bf16.py), load them straight from
+# /kaggle/input with no download or conversion. Recognise the model folder by a
+# weight file; the job dataset holds only job.json and referans.wav, so it never
+# matches. Fall back to the live Hugging Face download when no dataset is present.
+def find_model_dir():
+    for path in sorted(Path("/kaggle/input").rglob("*")):
+        if path.is_file() and path.suffix in {".pth", ".safetensors", ".ckpt"}:
+            return path.parent
+    return None
+
+
+model_dir = find_model_dir()
 # Kaggle's Python 3.13 image breaks fish-speech's editable install two ways:
 # pyaudio has no wheel and needs the portaudio headers to compile, and the
 # dependency resolver otherwise settles on an old tokenizers with no 3.13 wheel
@@ -63,7 +78,13 @@ subprocess.run(
     cwd=repository,
     check=True,
 )
-subprocess.run(["hf", "download", "fishaudio/s2-pro", "--local-dir", str(repository / "checkpoints" / "s2-pro")], check=True)
+if model_dir is not None:
+    checkpoint_path = model_dir
+    print(f"Loading Fish S2 Pro weights from the Kaggle dataset: {checkpoint_path}")
+else:
+    checkpoint_path = repository / "checkpoints" / "s2-pro"
+    print("No model dataset attached; downloading fishaudio/s2-pro from Hugging Face.")
+    subprocess.run(["hf", "download", "fishaudio/s2-pro", "--local-dir", str(checkpoint_path)], check=True)
 
 inference = repository / "fish_speech" / "models" / "text2semantic" / "inference.py"
 # The language model alone nearly fills one T4, so Fish S2 Pro does not fit on
@@ -93,6 +114,16 @@ source = source.replace(
 inference.write_text(source, encoding="utf-8")
 # Reduce allocator fragmentation so the ~11 GiB model leaves room for decoding.
 environment = {**os.environ, "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"}
+# Sampling controls for a calm, even news delivery. Fish's defaults (temperature
+# 1.0, top-p 0.9, top-k 30) sample loosely and let the voice drift and glitch on
+# long Turkish sentences; lower them so the reading tracks the reference voice's
+# steady pacing. A fixed seed keeps a re-run of the same story reproducible.
+# These are the only inference.py knobs the upstream CLI exposes — it has no
+# repetition-penalty or CFG/guidance flag (both exist only inside generate_long).
+temperature = os.environ.get("FISH_TEMPERATURE", "0.7")
+top_p = os.environ.get("FISH_TOP_P", "0.7")
+top_k = os.environ.get("FISH_TOP_K", "20")
+seed = os.environ.get("FISH_SEED", "42")
 for index, segment in enumerate(segments):
     text = segment.get("text", "").strip() if isinstance(segment, dict) else str(segment).strip()
     if not text:
@@ -103,10 +134,14 @@ for index, segment in enumerate(segments):
         "--text", text,
         "--prompt-text", reference_text,
         "--prompt-audio", str(reference_audio),
-        "--checkpoint-path", str(repository / "checkpoints" / "s2-pro"),
+        "--checkpoint-path", str(checkpoint_path),
         "--output", str(target),
         "--device", "cuda",
         "--chunk-length", "300",
+        "--temperature", temperature,
+        "--top-p", top_p,
+        "--top-k", top_k,
+        "--seed", seed,
     ], cwd=repository, check=True, env=environment)
     if not target.is_file() or target.stat().st_size < 1024:
         raise RuntimeError(f"Fish S2 Pro did not write a usable clip for segment {index}.")
