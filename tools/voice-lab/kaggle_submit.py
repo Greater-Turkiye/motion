@@ -12,6 +12,8 @@ import time
 import zipfile
 from pathlib import Path
 
+import tr_tts_prep
+
 
 def command(*args, cwd=None, capture=False):
     return subprocess.run(
@@ -62,10 +64,16 @@ def main():
             raise SystemExit("Kaggle could not determine the authenticated account name.")
         dataset = f"{owner}/motion-fish-s2-voice-job"
         kernel = f"{owner}/motion-fish-s2-pro"
+        # Fish reads the grapheme stream it is given and slips into an English
+        # accent on Latin acronyms and foreign spellings. Rewrite the spoken
+        # text into Turkish graphemes so synthesis stays monolingual; this
+        # changes pronunciation only, never a fact (CLAUDE.md section 2). The
+        # original segments keep driving clips.json and the on-screen scene.
+        spoken = [{**segment, "text": tr_tts_prep.prepare(segment.get("text", ""))} for segment in segments]
         job = {
             "reference_audio": "referans.wav",
             "reference_text": args.reference_text.read_text(encoding="utf-8").strip(),
-            "segments": segments,
+            "segments": spoken,
         }
         (input_dir / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         shutil.copyfile(args.reference, input_dir / "referans.wav")
@@ -77,6 +85,14 @@ def main():
             command("datasets", "create", "-p", input_dir)
 
         shutil.copyfile(args.notebook, kernel_dir / args.notebook.name)
+        # When the operator has published the bf16 weights as a private dataset
+        # (tools/voice-lab/kaggle_model_bf16.py) and set FISH_MODEL_DATASET to
+        # its slug, attach it so the kernel loads the model from /kaggle/input
+        # instead of downloading and converting ~11 GiB on every run. Until then
+        # the slug is empty and the kernel falls back to the live download, so a
+        # fresh account keeps working with no manual step (CLAUDE.md section 1).
+        model_dataset = os.environ.get("FISH_MODEL_DATASET", "").strip()
+        dataset_sources = [dataset] + ([model_dataset] if model_dataset else [])
         kernel_metadata.update({
             "id": kernel,
             "title": "Motion Fish S2 Pro",
@@ -86,7 +102,7 @@ def main():
             "is_private": True,
             "enable_gpu": True,
             "enable_internet": True,
-            "dataset_sources": [dataset],
+            "dataset_sources": dataset_sources,
         })
         kernel_metadata_path.write_text(json.dumps(kernel_metadata, indent=2) + "\n", encoding="utf-8")
         command("kernels", "push", "-p", kernel_dir, "--accelerator", "GPU", "-t", args.timeout)

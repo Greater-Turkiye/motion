@@ -8,7 +8,7 @@ const timeoutSeconds = Number(process.env.NVIDIA_NIM_TIMEOUT || 90);
 if (!scenePath || !narrationPath) throw new Error('usage: node tools/scene/nim-copy.mjs <scene.yaml> <narration.json>');
 if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 10 || timeoutSeconds > 120) throw new Error('NVIDIA_NIM_TIMEOUT must be 10-120 seconds');
 if (!apiKey) {
-  console.log('NVAPI is not configured; keeping deterministic source copy.');
+  console.log('::warning::NVAPI is not configured; narration keeps the deterministic source copy (no NIM rewrite).');
   process.exit(0);
 }
 
@@ -105,8 +105,8 @@ try {
     }
     console.log(`NIM spoken-copy segments accepted: ${changed}/${narration.segments.length}.`);
   } else {
-    console.log('NIM narration rejected; keeping deterministic narration.');
+    console.log('::warning::NIM narration rejected or empty; keeping deterministic narration.');
   }
 } catch (error) {
-  console.warn(`NIM copy unavailable; keeping deterministic text: ${error.message}`);
+  console.warn(`::warning::NIM copy unavailable; keeping deterministic text: ${error.message}`);
 }
