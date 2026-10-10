@@ -43,6 +43,19 @@ note ("Seslendirme: yapay ses"), and switched off with `MOTION_VOICE=off`. The t
 carries our mark and address, "greaterturkiye.org" (owner, 2026-10-06; it replaced the on-screen
 "SESLENDİRME: YAPAY SES").
 
-## 5. Closing a task
+## 5. Run the whole pipeline yourself (owner, 2026-10-10)
+The owner does not want to be handed steps he could have done for him. Carry a task to the end
+without asking for permission or confirmation:
+- Branch, open the pull request, and squash-merge it once CI is green — all of it autonomously.
+- Trigger `produce.yml` (and the other workflows) and submit and poll Kaggle jobs yourself; read the
+  logs and fix what broke, then run it again, rather than reporting the failure back.
+- Secrets and variables (`KAGGLE_API_TOKEN`, `NVAPI`, `HF_TOKEN`, `FISH_MODEL_DATASET`, …) live in the
+  GitHub organization and are injected into CI. Assume CI has them; never block on your local machine
+  lacking a key, and never ask the owner to run a CI-equivalent command locally.
+- Only name something as the owner's to do when it genuinely needs his credentials, his account access
+  (e.g. revoking a leaked token, phone-verifying Kaggle), or a file only he can produce (e.g. a voice
+  recording) — and even then, do everything around it first so that one drop-in is all that remains.
+
+## 6. Closing a task
 - End with a short factual summary and numbered next steps, recommendation marked; name anything
   the owner must do themselves as its own option.
