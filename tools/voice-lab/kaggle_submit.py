@@ -71,6 +71,12 @@ def main():
     if not args.narration.is_file():
         raise SystemExit("Narration is missing.")
     reference_clips = references(args)
+    # Fish clones fine from one clip, and each extra prompt lengthens the
+    # language-model context and its KV cache on the first T4 — three ~20 s
+    # clips overran it and the kernel errored. Use one clip by default (the
+    # first listed) and let FISH_MAX_REFERENCES raise the count deliberately.
+    max_references = max(1, int(os.environ.get("FISH_MAX_REFERENCES", "1")))
+    reference_clips = reference_clips[:max_references]
     narration = json.loads(args.narration.read_text(encoding="utf-8"))
     segments = narration.get("segments")
     if not isinstance(segments, list) or not segments:
@@ -144,14 +150,33 @@ def main():
         kernel_metadata_path.write_text(json.dumps(kernel_metadata, indent=2) + "\n", encoding="utf-8")
         command("kernels", "push", "-p", kernel_dir, "--accelerator", "GPU", "-t", args.timeout)
 
+        def dump_log(reason):
+            # On failure the kernel writes no artifact, so pull its log and print
+            # the tail — otherwise the CI step shows only "status error" with no
+            # cause. The log file is named after the kernel slug.
+            print(f"::error::{reason}")
+            try:
+                logdir = root / "faillog"
+                logdir.mkdir(exist_ok=True)
+                slug = kernel.split("/")[-1]
+                command("kernels", "output", kernel, "-p", logdir, "-o", "--file-pattern", f"{slug}.log")
+                logfile = logdir / f"{slug}.log"
+                if logfile.is_file():
+                    print("----- Kaggle kernel log (tail) -----")
+                    print(logfile.read_text(encoding="utf-8", errors="replace")[-8000:])
+            except Exception as exc:  # diagnosis only; never mask the original failure
+                print(f"(could not fetch Kaggle kernel log: {exc})")
+
         deadline = time.monotonic() + args.timeout
         while True:
             status = command("kernels", "status", kernel, capture=True).stdout.lower()
             if "complete" in status:
                 break
             if any(word in status for word in ("error", "failed", "cancelled")):
+                dump_log(f"Kaggle Fish job failed: {status.strip()}")
                 raise SystemExit(f"Kaggle Fish job failed: {status.strip()}")
             if time.monotonic() >= deadline:
+                dump_log("Timed out waiting for the Kaggle Fish job.")
                 raise SystemExit("Timed out waiting for the Kaggle Fish job.")
             time.sleep(30)
 
