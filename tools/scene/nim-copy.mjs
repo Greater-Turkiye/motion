@@ -8,9 +8,9 @@ const apiKey = process.env.NVAPI?.trim();
 // read from an env var. The HTTP 529 seen earlier was the shared endpoint being
 // overloaded (handled by the retry below), not a bad model id.
 const nimModel = 'google/gemma-4-31b-it';
-const timeoutSeconds = Number(process.env.NVIDIA_NIM_TIMEOUT || 90);
+const timeoutSeconds = Number(process.env.NVIDIA_NIM_TIMEOUT || 120);
 if (!scenePath || !narrationPath) throw new Error('usage: node tools/scene/nim-copy.mjs <scene.yaml> <narration.json>');
-if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 10 || timeoutSeconds > 120) throw new Error('NVIDIA_NIM_TIMEOUT must be 10-120 seconds');
+if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 10 || timeoutSeconds > 180) throw new Error('NVIDIA_NIM_TIMEOUT must be 10-180 seconds');
 if (!apiKey) {
   console.log('::warning::NVAPI is not configured; narration keeps the deterministic source copy (no NIM rewrite).');
   process.exit(0);
