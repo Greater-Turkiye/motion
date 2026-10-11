@@ -77,21 +77,41 @@ const SPOKEN_FRAME = new Set(['bildirildi', 'bildirdi', 'açıklandı', 'açıkl
   'bilgilere', 'raporuna', 'rapora', 'ajansına', 'ajansının', 'basınına', 'ayrıca', 'ardından', 'sırasında', 'henüz', 'halen',
   'üzere', 'şöyle', 'böylece', 'yönelik', 'ilişkin', 'dair', 'düzenlenen', 'gerçekleştirilen'].map(fold));
 
+// Turkish number words: a quantity the source did not state is a new claim even
+// when spelled out ("iki" → "üç"), so these are gated like digits.
+// "bir" is excluded: it is far more often the indefinite article "a" than "one".
+const NUMBER_WORDS = new Set(['iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz', 'on', 'yirmi', 'otuz',
+  'kırk', 'elli', 'altmış', 'yetmiş', 'seksen', 'doksan', 'yüz', 'bin', 'milyon', 'milyar', 'yarım', 'çeyrek'].map(fold));
+
+// The heard narration may be written freely as natural Turkish, but it must add
+// no fact the source does not carry. So the gate ties only the two things that
+// would be a fabricated claim to the source: numbers (digits and number words)
+// and proper nouns (capitalised tokens — places, people, weapons, orgs). Any
+// lower-case word (verbs, connectives, adjectives) is allowed, which lets NIM
+// turn the clipped facts into flowing news prose. The on-screen hook stays
+// strict (validate()). A residual phrasing risk is accepted for the spoken-only
+// track; the prompt forbids new facts and the banned-outrage words are blocked.
 function spokenCandidate(text, original) {
   if (typeof text !== 'string' || !text.trim() || text.includes('?')) return false;
-  if (text.length > Math.max(original.length + 60, 260)) return false;
+  if (text.length > Math.max(original.length + 80, 280)) return false;
   const low = lowerTr(text);
   if (SPOKEN_BANNED.some((b) => low.includes(b))) return false;
   const src = [...facts, original].flatMap(words);
+  const srcText = [...facts, original];
   const sourceName = words(scene.hook.source.replace(/^.*?:/, ''));
-  for (const w of words(text)) {
-    if (SPOKEN_STOP.has(w) || SPOKEN_FRAME.has(w) || sourceName.includes(w)) continue;
-    // Symmetric stem match so an inflected form of a source word is allowed
-    // ("kişi" ↔ "kişinin"), but an unrelated word (a new place or claim) is not.
-    const ok = /^\d/.test(w)
-      ? [...facts, original].some((t) => t.includes(w))
-      : src.some((x) => x.startsWith(stem(w)) || w.startsWith(stem(x)));
-    if (!ok) return false;
+  const inSource = (w) => SPOKEN_STOP.has(w) || SPOKEN_FRAME.has(w) || sourceName.includes(w)
+    || src.some((x) => x.startsWith(stem(w)) || w.startsWith(stem(x)));
+  // Keep case: a capitalised token mid- or start-of-sentence is a proper noun.
+  for (const raw of text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu) ?? []) {
+    const bare = raw.split(/['’]/)[0];
+    const w = fold(bare);
+    if (w.length < 2) continue;
+    if (/\d/.test(w) || NUMBER_WORDS.has(w)) {
+      // a number the source does not state is a new claim
+      if (!(/\d/.test(w) ? srcText.some((t) => t.includes(w)) : src.includes(w))) return false;
+      continue;
+    }
+    if (/^\p{Lu}/u.test(bare) && !inSource(w)) return false; // a proper noun not in the source
   }
   return true;
 }
