@@ -142,7 +142,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_VOICE: ${{ vars.GEMINI_VOICE }}
           NVAPI: ${{ secrets.NVAPI }}
-          NVIDIA_NIM_MODEL: ${{ vars.NVIDIA_NIM_MODEL }}
           MOTION_TTS_ENGINE: ${{ vars.MOTION_TTS_ENGINE }}
           EDGE_TTS_VOICE: ${{ vars.EDGE_TTS_VOICE }}
           HF_TTS_SPACE: ${{ vars.HF_TTS_SPACE }}
