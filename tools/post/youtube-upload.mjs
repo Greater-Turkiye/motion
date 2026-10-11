@@ -75,8 +75,8 @@ async function upload(sceneId, metadataFile, videoFile) {
   const required = ['YOUTUBE_CLIENT_ID', 'YOUTUBE_CLIENT_SECRET', 'YOUTUBE_REFRESH_TOKEN'];
   const missing = required.filter((key) => !process.env[key]);
   if (missing.length === required.length) {
-    const message = 'YouTube upload skipped: OAuth repository secrets are not configured.';
-    console.log(message);
+    const message = 'YouTube upload skipped: OAuth secrets are not configured, so no channel is connected. Set YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET and YOUTUBE_REFRESH_TOKEN (and optionally YOUTUBE_PRIVACY_STATUS) to publish to a channel.';
+    console.log(`::warning::${message}`);
     summary(message);
     return;
   }
