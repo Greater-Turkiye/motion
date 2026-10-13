@@ -64,6 +64,10 @@ export interface Scene {
     post?: boolean | 'close' };
   /** which order of the same facts this is, for testing what holds viewers (tools/scene/generate.mjs VARIANTS) */
   variant?: 'standart' | 'yakinlik' | 'kisa' | 'oruntu';
+  /** the language of the on-screen text and the narration: Turkish (default) for @ConflictGridTR,
+   *  English for @Conflict-Grid. The record's facts are the same; only the words change
+   *  (tools/scene/translate.mjs). It picks the fixed on-screen labels and the casing locale. */
+  lang?: 'tr' | 'en';
   /** 'synthetic': the video carries a machine-read narration and says so on screen in every frame */
   voice?: 'synthetic';
 }

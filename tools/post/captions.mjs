@@ -35,7 +35,68 @@ const STATUS = {
   'TARTIŞMALI': 'Tartışmalı',
 };
 
+const EN_STATUS = {
+  'DOĞRULANMADI': 'Unverified', 'KISMEN DOĞRULANDI': 'Partly verified', 'DOĞRULANDI': 'Verified', 'TARTIŞMALI': 'Disputed',
+};
+const EN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** A hashtag from a name, in plain Latin casing for the English channel: "#BlackSea". */
+const enTag = (s) => '#' + s.split(/[\s-]+/u).map((w) => w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : '').join('').replace(/['’]/gu, '');
+
+/** The English channel (@Conflict-Grid): the same record, its words already translated on the scene
+ *  (tools/scene/translate.mjs), said plainly in English. Same rules as the Turkish text — the record's
+ *  own facts, status and source, no teaser, no emoji (CLAUDE.md section 4). */
+export function enCaptions(sc, meta) {
+  const cap = (s) => (s ? s[0].toLocaleUpperCase('en-US') + s.slice(1) : s);
+  const headline = cap((sc.hook.sub || sc.hook.lines.join(' ')).replace(/\s+/g, ' ').trim()).replace(/[.!]?$/, '.');
+  const [kickPlace, kickDate] = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ') : ['', sc.hook.kicker];
+  const place = (sc.beats ?? []).find((b) => b.kind === 'place')?.title ?? kickPlace;
+  const EN_ACR = new Set(['UN', 'EU', 'UK', 'US', 'USA', 'NATO', 'UAV', 'ABD', 'BM', 'UAE']);
+  const name = (s) => s.split(/[\s-]+/u).map((w) => (EN_ACR.has(w) ? w : w ? w[0] + w.slice(1).toLocaleLowerCase('en-US') : w)).join(' ');
+  const day = /^\d{4}-\d{2}-\d{2}/.test(meta.date ?? '') ? `${EN_MONTHS[Number(meta.date.slice(5, 7)) - 1]} ${Number(meta.date.slice(8, 10))}` : '';
+  const when = day || (/\d/.test(kickDate) && !/KM$/u.test(kickDate) ? name(kickDate) : '');
+  const where = [place && name(place), when].filter(Boolean).join(', ');
+  const statusBeat = (sc.beats ?? []).find((b) => b.kind === 'status')?.text ?? '';
+  const statusWord = EN_STATUS[meta.status] ?? cap(sc.hook.status.toLocaleLowerCase('en-US'));
+  const status = `${statusWord}${statusBeat ? ` · ${statusBeat}` : ''}`;
+  const publisher = sc.hook.source.replace(/^[^:]*:\s*/, '');
+  const url = meta.sources[0];
+  const sourceLine = `Source: ${name(publisher)} (${url})`;
+  const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
+    .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), '#OSINT', '#GreaterTurkiye'];
+  const note = 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
+  const voiceLine = sc.voice === 'synthetic' ? 'Voice-over: synthetic.' : '';
+  const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
+  const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Satellite data: NASA FIRMS (VIIRS, NOAA-20), public domain. A heat detection is not a confirmed event.' : '';
+
+  const dist = (sc.beats ?? []).find((b) => b.kind === 'distance');
+  const far = dist ? ` | ~${Math.round((geoDistance(dist.from.at, dist.to.at) * 6371) / 10) * 10} km from Türkiye` : '';
+  const base = headline.replace(/\.$/, '');
+  const ytTitle = (base.length + far.length <= 92 ? base + far
+    : headline.length <= 92 ? base : headline.slice(0, 89).replace(/\s+\S*$/, '') + '…') + ' #Shorts';
+
+  const instagram = [headline, '', where ? `${where}.` : '', `Status: ${status}`, sourceLine, satellite, voiceLine, photoLine, '', note, '', tags.join(' ')]
+    .filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
+  const youtube = [`Title: ${ytTitle}`, '', 'Description:', headline, where ? `${where}.` : '', '', `Status: ${status}`, sourceLine, satellite, voiceLine, photoLine, '', note, 'Data and content CC BY 4.0, Greater Türkiye.', '', tags.join(' ')]
+    .filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
+  const tail = ` (${statusWord}) Source: `;
+  const room = 280 - tail.length - 23 - 2;
+  const xHead = headline.length <= room ? headline.replace(/\.$/, '') : headline.slice(0, room - 1).replace(/\s+\S*$/, '') + '…';
+  const x = `${xHead}${tail}${url}`;
+
+  const checklist = [
+    '=== WHEN POSTING (this section is not posted) ===',
+    ...(sc.voice === 'synthetic' ? [
+      '- Instagram: turn on the "AI label" before posting (the voice-over is synthetic).',
+      '- YouTube: answer "Yes" to the "Altered or synthetic content" question when uploading.',
+    ] : []),
+    '- To add trending music, use the music-free copy (-muziksiz.mp4, if present) and add music from the app’s own library.',
+    '',
+  ];
+  return [...checklist, '=== INSTAGRAM (Reels and carousel) ===', instagram, '', '=== YOUTUBE SHORTS ===', youtube, '', '=== X ===', x, ''].join('\n');
+}
+
 export function captions(sc, meta) {
+  if (sc.lang === 'en') return enCaptions(sc, meta);
   // the weekly digest's headline is its hook ("BU HAFTA KARADENİZ'DEN / 227 KAYIT DERLENDİ"), not a record's
   const digest = sc.template === 'digest';
   const week = digest && sc.hook.lines[0].match(/^BU HAFTA (.+)$/u);

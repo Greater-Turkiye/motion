@@ -59,6 +59,7 @@ def arguments():
     parser.add_argument("--reference", type=Path, default=Path("referans.wav"))
     parser.add_argument("--reference-text", type=Path, required=True)
     parser.add_argument("--references", type=Path, default=Path("assets/voice/references.json"))
+    parser.add_argument("--lang", default="tr", help="narration language; 'tr' applies the Turkish grapheme pre-processor, others pass the text through")
     parser.add_argument("--notebook", type=Path, default=Path("tools/voice-lab/kaggle-fish-s2-pro.py"))
     parser.add_argument("--timeout", type=int, default=3300)
     return parser.parse_args()
@@ -100,11 +101,16 @@ def main():
         dataset = f"{owner}/motion-fish-s2-voice-job"
         kernel = f"{owner}/motion-fish-s2-pro"
         # Fish reads the grapheme stream it is given and slips into an English
-        # accent on Latin acronyms and foreign spellings. Rewrite the spoken
-        # text into Turkish graphemes so synthesis stays monolingual; this
-        # changes pronunciation only, never a fact (CLAUDE.md section 2). The
-        # original segments keep driving clips.json and the on-screen scene.
-        spoken = [{**segment, "text": tr_tts_prep.prepare(segment.get("text", ""))} for segment in segments]
+        # accent on Latin acronyms and foreign spellings. For Turkish, rewrite
+        # the spoken text into Turkish graphemes so synthesis stays monolingual;
+        # this changes pronunciation only, never a fact (CLAUDE.md section 2).
+        # The original segments keep driving clips.json and the on-screen scene.
+        # The English track (@Conflict-Grid) is English already, so it passes the
+        # text through unchanged — the pre-processor is Turkish-specific.
+        if args.lang == "tr":
+            spoken = [{**segment, "text": tr_tts_prep.prepare(segment.get("text", ""))} for segment in segments]
+        else:
+            spoken = [dict(segment) for segment in segments]
         # Ship each reference clip under a stable name and record its transcript
         # alongside; the kernel passes every pair to Fish as a prompt. The first
         # pair is also kept under the legacy single-reference keys.
