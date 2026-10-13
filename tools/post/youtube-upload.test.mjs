@@ -36,3 +36,27 @@ test('adds factual metadata, hashtags and synthetic-media disclosure', () => {
   assert.equal(resource.status.privacyStatus, 'unlisted');
   assert.throws(() => youtubeResource({}, { title: 'x', description: 'y' }, 'everyone'), /must be private/);
 });
+
+test('reads the English caption markers for the English channel', () => {
+  const post = youtubePost([
+    '=== YOUTUBE SHORTS ===',
+    'Title: Attack near Sumy #Shorts',
+    '',
+    'Description:',
+    'Attack near Sumy.',
+    'Status: Unverified',
+    '=== X ===',
+    'tail',
+  ].join('\n'));
+
+  assert.equal(post.title, 'Attack near Sumy #Shorts');
+  assert.match(post.description, /Status: Unverified/);
+});
+
+test('sets the snippet language from the track', () => {
+  const en = youtubeResource({}, { title: 'x', description: 'y' }, 'unlisted', 'en');
+  assert.equal(en.snippet.defaultLanguage, 'en');
+  assert.equal(en.snippet.defaultAudioLanguage, 'en');
+  const tr = youtubeResource({}, { title: 'x', description: 'y' }, 'unlisted');
+  assert.equal(tr.snippet.defaultLanguage, 'tr');
+});

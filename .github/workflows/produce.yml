@@ -272,9 +272,11 @@ jobs:
           ID: ${{ steps.pick.outputs.id }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          # one client, a refresh token per channel: Turkish @ConflictGridTR, English @Conflict-Grid
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
-        run: node tools/post/youtube-upload.mjs "auto-$ID" meta.json "release/auto-$ID.mp4"
+        run: node tools/post/youtube-upload.mjs "auto-$ID" meta.json "release/auto-$ID.mp4" tr
 
   # the clock (timer.yml): after every production, a timer run sleeps until the next video is due.
   # The schedule above is only the second line: it ran about once in four hours on 1-2 October.
