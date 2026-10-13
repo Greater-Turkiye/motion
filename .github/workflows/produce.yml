@@ -278,6 +278,66 @@ jobs:
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
         run: node tools/post/youtube-upload.mjs "auto-$ID" meta.json "release/auto-$ID.mp4" tr
 
+      # The English channel (@Conflict-Grid): the same record in English. The whole track is
+      # continue-on-error and gated on the step before it, so if any part fails the Turkish video has
+      # already shipped and only the English upload is missed; the next run tries again.
+      - name: English translation
+        id: translate
+        if: steps.pick.outputs.id != '' && steps.voice.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          NVAPI: ${{ secrets.NVAPI }}
+        run: |
+          # NIM (gemma) translates the finished Turkish scene and narration; refit stretches the
+          # timeline for the longer English copy. Writes nothing on failure (then the track skips).
+          node tools/scene/translate.mjs "scenes/auto/auto-$ID.yaml" out/narration.json "scenes/auto/auto-$ID.en.yaml" out/narration.en.json
+          if [ -f "scenes/auto/auto-$ID.en.yaml" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "no English scene written; skipping the English track"; fi
+      - name: English narration voice
+        id: voice_en
+        if: steps.translate.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+          FISH_MODEL_DATASET: ${{ vars.FISH_MODEL_DATASET }}
+          FISH_TEMPERATURE: ${{ vars.FISH_TEMPERATURE }}
+          FISH_TOP_P: ${{ vars.FISH_TOP_P }}
+          FISH_TOP_K: ${{ vars.FISH_TOP_K }}
+          FISH_SEED: ${{ vars.FISH_SEED }}
+          FISH_MAX_REFERENCES: ${{ vars.FISH_MAX_REFERENCES }}
+        run: |
+          # the English voice is the same cloned timbre (the Turkish reference clips) speaking English;
+          # --lang en passes the text through unchanged (the Turkish grapheme pre-processor is skipped).
+          # English always uses Fish S2 Pro — the production voice; no CPU-TTS English path exists.
+          if ! python -u tools/voice-lab/kaggle_submit.py out/narration.en.json out/voice-en --lang en --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
+            echo "::warning::English Fish narration failed; skipping the English track this run"; exit 0
+          fi
+          node tools/audio/retime.mjs "auto-$ID.en" out/voice-en
+          echo "voice: synthetic" >> "scenes/auto/auto-$ID.en.yaml"
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+      - name: English video and YouTube upload
+        if: steps.voice_en.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          MUSIC: ${{ vars.MOTION_MUSIC }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+        run: |
+          scene="auto-$ID.en"
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
+          node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video-en
+          mkdir -p release-en
+          kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+          node tools/audio/voice.mjs out/voice-en out/video-en/*.mp4 "release-en/$scene.mp4" "${kit[@]}"
+          # English posting text (captions reads scene.lang and writes the English block)
+          node tools/post/captions.mjs "$scene" meta.json release-en
+          node tools/post/youtube-upload.mjs "$scene" meta.json "release-en/$scene.mp4" en
+
   # the clock (timer.yml): after every production, a timer run sleeps until the next video is due.
   # The schedule above is only the second line: it ran about once in four hours on 1-2 October.
   timer:
