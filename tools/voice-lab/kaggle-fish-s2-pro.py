@@ -58,7 +58,12 @@ workspace = Path("/kaggle/working")
 repository = workspace / "fish-speech"
 outputs = workspace / "voice"
 outputs.mkdir(exist_ok=True)
-subprocess.run(["git", "clone", "--depth", "1", "https://github.com/fishaudio/fish-speech.git", str(repository)], check=True)
+# Pin fish-speech to v2.0.0-beta: this is the s2-pro ("Speech 2") line our inference call and the
+# checkpoint target, and its setup declares transformers<=4.57.3, which the pin below satisfies.
+# The default branch moved on to v3.0.0-beta (transformers==5.19.0, tokenizers==0.23.2), which
+# conflicts with that pin and failed the kernel's install; an unpinned clone let that upstream bump
+# break production, so the clone is pinned to a tag.
+subprocess.run(["git", "clone", "--depth", "1", "--branch", "v2.0.0-beta", "https://github.com/fishaudio/fish-speech.git", str(repository)], check=True)
 
 # The ~11 GiB s2-pro weights are the expensive part of every run. When the
 # operator has attached the pre-converted bf16 weights as a Kaggle input dataset
