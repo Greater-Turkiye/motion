@@ -30,6 +30,27 @@ export const kmToBosphorus = (at: LonLat) => km(at, BOSPHORUS);
 export const SAFE = { left: 65, right: W - 180, top: 270, bottom: H - 400 };
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
+/** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
+ *  language. The record's own words (hook, facts, place and party names, source line) arrive already
+ *  translated in the scene data; only these labels are drawn by the template, so they switch here.
+ *  `loc` is the casing locale: Turkish folds i/İ specially, English must not. */
+function ui(sc: Scene) {
+  const en = sc.lang === 'en';
+  return {
+    where: en ? 'WHERE' : 'NEREDE',
+    what: en ? 'WHAT HAPPENED' : 'NE OLDU',
+    status: en ? 'STATUS' : 'DURUM',
+    sides: en ? 'SIDES' : 'TARAFLAR',
+    participants: en ? 'PARTICIPANTS' : 'KATILIMCILAR',
+    near: en ? 'HOW CLOSE TO TÜRKİYE' : "TÜRKİYE'YE NE KADAR YAKIN",
+    far: en ? 'DISTANCE TO TÜRKİYE' : "TÜRKİYE'YE UZAKLIK",
+    photo: en ? 'SOURCE PHOTO' : 'KAYNAĞIN FOTOĞRAFI',
+    summary: en ? 'SUMMARY' : 'ÖZET',
+    watching: en ? 'Watching the region through open sources.' : 'Açık kaynaklarla bölgeyi izliyoruz.',
+    loc: en ? 'en-US' : 'tr',
+  };
+}
+
 // film grain: a few whole-frame noise tiles made once from a fixed seed, picked by frame number
 let grain: HTMLCanvasElement[] | null = null;
 function grainTiles() {
@@ -723,6 +744,7 @@ export const POST_WINDOW = { y: 250, h: 1350 };
  */
 function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.save();
+  const L = ui(sc);
   // the map stays readable behind the card (Türkiye in it), the text block on a deeper band
   ctx.fillStyle = hexA(s.bg[1].startsWith('#') ? s.bg[1] : '#000000', 0.35);
   ctx.fillRect(0, POST_WINDOW.y, W, POST_WINDOW.h);
@@ -741,7 +763,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   const title = /[çğıöşüÇĞİÖŞÜ]/u.test(head) && head.length <= 120 ? head.replace(/\s+/g, ' ').replace(/(\d) '/gu, "$1'") : '';
   const said = week
     ? `Bu hafta ${week[1].toLocaleLowerCase('tr').replace(/(^|\s)(\p{Ll})/gu, (_, a, c) => a + c.toLocaleUpperCase('tr'))} ${sc.hook.lines.slice(1).join(' ').toLocaleLowerCase('tr')}`
-    : (title || sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase('tr'));
+    : (title || sc.hook.sub || fromTitle || lowered).replace(/^./u, (c) => c.toLocaleUpperCase(L.loc));
   ctx.font = `700 54px ${s.fonts.text}`;
   const lines = wrap(ctx, said, WIDTH).slice(0, 4);
   // the stack sits on the footer like every other slide's text, the map open above it
@@ -755,7 +777,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   let y = top + 30;
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = s.accent; ctx.font = `700 26px ${s.fonts.mono}`; ctx.letterSpacing = '8px';
-  ctx.fillText(`ÖZET · ${sc.hook.kicker}`, LEFT, y);
+  ctx.fillText(`${L.summary} · ${sc.hook.kicker}`, LEFT, y);
   ctx.letterSpacing = '0px';
   ctx.fillStyle = s.ink; ctx.font = `700 54px ${s.fonts.text}`;
   for (const line of lines) { y += 70; ctx.fillText(line, LEFT, y); }
@@ -763,7 +785,7 @@ function drawCloseCard(ctx: CanvasRenderingContext2D, sc: Scene, s: Style) {
   ctx.fillStyle = s.ink; ctx.font = `900 60px ${s.fonts.display}`;
   ctx.fillText('GREATER TÜRKİYE', LEFT, y);
   ctx.fillStyle = s.muted; ctx.font = `500 34px ${s.fonts.text}`;
-  ctx.fillText('Açık kaynaklarla bölgeyi izliyoruz.', LEFT, y + 56);
+  ctx.fillText(L.watching, LEFT, y + 56);
   ctx.restore();
 }
 
@@ -865,7 +887,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const px = fit(ctx, [b.title], (p) => `900 ${p}px ${s.fonts.display}`, 132, -0.02);
       const top = BLOCK_BOTTOM - text.length * 52 - (text.length ? 24 : 0) - px * 0.9;
       guard({ x: LEFT, y: top, w: WIDTH, h: BLOCK_BOTTOM - top }, 'place');
-      kicker('NEREDE', top - 22 + rise);
+      kicker(ui(sc).where, top - 22 + rise);
       ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.02 * px}px`;
       reveal(ctx, b.title, LEFT - 4, top + px * 0.9 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
       ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
@@ -877,7 +899,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const lh = Math.round(px * 1.18);
       const top = BLOCK_BOTTOM - b.lines.length * lh;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'facts');
-      kicker(b.kicker ?? 'NE OLDU', top + 0.8 * lh - 0.72 * px - 26 + rise);
+      kicker(b.kicker ?? ui(sc).what, top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
@@ -886,7 +908,8 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       // the distance in a line with the two places it lies between, at the size of the facts: no
       // counter running up and no number standing alone at poster size (CLAUDE.md section 4)
       const d = km(b.from.at, b.to.at);
-      const name = (n: string) => n.toLocaleLowerCase('tr').replace(/(^|[\s-])(\p{L})/gu, (_, a: string, c: string) => a + c.toLocaleUpperCase('tr'));
+      const loc = ui(sc).loc;
+      const name = (n: string) => n.toLocaleLowerCase(loc).replace(/(^|[\s-])(\p{L})/gu, (_, a: string, c: string) => a + c.toLocaleUpperCase(loc));
       const px = 64, lh = Math.round(px * 1.18);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       const main = wrap(ctx, `${name(b.from.label)} → ${name(b.to.label)}: *~${d}\u00a0km*`, WIDTH);
@@ -895,7 +918,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const top = BLOCK_BOTTOM - 0.8 * lh - (main.length - 1) * lh - (text.length ? 60 + (text.length - 1) * 50 : 0) - 10;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'distance');
       // close is close only when it is: past 700 km the beat says distance, not nearness
-      kicker(d <= 700 ? 'TÜRKİYE\'YE NE KADAR YAKIN' : 'TÜRKİYE\'YE UZAKLIK', top + 0.8 * lh - 0.72 * px - 26 + rise);
+      kicker(d <= 700 ? ui(sc).near : ui(sc).far, top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(main, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       ctx.font = `600 36px ${s.fonts.text}`;
@@ -910,7 +933,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const top = BLOCK_BOTTOM - text.length * 52 - 40 - px * 1.25;
       guard({ x: LEFT - 12, y: top - 40, w: WIDTH + 12, h: BLOCK_BOTTOM - top + 40 }, 'status');
       const p = anim(t, b.at, 0.6, ease.outExpo);
-      kicker('DURUM', top - 16 + rise);
+      kicker(ui(sc).status, top - 16 + rise);
       // the stamp: a frame that closes around the word
       ctx.globalAlpha = alpha;
       ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${0.02 * px}px`;
@@ -942,7 +965,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const rows = Math.ceil(parties.length / 2), chipH = 64, gap = 14;
       const top = BLOCK_BOTTOM - text.length * 50 - rows * (chipH + gap) - 20 - px * 0.95;
       guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, b.kind);
-      kicker(b.kind === 'link' ? 'TARAFLAR' : 'KATILIMCILAR', top - 16 + rise);
+      kicker(b.kind === 'link' ? ui(sc).sides : ui(sc).participants, top - 16 + rise);
       ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.01 * px}px`;
       reveal(ctx, b.title, LEFT - 3, top + px * 0.85 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
       ctx.letterSpacing = '0px';
@@ -1000,7 +1023,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const credit = wrap(ctx, b.credit, WIDTH);
       const y0 = BLOCK_BOTTOM - 10 - (credit.length - 1) * 44;
       guard({ x: LEFT, y: y0 - 96, w: WIDTH, h: BLOCK_BOTTOM - y0 + 96 }, 'photo');
-      kicker('KAYNAĞIN FOTOĞRAFI', y0 - 60 + rise);
+      kicker(ui(sc).photo, y0 - 60 + rise);
       ctx.font = `600 36px ${s.fonts.text}`;
       lines(credit, LEFT, y0 + rise, 44, b.at + 0.3, s.muted, 36);
       break;
