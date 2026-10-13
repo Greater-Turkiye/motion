@@ -37,6 +37,8 @@ jobs:
       - name: Emblems (pinned by hash in the manifest)
         run: python3 tools/data/fetch_emblems.py --sync
       - run: npx tsc --noEmit
+      - name: Unit tests (scene rules, narration, captions, upload)
+        run: node --test "tools/**/*.test.mjs"
       - name: Scenes from the newest records (datasets, auto-data branch)
         run: |
           git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets

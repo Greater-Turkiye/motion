@@ -86,7 +86,14 @@ export function score(r, now, recent) {
   const region = (x) => (x.regions ?? [])[0];
   const sameRegion = recent.slice(0, 3).filter((p) => region(p) && region(p) === region(r)).length;
   const V = 1 - 0.1 * sameRegion;
-  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G) * V;
+  // balance: the feed must not read as one side's bulletin (owner, 2026-10-14: no Ukraine-only run).
+  // Each of the last four videos about the same belligerent (the record's first non-Türkiye country)
+  // costs this record 12 %, so after a run on one side the other side's verified items rise. It is a
+  // soft counterweight on ranking, never a filter: a big story on the same side still wins.
+  const side = (x) => (x.countries ?? []).find((c) => c !== 'TUR') ?? null;
+  const sameSide = recent.slice(0, 4).filter((p) => side(p) && side(p) === side(r)).length;
+  const B = 1 - 0.12 * sameSide;
+  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G) * V * B;
 }
 
 if (process.argv[1]?.endsWith('select.mjs')) {

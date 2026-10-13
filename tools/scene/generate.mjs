@@ -674,6 +674,11 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // and a year is no count either: "MEDUSA 2026", "2026'da" stay in the text colour
   const facts = wrapLines(news).map((l) => l.replace(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)/gu, (n) => (/^(19|20)\d\d$/.test(n) ? n : `*${n}*`)));
   const nearest = nearestTr(at);
+  // a distance to Türkiye belongs on screen only when the story is about Türkiye — its waters, the
+  // Blue Homeland or the border — not on every far-away item (owner, 2026-10-14). The proxy: the event
+  // is within ~400 km of the nearest Turkish point (the Blue Homeland/EEZ reach, Cyprus, the border),
+  // or the record itself names Türkiye. An inland crisis elsewhere keeps its own place, no km line.
+  const trRelevant = nearest.km <= 400 || (record.countries ?? []).includes('TUR');
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
@@ -780,7 +785,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     if (parties.length) push({ kind: 'roster', title: exName ? TR(exName) : label ?? 'TATBİKAT' }, (exName ?? '').length + parties.map(nameOf).join(' ').length + 12, 3.4);
     push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
-    distanceBeat(placeTitle);
+    if (trRelevant) distanceBeat(placeTitle);
     statusBeat();
   } else if (speaker) {
     push({ kind: 'quote', speaker: 0, lines: facts.map((l) => l.replace(/\*/g, '')) }, facts.join(' ').length + parties[0].tr.length, 4.2);
@@ -792,7 +797,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     factsBeat();
     // a Cyprus record without a point is still on the island, a hundred-odd km off Türkiye: the island's
     // middle measures something true, unlike a large region's
-    if (pt || regionKey === 'cyprus') distanceBeat(placeTitle);
+    if (trRelevant && (pt || regionKey === 'cyprus')) distanceBeat(placeTitle);
     // what a satellite saw: heat detections (NASA FIRMS) within 25 km of a war item's place, on its day
     // and the next. Only in the Black Sea theatre, never in Iraq or Syria, where Turkish forces operate
     // (red line), and only with a place from the record, not a region's middle. A detection is not a
@@ -859,8 +864,14 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     near = (dx, dy, zoom) => ({ center: [round1(mid[0] + dx), round1(mid[1] + dy)], zoom: round1(z * zoom) });
   } else {
     const span = deg(home, at);
-    open = { center: [round1((home[0] + at[0]) / 2 - 4), round1((home[1] + at[1]) / 2 + 1.5)], zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
-    near = (dx, dy, zoom) => ({ center: [round1(at[0] + dx), round1(at[1] + dy)], zoom });
+    // Türkiye is the reference point and must stay framed, not slide off the bottom edge when the
+    // camera closes on a far event (owner, 2026-10-14). The farther the event, the more each centre is
+    // pulled back toward Türkiye, and the tighter zooms are capped so the home border stays in view.
+    // For a near event (small span) the bias is ~0 and the framing is unchanged.
+    const bias = Math.min(0.45, span / 55);
+    const homeward = (c) => [round1(c[0] + (home[0] - c[0]) * bias), round1(c[1] + (home[1] - c[1]) * bias)];
+    open = { center: homeward([(home[0] + at[0]) / 2 - 4, (home[1] + at[1]) / 2 + 1.5]), zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
+    near = (dx, dy, zoom) => { const c = homeward([at[0] + dx, at[1] + dy]); return { center: [round1(c[0]), round1(c[1])], zoom: round1(Math.min(zoom, 2.5)) }; };
   }
   const wide = deal || (speaker && !pt);
   const keys = [{ t: 0, ...open }, { t: beats[0].at, ...(wide ? near(0, 0, 1.0) : near(0.3, 2.4, 1.0)) }];
@@ -917,8 +928,10 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
       // question a Turkish viewer asks first, and the one line no other channel's video carries (PLAN.md
       // section 32). "YAKIN" only where it is near. A whole country without a point is measured from its
       // middle, which says little far away ("~1500 KM" for anywhere in Saudi Arabia): only a near one
-      ...(((pt && nearest.km <= 2000) || (whole && nearest.km <= 500)) && !kicker.startsWith('TÜRKİYE')
-        ? { badge: nearest.km <= 500 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
+      // the badge, like the distance beat, appears only when the story is about Türkiye — within ~400 km
+      // of a Turkish point (owner, 2026-10-14). A far item keeps its own place and shows no km to Türkiye.
+      ...(nearest.km <= 400 && !kicker.startsWith('TÜRKİYE')
+        ? { badge: nearest.km <= 250 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
     beats,
   };
   const problems = validate(structuredClone(scene));
