@@ -740,6 +740,16 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     hook = { kind: 'clause', lines: w.length > 1 ? [w.slice(0, cut).join(' '), w.slice(cut).join(' ')] : w, used: headline };
     sub = '';
   }
+  // a death or an injury is never the hook, in any form (owner, 2026-10-14): not only "8 KİŞİ /
+  // YARALANDI" (the casualty kind) but a clause like "KAPTAN / ÖLDÜ" too. If the assembled hook still
+  // reads as one and we have an event type to name, replace it with the event (place or region + type);
+  // the death moves to the sub-line (whichever non-casualty clause the sub found) and the facts.
+  const deathy = (ls) => /(ÖLDÜ|ÖLDÜR|ÖLÜ|YARALAN|YARALI|HAYATINI KAYBET|CAN KAYB|ÖLDÜĞ|ÖLMES)/u.test((ls ?? []).join(' '));
+  if (deathy(hook.lines)) {
+    if (label) hook = { kind: 'region', lines: [pt || area || whole ? placeTitle : regionWord, label], used: '' };
+    // nothing to say but that someone was hurt, and no event type to name: that is not a video.
+    else refuse('the only hook would be a casualty, with no event to show');
+  }
   // the kicker names the place unless the hook's first line already does ("KİEV BÖLGESİ" twice)
   if (hook.lines[0] === TR(where)) kicker = kicker.split(' · ').slice(1).join(' · ') || kicker;
   // "KARADENİZ / GELİŞME" and nothing under it tells a viewer nothing in the first two seconds

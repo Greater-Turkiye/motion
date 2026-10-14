@@ -25,3 +25,12 @@ test('a casualty headline does not become the hook; the event does', () => {
   assert.match(l0 ?? '', /ODESA/u);
   assert.match(l1 ?? '', /SALDIRI|OLAY/u);
 });
+
+test('a clause-form death ("captain killed") is also rerouted to the event', () => {
+  const r = casualtyStrike();
+  r.id = 'evt_test_clause';
+  r.title = { tr: "Rus saldırısında geminin kaptanı öldürüldü", en: 'Ship captain killed in Russian attack' };
+  const sc = generate(r, {});
+  assert.ok(!/(ÖLDÜ|ÖLDÜR)/u.test(sc.hook.lines.join(' ')), `a clause death must not be the hook: ${sc.hook.lines.join(' / ')}`);
+  assert.match(sc.hook.lines[1] ?? '', /SALDIRI|OLAY/u);
+});
