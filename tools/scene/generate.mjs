@@ -864,14 +864,8 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     near = (dx, dy, zoom) => ({ center: [round1(mid[0] + dx), round1(mid[1] + dy)], zoom: round1(z * zoom) });
   } else {
     const span = deg(home, at);
-    // Türkiye is the reference point and must stay framed, not slide off the bottom edge when the
-    // camera closes on a far event (owner, 2026-10-14). The farther the event, the more each centre is
-    // pulled back toward Türkiye, and the tighter zooms are capped so the home border stays in view.
-    // For a near event (small span) the bias is ~0 and the framing is unchanged.
-    const bias = Math.min(0.45, span / 55);
-    const homeward = (c) => [round1(c[0] + (home[0] - c[0]) * bias), round1(c[1] + (home[1] - c[1]) * bias)];
-    open = { center: homeward([(home[0] + at[0]) / 2 - 4, (home[1] + at[1]) / 2 + 1.5]), zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
-    near = (dx, dy, zoom) => { const c = homeward([at[0] + dx, at[1] + dy]); return { center: [round1(c[0]), round1(c[1])], zoom: round1(Math.min(zoom, 2.5)) }; };
+    open = { center: [round1((home[0] + at[0]) / 2 - 4), round1((home[1] + at[1]) / 2 + 1.5)], zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
+    near = (dx, dy, zoom) => ({ center: [round1(at[0] + dx), round1(at[1] + dy)], zoom });
   }
   const wide = deal || (speaker && !pt);
   const keys = [{ t: 0, ...open }, { t: beats[0].at, ...(wide ? near(0, 0, 1.0) : near(0.3, 2.4, 1.0)) }];
