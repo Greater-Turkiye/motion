@@ -926,23 +926,26 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       break;
     }
     case 'status': {
+      // no giant "DOĞRULANMADI" stamp any more (owner, 2026-10-14: "devasa kutuları kaldır"): the
+      // verification status stays on screen as a small quiet pill — the same label the footer carries —
+      // and the beat's room goes to the sentence that says what the status means. The red line
+      // (CLAUDE.md section 2: status on screen) is kept; only the billboard is gone.
       const label = sc.hook.status;
-      const px = fit(ctx, [label], (p) => `900 ${p}px ${s.fonts.display}`, 104, 0.02);
+      const px = 44;
       ctx.font = `600 40px ${s.fonts.text}`;
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
-      const top = BLOCK_BOTTOM - text.length * 52 - 40 - px * 1.25;
-      guard({ x: LEFT - 12, y: top - 40, w: WIDTH + 12, h: BLOCK_BOTTOM - top + 40 }, 'status');
-      const p = anim(t, b.at, 0.6, ease.outExpo);
+      const bh = Math.round(px * 1.5), pad = Math.round(px * 0.45);
+      const top = BLOCK_BOTTOM - text.length * 52 - 40 - bh;
+      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'status');
       kicker(ui(sc).status, top - 16 + rise);
-      // the stamp: a frame that closes around the word
       ctx.globalAlpha = alpha;
-      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${0.02 * px}px`;
+      ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.08)}px`;
       const tw = ctx.measureText(label).width;
-      ctx.strokeStyle = s.status; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.roundRect(LEFT - 12, top + rise, (tw + 24) * p, px * 1.25, 8); ctx.stroke();
-      ctx.fillStyle = s.status; ctx.fillText(label, LEFT, top + px * 1.0 + rise);
+      ctx.fillStyle = hexA(s.status, 0.16); ctx.strokeStyle = s.status; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.roundRect(LEFT - 2, top + rise, tw + 2 * pad + 4, bh, 6); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = s.status; ctx.fillText(label, LEFT + pad, top + px + rise);
       ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
-      lines(text, LEFT, top + px * 1.25 + 60 + rise, 52, b.at + 0.4, s.ink, 40);
+      lines(text, LEFT, top + bh + 54 + rise, 52, b.at + 0.4, s.ink, 40);
       break;
     }
     case 'close': {

@@ -105,6 +105,9 @@ export function validate(s: Scene): string[] {
   need((STYLE_IDS as readonly string[]).includes(s.style), `style must be one of ${STYLE_IDS.join(', ')}`);
   need(s.hook && s.hook.lines?.length, 'the hook needs at least one line');
   if (out.length) return out;
+  // the headline is at most two lines, punchy and legible (owner, 2026-10-14): a third big line
+  // overruns the frame and reads as a paragraph, not a hook.
+  need(s.hook.lines.length <= 2, 'the hook may use at most two lines');
   need(s.hook.status?.trim(), 'the verification status must be on screen');
   need(s.hook.source?.trim(), 'the source must be on screen');
   need(!s.hook.lines.some((l) => l.includes('?')), 'no question hooks (research/02, format 14)');

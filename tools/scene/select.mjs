@@ -86,7 +86,18 @@ export function score(r, now, recent) {
   const region = (x) => (x.regions ?? [])[0];
   const sameRegion = recent.slice(0, 3).filter((p) => region(p) && region(p) === region(r)).length;
   const V = 1 - 0.1 * sameRegion;
-  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G) * V;
+  // the feed must not read as one source's bulletin (owner, 2026-10-14: "hep aynı, hep Ukrayna").
+  // The pool is about 70 % one source — Ukrinform's war feed — so the strongest, most reliable
+  // counterweight is the source host itself (records carry no `countries` field to balance by side).
+  // Each of the last four videos from the same source host costs this record 18 %, and each of the
+  // last three of the same event type costs 10 %, so a run breaks to another outlet (news.am, RFE/RL,
+  // Shafaq, the US/EU/Kremlin feeds) and another kind of story instead of a fifth "Russian forces
+  // attack …" from one wire. Ranking, not a filter: a big story on the same source still wins.
+  const host = (x) => { try { return new URL((x.sources ?? [])[0]?.url ?? '').host.replace(/^www\./, ''); } catch { return ''; } };
+  const sameHost = recent.slice(0, 4).filter((p) => host(p) && host(p) === host(r)).length;
+  const sameType = recent.slice(0, 3).filter((p) => p.event_type && p.event_type === r.event_type).length;
+  const B = (1 - 0.18 * sameHost) * (1 - 0.1 * sameType);
+  return 100 * D * (0.3 * M + 0.2 * P + 0.2 * C + 0.15 * R + 0.15 * N) * (0.8 + 0.2 * G) * V * B;
 }
 
 if (process.argv[1]?.endsWith('select.mjs')) {

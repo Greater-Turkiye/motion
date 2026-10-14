@@ -674,6 +674,11 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // and a year is no count either: "MEDUSA 2026", "2026'da" stay in the text colour
   const facts = wrapLines(news).map((l) => l.replace(/(?<![-–]\s?)(?<![\p{L}\d.,])(\d[\d.,]*)/gu, (n) => (/^(19|20)\d\d$/.test(n) ? n : `*${n}*`)));
   const nearest = nearestTr(at);
+  // a distance to Türkiye belongs on screen only when the story is about Türkiye — its waters, the
+  // Blue Homeland or the border — not on every far-away item (owner, 2026-10-14). The proxy: the event
+  // is within ~400 km of the nearest Turkish point (the Blue Homeland/EEZ reach, Cyprus, the border),
+  // or the record itself names Türkiye. An inland crisis elsewhere keeps its own place, no km line.
+  const trRelevant = nearest.km <= 400 || (record.countries ?? []).includes('TUR');
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
@@ -690,13 +695,18 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
   const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;
   const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
-  if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
+  // a death or an injury is not the hook: it happens every day, and the record's own event — where
+  // and what (the strike, the drone, the target) — is the distinctive thing the hook must say. So a
+  // casualty title is routed to the event hook like any other, and the casualty drops to the sub-line
+  // and the facts, where it is still on screen (owner, 2026-10-14).
+  if (family === 'strike' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
   else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? (pt && placeName ? placeName : null) ?? (parties.length === 1 ? parties[0].tr : region?.name) ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
-  else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
-    // no casualty, no number, no place: where it happened and what it was, never a stray word pair
+  else if (found.kind === 'casualty' || found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
+    // a casualty, or no distinctive hook at all: where it happened and what it was, never the death
+    // toll and never a stray word pair. The casualty stays in the sub-line and the facts.
     hook = { kind: 'region', lines: [pt || area || whole ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
   }
   // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
@@ -729,6 +739,16 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     }
     hook = { kind: 'clause', lines: w.length > 1 ? [w.slice(0, cut).join(' '), w.slice(cut).join(' ')] : w, used: headline };
     sub = '';
+  }
+  // a death or an injury is never the hook, in any form (owner, 2026-10-14): not only "8 KİŞİ /
+  // YARALANDI" (the casualty kind) but a clause like "KAPTAN / ÖLDÜ" too. If the assembled hook still
+  // reads as one and we have an event type to name, replace it with the event (place or region + type);
+  // the death moves to the sub-line (whichever non-casualty clause the sub found) and the facts.
+  const deathy = (ls) => /(ÖLDÜ|ÖLDÜR|ÖLÜ|YARALAN|YARALI|HAYATINI KAYBET|CAN KAYB|ÖLDÜĞ|ÖLMES)/u.test((ls ?? []).join(' '));
+  if (deathy(hook.lines)) {
+    if (label) hook = { kind: 'region', lines: [pt || area || whole ? placeTitle : regionWord, label], used: '' };
+    // nothing to say but that someone was hurt, and no event type to name: that is not a video.
+    else refuse('the only hook would be a casualty, with no event to show');
   }
   // the kicker names the place unless the hook's first line already does ("KİEV BÖLGESİ" twice)
   if (hook.lines[0] === TR(where)) kicker = kicker.split(' · ').slice(1).join(' · ') || kicker;
@@ -780,7 +800,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     if (parties.length) push({ kind: 'roster', title: exName ? TR(exName) : label ?? 'TATBİKAT' }, (exName ?? '').length + parties.map(nameOf).join(' ').length + 12, 3.4);
     push({ kind: 'place', title: placeTitle, text: placeText }, placeTitle.length + placeText.length + 1, 3.0);
     factsBeat();
-    distanceBeat(placeTitle);
+    if (trRelevant) distanceBeat(placeTitle);
     statusBeat();
   } else if (speaker) {
     push({ kind: 'quote', speaker: 0, lines: facts.map((l) => l.replace(/\*/g, '')) }, facts.join(' ').length + parties[0].tr.length, 4.2);
@@ -792,7 +812,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     factsBeat();
     // a Cyprus record without a point is still on the island, a hundred-odd km off Türkiye: the island's
     // middle measures something true, unlike a large region's
-    if (pt || regionKey === 'cyprus') distanceBeat(placeTitle);
+    if (trRelevant && (pt || regionKey === 'cyprus')) distanceBeat(placeTitle);
     // what a satellite saw: heat detections (NASA FIRMS) within 25 km of a war item's place, on its day
     // and the next. Only in the Black Sea theatre, never in Iraq or Syria, where Turkish forces operate
     // (red line), and only with a place from the record, not a region's middle. A detection is not a
@@ -917,8 +937,10 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
       // question a Turkish viewer asks first, and the one line no other channel's video carries (PLAN.md
       // section 32). "YAKIN" only where it is near. A whole country without a point is measured from its
       // middle, which says little far away ("~1500 KM" for anywhere in Saudi Arabia): only a near one
-      ...(((pt && nearest.km <= 2000) || (whole && nearest.km <= 500)) && !kicker.startsWith('TÜRKİYE')
-        ? { badge: nearest.km <= 500 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
+      // the badge, like the distance beat, appears only when the story is about Türkiye — within ~400 km
+      // of a Turkish point (owner, 2026-10-14). A far item keeps its own place and shows no km to Türkiye.
+      ...(nearest.km <= 400 && !kicker.startsWith('TÜRKİYE')
+        ? { badge: nearest.km <= 250 ? `TÜRKİYE'YE YAKIN · ~${nearest.km} KM` : `TÜRKİYE'YE ~${nearest.km} KM` } : {}) },
     beats,
   };
   const problems = validate(structuredClone(scene));

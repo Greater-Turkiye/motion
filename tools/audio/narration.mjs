@@ -192,25 +192,13 @@ function blockParts(sc, b) {
       // the hook told this story aloud already; the block that shows it in full is read by the eye, under
       // the music, rather than said a second time (the weekly digest's facts are its items: said)
       if (sc.template !== 'digest') return [];
-      // what the hook's sub-line already said is not said twice: the facts go on from there
-      let body = b.lines.join(' ').replace(/\*/g, '');
-      // a hook that is itself the headline's first clause ("KHMARA, ADF KOMUTA / NOKTALARINI ZİYARET
-      // ETTİ", no sub-line) counts as said too
-      // (only a hook that ends on its verb: "BULGARİSTAN / ROMANYA" is no sentence, and cutting its two
-      // words off "Bulgaristan, Romanya ve İspanya …" left "Ayrıca ve İspanya …")
-      const sub = norm(sc.hook.sub || (verbish(sc.hook.lines.at(-1)?.split(' ').at(-1) ?? '') ? sc.hook.lines.join(' ') : ''));
-      if (sub && norm(body).startsWith(sub) && !factsOnlyRepeatHook(sc)) {
-        const words = sub.split(' ').length;
-        body = body.split(/\s+/).slice(words).join(' ').replace(/^[,;:.\s]+/, '');
-        // and what the hook's big lines said is not said again either: "Ayrıca iki kişi öldü, …" after
-        // the hook "İki kişi öldü."
-        const head = norm(speakable(sc.hook.lines.join(' '), true));
-        if (head && norm(body).startsWith(head)) body = body.split(/\s+/).slice(head.split(' ').length).join(' ').replace(/^[,;:.\s]+/, '');
-        return body ? [`Ayrıca ${B(body)}`] : [];
-      }
-      if (sub && norm(body) === sub) return [];
+      // the digest reads each item exactly as the screen shows it — the week's own headline, number by
+      // number, not a reworded or generic summary (owner, 2026-10-14: the on-screen text and the spoken
+      // line must match in a digest). No separate template runs here; the spoken string is the beat's own
+      // lines, only spelled for the voice (numbers in words, acronyms smoothed) by B().
+      const body = b.lines.join(' ').replace(/\*/g, '');
       const lead = b.kicker === 'KAYNAĞA GÖRE' && !/'[ae] göre/.test(body) ? 'Kaynağa göre, ' : '';
-      return [lead + B(body)];
+      return body ? [lead + B(body)] : [];
     }
     case 'distance':
       // said at the place block already: the block that draws the line is left to the eye
