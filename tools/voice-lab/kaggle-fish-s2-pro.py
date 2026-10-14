@@ -125,6 +125,32 @@ source = source.replace(
     "decode_to_audio(merged_codes.to(device), codec)",
     'decode_to_audio(merged_codes.to("cuda:1"), codec)',
 )
+# s2-pro declares a 32768-token context, so setup_caches preallocates a ~4.5 GiB KV
+# cache on cuda:0. On top of the ~9 GiB language model that leaves no room for the
+# prefill of a ~20 s reference clip, and generation OOMs mid-decode ("CUDA out of
+# memory. Tried to allocate 256.00 MiB"). Our narration is a sentence or two read with
+# one reference clip — well under a few thousand tokens — so build the cache for a 4096
+# context instead: it frees ~3.9 GiB and still leaves generate_long's (max_seq_len -
+# 2048) chunking threshold at 2048 tokens, more than any one narration segment needs.
+patched = source.replace(
+    "    model, decode_one_token = init_model(\n"
+    "        checkpoint_path, device, precision, compile=compile\n"
+    "    )\n"
+    "    with torch.device(device):\n"
+    "        model.setup_caches(",
+    "    model, decode_one_token = init_model(\n"
+    "        checkpoint_path, device, precision, compile=compile\n"
+    "    )\n"
+    "    model.config.max_seq_len = min(model.config.max_seq_len, 4096)\n"
+    "    with torch.device(device):\n"
+    "        model.setup_caches(",
+)
+if patched == source:
+    raise RuntimeError(
+        "Could not clamp the Fish KV-cache context: the setup_caches block in "
+        "inference.py did not match. Upstream may have reformatted it; update the patch."
+    )
+source = patched
 inference.write_text(source, encoding="utf-8")
 # Reduce allocator fragmentation so the ~11 GiB model leaves room for decoding.
 environment = {**os.environ, "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"}
