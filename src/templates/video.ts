@@ -936,7 +936,7 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
       const bh = Math.round(px * 1.5), pad = Math.round(px * 0.45);
       const top = BLOCK_BOTTOM - text.length * 52 - 40 - bh;
-      guard({ x: LEFT - 2, y: top - 40, w: WIDTH + 4, h: BLOCK_BOTTOM - top + 40 }, 'status');
+      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'status');
       kicker(ui(sc).status, top - 16 + rise);
       ctx.globalAlpha = alpha;
       ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.08)}px`;
