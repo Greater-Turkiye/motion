@@ -695,13 +695,18 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // only a known speaker gets the quote card under its flag; otherwise the quote stands alone
   const speaker = !deal && (family === 'statement' || family === 'deal') && !!speakerIso;
   const regionWord = warParty ? TR(warParty.tr) : TR(region?.name ?? placeTitle);
-  if (family === 'strike' && found.kind !== 'casualty' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
+  // a death or an injury is not the hook: it happens every day, and the record's own event — where
+  // and what (the strike, the drone, the target) — is the distinctive thing the hook must say. So a
+  // casualty title is routed to the event hook like any other, and the casualty drops to the sub-line
+  // and the facts, where it is still on screen (owner, 2026-10-14).
+  if (family === 'strike' && pt && label) hook = { kind: 'place', lines: [placeTitle, label], used: '' };
   else if (deal) hook = { kind: 'parties', lines: [nameOf(parties[0]), nameOf(parties[1])], used: '' };
   else if (family === 'exercise') hook = { kind: 'name', lines: exName ? [TR(exName), 'TATBİKATI'] : [locative(area?.name ?? (pt && placeName ? placeName : null) ?? (parties.length === 1 ? parties[0].tr : region?.name) ?? placeTitle), 'TATBİKAT'], used: exName ?? '' };
   else if (speaker && found.kind !== 'casualty' && found.kind !== 'number') hook = { kind: 'speaker', lines: [nameOf(parties[0]), label ?? 'AÇIKLAMA'], used: '' };
   else if (family === 'count' && found.kind === 'number') hook = found;
-  else if (found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
-    // no casualty, no number, no place: where it happened and what it was, never a stray word pair
+  else if (found.kind === 'casualty' || found.kind === 'fallback' || (found.kind === 'clause' && (!verbish(found.lines.join(' ')) || (!pt && label)))) {
+    // a casualty, or no distinctive hook at all: where it happened and what it was, never the death
+    // toll and never a stray word pair. The casualty stays in the sub-line and the facts.
     hook = { kind: 'region', lines: [pt || area || whole ? placeTitle : regionWord, label ?? 'GELİŞME'], used: '' };
   }
   // it must end on its verb: a title split at the comma of a list ("Kasta radarını, Rus İHA komuta
