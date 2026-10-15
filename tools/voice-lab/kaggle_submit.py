@@ -190,8 +190,17 @@ def main():
         downloaded.mkdir()
         command("kernels", "output", kernel, "-p", downloaded, "-o", "--file-pattern", "voice-artifact.zip")
         archive = downloaded / "voice-artifact.zip"
-        if not archive.is_file():
-            raise SystemExit("Kaggle completed without voice-artifact.zip.")
+        # Kaggle sometimes reports the kernel "complete" yet the artifact is missing or a truncated,
+        # non-zip download (a late crash, or a bad fetch). Opening it then raised a bare BadZipFile with
+        # no hint of why; instead pull the kernel log and print its tail, so a recurrence shows the real
+        # cause (OOM, an exception) rather than "File is not a zip file".
+        if not archive.is_file() or not zipfile.is_zipfile(archive):
+            dump_log(
+                "Kaggle reported the job complete but produced no usable voice-artifact.zip "
+                f"({'it is missing' if not archive.is_file() else 'it is not a zip file'}); "
+                "the kernel likely failed late."
+            )
+            raise SystemExit("Kaggle completed without a usable voice-artifact.zip.")
         args.output.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(archive) as artifact:
             artifact.extractall(args.output)
