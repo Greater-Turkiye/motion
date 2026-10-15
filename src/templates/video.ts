@@ -641,15 +641,25 @@ function drawFooter(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, alpha: n
   ctx.globalAlpha = alpha;
   // 28 px where it was 22: on a phone the frame is about a third of its size, and 22 px came out at
   // 7-8 pt, too small to read the status and the source the rules keep on screen (research/02: 32-36 px
-  // for the source line). A long pair shrinks to the width, never below 22
-  const status = sc.hook.status, source = sc.hook.source;
-  const sizeAt = (px: number) => {
+  // for the source line). A long pair shrinks to the width; 18 px is the floor, and if even there a very
+  // long publisher name still overruns the safe area, the source is trimmed with an ellipsis rather than
+  // failing the whole render (one long source once overflowed the footer and dropped the video).
+  const status = sc.hook.status;
+  let source = sc.hook.source;
+  // the real footer width at a font size: the pill (status + padding both sides) + the gap + the source,
+  // matching the draw below, so the fit test and the guard agree.
+  const widthAt = (px: number, src: string) => {
     ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.13)}px`;
-    return ctx.measureText(status).width + 46 + ctx.measureText(source).width;
+    return ctx.measureText(status).width + 2 * Math.round(px * 0.5) + 24 + ctx.measureText(src).width;
   };
   let px = 28;
-  while (px > 22 && sizeAt(px) > WIDTH) px--;
-  sizeAt(px);
+  while (px > 18 && widthAt(px, source) > WIDTH) px--;
+  if (widthAt(px, source) > WIDTH) {
+    let trimmed = source;
+    while (trimmed.length > 1 && widthAt(px, trimmed.replace(/[\s:·-]+$/u, '') + '…') > WIDTH) trimmed = trimmed.slice(0, -1);
+    source = trimmed.replace(/[\s:·-]+$/u, '') + '…';
+  }
+  widthAt(px, source);
   const sw = ctx.measureText(status).width, bh = Math.round(px * 1.7), pad = Math.round(px * 0.5);
   // the status as a pill, so it reads as a label of the whole video and not as part of a sentence
   ctx.fillStyle = hexA(s.status, 0.16); ctx.strokeStyle = s.status; ctx.lineWidth = 2;
