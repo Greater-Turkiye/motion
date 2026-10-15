@@ -25,52 +25,60 @@ if (!scenePath || !narrationPath || !outScenePath || !outNarrationPath) {
 const warn = (message) => { console.log(`::warning::English track skipped: ${message}`); process.exit(0); };
 if (!apiKey) warn('NVAPI is not configured.');
 
-const scene = parse(readFileSync(scenePath, 'utf8'));
 const narration = JSON.parse(readFileSync(narrationPath, 'utf8'));
+const starless = (s) => s.replace(/\*/g, '');
 
 // Collect every on-screen string with a setter, in a fixed order, so the translation maps straight
 // back by index. Asterisks mark accent words; keep them around the translated span, so strip and
-// restore them rather than sending them to the model.
-const slots = [];
-const add = (get, set) => { const v = get(); if (typeof v === 'string' && v.trim()) slots.push({ text: v, set }); };
-const addLines = (arr) => { if (Array.isArray(arr)) arr.forEach((_, i) => add(() => arr[i], (v) => { arr[i] = v; })); };
+// restore them rather than sending them to the model. The scene is parsed fresh each time so a
+// failed attempt's partial mutations never carry into the next (translate retries the whole thing).
+function buildScene() {
+  const scene = parse(readFileSync(scenePath, 'utf8'));
+  const slots = [];
+  const add = (get, set) => { const v = get(); if (typeof v === 'string' && v.trim()) slots.push({ text: v, set }); };
+  const addLines = (arr) => { if (Array.isArray(arr)) arr.forEach((_, i) => add(() => arr[i], (v) => { arr[i] = v; })); };
 
-add(() => scene.hook.kicker, (v) => { scene.hook.kicker = v; });
-addLines(scene.hook.lines);
-add(() => scene.hook.sub, (v) => { scene.hook.sub = v; });
-add(() => scene.hook.status, (v) => { scene.hook.status = v; });
-// the source line keeps its "SOURCE:" label; only the publisher name is translated
-const sourceName = scene.hook.source.replace(/^[^:]*:\s*/, '');
-add(() => sourceName, (v) => { scene.hook.source = `SOURCE: ${v}`; });
-for (const b of scene.beats ?? []) {
-  add(() => b.title, (v) => { b.title = v; });
-  add(() => b.text, (v) => { b.text = v; });
-  add(() => b.note, (v) => { b.note = v; });
-  add(() => b.kicker, (v) => { b.kicker = v; });
-  add(() => b.credit, (v) => { b.credit = v; });
-  addLines(b.lines);
-  if (b.from) add(() => b.from.label, (v) => { b.from.label = v; });
-  if (b.to) add(() => b.to.label, (v) => { b.to.label = v; });
+  add(() => scene.hook.kicker, (v) => { scene.hook.kicker = v; });
+  addLines(scene.hook.lines);
+  add(() => scene.hook.sub, (v) => { scene.hook.sub = v; });
+  add(() => scene.hook.status, (v) => { scene.hook.status = v; });
+  // the source line keeps its "SOURCE:" label; only the publisher name is translated
+  const sourceName = scene.hook.source.replace(/^[^:]*:\s*/, '');
+  add(() => sourceName, (v) => { scene.hook.source = `SOURCE: ${v}`; });
+  for (const b of scene.beats ?? []) {
+    add(() => b.title, (v) => { b.title = v; });
+    add(() => b.text, (v) => { b.text = v; });
+    add(() => b.note, (v) => { b.note = v; });
+    add(() => b.kicker, (v) => { b.kicker = v; });
+    add(() => b.credit, (v) => { b.credit = v; });
+    addLines(b.lines);
+    if (b.from) add(() => b.from.label, (v) => { b.from.label = v; });
+    if (b.to) add(() => b.to.label, (v) => { b.to.label = v; });
+  }
+  for (const l of scene.labels ?? []) if (l.text !== 'TÜRKİYE') add(() => l.text, (v) => { l.text = v; });
+  if (scene.subject) add(() => scene.subject.label, (v) => { scene.subject.label = v; });
+  for (const p of scene.parties ?? []) add(() => p.label, (v) => { p.label = v; });
+  return { scene, slots };
 }
-for (const l of scene.labels ?? []) if (l.text !== 'TÜRKİYE') add(() => l.text, (v) => { l.text = v; });
-if (scene.subject) add(() => scene.subject.label, (v) => { scene.subject.label = v; });
-for (const p of scene.parties ?? []) add(() => p.label, (v) => { p.label = v; });
 
-const starless = (s) => s.replace(/\*/g, '');
-const screen = slots.map((s) => starless(s.text));
+const screen = buildScene().slots.map((s) => starless(s.text));
 const spoken = narration.segments.map((s) => s.text);
 
+// Tell the model the exact counts it must return: the single most common failure was the translator
+// merging or splitting lines, so the array came back a different length and the whole English track
+// was dropped. Naming the counts, and retrying the content below, makes a faithful length reliable.
 const prompt = [
   'Translate the following Turkish short-news video text into natural, plain English. It is a factual OSINT news card: keep it sober, no clickbait, no added drama.',
   'Rules: translate meaning, do not add or drop any fact. Keep every number exactly as written. Keep every proper noun (places, people, countries, weapons, organisations, the source name) — use the common English spelling (Kiev, Kharkiv, Odesa, Russia, Ukraine, Türkiye).',
   'The "screen" lines are short captions shown on screen: translate each as tersely as the Turkish, ideally no longer. The "narration" lines are spoken sentences: translate them as fluent spoken English.',
-  'Return ONLY JSON with the same number of items in the same order: {"screen":[...],"narration":[...]}.',
+  `Translate each item one-to-one: never merge, split, reorder, add or drop an item. "screen" has exactly ${screen.length} item(s) and "narration" has exactly ${spoken.length} item(s); return exactly that many, in the same order.`,
+  'Return ONLY JSON, no prose or code fence: {"screen":[...],"narration":[...]}.',
   `INPUT:\n${JSON.stringify({ screen, narration: spoken })}`,
 ].join('\n\n');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function callNim() {
+async function callNim(temperature) {
   const backoff = [0, 4000, 10000];
   let lastError;
   for (let attempt = 0; attempt < backoff.length; attempt++) {
@@ -80,7 +88,7 @@ async function callNim() {
         method: 'POST',
         headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
         signal: AbortSignal.timeout(timeoutSeconds * 1000),
-        body: JSON.stringify({ model: nimModel, messages: [{ role: 'user', content: prompt }], temperature: 0.2, top_p: 0.9, max_tokens: 1600, stream: false }),
+        body: JSON.stringify({ model: nimModel, messages: [{ role: 'user', content: prompt }], temperature, top_p: 0.9, max_tokens: 2048, stream: false }),
       });
       if (response.ok) return response.json();
       lastError = new Error(`NVIDIA NIM HTTP ${response.status}`);
@@ -105,18 +113,23 @@ function responseJson(text) {
 // a quantity the source did not state (a red line, CLAUDE.md section 2).
 const digits = (arr) => new Set(arr.flatMap((s) => s.match(/\d+/g) ?? []));
 
-try {
-  const result = await callNim();
+// One translation attempt: call NIM, parse, check faithfulness, apply onto a fresh scene, refit and
+// validate. A stochastic translator sometimes merges a line or drops JSON; rather than lose the whole
+// English track to one bad roll, try a few times (nudging the temperature up) and keep the first that
+// passes. Only a genuine, repeated failure skips the track — the Turkish video always ships regardless.
+async function attempt(temperature) {
+  const result = await callNim(temperature);
   const candidate = responseJson(result.choices?.[0]?.message?.content ?? '');
   const outScreen = candidate.screen, outSpoken = candidate.narration;
-  if (!Array.isArray(outScreen) || outScreen.length !== screen.length) throw new Error('screen length mismatch');
-  if (!Array.isArray(outSpoken) || outSpoken.length !== spoken.length) throw new Error('narration length mismatch');
+  if (!Array.isArray(outScreen) || outScreen.length !== screen.length) throw new Error(`screen length mismatch (${Array.isArray(outScreen) ? outScreen.length : 'not an array'} vs ${screen.length})`);
+  if (!Array.isArray(outSpoken) || outSpoken.length !== spoken.length) throw new Error(`narration length mismatch (${Array.isArray(outSpoken) ? outSpoken.length : 'not an array'} vs ${spoken.length})`);
   if (outScreen.some((s) => typeof s !== 'string' || !s.trim()) || outSpoken.some((s) => typeof s !== 'string' || !s.trim())) throw new Error('empty translation');
 
   const srcNumbers = digits([...screen, ...spoken]);
   const outNumbers = digits([...outScreen, ...outSpoken]);
   for (const n of outNumbers) if (!srcNumbers.has(n)) throw new Error(`translation introduced a number not in the source: ${n}`);
 
+  const { scene, slots } = buildScene();
   // put accent asterisks back around the translated span of a line that had them
   slots.forEach((slot, i) => {
     const had = slot.text.includes('*');
@@ -131,6 +144,25 @@ try {
   refit(scene);
   const problems = validate(scene);
   if (problems.length) throw new Error(`the English scene will not validate: ${problems.join('; ')}`);
+  return { scene, scale, outScreen, outSpoken };
+}
+
+async function translate() {
+  const temperatures = [0.2, 0.3, 0.5, 0.5];
+  let lastError;
+  for (let i = 0; i < temperatures.length; i++) {
+    try {
+      return await attempt(temperatures[i]);
+    } catch (error) {
+      lastError = error;
+      console.log(`translate try ${i + 1}/${temperatures.length} rejected (${error.message})${i + 1 < temperatures.length ? '; re-rolling.' : '.'}`);
+    }
+  }
+  throw lastError;
+}
+
+try {
+  const { scene, scale, outScreen, outSpoken } = await translate();
 
   const header = `# English track, translated from ${scenePath} by tools/scene/translate.mjs (NIM ${nimModel}).\n`;
   writeFileSync(outScenePath, header + stringify(scene, { lineWidth: 0 }));
