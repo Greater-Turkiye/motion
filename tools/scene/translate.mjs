@@ -99,7 +99,12 @@ async function callNim(temperature) {
       console.log(`translate attempt ${attempt + 1} failed (${error.message}); retrying.`);
     }
   }
-  throw lastError;
+  // the endpoint is unreachable or kept erroring after its own retries: tag it so the caller skips
+  // fast instead of re-rolling (a down service will not answer a second roll, and each roll waits out
+  // the full timeout — four rolls once left the step spinning ~40 min before giving up).
+  const serviceError = lastError instanceof Error ? lastError : new Error(String(lastError));
+  serviceError.serviceError = true;
+  throw serviceError;
 }
 
 function responseJson(text) {
@@ -158,6 +163,9 @@ async function translate() {
     try {
       return await attempt(temperatures[i]);
     } catch (error) {
+      // only a bad answer is worth another roll; if NIM itself is unreachable, re-rolling just waits
+      // out the timeout again, so give up now and let the English track skip this run.
+      if (error.serviceError) throw error;
       lastError = error;
       console.log(`translate try ${i + 1}/${temperatures.length} rejected (${error.message})${i + 1 < temperatures.length ? '; re-rolling.' : '.'}`);
     }
