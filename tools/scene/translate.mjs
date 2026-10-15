@@ -136,6 +136,10 @@ async function attempt(temperature) {
     slot.set(had ? `*${outScreen[i].trim()}*` : outScreen[i].trim());
   });
   scene.lang = 'en';
+  // The Turkish scene already carries `voice: synthetic` (produce.yml appends it after narration), and
+  // produce.yml appends it again to the English file after the English voice — so dropping it here keeps
+  // the key from appearing twice, which made the English YAML fail to parse ("Map keys must be unique").
+  delete scene.voice;
   // source_text now holds the English words the hook may use: the translated screen text itself, so
   // every on-screen word is "in the source" for validate(). No Turkish headline is carried over.
   scene.source_text = [...new Set(screen.map((_, i) => starless(outScreen[i]).trim()))];
