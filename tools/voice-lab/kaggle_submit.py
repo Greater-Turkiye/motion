@@ -76,7 +76,14 @@ def main():
     # language-model context and its KV cache on the first T4 — three ~20 s
     # clips overran it and the kernel errored. Use one clip by default (the
     # first listed) and let FISH_MAX_REFERENCES raise the count deliberately.
-    max_references = max(1, int(os.environ.get("FISH_MAX_REFERENCES", "1")))
+    # produce.yml passes the GitHub variable through, and an unset variable
+    # arrives as "" (not absent), so `or` past an empty or non-numeric value to
+    # the default rather than crashing on int("") — which skipped the whole
+    # English track once, since that step passes the variable and Turkish does not.
+    try:
+        max_references = max(1, int(os.environ.get("FISH_MAX_REFERENCES") or "1"))
+    except ValueError:
+        max_references = 1
     reference_clips = reference_clips[:max_references]
     narration = json.loads(args.narration.read_text(encoding="utf-8"))
     segments = narration.get("segments")
