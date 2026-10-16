@@ -4,9 +4,10 @@ name: timer
 # ran about once in four hours on 1-2 October 2026 (17:27, 21:58, 01:39, 07:33 UTC), and the other
 # repositories' schedules slipped the same way, so a video due at 12:00 waited for a hand.
 #
-# One run of this workflow sleeps until the next video is due (the newest video-* release plus 5 h
-# 30 min, the same rule as produce's gate), then starts produce. A job may run six hours, so a run
-# never sleeps longer than 5 h 45 min; when the due time is further off it hands over to a fresh run.
+# One run of this workflow sleeps until the next video is due (the newest video-* release plus 12 h,
+# the same rule as produce's gate — two videos a day), then starts produce. A single run never sleeps
+# longer than 5 h 45 min; when the due time is further off it hands over to a fresh run (so a 12 h wait
+# is covered by a chain of hand-offs).
 # Only the newest timer run lives (concurrency). produce starts a new timer run at the end of every
 # production, so a broken chain mends itself with the next video; the schedule stays as the second
 # line. No secret is needed: a run's own token may start workflow_dispatch runs.
@@ -35,7 +36,7 @@ jobs:
         run: |
           last=$(gh release list -R "$GITHUB_REPOSITORY" --limit 20 --json tagName,publishedAt --jq '[.[]|select(.tagName|startswith("video-"))][0].publishedAt // ""')
           now=$(date -u +%s)
-          if [ -n "$last" ]; then due=$(( $(date -u -d "$last" +%s) + 330 * 60 )); else due=$now; fi
+          if [ -n "$last" ]; then due=$(( $(date -u -d "$last" +%s) + 720 * 60 )); else due=$now; fi
           wait=$(( due - now ))
           # a production that failed leaves the last video where it was, so the due time is already past:
           # half an hour's pause before the next try, not a loop of failing runs a few minutes apart
