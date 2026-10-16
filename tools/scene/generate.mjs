@@ -621,6 +621,16 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   const shownCountry = war ? COUNTRY_TABLE.find((c) => c.iso3 === 'UKR') : named.length === 1 ? named[0] : null;
   const theatre = shownCountry ? countryMiddle(shownCountry.iso3) : null;
   const whole = (!pt && !area && loc?.precision === 'country' && record.countries?.length === 1 && record.countries[0] !== 'TUR' ? countryMiddle(record.countries[0]) : null) ?? theatre;
+  // A placeless record whose only actor is the United States — a Pentagon budget request, a line from
+  // Washington — has no event on the ground. The US is deliberately not centred (it is usually acting
+  // elsewhere, so a US map would mislead too), and with no point, named area or single foreign theatre
+  // the only focus left is whatever watch region the feed filed it under, which for a US story is
+  // unrelated: "Pentagon plans to request $50bn from Congress for drones", filed under the Caucasus,
+  // drew a Caucasus map. Refuse it so the selector picks a record that has a place to show.
+  if (placeless && !whole) {
+    const actors = partiesOf(titleEn).filter((c) => !['TUR', 'CYP'].includes(c.iso3));
+    if (actors.length && actors.every((c) => c.iso3 === 'USA')) refuse('a US statement with no place on the ground');
+  }
   const wholeName = theatre ? shownCountry.tr : placeName;
   const at = pt ?? area?.at ?? whole ?? region?.at;
   if (!at) refuse('no place to show: no point and no watch region');
