@@ -180,18 +180,37 @@ def main():
             except Exception as exc:  # diagnosis only; never mask the original failure
                 print(f"(could not fetch Kaggle kernel log: {exc})")
 
+        # The kernel slug is fixed, so `kernels status` reports whatever version ran last. For a few
+        # seconds after a push the new version has not registered yet and the status is still the
+        # PREVIOUS run's terminal "complete" (or "error"). Accepting that downloads the previous run's
+        # voice-artifact.zip — which once shipped a prior English clip under a Turkish video (English
+        # voice, Turkish text). So wait for the new run to actually start (a non-terminal status) and
+        # only then treat "complete" as this run's result; a 9-second "job" means a stale artifact.
+        started_words = ("running", "queued", "pending", "preparing", "scheduled", "busy")
         deadline = time.monotonic() + args.timeout
+        start_deadline = time.monotonic() + 900  # the pushed version must register as started within 15 min
+        started = False
         while True:
             status = command("kernels", "status", kernel, capture=True).stdout.lower()
-            if "complete" in status:
-                break
-            if any(word in status for word in ("error", "failed", "cancelled")):
-                dump_log(f"Kaggle Fish job failed: {status.strip()}")
-                raise SystemExit(f"Kaggle Fish job failed: {status.strip()}")
+            if not started:
+                if any(word in status for word in started_words):
+                    started = True
+                elif time.monotonic() >= start_deadline:
+                    dump_log("The pushed Kaggle kernel never started a new run; its status stayed on the "
+                             "previous run's terminal state, so no fresh artifact would be produced.")
+                    raise SystemExit("The pushed Kaggle kernel never started a new run.")
+                # otherwise it is still the previous run's stale terminal status: keep waiting to see the
+                # new run start before accepting any "complete".
+            else:
+                if "complete" in status:
+                    break
+                if any(word in status for word in ("error", "failed", "cancelled")):
+                    dump_log(f"Kaggle Fish job failed: {status.strip()}")
+                    raise SystemExit(f"Kaggle Fish job failed: {status.strip()}")
             if time.monotonic() >= deadline:
                 dump_log("Timed out waiting for the Kaggle Fish job.")
                 raise SystemExit("Timed out waiting for the Kaggle Fish job.")
-            time.sleep(30)
+            time.sleep(15)
 
         downloaded = root / "downloaded"
         downloaded.mkdir()
