@@ -1,7 +1,9 @@
 name: produce
 
-# The automatic video loop (PLAN.md section 10, milestone M7). At most every five and a half hours (the
-# gate below): pick the best recent record that has no video yet (tools/scene/select.mjs), write its
+# The automatic video loop (PLAN.md section 10, milestone M7). At most every twelve hours (the
+# gate below) — two videos a day, the two best recent records, rather than the three or four a day
+# that an earlier 5 h 30 min cadence produced (owner, 2026-10-16): pick the best recent record that
+# has no video yet (tools/scene/select.mjs), write its
 # scene (tools/scene/generate.mjs), narrate it, render it, and publish the MP4, its first frame and its
 # metadata as a GitHub release tagged video-<record id>. The releases are the ledger: a record with a
 # release is never picked again. The second job republishes the latest twenty videos to this
@@ -12,8 +14,8 @@ name: produce
 # Cadence: GitHub delays scheduled runs under load and sometimes drops them (a 12:43 run started at
 # 18:08 on 2026-09-30; on the night of 1 October only one hourly wake-up in four ran, here and in
 # the datasets and platform repositories alike), so the schedule wakes three times an hour at
-# off-peak minutes and the gate job ends the run in seconds unless the last video is at least 5 h
-# 30 min old. In practice the schedule ran about once in four hours on 1-2 October, so the clock is now
+# off-peak minutes and the gate job ends the run in seconds unless the last video is at least 12 h
+# old. In practice the schedule ran about once in four hours on 1-2 October, so the clock is now
 # timer.yml: every production ends by starting a timer run that sleeps until the next video is due
 # and then starts this workflow. The schedule stays as the second line. No secret is needed.
 #
@@ -60,7 +62,7 @@ jobs:
           age=999999
           if [ -n "$last" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$last" +%s)) / 60 )); fi
           go=false
-          if [ "$EVENT" != "schedule" ] || [ "$age" -ge 330 ]; then go=true; fi
+          if [ "$EVENT" != "schedule" ] || [ "$age" -ge 720 ]; then go=true; fi
           echo "last video: ${last:-none} (${age} min ago); go=$go" | tee -a "$GITHUB_STEP_SUMMARY"
           echo "go=$go" >> "$GITHUB_OUTPUT"
 
