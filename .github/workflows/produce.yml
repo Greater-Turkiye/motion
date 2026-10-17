@@ -311,7 +311,8 @@ jobs:
           FISH_MAX_REFERENCES: ${{ vars.FISH_MAX_REFERENCES }}
         run: |
           # the English voice is the same cloned timbre (the Turkish reference clips) speaking English;
-          # --lang en passes the text through unchanged (the Turkish grapheme pre-processor is skipped).
+          # --lang en runs tools/voice-lab/en_tts_prep.py: the pronoun I and letter-read acronyms get their
+          # English sound, which the Turkish-prompted voice otherwise reads with Turkish letter values.
           # English always uses Fish S2 Pro — the production voice; no CPU-TTS English path exists.
           if ! python -u tools/voice-lab/kaggle_submit.py out/narration.en.json out/voice-en --lang en --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
             echo "::warning::English Fish narration failed; skipping the English track this run"; exit 0

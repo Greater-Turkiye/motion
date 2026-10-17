@@ -492,9 +492,9 @@ function regionStats(datasets, record) {
  *   oruntu    the pattern first: the last seven days around the place (or the month's count) next
  */
 export const VARIANTS = ['standart', 'yakinlik', 'kisa', 'oruntu'];
-/** How long a story video may run before its least valuable blocks go (PLAN.md section 30): 20-35 s is
- *  where shorts are watched to the end, and the shorter ones loop; ours ran 24-35 s with the voice. */
-export const BUDGET = 22;
+/** How long a story video may run before its least valuable blocks go (PLAN.md sections 30, 34): the
+ *  channel's first 13 shorts were watched to the end at 15 s (96 %) and to half at 27 s, so 18. */
+export const BUDGET = 18;
 function arrange(beats, variant) {
   const len = (i) => (beats[i + 1]?.at ?? beats.end) - beats[i].at;
   let list = beats.map((b, i) => ({ b, d: len(i) }));
