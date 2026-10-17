@@ -844,3 +844,19 @@ deniz kuvvetleri haberleri).
 Kapaktaki uzaklık (bölüm 32) YouTube'da arama ve önerilerde başlıkla görünür. Başlık kaydın kendi
 cümlesi kalır; sonuna, 92 karakteri aşmıyorsa mesafe bölümünün değeri eklenir: "Kerkük: IŞİD
 saldırısı bir polis memurunu öldürdü | Türkiye'ye ~240 km #Shorts". Sığmazsa yalnız başlık.
+
+## 34. Kanalın ilk verisi / The channel's first numbers (2026-10-17)
+
+Sıcak Temas kanal raporu (13 Short, 15–17 Ekim, ~4,1 bin görüntüleme, %94'ü Shorts akışından;
+izlemeye devam %31,7, kaydıran %68,3). Örnek küçük, ama yön açık:
+- Kısa olan kazanıyor: Kerkük 15 sn %95,9 izlendi, BM açıklaması 27 sn %50. `BUDGET` 22 → 18 sn;
+  aşan video yine önce kendi kayıt sayımızı bırakır (bölüm 30).
+- Türkiye'ye yakın sıcak haber kazanıyor: Irak videoları ortalama 758 görüntüleme (Kerkük, Maysan,
+  Bağdat), Rusya-Ukrayna 270, BM 200; Pentagon bütçesi 1, Kırgızistan-Ermenistan ziyareti 0.
+  Seçicide Irak yakınlığı 0,9 → 1,0 (Ege ve Kıbrıs'la aynı); tedarik ve politika 0,55 → 0,45,
+  anlaşma 0,55 → 0,45, diğer diplomasi 0,4 → 0,3.
+- İngilizce ses: Türkçe kayıtlarla koşullanan Fish, büyük I'yı Türkçe okuyordu ("I" → "ı", "UK"
+  Türkçe harf adlarıyla). `tools/voice-lab/en_tts_prep.py` yalnız telaffuzu düzeltir.
+Raporun alınmayan önerileri, bölüm 4 (CLAUDE.md) gereği: ilk karede "büyük şok rakamı", sona soru
+("Sence tırmanır mı?") ve soru yorumu sabitlemek. Rakam saydığı şeyle bir satırda kalır, soru kancası
+yok. Günde 4–6 video önerisi sahibin 2'ye indirdiği tempoyla (#150) çelişir; karar sahibin.

@@ -29,9 +29,11 @@ import { generate, records } from './generate.mjs';
 
 const MAGNITUDE = [
   [/^kinetic\.(missile-strike|airstrike|drone-strike)/, 1.0], [/^kinetic\./, 0.95], [/^maritime\./, 0.9],
-  [/^(deployment|exercise)\./, 0.75], [/^(procurement|policy)\./, 0.55], [/^diplomatic\.(agreement|treaty)/, 0.55], [/^diplomatic\./, 0.4], [/./, 0.3],
+  [/^(deployment|exercise)\./, 0.75], [/^(procurement|policy)\./, 0.45], [/^diplomatic\.(agreement|treaty)/, 0.45], [/^diplomatic\./, 0.3], [/./, 0.3],
 ];
-const PROXIMITY = { aegean: 1.0, cyprus: 1.0, 'east-med': 0.95, 'black-sea': 0.95, syria: 0.95, iraq: 0.9, caucasus: 0.9,
+// Iraq at the top with the Aegean and Cyprus, procurement and diplomacy lower (PLAN.md section 34): on the
+// channel's first 13 shorts Iraq drew 758 views a video, a Pentagon budget 1 and a state visit none
+const PROXIMITY = { aegean: 1.0, cyprus: 1.0, iraq: 1.0, 'east-med': 0.95, 'black-sea': 0.95, syria: 0.95, caucasus: 0.9,
   iran: 0.85, levant: 0.8, balkans: 0.8, 'libya-north-africa': 0.7, 'gulf-red-sea': 0.6, 'central-asia': 0.7, global: 0.4 };
 // the headline reports people killed or wounded: that outranks the event type alone
 const HARM = /\b(killed|dead|died|deaths?|wounded|injured|casualties)\b/i;
