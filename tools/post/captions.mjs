@@ -47,7 +47,10 @@ const enTag = (s) => '#' + s.split(/[\s-]+/u).map((w) => w ? w[0].toUpperCase() 
  *  own facts, status and source, no teaser, no emoji (CLAUDE.md section 4). */
 export function enCaptions(sc, meta) {
   const cap = (s) => (s ? s[0].toLocaleUpperCase('en-US') + s.slice(1) : s);
-  const headline = cap((sc.hook.sub || sc.hook.lines.join(' ')).replace(/\s+/g, ' ').trim()).replace(/[.!]?$/, '.');
+  // the source's own English headline when the record keeps one (most feeds are English): the hook's
+  // label ("50 BILLION $ PLANS TO REQUEST") read as a shouted fragment and the channel's titles drew no clicks
+  const own = (meta.title_en ?? '').replace(/\s+/g, ' ').trim();
+  const headline = cap(own || (sc.hook.sub || sc.hook.lines.join(' ')).replace(/\s+/g, ' ').trim()).replace(/[.!]?$/, '.');
   const [kickPlace, kickDate] = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ') : ['', sc.hook.kicker];
   const place = (sc.beats ?? []).find((b) => b.kind === 'place')?.title ?? kickPlace;
   const EN_ACR = new Set(['UN', 'EU', 'UK', 'US', 'USA', 'NATO', 'UAV', 'ABD', 'BM', 'UAE']);

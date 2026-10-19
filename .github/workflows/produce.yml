@@ -330,10 +330,19 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          EN_STYLE: ${{ vars.MOTION_EN_STYLE }}
         run: |
           scene="auto-$ID.en"
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
-          node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video-en
+          # its own look: the same frames minutes after the Turkish upload read as a re-upload, and the
+          # English channel's shorts got no test audience (1-15 views each, 15-18 October). A style that
+          # cannot fit the English copy falls back to the scene's own.
+          style="${EN_STYLE:-D}"
+          if ! node export/render.mjs --encoder ffmpeg --scene "$scene" --style "$style" --out out/video-en; then
+            echo "::warning::English render in style $style failed; using the scene's own style"
+            rm -rf out/video-en
+            node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video-en
+          fi
           mkdir -p release-en
           kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
           node tools/audio/voice.mjs out/voice-en out/video-en/*.mp4 "release-en/$scene.mp4" "${kit[@]}"

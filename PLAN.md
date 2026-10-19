@@ -860,3 +860,15 @@ izlemeye devam %31,7, kaydıran %68,3). Örnek küçük, ama yön açık:
 Raporun alınmayan önerileri, bölüm 4 (CLAUDE.md) gereği: ilk karede "büyük şok rakamı", sona soru
 ("Sence tırmanır mı?") ve soru yorumu sabitlemek. Rakam saydığı şeyle bir satırda kalır, soru kancası
 yok. Günde 4–6 video önerisi sahibin 2'ye indirdiği tempoyla (#150) çelişir; karar sahibin.
+
+## 35. İngilizce kanal test görmüyor / The English channel gets no test audience (2026-10-19)
+
+@Conflict-Grid'in 9 Short'u 1–15 görüntülemede kaldı (15–18 Ekim); aynı haberler Türkçe kanalda
+yüzlerce aldı. YouTube'un nedeni görünmüyor; ölçülebilen iki fark var:
+- İngilizce video, Türkçe yüklemeden dakikalar sonra aynı kareleri (aynı stil, aynı kamera, aynı
+  müzik) taşıyordu: yeniden yükleme gibi okunabilir. İngilizce artık kendi stilinde çizilir
+  (`MOTION_EN_STYLE`, varsayılan D "Uydu gecesi"; sığmazsa sahnenin stiline döner).
+- Başlık kancanın büyük harfli etiketiydi ("50 BILLION $ PLANS TO REQUEST", "UNITED KINGDOM
+  OFFICIAL STATEMENT"). Artık kaynağın kendi İngilizce başlığı (`title_en`), Türkçe başlığın
+  kaydın başlığından gelmesi gibi.
+Kanalı kapatıp yenisini açmak bu iki farkı gidermez; yeni kanal aynı videoları alırsa aynı yerde kalır.
