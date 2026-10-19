@@ -34,3 +34,10 @@ test('the English YouTube block uses English markers and words', () => {
 test('synthetic voice is disclosed in English', () => {
   assert.match(enCaptions(enScene, meta), /Voice-over: synthetic\./);
 });
+
+test('the English title is the source’s own English headline when the record keeps one', () => {
+  const text = enCaptions({ ...enScene, hook: { ...enScene.hook, sub: '', lines: ['50 BILLION $', 'PLANS TO REQUEST'] } },
+    { ...meta, title_en: 'Pentagon plans to ask Congress for $50 billion to mass-produce drones' });
+  assert.match(text, /^Title: Pentagon plans to ask Congress for \$50 billion to mass-produce drones/m);
+  assert.doesNotMatch(text, /PLANS TO REQUEST/);
+});
