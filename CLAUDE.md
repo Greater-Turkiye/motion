@@ -46,7 +46,10 @@ carries our mark and address, "greaterturkiye.org" (owner, 2026-10-06; it replac
 ## 5. Run the whole pipeline yourself (owner, 2026-10-10)
 The owner does not want to be handed steps he could have done for him. Carry a task to the end
 without asking for permission or confirmation:
-- Branch, open the pull request, and squash-merge it once CI is green — all of it autonomously.
+- Branch, open the pull request, and squash-merge it once CI is green — all of it autonomously. The
+  owner confirmed this again on 2026-10-23: merging a green pull request needs no further approval.
+- Never wait idle. Start anything slow (CI checks, renders, Kaggle jobs, downloads) in the background,
+  keep working on the next part of the task while it runs, and come back to it when it finishes.
 - Trigger `produce.yml` (and the other workflows) and submit and poll Kaggle jobs yourself; read the
   logs and fix what broke, then run it again, rather than reporting the failure back.
 - Secrets and variables (`KAGGLE_API_TOKEN`, `NVAPI`, `HF_TOKEN`, `FISH_MODEL_DATASET`, …) live in the

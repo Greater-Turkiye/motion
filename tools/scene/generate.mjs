@@ -692,7 +692,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   const stats = datasets ? regionStats(datasets, record) : null;
   const around = datasets && pt ? nearbyStats(datasets, record, pt) : null;
   const statusText = st === 'verified' ? 'En az iki inceleyici doğruladı.'
-    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : properName(name)}.` : `${hosts.length} ayrı kaynak.`} ${auto ? 'Henüz kimse incelemedi.' : 'Bağımsız teyit yok.'}`;
+    : `${hosts.length === 1 ? `Tek kaynak: ${name.length <= 4 ? name : properName(name)}.` : `${hosts.length} ayrı kaynak.`} Bağımsız teyit henüz yok.`;
 
   // ---- the hook, from the record's own fields first ------------------------------------------------
   const found = hookLines(news);
