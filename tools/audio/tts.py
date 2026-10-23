@@ -51,6 +51,8 @@ def save_wav(path, wav, sr):
     sf.write(str(path), data.T, int(sr))                            # soundfile wants (frames, channels)
 
 RETRY, FAIL = 0.20, 0.30
+# the narration's language: what Whisper listens for and how letters and numbers are compared
+LANG = os.environ.get("TTS_LANG", "tr")
 TRIES = int(os.environ.get("TTS_TRIES", "3"))
 NUMBER_EXTRA_TRIES = int(os.environ.get("TTS_NUMBER_EXTRA_TRIES", "2"))
 if TRIES < 1 or NUMBER_EXTRA_TRIES < 0:
@@ -72,7 +74,26 @@ def say(n):
     if n:
         parts.append(u1000(n))
     return " ".join(parts)
+EN_SMALL = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+            "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+EN_TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+def say_en(n):
+    if n < 20:
+        return EN_SMALL[n]
+    if n < 100:
+        return EN_TENS[n // 10] + ("" if n % 10 == 0 else " " + EN_SMALL[n % 10])
+    if n < 1000:
+        return EN_SMALL[n // 100] + " hundred" + ("" if n % 100 == 0 else " " + say_en(n % 100))
+    for unit, word in ((10**9, "billion"), (10**6, "million"), (1000, "thousand")):
+        if n >= unit:
+            k, r = divmod(n, unit)
+            return say_en(k) + " " + word + ("" if r == 0 else " " + say_en(r))
 def letters(s):
+    if LANG == "en":
+        # digits and spoken numbers compare as words; a British "and" inside a number is not a sound error
+        s = re.sub(r"(?<=\d),(?=\d{3})", "", s)
+        s = re.sub(r"\d+", lambda m: say_en(int(m.group())), s).lower()
+        return re.sub(r"[^a-z]", "", re.sub(r"\band\b", "", s))
     s = re.sub(r"\d+", lambda m: say(int(m.group())), s)
     s = s.replace("I", "ı").replace("İ", "i").lower()
     return re.sub(r"[^a-zçğıöşüâîû]", "", s)
@@ -83,6 +104,8 @@ def numbers(s):
     words ("bin dört yüz kırk"): what a listener must hear right above everything else. A Turkish
     number goes from the larger places to the smaller, so a word whose place is not smaller than the
     last one's starts a new number: "on dört yirmi beş" (14-25 said aloud) is 14 and 25, not 39."""
+    if LANG == "en":
+        return []  # English numbers are compared as words inside letters()
     s = s.replace("I", "ı").replace("İ", "i").lower()
     out = []
     state = {"cur": 0, "total": 0, "inside": False, "last": 10**12}
@@ -359,6 +382,23 @@ elif engine == "edge":
                 "-i", str(mp3), "-ac", "1", "-ar", "24000", str(wav),
             ], check=True, capture_output=True, text=True, timeout=90)
             return load_wav(wav)
+elif engine == "kokoro":
+    # Kokoro-82M (Apache-2.0 weights) through ONNX Runtime on the CPU: the English channel's voice
+    # when no GPU is available. It reads acronyms ("IDF", "UAVs") on its own; spacing their letters
+    # made it worse ("U A Vs" was heard as "U.S."). It reads "1,470" as "one, 470", so the
+    # thousands separator goes before synthesis.
+    if LANG != "en":
+        raise SystemExit("kokoro is used for English only here; set TTS_LANG=en")
+    from kokoro_onnx import Kokoro
+    KOKORO_DIR = pathlib.Path(os.environ.get("KOKORO_MODEL_DIR", "kokoro"))
+    KOKORO_VOICE = os.environ.get("KOKORO_VOICE", "").strip() or "bf_emma"
+    KOKORO_SPEED = float(os.environ.get("KOKORO_SPEED", "").strip() or "1.0")
+    kokoro = Kokoro(str(KOKORO_DIR / "kokoro-v1.0.onnx"), str(KOKORO_DIR / "voices-v1.0.bin"))
+    def speak(text):
+        text = re.sub(r"(?<=\d),(?=\d{3})", "", text)
+        samples, sr = kokoro.create(text, voice=KOKORO_VOICE, speed=KOKORO_SPEED,
+                                    lang="en-gb" if KOKORO_VOICE.startswith("b") else "en-us")
+        return torch.from_numpy(np.asarray(samples, dtype=np.float32)).reshape(1, -1), sr
 elif engine == "freya":
     from freyatts import FreyaTTS
     model = FreyaTTS.from_pretrained("freyavoice/freya-tts", device="cpu")
@@ -379,7 +419,7 @@ def heard(wav, sr):
     # half a second of silence on each side: a clip that starts or ends on a word is otherwise misheard
     # at its edges ("yaklaşık bin kilometre" came back "1 km" alone, "1000 km" in the finished video)
     pad = np.zeros(8000, dtype=mono.dtype)
-    segs = list(ear.transcribe(np.concatenate([pad, mono, pad]), language="tr", beam_size=5, word_timestamps=True)[0])
+    segs = list(ear.transcribe(np.concatenate([pad, mono, pad]), language=LANG, beam_size=5, word_timestamps=True)[0])
     words = [w for s in segs for w in (s.words or [])]
     return " ".join(s.text for s in segs).strip(), (max(w.end for w in words) - 0.5 if words else None)
 

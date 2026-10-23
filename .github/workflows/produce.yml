@@ -190,7 +190,19 @@ jobs:
               python -u tools/audio/tts.py out/narration.json out/voice edge
               ;;
             kaggle-fish)
-              python -u tools/voice-lab/kaggle_submit.py out/narration.json out/voice --reference referans.wav --reference-text assets/voice/reference-transcript.txt
+              # Kaggle's weekly GPU quota runs out ("The pushed Kaggle kernel never started a new run",
+              # 22 October): every production then failed and no video shipped. The CPU voices take over.
+              if ! python -u tools/voice-lab/kaggle_submit.py out/narration.json out/voice --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
+                echo "::warning::Kaggle Fish failed (GPU quota or queue); using OmniVoice, then Edge TTS"
+                rm -rf out/voice
+                if ! python -u tools/audio/tts.py out/narration.json out/voice omnivoice; then
+                  rm -rf out/voice
+                  if ! python -u tools/audio/tts.py out/narration.json out/voice edge; then
+                    echo "::error::Kaggle Fish, OmniVoice and Edge TTS all failed; stopping the run instead of publishing a silent video"
+                    exit 1
+                  fi
+                fi
+              fi
               ;;
             gemini)
               if [ -z "$GEMINI_API_KEY" ] || ! python -u tools/audio/tts.py out/narration.json out/voice gemini; then
@@ -295,6 +307,13 @@ jobs:
           # timeline for the longer English copy. Writes nothing on failure (then the track skips).
           node tools/scene/translate.mjs "scenes/auto/auto-$ID.yaml" out/narration.json "scenes/auto/auto-$ID.en.yaml" out/narration.en.json
           if [ -f "scenes/auto/auto-$ID.en.yaml" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "no English scene written; skipping the English track"; fi
+      - name: Kokoro model cache
+        if: steps.translate.outputs.ok == 'true'
+        continue-on-error: true
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: kokoro
+          key: kokoro-onnx-model-files-v1.0
       - name: English narration voice
         id: voice_en
         if: steps.translate.outputs.ok == 'true'
@@ -309,13 +328,33 @@ jobs:
           FISH_TOP_K: ${{ vars.FISH_TOP_K }}
           FISH_SEED: ${{ vars.FISH_SEED }}
           FISH_MAX_REFERENCES: ${{ vars.FISH_MAX_REFERENCES }}
+          EN_TTS_ENGINE: ${{ vars.MOTION_EN_TTS_ENGINE }}
+          KOKORO_VOICE: ${{ vars.KOKORO_VOICE }}
+          KOKORO_SPEED: ${{ vars.KOKORO_SPEED }}
         run: |
-          # the English voice is the same cloned timbre (the Turkish reference clips) speaking English;
-          # --lang en runs tools/voice-lab/en_tts_prep.py: the pronoun I and letter-read acronyms get their
-          # English sound, which the Turkish-prompted voice otherwise reads with Turkish letter values.
-          # English always uses Fish S2 Pro — the production voice; no CPU-TTS English path exists.
-          if ! python -u tools/voice-lab/kaggle_submit.py out/narration.en.json out/voice-en --lang en --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
-            echo "::warning::English Fish narration failed; skipping the English track this run"; exit 0
+          # kokoro (default): Kokoro-82M on the CPU, a British news voice (bf_emma), checked clip by clip
+          # with Whisper like the Turkish voice. kaggle-fish: the cloned Turkish timbre speaking English
+          # on a Kaggle GPU (--lang en runs tools/voice-lab/en_tts_prep.py for "I" and acronyms); when
+          # Kaggle's weekly quota is spent it fails, and Kokoro takes over.
+          if [ "${EN_TTS_ENGINE:-kokoro}" = "kaggle-fish" ]; then
+            if python -u tools/voice-lab/kaggle_submit.py out/narration.en.json out/voice-en --lang en --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
+              fish=ok
+            else
+              echo "::warning::English Fish narration failed; using Kokoro"
+              rm -rf out/voice-en
+            fi
+          fi
+          if [ "$fish" != ok ]; then
+            mkdir -p kokoro
+            fetch() { [ -f "kokoro/$1" ] || curl -fsSL --retry 3 -o "kokoro/$1" "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/$1"; }
+            fetch kokoro-v1.0.onnx && fetch voices-v1.0.bin
+            printf '%s  %s\n' \
+              7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5 kokoro/kokoro-v1.0.onnx \
+              bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d kokoro/voices-v1.0.bin | sha256sum -c -
+            python -m pip install --quiet kokoro-onnx==0.4.7
+            if ! TTS_LANG=en KOKORO_MODEL_DIR=kokoro python -u tools/audio/tts.py out/narration.en.json out/voice-en kokoro; then
+              echo "::warning::English Kokoro narration failed; skipping the English track this run"; exit 0
+            fi
           fi
           node tools/audio/retime.mjs "auto-$ID.en" out/voice-en
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.en.yaml"
