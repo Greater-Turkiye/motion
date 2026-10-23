@@ -28,11 +28,15 @@ export type Beat =
   /** the parties as a list of flags and names (an exercise's participants) */
   | { kind: 'roster'; at: number; title: string; text?: string }
   /** what a party said, in the source's own words, under its flag */
-  | { kind: 'quote'; at: number; speaker?: number; lines: string[] };
+  | { kind: 'quote'; at: number; speaker?: number; lines: string[] }
+  /** a launch's target orbit: the ascent from the pad, then the ground track around the globe at its
+   *  inclination, and the orbit's height drawn to the Earth's own scale. Values are typical for the
+   *  orbit type (tools/scene/launch.mjs) and the text says so. */
+  | { kind: 'orbit'; at: number; title: string; text?: string; inclination: number; heading?: 'north' | 'south'; altitude: number; apogee?: number };
 
 /** The map symbol of an event, by its type: a drone, a missile, an aircraft, a ship, artillery, a
  *  clash on the ground, an exercise or a meeting; 'ring' when the type says none of these. */
-export type EventKind = 'drone' | 'missile' | 'air' | 'sea' | 'artillery' | 'ground' | 'exercise' | 'meeting' | 'ring';
+export type EventKind = 'drone' | 'missile' | 'air' | 'sea' | 'artillery' | 'ground' | 'exercise' | 'meeting' | 'launch' | 'ring';
 
 export interface Scene {
   id: string;
@@ -158,6 +162,7 @@ export function beatText(b: Beat): string[] {
     case 'satellite': return [b.title, b.text ?? '', b.note ?? ''];
     case 'roster': return [b.title, b.text ?? ''];
     case 'quote': return b.lines;
+    case 'orbit': return [b.title, b.text ?? ''];
   }
 }
 
