@@ -472,7 +472,8 @@ export class GlobeGL {
     gl.uniform4fv(u('uSea'), rgba(s.sea)); gl.uniform4fv(u('uGrat'), rgba(s.graticule));
     gl.uniform4fv(u('uAtmo'), rgba(s.atmosphere ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uHasAtmo'), s.atmosphere && !s.flat ? 1 : 0);
     gl.uniform4fv(u('uGlowC'), rgba(s.glow ?? 'rgba(0,0,0,0)')); gl.uniform1f(u('uHasGlow'), s.glow && this.glowTex ? 1 : 0);
-    gl.uniform4fv(u('uHatch'), s.flat ? [0.08, 0.08, 0.08, 0.45] : [1, 1, 1, 0.38]);
+    // the occupied-territory hatch stays (ADR 0014) but quietly: at 0.38-0.45 it read as stray grey lines
+    gl.uniform4fv(u('uHatch'), s.flat ? [0.08, 0.08, 0.08, 0.22] : [1, 1, 1, 0.16]);
     gl.uniform1f(u('uReveal'), o.subjectReveal); gl.uniform1f(u('uPulse'), o.pulse);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
