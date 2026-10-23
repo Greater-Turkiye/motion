@@ -50,6 +50,7 @@ export function enCaptions(sc, meta) {
   // the source's own English headline when the record keeps one (most feeds are English): the hook's
   // label ("50 BILLION $ PLANS TO REQUEST") read as a shouted fragment and the channel's titles drew no clicks
   const own = (meta.title_en ?? '').replace(/\s+/g, ' ').trim();
+  const launch = meta.variant === 'launch';
   const headline = cap(own || (sc.hook.sub || sc.hook.lines.join(' ')).replace(/\s+/g, ' ').trim()).replace(/[.!]?$/, '.');
   const [kickPlace, kickDate] = sc.hook.kicker.includes(' · ') ? sc.hook.kicker.split(' · ') : ['', sc.hook.kicker];
   const place = (sc.beats ?? []).find((b) => b.kind === 'place')?.title ?? kickPlace;
@@ -65,8 +66,10 @@ export function enCaptions(sc, meta) {
   const url = meta.sources[0];
   const sourceLine = `Source: ${name(publisher)} (${url})`;
   const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
-    .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), '#OSINT', '#GreaterTurkiye'];
-  const note = 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
+    .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), ...(launch ? ['#Space', '#RocketLaunch'] : ['#OSINT']), '#GreaterTurkiye'];
+  const note = launch
+    ? 'Auto-generated from Launch Library 2 (The Space Devs) data, published with no human in the loop. The orbit drawn is typical for its type, not the mission’s own elements.'
+    : 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
   const voiceLine = sc.voice === 'synthetic' ? 'Voice-over: synthetic.' : '';
   const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
   const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Satellite data: NASA FIRMS (VIIRS, NOAA-20), public domain. A heat detection is not a confirmed event.' : '';

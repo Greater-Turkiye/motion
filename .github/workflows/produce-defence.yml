@@ -1,0 +1,161 @@
+name: produce-defence
+
+# The Greater Defence channel (@greaterdefence): English shorts of the coming space launches. After each
+# production (produce.yml) it asks Launch Library 2 (The Space Devs; free, no key) for the launches of
+# the next 48 hours, takes the most newsworthy one not yet published (tools/scene/launch.mjs: Türkiye's
+# payloads first, then crews, new rockets, government missions), and draws it: the pad on the globe,
+# the rocket and payload, the target orbit around the Earth at its inclination and at the Earth's own
+# scale, and the status Launch Library 2 gives. The orbit's height and inclination are typical values
+# for its type, and the screen says so. Kokoro's voice (MOTION_DEFENCE_VOICE, default bm_george), the
+# scene's style D unless MOTION_DEFENCE_STYLE says otherwise. Published as a GitHub release tagged
+# defence-<scene>, which is also the ledger of what was published, then uploaded to the channel.
+#
+# Kill switch: MOTION_DEFENCE=off. Twice a day at most, like the other channels.
+on:
+  workflow_run:
+    workflows: [produce]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      launch:
+        description: "Launch Library 2 launch id to render instead of the next pick (optional)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: produce-defence
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: vars.MOTION_DEFENCE != 'off' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.age.outputs.go }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+    steps:
+      - id: age
+        run: |
+          last=$(gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName,publishedAt --jq '[.[]|select(.tagName|startswith("defence-"))][0].publishedAt // ""')
+          age=999999
+          if [ -n "$last" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$last" +%s)) / 60 )); fi
+          go=false
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$age" -ge 600 ]; then go=true; fi
+          echo "last defence video: ${last:-none} (${age} min ago); go=$go" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+
+  produce:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: assets/emblems
+          key: emblems-${{ hashFiles('assets/emblems/manifest.json') }}
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
+      - name: Emblems (pinned by hash in the manifest)
+        run: python3 tools/data/fetch_emblems.py --sync
+      - name: Choose a launch and write its scene
+        id: pick
+        env:
+          LAUNCH: ${{ inputs.launch }}
+        run: |
+          gh release list --limit 400 --json tagName --jq '.[].tagName' | sed -nE 's/^defence-//p' > published.txt
+          if [ -n "$LAUNCH" ]; then
+            case "$LAUNCH" in *[!0-9a-f-]*) echo "not a launch id: $LAUNCH"; exit 1 ;; esac
+            scene=$(node tools/scene/launch.mjs --id "$LAUNCH" --meta meta.json --narration out/narration.en.json)
+          else
+            scene=$(node tools/scene/launch.mjs --next --published published.txt --hours 48 --meta meta.json --narration out/narration.en.json)
+          fi
+          # no launch with a drawable orbit in the window is a normal outcome, not a failure
+          [ -n "$scene" ] || echo "::notice::no launch to publish in the next 48 hours"
+          echo "scene=$scene" >> "$GITHUB_OUTPUT"
+          echo "scene: ${scene:-none}" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.pick.outputs.scene != ''
+        with:
+          python-version: "3.11"
+      - name: Kokoro model cache
+        if: steps.pick.outputs.scene != ''
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: kokoro
+          key: kokoro-onnx-model-files-v1.0
+      - name: Narration (Kokoro)
+        if: steps.pick.outputs.scene != ''
+        env:
+          SCENE: ${{ steps.pick.outputs.scene }}
+          KOKORO_VOICE: ${{ vars.MOTION_DEFENCE_VOICE || 'bm_george' }}
+          KOKORO_SPEED: ${{ vars.MOTION_DEFENCE_SPEED }}
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet faster-whisper soundfile kokoro-onnx==0.4.7
+          mkdir -p kokoro
+          fetch() { [ -f "kokoro/$1" ] || curl -fsSL --retry 3 -o "kokoro/$1" "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/$1"; }
+          fetch kokoro-v1.0.onnx && fetch voices-v1.0.bin
+          printf '%s  %s\n' \
+            7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5 kokoro/kokoro-v1.0.onnx \
+            bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d kokoro/voices-v1.0.bin | sha256sum -c -
+          # a video is never shipped without its voice: a failed narration stops the job here
+          TTS_LANG=en KOKORO_MODEL_DIR=kokoro python -u tools/audio/tts.py out/narration.en.json out/voice-en kokoro
+          node tools/audio/retime.mjs "$SCENE" out/voice-en
+          echo "voice: synthetic" >> "scenes/auto/$SCENE.yaml"
+      - name: Video and poster
+        if: steps.pick.outputs.scene != ''
+        env:
+          SCENE: ${{ steps.pick.outputs.scene }}
+          MUSIC: ${{ vars.MOTION_MUSIC }}
+          DEFENCE_STYLE: ${{ vars.MOTION_DEFENCE_STYLE }}
+        run: |
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
+          style="$DEFENCE_STYLE"
+          if ! node export/render.mjs --encoder ffmpeg --scene "$SCENE" ${style:+--style "$style"} --out out/video; then
+            [ -n "$style" ] || exit 1
+            echo "::warning::render in style $style failed; using the scene's own style"
+            rm -rf out/video; style=
+            node export/render.mjs --encoder ffmpeg --scene "$SCENE" --out out/video
+          fi
+          node export/render.mjs --no-build --scene "$SCENE" ${style:+--style "$style"} --frames-only --every 100000 --save-frames --out out/poster
+          mkdir -p release
+          kit=(--kit assets/sound/kit.json --scene "$SCENE"); [ "$MUSIC" = "off" ] && kit=()
+          node tools/audio/voice.mjs out/voice-en out/video/*.mp4 "release/$SCENE.mp4" "${kit[@]}"
+          cp out/poster/*-frames/0000.jpg "release/$SCENE.jpg"
+          cp meta.json "release/$SCENE.json"
+          node tools/post/captions.mjs "$SCENE" meta.json release
+          ls -la release
+      - name: Publish
+        if: steps.pick.outputs.scene != ''
+        env:
+          SCENE: ${{ steps.pick.outputs.scene }}
+          KOKORO_VOICE: ${{ vars.MOTION_DEFENCE_VOICE || 'bm_george' }}
+        run: |
+          title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/'+process.env.SCENE+'.yaml','utf8'));console.log(s.hook.lines.join(' · ') + ' · ' + s.hook.kicker + ' · @greaterdefence')")
+          src=$(node -e "console.log(require('./meta.json').sources[0])")
+          printf '%s\n\nSource: Launch Library 2, The Space Devs (%s). The orbit drawn is typical for its type, not the mission'"'"'s own elements.\nVoice-over: Kokoro-82M synthetic voice (%s).\n' "$title" "$src" "$KOKORO_VOICE" > notes.md
+          gh release create "defence-$SCENE" release/* --title "$title" --notes-file notes.md --latest=false
+          echo "published: defence-$SCENE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload to @greaterdefence
+        if: steps.pick.outputs.scene != ''
+        continue-on-error: true
+        env:
+          SCENE: ${{ steps.pick.outputs.scene }}
+          YOUTUBE_GT_CLIENT_ID: ${{ secrets.YOUTUBE_GT_CLIENT_ID }}
+          YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
+          YOUTUBE_DEFENCE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_DEFENCE_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+        run: node tools/post/youtube-upload.mjs "$SCENE" meta.json "release/$SCENE.mp4" defence

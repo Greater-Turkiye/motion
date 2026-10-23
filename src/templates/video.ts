@@ -6,6 +6,7 @@ import { H, W } from '../render/globe';
 import type { MapRenderer } from '../render/map';
 import { makeProject, type Project } from '../gl/globe-gl';
 import { drawLabels, placeLabels, planSpots, type Box, type Label } from '../render/labels';
+import { drawOrbit } from '../render/orbit';
 import type { Style } from '../styles';
 
 const BOSPHORUS: LonLat = [29.05, 41.2];
@@ -45,6 +46,7 @@ function ui(sc: Scene) {
     near: en ? 'HOW CLOSE TO TÜRKİYE' : "TÜRKİYE'YE NE KADAR YAKIN",
     far: en ? 'DISTANCE TO TÜRKİYE' : "TÜRKİYE'YE UZAKLIK",
     photo: en ? 'SOURCE PHOTO' : 'KAYNAĞIN FOTOĞRAFI',
+    orbit: en ? 'TARGET ORBIT' : 'HEDEF YÖRÜNGE',
     summary: en ? 'SUMMARY' : 'ÖZET',
     watching: en ? 'Watching the region through open sources.' : 'Açık kaynaklarla bölgeyi izliyoruz.',
     loc: en ? 'en-US' : 'tr',
@@ -507,6 +509,21 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
     }
   }
 
+  // a launch's target orbit: the climb out of the pad, the ground track once around the globe, then the
+  // orbit's height as a ring at the Earth's own scale (src/render/orbit.ts)
+  if (beat?.kind === 'orbit' && sc.event) {
+    const w = windowOf(sc, beatIdx, t);
+    const flat = !!s.flat;
+    drawOrbit(ctx, proj, s, {
+      pad: sc.event.at, inclination: beat.inclination, heading: beat.heading, altitude: beat.altitude, apogee: beat.apogee,
+      ascent: anim(t, beat.at + 0.2, 1.0, ease.inOutCubic),
+      track: anim(t, beat.at + 1.2, 2.2, ease.inOutCubic),
+      ring: anim(t, beat.at + 2.6, 1.0, ease.outCubic),
+      alpha: w.out,
+      globe: flat ? null : { cx: W / 2, cy: s.cy, r: s.baseScale * view.zoom },
+    });
+  }
+
   // the story's own photograph over the map's upper part, cropped to fill it, fading into the page above
   // the text block; no frame, no filter, no motion on the picture itself (PLAN.md section 29)
   if (beat?.kind === 'photo') {
@@ -843,6 +860,10 @@ function drawSymbol(ctx: CanvasRenderingContext2D, kind: string, x: number, y: n
     case 'exercise': // a diamond, open
       ctx.moveTo(0, -u); ctx.lineTo(u, 0); ctx.lineTo(0, u); ctx.lineTo(-u, 0); ctx.closePath(); ctx.stroke();
       break;
+    case 'launch': // a rocket, nose up
+      ctx.moveTo(0, -u); ctx.quadraticCurveTo(u * 0.32, -u * 0.55, u * 0.28, u * 0.45); ctx.lineTo(u * 0.6, u); ctx.lineTo(-u * 0.6, u);
+      ctx.lineTo(-u * 0.28, u * 0.45); ctx.quadraticCurveTo(-u * 0.32, -u * 0.55, 0, -u); ctx.closePath(); ctx.fill();
+      break;
     case 'meeting': // two points joined
       ctx.arc(-u * 0.55, 0, u * 0.28, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(u * 0.55, 0, u * 0.28, 0, Math.PI * 2); ctx.fill();
@@ -1029,6 +1050,20 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
         ctx.font = `600 36px ${s.fonts.text}`;
         lines(note, LEFT, top + said.length * lh + 18 + 36 + rise, 44, b.at + 0.6, s.muted, 36);
       }
+      break;
+    }
+    case 'orbit': {
+      // the orbit's name as the title, the typical values in a sentence under it
+      ctx.font = `600 40px ${s.fonts.text}`;
+      const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
+      const px = fit(ctx, [b.title], (p) => `900 ${p}px ${s.fonts.display}`, 104, -0.01);
+      const top = BLOCK_BOTTOM - text.length * 52 - (text.length ? 24 : 0) - px * 0.9;
+      guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'orbit');
+      kicker(ui(sc).orbit, top - 22 + rise);
+      ctx.font = `900 ${px}px ${s.fonts.display}`; ctx.letterSpacing = `${-0.01 * px}px`;
+      reveal(ctx, b.title, LEFT - 3, top + px * 0.9 + rise, t, b.at, mode, s.ink, s.accent, alpha, px);
+      ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
+      lines(text, LEFT, top + px * 0.9 + 24 + 52 + rise, 52, b.at + 0.35, s.muted, 40);
       break;
     }
     case 'photo': {
