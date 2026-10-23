@@ -11,13 +11,14 @@ function hookChars(scene) {
   return [...scene.hook.lines, scene.hook.sub.replace(/\{[^}]*\}/g, '000')].join(' ').length;
 }
 
-/** The factor the timeline must grow by so every block gets chars/CPS seconds (never below 1). */
-export function fitScale(scene) {
+/** The factor the timeline must grow by so every block gets chars/CPS seconds (never below 1);
+ *  `slack` seconds are added to every block's need. */
+export function fitScale(scene, slack = 0) {
   const ends = [...scene.beats.map((b) => b.at), scene.duration];
   let scale = 1;
   const consider = (chars, available) => {
     if (available <= 0) return;
-    const needed = Math.max(MIN_BLOCK, chars / CPS);
+    const needed = Math.max(MIN_BLOCK, chars / CPS) + slack;
     if (needed / available > scale) scale = needed / available;
   };
   consider(hookChars(scene), ends[0]);
@@ -28,9 +29,11 @@ export function fitScale(scene) {
 /** Scale every time in the scene by `fitScale`, rounded to the frame, so the translated text is
  *  readable. Mutates and returns the scene. A scale of 1 (the text already fits) is a no-op. */
 export function refit(scene) {
-  const scale = fitScale(scene);
-  if (scale <= 1) return scene;
   const q = 1 / (scene.fps || 60);
+  if (fitScale(scene) <= 1) return scene;
+  // rounding both ends of a block to the frame can take up to a frame off it, which failed the
+  // tightest block by a hair ("needs 5.9 s, it gets 5.9 s", 2026-10-23): plan one frame more
+  const scale = fitScale(scene, q);
   const at = (t) => Math.round((t * scale) / q) * q;
   scene.beats.forEach((b) => { b.at = at(b.at); });
   scene.duration = at(scene.duration);

@@ -47,3 +47,14 @@ test('a scene that already fits is untouched', () => {
   refit(s);
   assert.equal(JSON.stringify(s), before);
 });
+
+test('refit leaves no block a frame short after rounding to the frame', () => {
+  // status lines of every length: rounding each end to the frame used to cost the tightest block a frame
+  for (let n = 40; n <= 130; n++) {
+    const s = enScene();
+    s.beats[2].text = 'x'.repeat(n);
+    s.source_text.push(s.beats[2].text);
+    refit(s);
+    assert.deepEqual(validate(s).filter((p) => /it gets/.test(p)), [], `status of ${n} characters`);
+  }
+});
