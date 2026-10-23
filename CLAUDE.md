@@ -52,7 +52,10 @@ without asking for permission or confirmation:
   keep working on the next part of the task while it runs, and come back to it when it finishes.
 - Trigger `produce.yml` (and the other workflows) and submit and poll Kaggle jobs yourself; read the
   logs and fix what broke, then run it again, rather than reporting the failure back.
-- Secrets and variables (`KAGGLE_API_TOKEN`, `NVAPI`, `HF_TOKEN`, `FISH_MODEL_DATASET`, …) live in the
+- **Kaggle: never use the `KAGGLE_API_TOKEN` secret or the @trnntr account** (owner, 2026-10-23). Its
+  quota is not ours to spend. Kaggle jobs run with `KAGGLE_AVAIBLE_TOKEN` (the new account), and
+  `tools/voice-lab/kaggle_submit.py` refuses any account in `KAGGLE_BLOCKED_ACCOUNTS` (default `trnntr`).
+- Secrets and variables (`KAGGLE_AVAIBLE_TOKEN`, `NVAPI`, `HF_TOKEN`, `FISH_MODEL_DATASET`, …) live in the
   GitHub organization and are injected into CI. Assume CI has them; never block on your local machine
   lacking a key, and never ask the owner to run a CI-equivalent command locally.
 - Only name something as the owner's to do when it genuinely needs his credentials, his account access
