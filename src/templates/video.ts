@@ -39,7 +39,7 @@ function ui(sc: Scene) {
   return {
     where: en ? 'WHERE' : 'NEREDE',
     what: en ? 'WHAT HAPPENED' : 'NE OLDU',
-    status: en ? 'STATUS' : 'DURUM',
+    status: en ? 'SOURCING' : 'KAYNAK',
     sides: en ? 'SIDES' : 'TARAFLAR',
     participants: en ? 'PARTICIPANTS' : 'KATILIMCILAR',
     near: en ? 'HOW CLOSE TO TÜRKİYE' : "TÜRKİYE'YE NE KADAR YAKIN",
@@ -145,7 +145,8 @@ function cameraAt(sc: Scene, s: Style, t: number): Camera {
   // left the Earth after a quarter of a second, too soon to be seen
   const dive = !!cam.globe && i === 0;
   const k = dive ? ease.inOutCubic(span(t, 0.15, Math.min(2.0, b.t)))
-    : mode === 'snap' ? ease.outExpo(span(t, a.t, a.t + Math.min(1.2, (b.t - a.t) * 0.35)))
+    // outCubic over up to 1.6 s: outExpo covered most of the move in a few frames and the map seemed to jump
+    : mode === 'snap' ? ease.outCubic(span(t, a.t, a.t + Math.min(1.6, (b.t - a.t) * 0.5)))
     : ease.inOutCubic(span(t, a.t, b.t));
   const far = Math.hypot(b.center[0] - a.center[0], b.center[1] - a.center[1]);
   const rise = mode === 'fly' && !dive ? 1 + Math.min(1.2, far / 6) * Math.sin(Math.PI * k) : 1;
@@ -156,7 +157,7 @@ function cameraAt(sc: Scene, s: Style, t: number): Camera {
 }
 
 /** When the subject's emblem leaves: after the opening, before the camera zooms in far enough to crop it. */
-const EMBLEM = 140;
+const EMBLEM = 104;
 const emblemOutOf = (sc: Scene) => (sc.beats.length ? sc.beats[0].at + 0.8 : sc.duration);
 
 /**
@@ -182,8 +183,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
 
   if (sc.event) {
     const p = proj(sc.event.at);
-    // as wide as the ring with its shock waves (they reach ~140 px): names stood on the outer rings
-    if (p) obstacles.push({ x: p[0] - 95, y: p[1] - 95, w: 190, h: 190 });
+    // as wide as the ring with its shock waves (they reach ~90 px): names stood on the outer rings
+    if (p) obstacles.push({ x: p[0] - 62, y: p[1] - 62, w: 124, h: 124 });
   }
   // a digest story's own place: ringed (see drawVideo) and named under the ring while its block is on
   if (beat?.kind === 'facts' && beat.place) {
@@ -222,8 +223,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const alpha = anim(t, 0.45, 0.4) * (1 - span(t, emblemOut - 0.4, emblemOut));
     if (at && alpha > 0) {
       // the emblem stands above its country's label, which never moves
-      // 140 px: at 200 the emblem dwarfed the country it stands for (a trident over a Ukraine half its size)
-      const size = EMBLEM * (0.85 + 0.15 * anim(t, 0.45, 0.7, ease.outCubic));
+      // one size from first frame to last: a growing emblem read as the map breathing (review, 23 October),
+      // and 104 px keeps it smaller than the country it stands over (at 140 a shield covered Israel)
+      const size = EMBLEM;
       const y = at[1] - (EMBLEM * emblemAr) / 2 - 30;
       const box = { x: at[0] - size / 2 - 20, y: y - (size * emblemAr) / 2 - 20, w: size + 40, h: size * emblemAr + 40 };
       // a small country beside Türkiye puts the emblem above it onto Turkish ground (GKRY's arms stood on
@@ -244,7 +246,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // names grow a little as the camera closes in and shrink a little when it pulls back: at a fixed
   // size a name was large beside a small country in the wide opening and small over the country it
   // filled when the camera came close (zoom 0.6 -> 0.88x, 1 -> 1x, 2.7 -> 1.25x)
-  const nameScale = Math.min(1.25, Math.max(0.85, Math.pow(cameraAt(sc, s, t).zoom, 0.25)));
+  // held to ±8 %: a wider range made the names swell and shrink on screen (review, 23 October)
+  const nameScale = Math.min(1.08, Math.max(0.92, Math.pow(cameraAt(sc, s, t).zoom, 0.12)));
   sc.labels.forEach((l, i) => {
     const home = l.kind === 'home';
     // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,
@@ -272,6 +275,12 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // a sea's name gives way to any place name: the place is the story, the sea only the setting
       priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin * meets });
   });
+  // with the whole globe in the frame the countries are too small to carry their names: the labels were
+  // pushed off their places ("KERKÜK" over Russia, "TÜRKİYE" under Arabia), so they wait for the zoom
+  if (sc.camera.globe && !s.flat) {
+    const near = span(s.baseScale * cameraAt(sc, s, t).zoom, 520, 700);
+    if (near < 1) for (const l of labels) l.alpha = (l.alpha ?? 1) * near;
+  }
   return { labels, obstacles, emblem };
 }
 
@@ -366,7 +375,9 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       // what happened decides how the place moves: a strike sends short, quick waves; a ship's sea
       // slow, wide ones; an aircraft, an exercise or a meeting none (PLAN.md section 26)
       const kind = own ? 'ring' : sc.event?.kind ?? 'ring';
-      const waves = { drone: [3, 1.1, 120], missile: [2, 0.7, 150], artillery: [3, 1.1, 110], ground: [2, 1.4, 90], sea: [2, 2.2, 170], ring: [3, 1.1, 120] }[kind as string] as [number, number, number] | undefined;
+      // about half their old reach: at 120-170 px the waves and the 44 px ring read as a radar target laid
+      // over a whole country (review, 23 October); the place is marked, not aimed at
+      const waves = { drone: [2, 1.3, 64], missile: [2, 0.9, 78], artillery: [2, 1.3, 58], ground: [2, 1.6, 48], sea: [2, 2.4, 90], ring: [2, 1.3, 64] }[kind as string] as [number, number, number] | undefined;
       if (waves) {
         const [count, period, reach] = waves;
         for (let n = 0; n < count; n++) {
@@ -375,19 +386,19 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
           const ph = w - Math.floor(w);
           ctx.beginPath();
           // the sea's waves are flattened, as water spreads; the others round
-          if (kind === 'sea') ctx.ellipse(x, y, 18 + ph * reach, (18 + ph * reach) * 0.45, 0, 0, Math.PI * 2);
-          else ctx.arc(x, y, 18 + ph * reach, 0, Math.PI * 2);
-          ctx.strokeStyle = s.accent; ctx.globalAlpha = (1 - ph) * 0.9 * dim * tail; ctx.lineWidth = 3 * (1 - ph) + 0.5; ctx.stroke();
+          if (kind === 'sea') ctx.ellipse(x, y, 14 + ph * reach, (14 + ph * reach) * 0.45, 0, 0, Math.PI * 2);
+          else ctx.arc(x, y, 14 + ph * reach, 0, Math.PI * 2);
+          ctx.strokeStyle = s.accent; ctx.globalAlpha = (1 - ph) * 0.6 * dim * tail; ctx.lineWidth = 1.8 * (1 - ph) + 0.4; ctx.stroke();
         }
       }
       // on the globe opening the place is marked from frame 0: the thumbnail shows where, not only Türkiye
       // and it stays to the last frame, which is the first again (the loop)
       ctx.globalAlpha = (sc.camera.globe && !own ? 1 : anim(t, 0.35, 0.4) * tail) * dim;
-      ctx.beginPath(); ctx.arc(x, y, 44, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 3; ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, 26, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 2; ctx.stroke();
       if (kind === 'ring') {
-        ctx.beginPath(); ctx.arc(x, y, 9 + 2 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 6 + 1.5 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
       } else {
-        drawSymbol(ctx, kind, x, y, 44, s.accent);
+        drawSymbol(ctx, kind, x, y, 24, s.accent);
       }
       ctx.globalAlpha = 1;
     }
@@ -522,9 +533,9 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   if (emblemImg && lay.emblem) {
     const { x, y, size, alpha } = lay.emblem;
     ctx.save();
-    ctx.globalAlpha = alpha;
-    if (s.emblemMono) ctx.filter = 'grayscale(1) brightness(2.2) contrast(1.1)';
-    if (!s.flat) { ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 30; }
+    // no drop shadow (it read as a sticker), and quieter than the map's own lines
+    ctx.globalAlpha = alpha * 0.82;
+    if (s.emblemMono) ctx.filter = 'grayscale(1) brightness(1.7)';
     ctx.drawImage(emblemImg, x - size / 2, y - (size * emblemAr) / 2, size, size * emblemAr);
     ctx.restore();
   }
@@ -644,29 +655,26 @@ function drawFooter(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, alpha: n
   // for the source line). A long pair shrinks to the width; 18 px is the floor, and if even there a very
   // long publisher name still overruns the safe area, the source is trimmed with an ellipsis rather than
   // failing the whole render (one long source once overflowed the footer and dropped the video).
-  const status = sc.hook.status;
+  // one quiet credit line, source first and the status after it, as an agency credits a picture: the
+  // neon pill read as a "not true" stamp beside a named source (owner's review, 23 October). The status
+  // stays on every frame (CLAUDE.md section 2); only the box and the colour are gone.
+  const tail = ` · ${sc.hook.status}`;
   let source = sc.hook.source;
-  // the real footer width at a font size: the pill (status + padding both sides) + the gap + the source,
-  // matching the draw below, so the fit test and the guard agree.
   const widthAt = (px: number, src: string) => {
-    ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.13)}px`;
-    return ctx.measureText(status).width + 2 * Math.round(px * 0.5) + 24 + ctx.measureText(src).width;
+    ctx.font = `600 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.1)}px`;
+    return ctx.measureText(src + tail).width;
   };
-  let px = 28;
+  let px = 24;
   while (px > 18 && widthAt(px, source) > WIDTH) px--;
   if (widthAt(px, source) > WIDTH) {
     let trimmed = source;
     while (trimmed.length > 1 && widthAt(px, trimmed.replace(/[\s:·-]+$/u, '') + '…') > WIDTH) trimmed = trimmed.slice(0, -1);
     source = trimmed.replace(/[\s:·-]+$/u, '') + '…';
   }
-  widthAt(px, source);
-  const sw = ctx.measureText(status).width, bh = Math.round(px * 1.7), pad = Math.round(px * 0.5);
-  // the status as a pill, so it reads as a label of the whole video and not as part of a sentence
-  ctx.fillStyle = hexA(s.status, 0.16); ctx.strokeStyle = s.status; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.roundRect(LEFT - 2, FOOT - bh + 11, sw + 2 * pad + 4, bh, 6); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = s.status; ctx.fillText(status, LEFT + pad, FOOT);
-  ctx.fillStyle = s.muted; ctx.fillText(source, LEFT + sw + 2 * pad + 24, FOOT);
-  guard({ x: LEFT - 2, y: FOOT - bh + 11, w: sw + 2 * pad + 24 + ctx.measureText(source).width, h: bh }, 'footer');
+  const lineW = widthAt(px, source);
+  ctx.globalAlpha = alpha * 0.8;
+  ctx.fillStyle = s.muted; ctx.fillText(source + tail, LEFT, FOOT);
+  guard({ x: LEFT, y: FOOT - px, w: lineW, h: px + 6 }, 'footer');
   ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
 }
 
@@ -805,7 +813,7 @@ function drawSymbol(ctx: CanvasRenderingContext2D, kind: string, x: number, y: n
   const u = size / 2;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = Math.max(1.5, size / 14); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   ctx.beginPath();
   switch (kind) {
     case 'drone': // a delta wing, as the one-way attack drones are drawn
@@ -830,7 +838,7 @@ function drawSymbol(ctx: CanvasRenderingContext2D, kind: string, x: number, y: n
       break;
     case 'ground': // crossed lines: a clash on the ground
       ctx.moveTo(-u * 0.75, -u * 0.75); ctx.lineTo(u * 0.75, u * 0.75); ctx.moveTo(u * 0.75, -u * 0.75); ctx.lineTo(-u * 0.75, u * 0.75);
-      ctx.lineWidth = 5; ctx.stroke();
+      ctx.lineWidth = Math.max(2, size / 10); ctx.stroke();
       break;
     case 'exercise': // a diamond, open
       ctx.moveTo(0, -u); ctx.lineTo(u, 0); ctx.lineTo(0, u); ctx.lineTo(-u, 0); ctx.closePath(); ctx.stroke();
@@ -849,13 +857,14 @@ const BRAND = { x: LEFT, y: SAFE.top + 32, text: 'greaterturkiye.org', mark: 34 
 /** Our mark and our address, small, in the top corner: who made the video, in every frame. The
  *  synthetic voice is declared in the posting text and the release notes instead (owner, 6 October). */
 function drawBrand(ctx: CanvasRenderingContext2D, s: Style, a: Assets) {
-  ctx.globalAlpha = 0.9;
+  // a signature, not a stamp: at 0.9 the address stood out over the map it sits on (review, 23 October)
+  ctx.globalAlpha = 0.5;
   let x = BRAND.x;
   if (a.mark) {
     ctx.drawImage(a.mark, x, BRAND.y - BRAND.mark + 8, BRAND.mark, BRAND.mark);
     x += BRAND.mark + 12;
   }
-  ctx.font = `700 20px ${s.fonts.mono}`; ctx.letterSpacing = '1px';
+  ctx.font = `600 18px ${s.fonts.mono}`; ctx.letterSpacing = '1px';
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = s.muted; ctx.fillText(BRAND.text, x, BRAND.y);
   guard({ x: BRAND.x, y: BRAND.y - BRAND.mark + 8, w: x - BRAND.x + ctx.measureText(BRAND.text).width, h: BRAND.mark }, 'brand');
@@ -940,22 +949,15 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       // verification status stays on screen as a small quiet pill — the same label the footer carries —
       // and the beat's room goes to the sentence that says what the status means. The red line
       // (CLAUDE.md section 2: status on screen) is kept; only the billboard is gone.
-      const label = sc.hook.status;
-      const px = 44;
-      ctx.font = `600 40px ${s.fonts.text}`;
+      // and no stamp at all since the review of 23 October: the beat says, in a sentence, where the
+      // story comes from; the status word itself stays in the credit line under it
+      ctx.font = `600 44px ${s.fonts.text}`;
       const text = b.text ? wrap(ctx, b.text, WIDTH) : [];
-      const bh = Math.round(px * 1.5), pad = Math.round(px * 0.45);
-      const top = BLOCK_BOTTOM - text.length * 52 - 40 - bh;
+      const top = BLOCK_BOTTOM - text.length * 58;
       guard({ x: LEFT, y: top - 40, w: WIDTH, h: BLOCK_BOTTOM - top + 40 }, 'status');
       kicker(ui(sc).status, top - 16 + rise);
-      ctx.globalAlpha = alpha;
-      ctx.font = `700 ${px}px ${s.fonts.mono}`; ctx.letterSpacing = `${Math.round(px * 0.08)}px`;
-      const tw = ctx.measureText(label).width;
-      ctx.fillStyle = hexA(s.status, 0.16); ctx.strokeStyle = s.status; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.roundRect(LEFT - 2, top + rise, tw + 2 * pad + 4, bh, 6); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = s.status; ctx.fillText(label, LEFT + pad, top + px + rise);
-      ctx.letterSpacing = '0px'; ctx.font = `600 40px ${s.fonts.text}`;
-      lines(text, LEFT, top + bh + 54 + rise, 52, b.at + 0.4, s.ink, 40);
+      ctx.font = `600 44px ${s.fonts.text}`;
+      lines(text, LEFT, top + 50 + rise, 58, b.at + 0.2, s.ink, 44);
       break;
     }
     case 'close': {

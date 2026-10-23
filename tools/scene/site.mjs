@@ -1,31 +1,37 @@
 // The video list the site's videos page reads (platform apps/web/videolar.html).
 //
-//   node tools/scene/site.mjs site/        # reads site/v/*.json, writes site/videos.json
+//   node tools/scene/site.mjs site/        # reads site/v/*.json and site/v/tags.tsv, writes site/videos.json
 //
-// Each published video has three files in site/v/ (and, since the carousel, its slides -01.jpg …): auto-<record>.mp4, .jpg (its first frame) and
-// .json (what generate.mjs --meta wrote). The list is newest first and names files relative to the
-// site root, so the page can load them from the same origin.
+// Every published video whose files the pages job copied into site/v/ (produce.yml: newest first,
+// while an 850 MB budget lasts, so every video until the budget is full, not the latest twenty): its
+// MP4, first frame (.jpg), carousel slides (-01.jpg …) and metadata (.json, what generate.mjs --meta
+// wrote). A story's English cut (`<base>.en.mp4`, added to the same release by the English track) is
+// `video_en`. Files stay on the site's own origin: the platform's CSP loads nothing from elsewhere.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 
 const root = process.argv[2] || 'site';
 const dir = path.join(root, 'v');
+const files = existsSync(dir) ? readdirSync(dir) : [];
+const mp4 = (base) => (files.includes(`${base}.mp4`) ? `v/${base}.mp4` : null);
 const videos = [];
-for (const f of existsSync(dir) ? readdirSync(dir) : []) {
+for (const f of files) {
   if (!f.endsWith('.json')) continue;
   const base = f.slice(0, -5);
-  if (!existsSync(path.join(dir, base + '.mp4')) || !existsSync(path.join(dir, base + '.jpg'))) continue;
+  const video = mp4(base);
+  if (!video || !files.includes(base + '.jpg')) continue;
   const m = JSON.parse(readFileSync(path.join(dir, f), 'utf8'));
   // the Instagram carousel's slides (tools/post/carousel.mjs), when the release has them
-  const post = readdirSync(dir).filter((x) => x.startsWith(`${base}-`) && /-\d{2}\.jpg$/.test(x)).sort().map((x) => `v/${x}`);
-  videos.push({ ...m, video: `v/${base}.mp4`, poster: `v/${base}.jpg`, ...(post.length ? { post } : {}) });
+  const post = files.filter((x) => x.startsWith(`${base}-`) && /-\d{2}\.jpg$/.test(x)).sort().map((x) => `v/${x}`);
+  const en = mp4(`${base}.en`);
+  videos.push({ ...m, video, poster: `v/${base}.jpg`, ...(en ? { video_en: en } : {}), ...(post.length ? { post } : {}) });
 }
 videos.sort((a, b) => String(b.published ?? b.date).localeCompare(String(a.published ?? a.date)));
 writeFileSync(path.join(root, 'videos.json'), JSON.stringify({ generated: new Date().toISOString(), videos }, null, 1) + '\n');
 writeFileSync(path.join(root, 'index.html'), '<!doctype html><meta charset="utf-8"><title>Greater Türkiye · motion</title>'
   + '<p>Otomatik videolar / automatic videos: <a href="https://greater-turkiye.github.io/platform/videolar.html">videolar</a> · '
   + '<a href="videos.json">videos.json</a> · <a href="studio/">stüdyo</a></p>\n');
-console.log(`${videos.length} videos in ${path.join(root, 'videos.json')}`);
+console.log(`${videos.length} videos in ${path.join(root, 'videos.json')}, ${videos.filter((v) => v.video_en).length} with an English cut`);
 
 // the studio (tools/scene/studio.mjs): every style on a recent story of each family, the default marked
 const studioJson = path.join(root, 'studio', 'studio.json');

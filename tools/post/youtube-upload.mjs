@@ -52,10 +52,22 @@ async function responseJson(response, label) {
   return body;
 }
 
-async function accessToken(refreshToken) {
+/** The channels, by the uploader's last argument. The two Conflict Grid channels share the original
+ *  OAuth client; the Greater Türkiye family was authorized through a second client of the same Google
+ *  project (YOUTUBE_GT_CLIENT_ID / _SECRET), and a refresh token only works with the client that minted it. */
+export const CHANNELS = {
+  tr: { token: 'YOUTUBE_REFRESH_TOKEN', client: 'YOUTUBE', lang: 'tr', name: '@ConflictGridTR (Turkish)' },
+  en: { token: 'YOUTUBE_REFRESH_TOKEN_EN', client: 'YOUTUBE', lang: 'en', name: '@Conflict-Grid (English)' },
+  gt: { token: 'YOUTUBE_GT_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterturkiye (English)' },
+  defence: { token: 'YOUTUBE_DEFENCE_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterdefence (English)' },
+  numbers: { token: 'YOUTUBE_NUMBERS_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@geocompetitions (English)' },
+  earth: { token: 'YOUTUBE_EARTH_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterearth (English)' },
+};
+
+async function accessToken(refreshToken, client = 'YOUTUBE') {
   const body = new URLSearchParams({
-    client_id: process.env.YOUTUBE_CLIENT_ID,
-    client_secret: process.env.YOUTUBE_CLIENT_SECRET,
+    client_id: process.env[`${client}_CLIENT_ID`],
+    client_secret: process.env[`${client}_CLIENT_SECRET`],
     refresh_token: refreshToken,
     grant_type: 'refresh_token',
   });
@@ -73,16 +85,16 @@ function summary(text) {
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`);
 }
 
-async function upload(sceneId, metadataFile, videoFile, lang = 'tr') {
-  // Each channel has its own refresh token under the same client id/secret: the Turkish channel
-  // (@ConflictGridTR) is YOUTUBE_REFRESH_TOKEN, the English one (@Conflict-Grid) is
-  // YOUTUBE_REFRESH_TOKEN_EN. Mint them with tools/post/youtube-oauth.mjs, once per channel.
-  const tokenKey = lang === 'en' ? 'YOUTUBE_REFRESH_TOKEN_EN' : 'YOUTUBE_REFRESH_TOKEN';
-  const channel = lang === 'en' ? '@Conflict-Grid (English)' : '@ConflictGridTR (Turkish)';
-  const required = ['YOUTUBE_CLIENT_ID', 'YOUTUBE_CLIENT_SECRET', tokenKey];
-  const missing = required.filter((key) => !process.env[key]);
-  if (missing.includes(tokenKey) && !process.env.YOUTUBE_CLIENT_ID && !process.env.YOUTUBE_CLIENT_SECRET) {
-    const message = `YouTube upload skipped for ${channel}: OAuth secrets are not configured, so no channel is connected. Set YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET and ${tokenKey} (and optionally YOUTUBE_PRIVACY_STATUS) to publish. Mint the token with tools/post/youtube-oauth.mjs.`;
+async function upload(sceneId, metadataFile, videoFile, key = 'tr') {
+  // Each channel has its own refresh token (CHANNELS above); mint one with tools/post/youtube-oauth.mjs,
+  // once per channel, with the client the channel belongs to.
+  const ch = CHANNELS[key];
+  const tokenKey = ch.token, channel = ch.name, lang = ch.lang;
+  const clientId = `${ch.client}_CLIENT_ID`, clientSecret = `${ch.client}_CLIENT_SECRET`;
+  const required = [clientId, clientSecret, tokenKey];
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.includes(tokenKey)) {
+    const message = `YouTube upload skipped for ${channel}: ${tokenKey} is not configured, so the channel is not connected. Set ${clientId}, ${clientSecret} and ${tokenKey} (and optionally YOUTUBE_PRIVACY_STATUS) to publish. Mint the token with tools/post/youtube-oauth.mjs.`;
     console.log(`::warning::${message}`);
     summary(message);
     return;
@@ -97,7 +109,7 @@ async function upload(sceneId, metadataFile, videoFile, lang = 'tr') {
   const size = statSync(videoFile).size;
   if (!size) throw new Error(`Video is empty: ${videoFile}`);
 
-  const token = await accessToken(process.env[tokenKey]);
+  const token = await accessToken(process.env[tokenKey], ch.client);
   const initUrl = new URL('https://www.googleapis.com/upload/youtube/v3/videos');
   initUrl.searchParams.set('uploadType', 'resumable');
   initUrl.searchParams.set('part', 'snippet,status');
@@ -128,9 +140,9 @@ async function upload(sceneId, metadataFile, videoFile, lang = 'tr') {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [sceneId, metadataFile, videoFile, lang] = process.argv.slice(2);
-  if (!sceneId || !metadataFile || !videoFile) throw new Error('Usage: youtube-upload.mjs <scene> <meta.json> <video.mp4> [tr|en]');
-  upload(sceneId, metadataFile, videoFile, lang === 'en' ? 'en' : 'tr').catch((error) => {
+  const [sceneId, metadataFile, videoFile, key = 'tr'] = process.argv.slice(2);
+  if (!sceneId || !metadataFile || !videoFile || !CHANNELS[key]) throw new Error(`Usage: youtube-upload.mjs <scene> <meta.json> <video.mp4> [${Object.keys(CHANNELS).join('|')}]`);
+  upload(sceneId, metadataFile, videoFile, key).catch((error) => {
     console.error(error.message);
     summary(`YouTube upload failed: ${error.message}`);
     process.exitCode = 1;

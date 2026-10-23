@@ -96,7 +96,8 @@ jobs:
           RECORD: ${{ inputs.record }}
         run: |
           git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
-          gh release list --limit 200 --json tagName --jq '.[].tagName' | sed -n 's/^video-//p' > published.txt
+          # a story the Greater Türkiye channel already told (produce-gt.yml, gt-<record>) is published too
+          gh release list --limit 400 --json tagName --jq '.[].tagName' | sed -nE 's/^(video|gt)-//p' > published.txt
           if [ -n "$RECORD" ]; then id="$RECORD"; else id=$(node tools/scene/select.mjs --datasets ../datasets --published published.txt); fi
           echo "id=$id" >> "$GITHUB_OUTPUT"
           echo "record: ${id:-none}" >> "$GITHUB_STEP_SUMMARY"
@@ -385,6 +386,8 @@ jobs:
           mkdir -p release-en
           kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
           node tools/audio/voice.mjs out/voice-en out/video-en/*.mp4 "release-en/$scene.mp4" "${kit[@]}"
+          # the English cut joins the story's release, so the site's videos page has it too
+          gh release upload "video-$ID" "release-en/$scene.mp4" --clobber || echo "::warning::could not add the English cut to video-$ID"
           # English posting text (captions reads scene.lang and writes the English block)
           node tools/post/captions.mjs "$scene" meta.json release-en
           node tools/post/youtube-upload.mjs "$scene" meta.json "release-en/$scene.mp4" en
@@ -434,13 +437,22 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
-      - name: The latest twenty videos
+      - name: Every video
         run: |
+          # every release, newest first, while 850 MB of MP4s lasts (Pages allows 1 GB): the videos stay
+          # on the site's own origin because the platform's CSP loads nothing from elsewhere. A release
+          # whose MP4s no longer fit is left out whole; tools/scene/site.mjs lists what is here.
           mkdir -p site/v
-          for tag in $(gh release list --limit 20 --json tagName --jq '.[].tagName' | grep -E '^(video-evt_|digest-)'); do
+          budget=$((850 * 1024 * 1024)); used=0
+          for tag in $(gh release list --limit 1000 --json tagName --jq '.[].tagName' | grep -E '^(video-evt_|digest-)'); do
+            # the voice-only copy (-muziksiz) is for posting, not for the site
+            size=$(gh release view "$tag" --json assets --jq '[.assets[] | select(.name | endswith(".mp4")) | select(.name | endswith("-muziksiz.mp4") | not) | .size] | add // 0')
+            if [ $((used + size)) -gt "$budget" ]; then echo "budget full: $tag and older stay on their releases"; break; fi
             gh release download "$tag" --dir site/v --pattern '*.mp4' --pattern '*.jpg' --pattern '*.json' --clobber
-            rm -f site/v/*-muziksiz.mp4  # the site shows the video as made; the voice-only copy is for posting
+            rm -f site/v/*-muziksiz.mp4
+            used=$((used + size))
           done
+          echo "MP4s on the site: $((used / 1024 / 1024)) MB"
           # the studio stills, when the studio workflow has made them
           gh release download studio --pattern studio.tar --dir . --clobber 2>/dev/null && tar -C site -xf studio.tar || echo "no studio yet"
           node tools/scene/site.mjs site

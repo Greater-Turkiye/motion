@@ -112,7 +112,8 @@ export function drawLabels(ctx: CanvasRenderingContext2D, placed: { label: Label
     ctx.letterSpacing = `${l.spacing * l.size}px`;
     ctx.globalAlpha = l.alpha ?? 1;
     if (l.halo) {
-      ctx.strokeStyle = l.halo; ctx.lineWidth = l.size * 0.22; ctx.lineJoin = 'round';
+      // a thin halo: at 0.22 em it read as a drop shadow on the names (review, 23 October)
+      ctx.strokeStyle = l.halo; ctx.lineWidth = l.size * 0.1; ctx.lineJoin = 'round';
       ctx.strokeText(l.text, l.x, l.y);
     }
     ctx.fillStyle = l.color;
