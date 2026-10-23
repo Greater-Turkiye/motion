@@ -1,0 +1,177 @@
+name: produce-gt
+
+# The Greater Türkiye channel (@greaterturkiye): English war and conflict shorts, a story of its own.
+# After each production (produce.yml) it takes the next-best record, the one the Turkish channel did
+# not take, so no story is told twice on two English channels (Conflict Grid has its own cut of the
+# produce story). Same generator, same red lines and checks; its own look: the short story order
+# (kisa, 12-15 s), the style in MOTION_GT_STYLE (default B), and Kokoro's British news voice
+# (MOTION_GT_VOICE, default bf_emma). Published as a GitHub release tagged gt-<record>, which
+# produce.yml also counts as published, then uploaded to the channel and added to the videos page.
+#
+# Kill switch: MOTION_GT=off. Twice a day at most, like the Turkish channel.
+on:
+  workflow_run:
+    workflows: [produce]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      record:
+        description: "Record id to render instead of the selector's pick (optional)"
+        required: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: produce-gt
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: vars.MOTION_GT != 'off' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.age.outputs.go }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENT: ${{ github.event_name }}
+    steps:
+      - id: age
+        run: |
+          last=$(gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName,publishedAt --jq '[.[]|select(.tagName|startswith("gt-"))][0].publishedAt // ""')
+          age=999999
+          if [ -n "$last" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$last" +%s)) / 60 )); fi
+          go=false
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$age" -ge 600 ]; then go=true; fi
+          echo "last gt video: ${last:-none} (${age} min ago); go=$go" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+
+  produce:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: assets/emblems
+          key: emblems-${{ hashFiles('assets/emblems/manifest.json') }}
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
+      - name: Emblems (pinned by hash in the manifest)
+        run: python3 tools/data/fetch_emblems.py --sync
+      - name: Choose a record
+        id: pick
+        env:
+          RECORD: ${{ inputs.record }}
+        run: |
+          git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
+          # what either channel family already told, the produce story just released included
+          gh release list --limit 400 --json tagName --jq '.[].tagName' | sed -nE 's/^(video|gt)-//p' > published.txt
+          if [ -n "$RECORD" ]; then id="$RECORD"; else id=$(node tools/scene/select.mjs --datasets ../datasets --published published.txt); fi
+          case "$id" in ""|evt_[0-9a-z]*) ;; *) echo "not a record id: $id"; exit 1 ;; esac
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "record: ${id:-none}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Scene
+        if: steps.pick.outputs.id != ''
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+        run: node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant kisa --notes notes.md --meta meta.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.pick.outputs.id != ''
+        with:
+          python-version: "3.11"
+      - name: English scene
+        id: translate
+        if: steps.pick.outputs.id != ''
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          NVAPI: ${{ secrets.NVAPI }}
+        run: |
+          # the channel is English only: the Turkish narration is written first because the translator
+          # works on the finished scene and its narration together (tools/scene/translate.mjs)
+          node tools/audio/narration.mjs "auto-$ID" out/narration.json
+          node tools/scene/nim-copy.mjs "scenes/auto/auto-$ID.yaml" out/narration.json
+          node tools/scene/translate.mjs "scenes/auto/auto-$ID.yaml" out/narration.json "scenes/auto/auto-$ID.en.yaml" out/narration.en.json
+          if [ -f "scenes/auto/auto-$ID.en.yaml" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
+          else echo "::warning::no English scene for $ID; nothing to publish this run"; fi
+      - name: Kokoro model cache
+        if: steps.translate.outputs.ok == 'true'
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: kokoro
+          key: kokoro-onnx-model-files-v1.0
+      - name: Narration (Kokoro)
+        if: steps.translate.outputs.ok == 'true'
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          KOKORO_VOICE: ${{ vars.MOTION_GT_VOICE || 'bf_emma' }}
+          KOKORO_SPEED: ${{ vars.MOTION_GT_SPEED }}
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet faster-whisper soundfile kokoro-onnx==0.4.7
+          mkdir -p kokoro
+          fetch() { [ -f "kokoro/$1" ] || curl -fsSL --retry 3 -o "kokoro/$1" "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/$1"; }
+          fetch kokoro-v1.0.onnx && fetch voices-v1.0.bin
+          printf '%s  %s\n' \
+            7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5 kokoro/kokoro-v1.0.onnx \
+            bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d kokoro/voices-v1.0.bin | sha256sum -c -
+          # a video is never shipped without its voice: a failed narration stops the job here
+          TTS_LANG=en KOKORO_MODEL_DIR=kokoro python -u tools/audio/tts.py out/narration.en.json out/voice-en kokoro
+          node tools/audio/retime.mjs "auto-$ID.en" out/voice-en
+          echo "voice: synthetic" >> "scenes/auto/auto-$ID.en.yaml"
+      - name: Video and poster
+        if: steps.translate.outputs.ok == 'true'
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          MUSIC: ${{ vars.MOTION_MUSIC }}
+          GT_STYLE: ${{ vars.MOTION_GT_STYLE }}
+        run: |
+          scene="auto-$ID.en"
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
+          style="${GT_STYLE:-B}"
+          if ! node export/render.mjs --encoder ffmpeg --scene "$scene" --style "$style" --out out/video; then
+            echo "::warning::render in style $style failed; using the scene's own style"
+            rm -rf out/video; style=
+            node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video
+          fi
+          node export/render.mjs --no-build --scene "$scene" ${style:+--style "$style"} --frames-only --every 100000 --save-frames --out out/poster
+          mkdir -p release
+          kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+          node tools/audio/voice.mjs out/voice-en out/video/*.mp4 "release/$scene.mp4" "${kit[@]}"
+          cp out/poster/*-frames/0000.jpg "release/$scene.jpg"
+          cp meta.json "release/$scene.json"
+          node tools/post/captions.mjs "$scene" meta.json release
+          ls -la release
+      - name: Publish
+        if: steps.translate.outputs.ok == 'true'
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          KOKORO_VOICE: ${{ vars.MOTION_GT_VOICE || 'bf_emma' }}
+        run: |
+          title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/auto-'+process.env.ID+'.en.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker + ' · @greaterturkiye')")
+          { cat notes.md; echo; echo "English cut for @greaterturkiye: Kokoro-82M synthetic voice (${KOKORO_VOICE:-bf_emma}), telling the on-screen facts in its own sentences."; } > notes-gt.md
+          gh release create "gt-$ID" release/* --title "$title" --notes-file notes-gt.md --latest=false
+          echo "published: gt-$ID" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload to @greaterturkiye
+        if: steps.translate.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          ID: ${{ steps.pick.outputs.id }}
+          YOUTUBE_GT_CLIENT_ID: ${{ secrets.YOUTUBE_GT_CLIENT_ID }}
+          YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
+          YOUTUBE_GT_REFRESH_TOKEN: ${{ secrets.YOUTUBE_GT_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+        run: node tools/post/youtube-upload.mjs "auto-$ID.en" meta.json "release/auto-$ID.en.mp4" gt
+      - name: Refresh the videos page
+        if: steps.translate.outputs.ok == 'true'
+        run: gh workflow run produce.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f pages_only=true

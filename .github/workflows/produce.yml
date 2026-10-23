@@ -96,7 +96,8 @@ jobs:
           RECORD: ${{ inputs.record }}
         run: |
           git clone --quiet --depth 1 --branch auto-data https://github.com/Greater-Turkiye/datasets.git ../datasets
-          gh release list --limit 200 --json tagName --jq '.[].tagName' | sed -n 's/^video-//p' > published.txt
+          # a story the Greater Türkiye channel already told (produce-gt.yml, gt-<record>) is published too
+          gh release list --limit 400 --json tagName --jq '.[].tagName' | sed -nE 's/^(video|gt)-//p' > published.txt
           if [ -n "$RECORD" ]; then id="$RECORD"; else id=$(node tools/scene/select.mjs --datasets ../datasets --published published.txt); fi
           echo "id=$id" >> "$GITHUB_OUTPUT"
           echo "record: ${id:-none}" >> "$GITHUB_STEP_SUMMARY"

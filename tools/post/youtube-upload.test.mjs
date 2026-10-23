@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { youtubePost, youtubeResource } from './youtube-upload.mjs';
+import { CHANNELS, youtubePost, youtubeResource } from './youtube-upload.mjs';
+
+test('the Conflict Grid channels keep their client; the Greater Türkiye family uses its own', () => {
+  assert.deepEqual([CHANNELS.tr.token, CHANNELS.tr.client], ['YOUTUBE_REFRESH_TOKEN', 'YOUTUBE']);
+  assert.deepEqual([CHANNELS.en.token, CHANNELS.en.client], ['YOUTUBE_REFRESH_TOKEN_EN', 'YOUTUBE']);
+  for (const k of ['gt', 'defence', 'numbers', 'earth']) {
+    assert.equal(CHANNELS[k].client, 'YOUTUBE_GT');
+    assert.equal(CHANNELS[k].lang, 'en');
+    assert.match(CHANNELS[k].token, /^YOUTUBE_[A-Z]+_REFRESH_TOKEN$/);
+  }
+});
 
 test('extracts the factual Shorts title and description', () => {
   const post = youtubePost([
