@@ -113,7 +113,8 @@ export function buildScene(l) {
   const pad = [Math.round(lon * 100) / 100, Math.round(lat * 100) / 100];
   const orbitAt = beats[2].at;
   // the whole orbit in the frame: wide enough for a ring at the orbit's height (GEO is 6.6 Earth radii)
-  const far = orbit.apogee || orbit.altitude > 5000 ? 0.12 : 0.62;
+  // at 0.12 the geostationary ring (6.6 Earth radii) ran out of the frame and through the text block
+  const far = orbit.apogee || orbit.altitude > 5000 ? 0.08 : 0.62;
   const keys = [
     { t: 0, center: pad, zoom: 0.5 },
     { t: hookEnd, center: pad, zoom: 2.2 },

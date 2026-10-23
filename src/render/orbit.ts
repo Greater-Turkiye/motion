@@ -93,6 +93,8 @@ export function drawOrbit(ctx: CanvasRenderingContext2D, proj: Project, s: Style
       ctx.setLineDash([]);
       // its height written where the ring crosses the upper right, outside the globe
       const a = -Math.PI / 4, lx = cx + Math.cos(a) * rr + 10, ly = cy + Math.sin(a) * rr - 14;
+      // only where it can be read whole: while the camera is close the ring runs out of the frame
+      if (lx < 0 || ly < 0 || lx + ctx.measureText(label(ring.km)).width > ctx.canvas.width - 24) continue;
       ctx.globalAlpha = o.alpha * o.ring; ctx.fillStyle = s.muted;
       ctx.fillText(label(ring.km), lx, ly);
     }
