@@ -53,6 +53,12 @@ def references(args):
     raise SystemExit("No reference voice clip is available (checked references.json and referans.wav).")
 
 
+def blocked(owner: str, env: str | None = None) -> bool:
+    """Whether the token's Kaggle account is one whose quota must never be used."""
+    names = (os.environ.get("KAGGLE_BLOCKED_ACCOUNTS", "trnntr") if env is None else env)
+    return owner.strip().lower() in {n.strip().lower() for n in names.split(",") if n.strip()}
+
+
 def arguments():
     parser = argparse.ArgumentParser(description="Produce Fish S2 Pro narration through Kaggle.")
     parser.add_argument("narration", type=Path)
@@ -106,6 +112,11 @@ def main():
         owner, separator, _ = kernel_metadata.get("id", "").partition("/")
         if not separator or not owner or owner == "USERNAME":
             raise SystemExit("Kaggle could not determine the authenticated account name.")
+        # an account whose quota must not be spent (owner, 2026-10-23: @trnntr) is refused before any
+        # dataset version or kernel push; the workflow then takes its OmniVoice / Edge TTS fallback
+        if blocked(owner):
+            raise SystemExit(f"::error::Kaggle account {owner!r} is blocked (KAGGLE_BLOCKED_ACCOUNTS); "
+                             "set KAGGLE_AVAIBLE_TOKEN to the new account's token.")
         dataset = f"{owner}/motion-fish-s2-voice-job"
         kernel = f"{owner}/motion-fish-s2-pro"
         # Fish reads the grapheme stream it is given and slips into an English
