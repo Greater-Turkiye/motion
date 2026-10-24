@@ -872,3 +872,30 @@ yüzlerce aldı. YouTube'un nedeni görünmüyor; ölçülebilen iki fark var:
   OFFICIAL STATEMENT"). Artık kaynağın kendi İngilizce başlığı (`title_en`), Türkçe başlığın
   kaydın başlığından gelmesi gibi.
 Kanalı kapatıp yenisini açmak bu iki farkı gidermez; yeni kanal aynı videoları alırsa aynı yerde kalır.
+
+## 36. Dördüncü saniye / The fourth second (2026-10-24)
+
+Sahip: "videolar 4. saniyeden sonra geçiliyor; viral olma ve hook potansiyeli sıkıntılı." Son üretilen
+sahneler (kerkük konuşlanması 19,6 sn, Bağdat İHA yalanlaması 15,2 sn) ilk dört saniyede iki yapısal
+durgunluk taşıyordu; ikisi de kural gereği değil kurgu hatası gereği:
+
+- **Dalış donuyor.** Küreden açılışın dalışı (bölüm 31) `inOutCubic` ile kancanın ilk iki saniyesine
+  sıkışıktı ve `span` doyduktan sonra kamera ilk bölüme kadar duruyordu. `inOutCubic` başlangıç
+  hızından yoksundur: hareketin ilk yarım saniyeye düşen payı ~%3 (kapak karesi sayfa gibi durur),
+  iki saniyede yere iner, sonra **3-3,5 sn boyunca kare donuk kalır** — tam kaydırma kararının
+  verildiği aralık. Şimdi dalış kancanın bütün segmentine yayılıyor ve `outCubic` ile ilk kareden
+  hareketli (ölçüm: 0→0,5 sn kare farkı PSNR 19 dB; 1,5→2,5 sn 24 dB — eski kurguda bu aralık
+  donuktu). "Snap" korkusu (Dünya'nın çeyrek saniyede kaybolması) `outExpo`'dan geliyordu; `outCubic`
+  küreyi bir saniyeden uzun gösterir.
+- **Kanca bloğu alt satırı tam ücretliyor.** Kanca süresi `karakter ÷ 15` ile hesaplanıyor ve 40 px'lik
+  alt satır — sesin ilk saniyelerden itibaren okuduğu haber cümlesinin kendisi (bölüm 23) — de tam
+  okuma ücreti ödüyordu; blok 5-6 sn'ye uzuyor, ilk yeni bölüm 5.-6. saniyede geliyordu. Artık alt
+  satır yarım ücretleniyor (doğrulayıcıda aynı kural; ses klipleri gerçekten yer ararsa `retime.mjs`
+  bloğu yine uzatır): kanca 2,6-4 sn, ilk bölüm 3.-4. saniyede. Kerkük sahnesinin kancası hesapla
+  5,6 → 3,5 sn; körfez füze sahnesi 4,9 → 3,5 sn.
+- **Etiket kancalar zayıf kalabilir** ("KERKÜK / KONUŞLANMA") ama bu sahibin bilinen kuralı
+  (2026-10-14: can kaybı kanca olmaz, olayın kendisi olur) ve bilerek; etkisi seçicinin kanca
+  ağırlığında (bölüm 34) sıralamaya giriyor. Burada değiştirilmedi.
+
+Kırmızı çizgiler aynı: soru kancası yok, kaynağın söylemediği iddia yok; değişen yalnızca ne zaman
+neyin ekrana geldiği ve kameranın ne zaman durduğu.
