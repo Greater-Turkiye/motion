@@ -141,10 +141,15 @@ function cameraAt(sc: Scene, s: Style, t: number): Camera {
   // glide: one smooth move across the whole gap between keys
   // snap: the move happens in the first third, fast and decisive, then the frame holds
   // fly: like glide, but a long move rises and comes down (van Wijk and Nuij's zoom-out-then-in)
-  // the dive from the globe is one even move in every style, over the hook's first two seconds: a snap
-  // left the Earth after a quarter of a second, too soon to be seen
+  // the dive from the globe is one move over the whole hook segment in every style, easing out from
+  // the first frame. It once ran over the hook's first two seconds with inOutCubic and then clamped:
+  // inOutCubic all but stands still for the first half second (a frame-0 thumbnail that does not
+  // move), and once it landed the camera froze until the first beat — a still map through the third
+  // and fourth second, exactly where a scrolling viewer decides. outCubic moves from frame one and
+  // settles as the first beat arrives; a snap (the fear that made it inOutCubic) left the Earth
+  // within a quarter second, outCubic still shows the globe shrinking for over a second
   const dive = !!cam.globe && i === 0;
-  const k = dive ? ease.inOutCubic(span(t, 0.15, Math.min(2.0, b.t)))
+  const k = dive ? ease.outCubic(span(t, 0.1, b.t))
     // outCubic over up to 1.6 s: outExpo covered most of the move in a few frames and the map seemed to jump
     : mode === 'snap' ? ease.outCubic(span(t, a.t, a.t + Math.min(1.6, (b.t - a.t) * 0.5)))
     : ease.inOutCubic(span(t, a.t, b.t));
