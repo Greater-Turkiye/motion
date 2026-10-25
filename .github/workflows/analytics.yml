@@ -1,0 +1,58 @@
+name: analytics
+# The daily YouTube Analytics pull (tools/post/youtube-analytics.mjs): every connected channel's
+# per-video numbers and the retention curves of its newest videos, committed to the analytics-data
+# branch as analytics/<channel>/latest.json plus a dated copy, so the selector and the templates can
+# learn from what people actually watched. A channel whose token was minted for upload only is
+# skipped with a warning until it is minted again with tools/post/youtube-oauth.mjs --save.
+#
+# Kill switch: MOTION_ANALYTICS=off.
+on:
+  schedule:
+    - cron: "17 5 * * *" # 05:17 UTC, 08:17 in Türkiye, after YouTube's overnight processing
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: analytics
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    if: vars.MOTION_ANALYTICS != 'off'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
+      - name: Pull
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_GT_CLIENT_ID: ${{ secrets.YOUTUBE_GT_CLIENT_ID }}
+          YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
+          YOUTUBE_GT_REFRESH_TOKEN: ${{ secrets.YOUTUBE_GT_REFRESH_TOKEN }}
+          YOUTUBE_DEFENCE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_DEFENCE_REFRESH_TOKEN }}
+          YOUTUBE_NUMBERS_REFRESH_TOKEN: ${{ secrets.YOUTUBE_NUMBERS_REFRESH_TOKEN }}
+          YOUTUBE_EARTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_EARTH_REFRESH_TOKEN }}
+        run: node tools/post/youtube-analytics.mjs "$RUNNER_TEMP/analytics" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Commit to analytics-data
+        run: |
+          src="$RUNNER_TEMP/analytics"
+          [ -n "$(ls -A "$src" 2>/dev/null)" ] || { echo "no channel could be read yet"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git fetch --depth 1 origin analytics-data 2>/dev/null; then git switch -c analytics-data FETCH_HEAD; else git switch --orphan analytics-data; git rm -rq --cached . 2>/dev/null || true; fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name analytics -exec rm -rf {} +
+          mkdir -p analytics && cp -r "$src"/* analytics/
+          git add analytics
+          git diff --cached --quiet && { echo "no change"; exit 0; }
+          git commit -qm "Analytics $(date -u +%F)"
+          git push -q origin analytics-data
