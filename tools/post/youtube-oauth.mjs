@@ -1,6 +1,6 @@
 // One-time helper to mint a YouTube refresh token for a channel.
 //
-//   YOUTUBE_CLIENT_ID=... YOUTUBE_CLIENT_SECRET=... node tools/post/youtube-oauth.mjs
+//   YOUTUBE_CLIENT_ID=... YOUTUBE_CLIENT_SECRET=... node tools/post/youtube-oauth.mjs [--save SECRET_NAME]
 //
 // The owner runs this on his own machine, once per channel, because it needs his Google login and his
 // choice of which channel to authorize — neither of which CI or this assistant can do. It opens the
@@ -13,7 +13,7 @@
 // Needs only the client id and secret of a Desktop-app OAuth client (YouTube Data API v3 enabled). No
 // npm dependency: Node's http, crypto and child_process do the loopback flow.
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 
 const clientId = process.env.YOUTUBE_CLIENT_ID?.trim();
@@ -23,7 +23,13 @@ if (!clientId || !clientSecret) {
   process.exit(1);
 }
 
-const SCOPE = 'https://www.googleapis.com/auth/youtube.upload';
+// upload, plus read access for the daily analytics pull (tools/post/youtube-analytics.mjs): a token
+// minted with upload alone cannot read a channel's statistics
+const SCOPE = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.readonly',
+  'https://www.googleapis.com/auth/yt-analytics.readonly'].join(' ');
+// --save NAME writes the token straight into the repository secret NAME with the gh CLI, so it is never
+// printed to the terminal or pasted into a chat
+const saveAs = process.argv.includes('--save') ? process.argv[process.argv.indexOf('--save') + 1] : null;
 const state = randomBytes(16).toString('hex');
 
 function openBrowser(url) {
@@ -69,6 +75,13 @@ const server = createServer(async (request, response) => {
     if (!token.refresh_token) {
       console.error('\nNo refresh_token was returned. Revoke the app at https://myaccount.google.com/permissions and run again (we force prompt=consent, which normally returns one).');
       process.exit(1);
+    }
+    if (saveAs) {
+      const r = spawnSync('gh', ['secret', 'set', saveAs, '-R', 'Greater-Turkiye/motion'], { input: token.refresh_token, stdio: ['pipe', 'inherit', 'inherit'] });
+      if (r.status !== 0) { console.error(`gh secret set ${saveAs} failed; run again without --save to print the token`); process.exit(1); }
+      console.log(`\nSaved the refresh token as the repository secret ${saveAs}.`);
+      server.close();
+      process.exit(0);
     }
     console.log('\nRefresh token (put it in the GitHub org secret for this channel):\n');
     console.log(token.refresh_token);

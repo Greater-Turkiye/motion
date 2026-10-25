@@ -64,7 +64,7 @@ export const CHANNELS = {
   earth: { token: 'YOUTUBE_EARTH_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterearth (English)' },
 };
 
-async function accessToken(refreshToken, client = 'YOUTUBE') {
+export async function accessToken(refreshToken, client = 'YOUTUBE') {
   const body = new URLSearchParams({
     client_id: process.env[`${client}_CLIENT_ID`],
     client_secret: process.env[`${client}_CLIENT_SECRET`],
