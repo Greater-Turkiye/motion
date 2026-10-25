@@ -142,7 +142,7 @@ jobs:
             node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video || return 1
             node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster || return 1
             mkdir -p release
-            kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+            kit=(--kit assets/sound/kit-kenney.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
             if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp "out/video/$scene-"*.mp4 "release/$scene.mp4"
             else node tools/audio/voice.mjs "$voice" "out/video/$scene-"*.mp4 "release/$scene.mp4" "${kit[@]}" || return 1; fi
             cp out/poster/"$scene-"*-frames/0000.jpg "release/$scene.jpg" || return 1

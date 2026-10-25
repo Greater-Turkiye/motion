@@ -66,8 +66,10 @@ export function enCaptions(sc, meta) {
   const url = meta.sources[0];
   const sourceLine = `Source: ${name(publisher)} (${url})`;
   const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
-    .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), ...(launch ? ['#Space', '#RocketLaunch'] : ['#OSINT']), '#GreaterTurkiye'];
-  const note = launch
+    .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), ...(launch ? ['#Space', '#RocketLaunch'] : meta.variant === 'quake' ? ['#Earthquake'] : ['#OSINT']), '#GreaterTurkiye'];
+  const note = meta.variant === 'quake'
+    ? 'Auto-generated from the USGS earthquake feed (public domain), published with no human in the loop. Magnitude, place and depth are the USGS solution and may be revised.'
+    : launch
     ? 'Auto-generated from Launch Library 2 (The Space Devs) data, published with no human in the loop. The orbit drawn is typical for its type, not the mission’s own elements.'
     : 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
   const voiceLine = sc.voice === 'synthetic' ? 'Voice-over: synthetic.' : '';
@@ -124,8 +126,11 @@ export function captions(sc, meta) {
   // a digest has many sources: up to three links, the rest in the release
   const sourceLine = digest ? `Kaynaklar (${publisher}): ${meta.sources.slice(0, 3).join(' ')}` : `Kaynak: ${name(publisher)} (${url})`;
   const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
-    .filter((x) => x && x !== 'TÜRKİYE').map(tag)), '#OSINT', '#GreaterTürkiye'];
-  const note = 'Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi başlığıdır, kimse okumadan yayımlandı.';
+    .filter((x) => x && x !== 'TÜRKİYE').map(tag)), ...(meta.variant === 'quake' ? ['#deprem', '#sondakika'] : ['#OSINT', '#GreaterTürkiye'])];
+  // an earthquake comes from Kandilli's list, not from the dataset, and its wave arrivals are a model's
+  const note = meta.variant === 'quake'
+    ? 'Kandilli Rasathanesi\'nin kaydından otomatik üretildi. Büyüklük ve yer Kandilli\'nin çözümüdür, güncellenebilir. Dalga varış süreleri IASP91 modeliyle hesaplanmış tahminlerdir; depremin hissedildiği anlamına gelmez.'
+    : 'Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi başlığıdır, kimse okumadan yayımlandı.';
   // the satellite block's data, credited where the source is (PLAN.md section 25)
   // the voice is declared here, not on screen (the corner carries our address)
   const voiceLine = sc.voice === 'synthetic' ? 'Seslendirme: yapay ses.' : '';

@@ -1,0 +1,164 @@
+name: produce-quake
+# Earthquakes as instant stories (tools/scene/quake.mjs; PLAN.md section 38), for two channels:
+#   tr     the owner's Türkiye channel: Kandilli's list, M ≥ MOTION_QUAKE_TR_MIN (default 3.8), Turkish,
+#          with the P and S fronts at model-computed arrival times (tools/scene/arrivals.py, IASP91)
+#   earth  Greater Earth: USGS's worldwide feed, M ≥ MOTION_QUAKE_EARTH_MIN (default 5.5), English
+# Every 15 minutes each channel takes its biggest unpublished quake of the last 6 hours. The voice is
+# Kaggle Fish only (the owner's rule, 2026-10-25: no fallback voice); when Kaggle cannot run, nothing
+# is published and the next run tries again. Its own Kaggle job (KAGGLE_JOB_SUFFIX=quake), so it never
+# overwrites a production's narration. Sound: the Kenney kit, no music. Published as a release tagged
+# quake-<channel>-<id>, then uploaded (earth; tr once YOUTUBE_OWN_REFRESH_TOKEN exists).
+#
+# Kill switches: MOTION_QUAKE=off for both, MOTION_QUAKE_TR=off, MOTION_QUAKE_EARTH=off.
+on:
+  schedule:
+    - cron: "4,19,34,49 * * * *"
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "tr or earth (empty: both)"
+        required: false
+      id:
+        description: "a quake id to render instead of the next pick (Kandilli yyyymmddhhmmss or USGS id)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: produce-quake
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: vars.MOTION_QUAKE != 'off'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        channel: [tr, earth]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CHANNEL: ${{ matrix.channel }}
+    steps:
+      - name: Gate
+        id: gate
+        env:
+          WANT: ${{ inputs.channel }}
+          OFF_TR: ${{ vars.MOTION_QUAKE_TR }}
+          OFF_EARTH: ${{ vars.MOTION_QUAKE_EARTH }}
+        run: |
+          go=true
+          [ -n "$WANT" ] && [ "$WANT" != "$CHANNEL" ] && go=false
+          [ "$CHANNEL" = tr ] && [ "$OFF_TR" = off ] && go=false
+          [ "$CHANNEL" = earth ] && [ "$OFF_EARTH" = off ] && go=false
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.gate.outputs.go == 'true'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        if: steps.gate.outputs.go == 'true'
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Pick a quake
+        id: pick
+        if: steps.gate.outputs.go == 'true'
+        env:
+          ID: ${{ inputs.id }}
+          TR_MIN: ${{ vars.MOTION_QUAKE_TR_MIN || '3.8' }}
+          EARTH_MIN: ${{ vars.MOTION_QUAKE_EARTH_MIN || '5.5' }}
+        run: |
+          gh release list --limit 300 --json tagName --jq '.[].tagName' > published.txt
+          min=$TR_MIN; [ "$CHANNEL" = earth ] && min=$EARTH_MIN
+          pick=$(node tools/scene/quake.mjs --channel "$CHANNEL" --pick --published published.txt --hours 6 --min "$min" ${ID:+--id "$ID"} || true)
+          [ -n "$pick" ] || echo "::notice::$CHANNEL: no quake to publish in the last 6 hours"
+          echo "pick=$pick" >> "$GITHUB_OUTPUT"
+          echo "$CHANNEL pick: ${pick:-none}" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.pick.outputs.pick != ''
+        with:
+          python-version: "3.11"
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
+        if: steps.pick.outputs.pick != ''
+      - name: Scene (with model arrivals for Türkiye)
+        id: scene
+        if: steps.pick.outputs.pick != ''
+        env:
+          PICK: ${{ steps.pick.outputs.pick }}
+        run: |
+          read -r qid lon lat depth <<< "$PICK"
+          arr=()
+          if [ "$CHANNEL" = tr ]; then
+            python -m pip install --quiet obspy
+            python tools/scene/arrivals.py --lon "$lon" --lat "$lat" --depth "$depth" > arrivals.json
+            arr=(--arrivals arrivals.json)
+          fi
+          lang=tr; [ "$CHANNEL" = earth ] && lang=en
+          scene=$(node tools/scene/quake.mjs --channel "$CHANNEL" --id "$qid" "${arr[@]}" --meta meta.json --narration "out/narration.$lang.json")
+          echo "scene=$scene" >> "$GITHUB_OUTPUT"
+          echo "lang=$lang" >> "$GITHUB_OUTPUT"
+          echo "scene: $scene" >> "$GITHUB_STEP_SUMMARY"
+      - name: Voice (Kaggle Fish only)
+        id: voice
+        if: steps.scene.outputs.scene != ''
+        timeout-minutes: 60
+        env:
+          SCENE: ${{ steps.scene.outputs.scene }}
+          LANG_: ${{ steps.scene.outputs.lang }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_AVAIBLE_TOKEN }}
+          KAGGLE_BLOCKED_ACCOUNTS: ${{ vars.KAGGLE_BLOCKED_ACCOUNTS || 'trnntr' }}
+          KAGGLE_JOB_SUFFIX: quake
+          FISH_MODEL_DATASET: ${{ vars.FISH_MODEL_DATASET }}
+        run: |
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet kaggle==2.2.4 soundfile
+          if python -u tools/voice-lab/kaggle_submit.py "out/narration.$LANG_.json" out/voice --lang "$LANG_" --reference referans.wav --reference-text assets/voice/reference-transcript.txt; then
+            node tools/audio/retime.mjs "$SCENE" out/voice
+            echo "voice: synthetic" >> "scenes/auto/$SCENE.yaml"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Kaggle Fish could not voice $SCENE; nothing is published, the next run tries again"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Video and poster
+        if: steps.voice.outputs.ok == 'true'
+        env:
+          SCENE: ${{ steps.scene.outputs.scene }}
+        run: |
+          export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
+          node export/render.mjs --encoder ffmpeg --scene "$SCENE" --out out/video
+          node export/render.mjs --no-build --scene "$SCENE" --frames-only --every 100000 --save-frames --out out/poster
+          mkdir -p release
+          node tools/audio/voice.mjs out/voice out/video/*.mp4 "release/$SCENE.mp4" --kit assets/sound/kit-kenney.json --scene "$SCENE"
+          cp out/poster/*-frames/0000.jpg "release/$SCENE.jpg"
+          cp meta.json "release/$SCENE.json"
+          ls -la release
+      - name: Publish
+        if: steps.voice.outputs.ok == 'true'
+        env:
+          SCENE: ${{ steps.scene.outputs.scene }}
+        run: |
+          title=$(node -e "console.log(require('./meta.json').title)")
+          src=$(node -e "console.log(require('./meta.json').sources[0])")
+          if [ "$CHANNEL" = tr ]; then
+            printf '%s\n\nKaynak: Kandilli Rasathanesi (%s). Dalga varışları tahminidir (IASP91 modeli), hissedilme bilgisi değildir.\nSeslendirme: yapay ses (Fish Audio S2 Pro). Efektler: Kenney (CC0).\n' "$title" "$src" > notes.md
+          else
+            printf '%s\n\nSource: USGS (%s), public domain.\nVoice-over: synthetic voice (Fish Audio S2 Pro). Sound effects: Kenney (CC0).\n' "$title" "$src" > notes.md
+          fi
+          gh release create "$SCENE" release/* --title "$title" --notes-file notes.md --latest=false
+      - name: Upload
+        if: steps.voice.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          SCENE: ${{ steps.scene.outputs.scene }}
+          YOUTUBE_GT_CLIENT_ID: ${{ secrets.YOUTUBE_GT_CLIENT_ID }}
+          YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
+          YOUTUBE_EARTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_EARTH_REFRESH_TOKEN }}
+          YOUTUBE_OWN_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OWN_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+        run: |
+          key=earth; [ "$CHANNEL" = tr ] && key=own
+          node tools/post/youtube-upload.mjs "$SCENE" meta.json "release/$SCENE.mp4" "$key"

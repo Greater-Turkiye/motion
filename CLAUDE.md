@@ -38,6 +38,11 @@ stat pills, "Ama suyun altında:"): rubbish design. None of it in any video, fra
 - **No sticker furniture**: no pills of side statistics, no "BÖLÜM 5" series tags, no swipe-bait.
 - **No teaser or bait copy**: no "Ama…", "Peki ya…?", "İşte…", "Şok", "Bomba", no question hooks,
   no emoji. Every word on screen is the record's own fact, status or source.
+**Owner's change, 2026-10-25.** Sound effects are allowed: the CC0 Kenney kit
+(`assets/sound/kit-kenney.json`) puts an opening hit, wooshes on block changes, ticks and pops under every
+channel, and no music bed is used anywhere (the owner found the beds bad). On the earthquake channels the
+waves block shows the simulated time since the quake as it runs (`+1 dk 25 sn`): it is the clock of a
+model, labelled as such ("tahmini varış, IASP91 modeli · N kat hızlı"), not a counter on a fact.
 The one generated element is the narration voice: it is declared in every posting text and release
 note ("Seslendirme: yapay ses"), and switched off with `MOTION_VOICE=off`. The top corner of every frame
 carries our mark and address, "greaterturkiye.org" (owner, 2026-10-06; it replaced the on-screen

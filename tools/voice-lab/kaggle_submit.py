@@ -117,8 +117,12 @@ def main():
         if blocked(owner):
             raise SystemExit(f"::error::Kaggle account {owner!r} is blocked (KAGGLE_BLOCKED_ACCOUNTS); "
                              "set KAGGLE_AVAIBLE_TOKEN to the new account's token.")
-        dataset = f"{owner}/motion-fish-s2-voice-job"
-        kernel = f"{owner}/motion-fish-s2-pro"
+        # KAGGLE_JOB_SUFFIX gives a second pipeline (the earthquake channel) its own job dataset and kernel,
+        # so two runs at once never overwrite each other's narration; Kaggle derives a slug from its title
+        suffix = "".join(c for c in os.environ.get("KAGGLE_JOB_SUFFIX", "").strip().lower() if c.isalnum())
+        dataset = f"{owner}/motion-fish-s2-voice-job" + (f"-{suffix}" if suffix else "")
+        kernel = f"{owner}/motion-fish-s2-pro" + (f"-{suffix}" if suffix else "")
+        title_tail = f" {suffix.title()}" if suffix else ""
         # Fish reads the grapheme stream it is given and slips into an English
         # accent on Latin acronyms and foreign spellings. For Turkish, rewrite
         # the spoken text into Turkish graphemes so synthesis stays monolingual;
@@ -147,7 +151,7 @@ def main():
             "segments": spoken,
         }
         (input_dir / "job.json").write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        dataset_metadata.update({"id": dataset, "title": "Motion Fish S2 voice job", "licenses": [{"name": "other"}]})
+        dataset_metadata.update({"id": dataset, "title": f"Motion Fish S2 voice job{title_tail}", "licenses": [{"name": "other"}]})
         dataset_metadata_path.write_text(json.dumps(dataset_metadata, indent=2) + "\n", encoding="utf-8")
         try:
             command("datasets", "version", "-p", input_dir, "-m", "Update daily Motion voice job")
@@ -165,7 +169,7 @@ def main():
         dataset_sources = [dataset] + ([model_dataset] if model_dataset else [])
         kernel_metadata.update({
             "id": kernel,
-            "title": "Motion Fish S2 Pro",
+            "title": f"Motion Fish S2 Pro{title_tail}",
             "code_file": args.notebook.name,
             "language": "python",
             "kernel_type": "script",

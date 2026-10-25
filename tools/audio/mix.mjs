@@ -55,6 +55,8 @@ export function cues(scene, kit) {
       for (let k = 0; k < n; k++) out.push({ file: kit.tick, at: b.at + 0.3 + (1.8 * k) / Math.max(1, b.points.length), db: g('tick', -18) });
     }
     if (b.kind === 'distance' && kit.pop) out.push({ file: kit.pop, at: b.at + 1.6, db: g('pop', -12) });
+    // an earthquake's fronts: a tick as each named province lights (tools/scene/quake.mjs)
+    if (b.kind === 'waves' && kit.tick) for (const p of b.places.filter((x) => x.show)) out.push({ file: kit.tick, at: b.at + p.s / b.speed, db: g('tick', -14) });
     if (kit.type && (b.kind === 'facts' || b.kind === 'quote')) out.push({ file: kit.type, at: b.at, db: g('type', -14), max: 2.2 });
   }
   return out;

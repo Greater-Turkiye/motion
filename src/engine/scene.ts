@@ -1,7 +1,7 @@
 import { parse } from 'yaml';
 
 export type LonLat = [number, number];
-export const STYLE_IDS = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'K'] as const;
+export const STYLE_IDS = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'K', 'Q'] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 
 export interface Camera { center: LonLat; zoom: number }
@@ -12,7 +12,11 @@ export type Beat =
   | { kind: 'place'; at: number; title: string; text?: string }
   /** place: where this story happened, ringed and named while the block is on (the weekly digest's stories) */
   | { kind: 'facts'; at: number; kicker?: string; lines: string[]; place?: { at: LonLat; label: string } }
-  | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string }
+  /** an earthquake's P and S fronts on the map at model-computed arrival times (tools/scene/arrivals.py),
+   *  sped up `speed` times; each place lights when the S front reaches it */
+  | { kind: 'waves'; at: number; title: string; note: string; speed: number; curve: [number, number | null, number | null][];
+      places: { name: string; at: LonLat; s: number; show?: boolean }[] }
+  | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string; kicker?: string }
   | { kind: 'status'; at: number; text?: string }
   | { kind: 'close'; at: number; kicker?: string; lines: string[] }
   /** the parties linked on the map, capital to capital; title is what joins them (a meeting, an agreement) */
@@ -157,6 +161,7 @@ export function beatText(b: Beat): string[] {
   switch (b.kind) {
     case 'place': return [b.title, b.text ?? ''];
     case 'facts': return [b.kicker ?? '', ...b.lines];
+    case 'waves': return [b.title, b.note];
     case 'distance': return [`${b.from.label} ${b.to.label}`, b.text ?? ''];
     case 'status': return [b.text ?? ''];
     case 'close': return [b.kicker ?? '', ...b.lines];
