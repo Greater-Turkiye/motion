@@ -116,11 +116,15 @@ export function validate(s: Scene): string[] {
   need(s.hook.source?.trim(), 'the source must be on screen');
   need(!s.hook.lines.some((l) => l.includes('?')), 'no question hooks (research/02, format 14)');
 
-  // timing: each block long enough to be read at CPS
+  // timing: each block long enough to be read at CPS. The hook's sub-line is charged at half rate:
+  // it is the voice's story sentence, spoken over the same words from the first quarter second and
+  // whole on frame 0, so the eye keeps the voice's pacing with it (PLAN.md section 30); charging
+  // every character held a still hook frame past the fourth second, where a viewer decides to stay
   const ends = [...s.beats.map((b) => b.at), s.duration];
   const hookEnd = ends[0];
-  const hookChars = [...s.hook.lines, s.hook.sub.replace(/\{[^}]*\}/g, '000')].join(' ').length;
-  need(hookEnd >= Math.max(MIN_BLOCK, hookChars / CPS), `the hook has ${hookChars} characters and needs ${(hookChars / CPS).toFixed(1)} s, it gets ${hookEnd.toFixed(1)} s`);
+  const hookLines = s.hook.lines.join(' ').length;
+  const hookSub = Math.ceil(s.hook.sub.replace(/\{[^}]*\}/g, '000').length / 2);
+  need(hookEnd >= Math.max(MIN_BLOCK, (hookLines + hookSub) / CPS), `the hook's lines and half its sub-line (${hookLines}+${hookSub} chars) need ${((hookLines + hookSub) / CPS).toFixed(1)} s, it gets ${hookEnd.toFixed(1)} s`);
   s.beats.forEach((b, i) => {
     const dur = ends[i + 1] - b.at;
     need(dur > 0, `beat ${i + 1} (${b.kind}) starts after the next one`);

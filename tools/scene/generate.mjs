@@ -770,7 +770,12 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
 
   // ---- beats, by family ------------------------------------------------------------------------------
   const beats = [];
-  const hookChars = [...hook.lines, sub].join(' ').length;
+  // the hook block holds its big lines' reading time and half the sub-line's (the same rule the scene
+  // check enforces): the sub is the voice's story, spoken over the same words from the first quarter
+  // second, and holding the hook until every character of it had been charged kept a still frame on
+  // screen into the fifth second — past the moment a scrolling viewer decides. retime.mjs still
+  // stretches the block when the clip truly needs the room.
+  const hookChars = hook.lines.join(' ').length + Math.ceil(sub.length / 2);
   let t = secs(hookChars, 2.6, 0.4);
   const push = (b, chars, min, pad) => { beats.push({ ...b, at: round1(t) }); t += secs(chars, min, pad); };
   // the facts block exists to say more than the hook's sub-line; when it would only say it again
