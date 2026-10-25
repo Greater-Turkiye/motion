@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   publicDir: 'assets',
   base: './',
-  build: { outDir: 'dist', emptyOutDir: true, target: 'es2022' },
+  // v2.html: the Three.js engine (src/v2), rendered with export/render.mjs --page v2.html
+  build: { outDir: 'dist', emptyOutDir: true, target: 'es2022', rollupOptions: { input: { index: 'index.html', v2: 'v2.html' } } },
   server: { port: 5178 },
 });

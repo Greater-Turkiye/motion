@@ -13,6 +13,9 @@
 | `assets/fonts/specialelite-regular.ttf` | [google/fonts](https://github.com/google/fonts/tree/main/apache/specialelite) @ `9710da1e` | Apache License 2.0 (`assets/fonts/licenses/specialelite-LICENSE.txt`) |
 | `assets/data/countries.json` | Unicode CLDR 48.2.3 `codeMappings` (ISO kodları), Natural Earth (ağırlık merkezleri), elle yazılmış başkent koordinatları; `tools/data/build_countries.mjs` | Unicode License v3; Natural Earth kamu malı |
 | `assets/emblems/**` | Wikimedia Commons, Wikidata üzerinden | Her dosyanın lisansı ve yazarı `assets/emblems/manifest.json`'da; yalnızca kamu malı, CC0, CC BY, CC BY-SA |
+| `assets/data/tr-adm1.json` | [geoBoundaries](https://www.geoboundaries.org/) TUR ADM1 (OpenStreetMap'ten türetilmiş), 0,01 dereceye yuvarlanmış | CC BY-SA 2.0; bu türev dosya da aynı lisansla; videoda "Sınırlar: geoBoundaries / OpenStreetMap (CC BY-SA 2.0)" yazar |
+| `assets/data/tr-population-2025.json` | TÜİK, Adrese Dayalı Nüfus Kayıt Sistemi Sonuçları 2025 (il nüfusları) | Resmî istatistik; kaynak gösterilerek kullanılır, videoda "Kaynak: TÜİK" yazar |
+| three (paketlenir, v2) | [three.js](https://github.com/mrdoob/three.js) 0.170.0 | MIT |
 | earcut (paketlenir) | [mapbox/earcut](https://github.com/mapbox/earcut) | ISC |
 | mp4-muxer (paketlenir) | [Vanilagy/mp4-muxer](https://github.com/Vanilagy/mp4-muxer) | MIT |
 | `assets/sound/bed-452999.mp3` | Freesound 452999 "Postapocalyptic Drone", Breviceps (https://freesound.org/people/Breviceps/sounds/452999/) | CC0 1.0 |
