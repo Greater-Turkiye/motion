@@ -492,9 +492,10 @@ function regionStats(datasets, record) {
  *   oruntu    the pattern first: the last seven days around the place (or the month's count) next
  */
 export const VARIANTS = ['standart', 'yakinlik', 'kisa', 'oruntu'];
-/** How long a story video may run before its least valuable blocks go (PLAN.md sections 30, 34): the
- *  channel's first 13 shorts were watched to the end at 15 s (96 %) and to half at 27 s, so 18. */
-export const BUDGET = 18;
+/** How long a story video may run before its least valuable blocks go (PLAN.md sections 30, 34, 37):
+ *  the channel's shorts held 92-75 % through 17-20 s and fell to 57-32 % at 22-27 s, and retime only
+ *  ever lengthens a scene past this clock, so 16. */
+export const BUDGET = 16;
 function arrange(beats, variant) {
   const len = (i) => (beats[i + 1]?.at ?? beats.end) - beats[i].at;
   let list = beats.map((b, i) => ({ b, d: len(i) }));
@@ -520,10 +521,12 @@ function arrange(beats, variant) {
     list = [core, list.find((x) => x.b.kind === 'status')].filter(Boolean);
   }
   // over the budget, the counts of our own records go first (the month's, then the last seven days'),
-  // except in the pattern order, whose point they are: there the distance goes. What happened, the
-  // satellite's view and the status always stay
+  // then the exercise's participant list; except in the pattern order, whose point the counts are:
+  // there the distance goes. What happened, the satellite's view and the status always stay — a quote
+  // story's quote and a deal's contact line are what happened, they are never dropped (a speaker's
+  // long quote still runs past the budget; its short form is the kisa order, PLAN.md section 16)
   const total = () => beats[0].at + list.reduce((s, x) => s + x.d, 0);
-  for (const kind of variant === 'oruntu' ? ['distance'] : ['close', 'recent']) if (total() > BUDGET && list.length > 2) drop(kind);
+  for (const kind of variant === 'oruntu' ? ['distance', 'roster'] : ['close', 'recent', 'roster']) if (total() > BUDGET && list.length > 2) drop(kind);
   if (place && note && !has('place')) {
     const k = list.findIndex((x) => x.b.kind === 'distance');
     const at = k >= 0 ? k : list.findIndex((x) => x.b.kind === 'status');

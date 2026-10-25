@@ -899,3 +899,26 @@ durgunluk taşıyordu; ikisi de kural gereği değil kurgu hatası gereği:
 
 Kırmızı çizgiler aynı: soru kancası yok, kaynağın söylemediği iddia yok; değişen yalnızca ne zaman
 neyin ekrana geldiği ve kameranın ne zaman durduğu.
+
+## 37. On altı saniye ve Türkiye'nin çevresi / Sixteen seconds (2026-10-25)
+
+Kanalın analitiği (sahibin gönderdiği altı ekran görüntüsü, YouTube Studio) iki şeyi netleştirdi;
+arkadaşın teşhisi ("çok uzun, heyecan yok") veriyle örtüşüyor:
+
+- **Kısa olan yine kazandı ve sınır netleşti.** Kerkük konuşlanması (~20 sn) %92,1 ortalama izleme,
+  952 görüntüleme ("diğer Shortslarından %73 iyi"); Washington fuarındaki Irak videosu (~17 sn)
+  1.214 görüntüleme ve %74,7; buna karşılık NYT/ABD-İsrail (~25 sn) %57,0, DIU (~22 sn) ~%32,
+  bölüm 34'teki BM açıklaması (27 sn) %50. Eğri: **20 sn altı tutuyor, 22 sn üstü düşüyor.**
+  `BUDGET` 18 → 16 sn ve atılabilir bloklar arasına tatbikat katılımcı listesi de girdi; `retime.mjs`
+  sahneyi yalnız uzattığı için sahne saati 16 sn'de bitince sesli video ~17-19 sn'ye geliyor (Kerkük
+  19,6 sn çıkmıştı; hedef o aralık). Ne olduğu her zaman kalır: alıntı hikâyesinde alıntı, anlaşmada
+  temas satırı "ne olduğu"nun kendisidir, atılmaz — uzun alıntılı kayıtlar bütçeyi yine aşar; onların
+  kısa biçimi dönen `kisa` sırası (bölüm 16), sayıları gelince karar verir.
+- **Kanalın iki en iyi videosu da Irak'tı** (1.214 ve 952 görüntüleme; YouTube'un kendi bildirimi
+  "views 73 % higher than your other Shorts"). Yakınlık tablosunda Suriye ve doğu Akdeniz Irak'la
+  aynı kademeye çıktı (1,0 — Ege ve Kıbrıs gibi; hepsi Türkiye'nin hemen çevresi), `global`
+  0,4 → 0,3 (Pentagon bütçesi 1 görüntüleme almıştı). Eleme değil sıralama: büyük bir küresel haber
+  hâlâ kazanır.
+- Abone kazancı hâlâ 0; bu değişiklikler tutma/dağıtım için. Etkisi bir hafta sonra aynı tablodan
+  ölçülecek (bölüm 34'ün ölçüm düzeni).
+
