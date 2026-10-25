@@ -62,6 +62,9 @@ jobs:
         with:
           node-version: "24"
           cache: npm
+      # before the pick: quake.mjs imports yaml, and without it every run said "no quake" (2026-10-25)
+      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
+        if: steps.gate.outputs.go == 'true'
       - name: Pick a quake
         id: pick
         if: steps.gate.outputs.go == 'true'
@@ -72,7 +75,7 @@ jobs:
         run: |
           gh release list --limit 300 --json tagName --jq '.[].tagName' > published.txt
           min=$TR_MIN; [ "$CHANNEL" = earth ] && min=$EARTH_MIN
-          pick=$(node tools/scene/quake.mjs --channel "$CHANNEL" --pick --published published.txt --hours 6 --min "$min" ${ID:+--id "$ID"} || true)
+          pick=$(node tools/scene/quake.mjs --channel "$CHANNEL" --pick --published published.txt --hours 6 --min "$min" ${ID:+--id "$ID"})
           [ -n "$pick" ] || echo "::notice::$CHANNEL: no quake to publish in the last 6 hours"
           echo "pick=$pick" >> "$GITHUB_OUTPUT"
           echo "$CHANNEL pick: ${pick:-none}" >> "$GITHUB_STEP_SUMMARY"
@@ -80,8 +83,6 @@ jobs:
         if: steps.pick.outputs.pick != ''
         with:
           python-version: "3.11"
-      - run: for i in 1 2 3; do npm ci && exit 0; echo "npm ci failed ($i), retrying"; sleep 60; done; exit 1
-        if: steps.pick.outputs.pick != ''
       - name: Scene (with model arrivals for Türkiye)
         id: scene
         if: steps.pick.outputs.pick != ''
