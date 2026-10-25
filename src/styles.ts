@@ -100,7 +100,7 @@ export const STYLES: Record<StyleId, Style> = {
     hypso: ['#CFE3B4', '#EFE9D2', '#E6D5B8'], contour: { color: 'rgba(160,112,60,0.55)', step: 0.04 }, gratStep: 1 },
   // the earthquake channel (owner, 2026-10-25): the light relief map he liked, Türkiye a pale red with a red
   // edge, so the red wave fronts and the province names read over it
-  Q: { id: 'Q', fonts: { display: 'Schibsted', text: 'Schibsted', mono: 'X' }, motion: { text: 'wipe', camera: 'glide', progress: false }, name: 'Deprem (açık rölyef)', flat: true, bg: ['#eef0ea', '#e4e7df'], sea: '#A7C5D9', land: '#A9B89A', border: 'rgba(40,40,40,0.45)',
+  Q: { id: 'Q', fonts: { display: 'Schibsted', text: 'Schibsted', mono: 'X' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Deprem (açık rölyef)', flat: true, bg: ['#eef0ea', '#e4e7df'], sea: '#A7C5D9', land: '#A9B89A', border: 'rgba(40,40,40,0.45)',
     graticule: 'rgba(40,60,80,0.07)', home: '#F3C7C9', homeStroke: '#C8102E', subject: '#7A1F2B', subjectStroke: '#7A1F2B',
     glow: null, atmosphere: null, accent: '#C8102E', ink: '#1d2326', muted: '#46525c', status: '#7A1F2B',
     label: 'rgba(20,30,40,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 1.0, limb: 0,

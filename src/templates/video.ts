@@ -29,6 +29,8 @@ export const kmToBosphorus = (at: LonLat) => km(at, BOSPHORUS);
  * it is reported as a page error, and the exporter refuses to write the video.
  */
 export const SAFE = { left: 65, right: W - 180, top: 270, bottom: H - 400 };
+/** The middle of Türkiye's bounding box (26.0-44.8 E, 35.8-42.1 N), where its name stands. */
+const TR_MIDDLE: LonLat = [35.4, 38.95];
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
 /** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
@@ -259,10 +261,15 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const home = l.kind === 'home';
     // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,
     // and as the first, sticky label every other name gives way to it
-    const anchors: LonLat[] = home ? [l.at] : [l.at, ...(l.alts ?? [])];
+    // TÜRKİYE stands at the middle of the country's bounding box, not at a fixed point that read low and
+    // right of it; the event's own place name stands right under its mark. Both are pinned: no other spot
+    const evt = sc.event && !home && l.kind === 'country' && Math.abs(l.at[0] - sc.event.at[0]) < 0.01 && Math.abs(l.at[1] - (sc.event.at[1] - 0.9)) < 0.01;
+    const anchors: LonLat[] = home ? [TR_MIDDLE] : evt ? [sc.event!.at] : [l.at, ...(l.alts ?? [])];
     const alts = anchors.map((x) => proj(x));
-    const p = alts[0] ?? alts.find(Boolean);
+    let p = alts[0] ?? alts.find(Boolean);
     if (!p) return;
+    // under the event ring's keep-out (95 px), so the name is never faded by its own mark
+    if (evt) p = [p[0], p[1] + 125];
     const isSubject = l === subjectLabel;
     // on a distance beat its end points carry their own names: the map's label of the same place
     // gives way, or "TİRAN" stands twice a few pixels apart
@@ -273,7 +280,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const q = beat?.kind === 'distance' ? proj(beat.to.at) : null;
     const meets = home && !!q && Math.abs(q[0] - p[0]) < 200 && Math.abs(q[1] - p[1]) < 90
       ? 1 - anim(t, beat!.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
-    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home,
+    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home || evt, pinned: home || evt,
       // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
       // TÜRKİYE stands on its own fill, where a paper-coloured outline would read as a box
       color: home ? homeInk : s.label, halo: home ? undefined : hexA(s.land, 0.75), spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
@@ -470,7 +477,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       if (p.s > sim) continue;
       const q = proj(p.at);
       if (!q) continue;
-      const lit = Math.min(1, (sim - p.s) / (0.35 * beat.speed));
+      const lit = ease.outCubic(Math.min(1, (sim - p.s) / (0.6 * beat.speed)));
       ctx.globalAlpha = w.out * lit; ctx.fillStyle = s.accent;
       ctx.beginPath(); ctx.arc(q[0], q[1], p.show ? 9 : 5, 0, Math.PI * 2); ctx.fill();
       if (!p.show) continue;
@@ -1016,19 +1023,18 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       break;
     }
     case 'waves': {
-      // the title, the simulated time since the quake and how the picture was made, in the text block
-      const sim = Math.max(0, (t - b.at) * b.speed);
-      const mm = Math.floor(sim / 60), ss = Math.floor(sim % 60);
+      // the title, one model arrival written once (no running clock: the owner found it tiring) and how
+      // the picture was made, in the text block
       const px = 76, lh = Math.round(px * 1.18);
       ctx.font = `600 34px ${s.fonts.text}`;
       const note = wrap(ctx, b.note, WIDTH);
       const top = BLOCK_BOTTOM - lh - 20 - note.length * 44;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'waves');
       kicker(b.title, top - 26 + rise);
-      ctx.globalAlpha = alpha; ctx.fillStyle = s.ink; ctx.font = `800 ${px}px ${s.fonts.text}`;
-      ctx.fillText(`+${mm ? `${mm} dk ` : ''}${String(ss).padStart(mm ? 2 : 1, '0')} sn`, LEFT, top + lh * 0.8 + rise);
-      ctx.font = `600 34px ${s.fonts.text}`; ctx.fillStyle = s.muted;
-      note.forEach((l, k) => ctx.fillText(l, LEFT, top + lh + 24 + k * 44 + rise));
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines([b.headline ?? ''], LEFT, top + lh * 0.8 + rise, lh, b.at + 0.2, s.ink, px);
+      ctx.font = `600 34px ${s.fonts.text}`;
+      lines(note, LEFT, top + lh + 24 + rise, 44, b.at + 0.9, s.muted, 34);
       break;
     }
     case 'distance': {

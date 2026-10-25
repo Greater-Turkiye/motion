@@ -25,6 +25,7 @@
 | `assets/sound/kenney/hit.ogg` | Kenney (https://kenney.nl), Impact Sounds, impactPlate_heavy_000.ogg | CC0 1.0 |
 | `assets/sound/kenney/tick.ogg` | Kenney (https://kenney.nl), Interface Sounds, click_002.ogg | CC0 1.0 |
 | `assets/sound/kenney/pop.ogg` | Kenney (https://kenney.nl), Interface Sounds, drop_002.ogg | CC0 1.0 |
+| `assets/sound/kenney/type.ogg` | Kenney (https://kenney.nl), Interface Sounds click_001-005.ogg, mixed into a 2 s typing run | CC0 1.0 |
 | Seslendirme modeli (runner'da indirilir, depoya girmez) | [Chatterbox Multilingual](https://github.com/resemble-ai/chatterbox), Resemble AI | MIT; üretilen her klip PerTh filigranı taşır, videoda "SESLENDİRME: YAPAY SES" yazar |
 | ffmpeg (`ffmpeg-static`, yalnız geliştirme) | [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) | GPL-3.0 ikili; depoya girmez, videoya gömülmez |
 

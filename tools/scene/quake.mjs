@@ -99,22 +99,17 @@ function wavesSentence(w) {
 
 /** The camera: the whole Earth, the country, the province, the epicentre, in the hook's first seconds. */
 function keysFor(at, country, D, beats) {
-  const k = [
+  // one calm move, then a hold: the globe glides to the country by the end of the hook and stays there,
+  // drifting only a little toward the epicentre, while the fronts spread; the globe again at the end.
+  // The owner (2026-10-25): a dive into the province and back, three moves in two seconds, tired the eye
+  const near = [country.center[0] * 0.8 + at[0] * 0.2, country.center[1] * 0.8 + at[1] * 0.2];
+  const last = beats.at(-1);
+  return [
     { t: 0, center: country.center, zoom: 1.0 },
-    { t: 0.9, center: country.center, zoom: country.zoom },
-    { t: 1.9, center: at, zoom: country.zoom * 2.4 },
-    { t: beats[0].at, center: at, zoom: country.zoom * 3.4 },
-  ];
-  for (const b of beats.slice(1)) k.push({ t: b.at, center: [at[0] + 0.2, at[1] - 0.15], zoom: country.zoom * (b.kind === 'status' ? 2.2 : 3.0) });
-  const wv = beats.find((b) => b.kind === 'waves');
-  if (wv) {
-    const end = beats[beats.indexOf(wv) + 1]?.at ?? D;
-    k.push({ t: wv.at + 1.2, center: [(at[0] + country.center[0]) / 2, (at[1] + country.center[1]) / 2], zoom: country.zoom * 1.5 });
-    k.push({ t: end - 0.3, center: country.center, zoom: country.zoom * 1.05 });
-    k.sort((a, b) => a.t - b.t);
-  }
-  k.push({ t: D, center: country.center, zoom: 1.0 });
-  return k.filter((x, i, a) => i === 0 || x.t > a[i - 1].t);
+    { t: beats[0].at, center: near, zoom: country.zoom },
+    { t: Math.max(beats[0].at + 0.5, last.at), center: [near[0] + 0.3, near[1]], zoom: country.zoom * 1.06 },
+    { t: D, center: country.center, zoom: 1.0 },
+  ].filter((x, i, a) => i === 0 || x.t > a[i - 1].t);
 }
 
 export function sceneTr(q, list, arrivals = null) {
@@ -144,11 +139,13 @@ export function sceneTr(q, list, arrivals = null) {
       .filter((n, i, a) => a.indexOf(n) === i && byName.get(n)?.s_s != null).slice(0, 6);
     const last = Math.max(...named.map((n) => byName.get(n).s_s));
     const speed = Math.max(2, Math.ceil(last / 6.2));
-    waves = { kind: 'waves', at: t, title: 'DALGANIN TAHMİNİ VARIŞI',
+    const head = byName.get('ANKARA')?.s_s != null && byName.get('ANKARA').km > 60 ? byName.get('ANKARA') : byName.get(named[0]);
+    const mm = Math.floor(head.s_s / 60), ss = Math.round(head.s_s % 60);
+    waves = { kind: 'waves', at: t, title: 'DALGANIN TAHMİNİ VARIŞI', headline: `${title(head.name)}: ~${mm ? `${mm} dk ${ss} sn` : `${ss} sn`}`,
       note: `Tahmini S dalgası varışı, ${arrivals.model} modeli · ${speed} kat hızlı`, speed, curve: arrivals.curve,
       places: arrivals.provinces.filter((r) => r.s_s != null).map((r) => ({ name: r.name, at: r.at, s: r.s_s, ...(named.includes(r.name) ? { show: true } : {}) })) };
     beats.push(waves);
-    source_text.push(`${waves.title}. ${waves.note}.`);
+    source_text.push(`${waves.title}. ${waves.headline}. ${waves.note}.`);
     t += 7.0;
   } else if (nearKm >= 8) {
     beats.push({ kind: 'distance', at: t, kicker: 'MERKEZ ÜSSÜNDEN', from: { at: q.at, label: 'MERKEZ ÜSSÜ' }, to: { at: near.at, label: near.name }, text: 'Kuş uçuşu, en yakın il merkezine.' });

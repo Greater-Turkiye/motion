@@ -8,5 +8,6 @@
  "hitMax": 1,
  "tick": "assets/sound/kenney/tick.ogg",
  "pop": "assets/sound/kenney/pop.ogg",
- "gain": { "open": -10, "whoosh": -14, "hit": -12, "tick": -18, "pop": -12 }
+ "type": "assets/sound/kenney/type.ogg",
+ "gain": { "open": -10, "whoosh": -14, "hit": -12, "tick": -18, "pop": -12, "type": -20 }
 }
