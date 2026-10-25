@@ -31,10 +31,12 @@ const MAGNITUDE = [
   [/^kinetic\.(missile-strike|airstrike|drone-strike)/, 1.0], [/^kinetic\./, 0.95], [/^maritime\./, 0.9],
   [/^(deployment|exercise)\./, 0.75], [/^(procurement|policy)\./, 0.45], [/^diplomatic\.(agreement|treaty)/, 0.45], [/^diplomatic\./, 0.3], [/./, 0.3],
 ];
-// Iraq at the top with the Aegean and Cyprus, procurement and diplomacy lower (PLAN.md section 34): on the
-// channel's first 13 shorts Iraq drew 758 views a video, a Pentagon budget 1 and a state visit none
-const PROXIMITY = { aegean: 1.0, cyprus: 1.0, iraq: 1.0, 'east-med': 0.95, 'black-sea': 0.95, syria: 0.95, caucasus: 0.9,
-  iran: 0.85, levant: 0.8, balkans: 0.8, 'libya-north-africa': 0.7, 'gulf-red-sea': 0.6, 'central-asia': 0.7, global: 0.4 };
+// Iraq at the top with the Aegean and Cyprus, Syria and the east Mediterranean now beside it (PLAN.md
+// sections 34, 37): the channel's two best shorts by views were both Iraq (1,214 and 952, "73 % higher
+// than your other Shorts"), while a Pentagon budget drew 1 view — Türkiye's immediate circle draws,
+// routine global items waste the slot
+const PROXIMITY = { aegean: 1.0, cyprus: 1.0, iraq: 1.0, syria: 1.0, 'east-med': 1.0, 'black-sea': 0.95, caucasus: 0.9,
+  iran: 0.85, levant: 0.8, balkans: 0.8, 'libya-north-africa': 0.7, 'gulf-red-sea': 0.6, 'central-asia': 0.7, global: 0.3 };
 // the headline reports people killed or wounded: that outranks the event type alone
 const HARM = /\b(killed|dead|died|deaths?|wounded|injured|casualties)\b/i;
 // police and riot drills, food and aid: filed under exercise or clash by the feeds' type rules, but not
