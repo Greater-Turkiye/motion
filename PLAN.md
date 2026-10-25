@@ -940,3 +940,8 @@ sahibin önüne konan sayfada (Gündem Türkiye Viral Planı); bu bölüm ilk uy
   ve il adları okunsun diye.
 - Sırada: v2 (Three.js) tasarımları A, B, C, E; deprem için 3D OSM bina bölümü; iç gündemin para,
   alarm, futbol-veri, teknoloji, devlet ayakları; analitik geri besleme (#165).
+- Sahibin ilk örnek yorumu: kamera il bulanıklığına dalıp geri çıkıyordu, altta saat koşuyordu, göz
+  yoruyordu. Kamera tek yumuşak hareketle Türkiye'ye iner ve sabit kalır; saat yerine tek bir model
+  varışı yazılır ("Ankara: ~1 dk 25 sn"); metinler imleçle yazılır (sahip bunu ani belirmeden iyi
+  buldu). TÜRKİYE etiketi ülkenin sınır kutusunun ortasına, olay yerinin adı işaretinin altına
+  sabitlendi; ikisi de artık başka yere kaymaz.
