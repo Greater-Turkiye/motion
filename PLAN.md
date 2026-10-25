@@ -922,3 +922,26 @@ arkadaşın teşhisi ("çok uzun, heyecan yok") veriyle örtüşüyor:
 - Abone kazancı hâlâ 0; bu değişiklikler tutma/dağıtım için. Etkisi bir hafta sonra aynı tablodan
   ölçülecek (bölüm 34'ün ölçüm düzeni).
 
+## 38. Deprem kanalları ve Kenney sesleri / Earthquake channels and Kenney sounds (2026-10-25)
+
+Sahip: "Videolar hâlâ çok yavaş; dünyayı, bölgeleri, illeri göster; ses efekti kullan, müzik kullanma;
+dandik sesi kullanma, Kaggle'daki seslendirici on numara; Greater Earth bağlı değil." Planın tamamı
+sahibin önüne konan sayfada (Gündem Türkiye Viral Planı); bu bölüm ilk uygulanan parçayı kaydeder.
+- Deprem, sahibin kendi Türkiye kanalının ayaklarından biri (öncelik iç gündem kanalı, siyaset hariç).
+  `produce-quake.yml` 15 dakikada bir Kandilli'yi (Türkiye) ve USGS'yi (Greater Earth) okur.
+- Dalga varışları sabit hızlı bir halka değil: `arrivals.py` TauP ve IASP91 ile her il merkezine ilk P
+  ve S varışını derinlik ve mesafeyle hesaplar; halkalar modelin o anki yerinde çizilir, ekranda
+  "tahmini varış, IASP91 modeli, N kat hızlı" yazar. Varış, hissedilme değildir; hissedilme bilgisi
+  ancak kaynak (AFAD ya da USGS şiddet haritası) verirse yazılır (henüz yok).
+- Ses yalnız Kaggle Fish; olmazsa yayın yok, sonraki çalışma dener. Kendi Kaggle işi (`quake`).
+- Kenney'nin CC0 efekt seti bütün kanallarda; müzik yatağı hiçbir yerde yok. CLAUDE.md bölüm 4'e
+  sahibin değişikliği olarak yazıldı.
+- Stil Q: sahibin beğendiği açık rölyef harita, Türkiye uçuk kırmızı ve kırmızı kenarlı, kırmızı dalga
+  ve il adları okunsun diye.
+- Sırada: v2 (Three.js) tasarımları A, B, C, E; deprem için 3D OSM bina bölümü; iç gündemin para,
+  alarm, futbol-veri, teknoloji, devlet ayakları; analitik geri besleme (#165).
+- Sahibin ilk örnek yorumu: kamera il bulanıklığına dalıp geri çıkıyordu, altta saat koşuyordu, göz
+  yoruyordu. Kamera tek yumuşak hareketle Türkiye'ye iner ve sabit kalır; saat yerine tek bir model
+  varışı yazılır ("Ankara: ~1 dk 25 sn"); metinler imleçle yazılır (sahip bunu ani belirmeden iyi
+  buldu). TÜRKİYE etiketi ülkenin sınır kutusunun ortasına, olay yerinin adı işaretinin altına
+  sabitlendi; ikisi de artık başka yere kaymaz.

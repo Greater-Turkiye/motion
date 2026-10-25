@@ -29,6 +29,8 @@ export const kmToBosphorus = (at: LonLat) => km(at, BOSPHORUS);
  * it is reported as a page error, and the exporter refuses to write the video.
  */
 export const SAFE = { left: 65, right: W - 180, top: 270, bottom: H - 400 };
+/** The middle of Türkiye's bounding box (26.0-44.8 E, 35.8-42.1 N), where its name stands. */
+const TR_MIDDLE: LonLat = [35.4, 38.95];
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
 /** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
@@ -259,10 +261,15 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const home = l.kind === 'home';
     // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,
     // and as the first, sticky label every other name gives way to it
-    const anchors: LonLat[] = home ? [l.at] : [l.at, ...(l.alts ?? [])];
+    // TÜRKİYE stands at the middle of the country's bounding box, not at a fixed point that read low and
+    // right of it; the event's own place name stands right under its mark. Both are pinned: no other spot
+    const evt = sc.event && !home && l.kind === 'country' && Math.abs(l.at[0] - sc.event.at[0]) < 0.01 && Math.abs(l.at[1] - (sc.event.at[1] - 0.9)) < 0.01;
+    const anchors: LonLat[] = home ? [TR_MIDDLE] : evt ? [sc.event!.at] : [l.at, ...(l.alts ?? [])];
     const alts = anchors.map((x) => proj(x));
-    const p = alts[0] ?? alts.find(Boolean);
+    let p = alts[0] ?? alts.find(Boolean);
     if (!p) return;
+    // under the event ring's keep-out (95 px), so the name is never faded by its own mark
+    if (evt) p = [p[0], p[1] + 125];
     const isSubject = l === subjectLabel;
     // on a distance beat its end points carry their own names: the map's label of the same place
     // gives way, or "TİRAN" stands twice a few pixels apart
@@ -273,7 +280,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const q = beat?.kind === 'distance' ? proj(beat.to.at) : null;
     const meets = home && !!q && Math.abs(q[0] - p[0]) < 200 && Math.abs(q[1] - p[1]) < 90
       ? 1 - anim(t, beat!.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
-    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home,
+    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home || evt, pinned: home || evt,
       // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
       // TÜRKİYE stands on its own fill, where a paper-coloured outline would read as a box
       color: home ? homeInk : s.label, halo: home ? undefined : hexA(s.land, 0.75), spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
@@ -429,6 +436,72 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       ctx.beginPath(); ctx.arc(q[0], q[1], 20 * show, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 2; ctx.stroke();
     }
     ctx.globalAlpha = 1;
+  }
+
+  // waves: an earthquake's P and S fronts where the 1-D model puts them at each moment (arrivals.py),
+  // sped up; a place lights, with its arrival time, when the S front reaches it
+  if (beat?.kind === 'waves' && sc.event) {
+    const w = windowOf(sc, beatIdx, t);
+    const sim = Math.max(0, (t - beat.at) * beat.speed);
+    const radius = (col: 1 | 2) => {
+      const c = beat.curve.filter((r) => r[col] != null) as [number, number, number][];
+      if (!c.length || sim <= c[0][col]) return 0;
+      for (let k = 1; k < c.length; k++) if (sim <= c[k][col]) return c[k - 1][0] + ((sim - c[k - 1][col]) / (c[k][col] - c[k - 1][col])) * (c[k][0] - c[k - 1][0]);
+      return c[c.length - 1][0];
+    };
+    const [lon0, lat0] = sc.event.at.map((x) => (x * Math.PI) / 180);
+    const ring = (km: number) => {
+      const d = km / 6371, pts: [number, number][] = [];
+      for (let k = 0; k <= 96; k++) {
+        const th = (k / 96) * 2 * Math.PI;
+        const lat = Math.asin(Math.sin(lat0) * Math.cos(d) + Math.cos(lat0) * Math.sin(d) * Math.cos(th));
+        const lon = lon0 + Math.atan2(Math.sin(th) * Math.sin(d) * Math.cos(lat0), Math.cos(d) - Math.sin(lat0) * Math.sin(lat));
+        const q = proj([(lon * 180) / Math.PI, (lat * 180) / Math.PI]);
+        if (q) pts.push(q);
+      }
+      return pts;
+    };
+    const stroke = (pts: [number, number][], width: number, dash: number[], a: number) => {
+      if (pts.length < 2) return;
+      ctx.globalAlpha = a * w.out; ctx.strokeStyle = s.accent; ctx.lineWidth = width; ctx.setLineDash(dash);
+      ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); ctx.setLineDash([]);
+    };
+    const rp = radius(1), rs = radius(2);
+    if (rp > 0) stroke(ring(rp), 2, [6, 10], 0.7);
+    if (rs > 0) stroke(ring(rs), 5, [], 0.95);
+    ctx.font = `700 26px ${s.fonts.mono}`; ctx.textBaseline = 'middle';
+    // each name finds a height where it overlaps no earlier name and stays above the text block; the
+    // spots are computed for the whole set every frame, in arrival order, so a name never jumps
+    const placed: { x: number; y: number; w: number; h: number }[] = [];
+    for (const p of beat.places) {
+      if (p.s > sim) continue;
+      const q = proj(p.at);
+      if (!q) continue;
+      const lit = ease.outCubic(Math.min(1, (sim - p.s) / (0.6 * beat.speed)));
+      ctx.globalAlpha = w.out * lit; ctx.fillStyle = s.accent;
+      ctx.beginPath(); ctx.arc(q[0], q[1], p.show ? 9 : 5, 0, Math.PI * 2); ctx.fill();
+      if (!p.show) continue;
+      const mm = Math.floor(p.s / 60), ss = Math.round(p.s % 60);
+      const text = `${p.name} · ${mm ? `${mm} dk ${ss} sn` : `${ss} sn`}`;
+      const tw = ctx.measureText(text).width + 16;
+      const leftSide = q[0] + 14 + tw > SAFE.right;
+      const x = leftSide ? q[0] - 14 - tw : q[0] + 14;
+      let y = q[1];
+      for (const dy of [0, -44, 44, -88, 88, -132, 132]) {
+        const r = { x, y: q[1] + dy - 18, w: tw, h: 36 };
+        if (r.y + r.h > 900 || r.y < SAFE.top + 60) continue;
+        if (!placed.some((o) => r.x < o.x + o.w && o.x < r.x + r.w && r.y < o.y + o.h && o.y < r.y + r.h)) { y = q[1] + dy; break; }
+      }
+      placed.push({ x, y: y - 18, w: tw, h: 36 });
+      if (y !== q[1]) {
+        ctx.globalAlpha = 0.6 * w.out * lit; ctx.strokeStyle = s.ink; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(leftSide ? x + tw : x, y); ctx.stroke();
+      }
+      ctx.fillStyle = s.bg[1].startsWith('#') ? s.bg[1] : '#000'; ctx.globalAlpha = 0.85 * w.out * lit;
+      ctx.fillRect(x, y - 18, tw, 36);
+      ctx.globalAlpha = w.out * lit; ctx.fillStyle = s.ink; ctx.fillText(text, x + 8, y + 1);
+    }
+    ctx.textBaseline = 'alphabetic'; ctx.globalAlpha = 1;
   }
 
   // link: capital to capital, a great circle drawn with a bright head (research/05, effect 1)
@@ -949,6 +1022,21 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       lines(b.lines, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       break;
     }
+    case 'waves': {
+      // the title, one model arrival written once (no running clock: the owner found it tiring) and how
+      // the picture was made, in the text block
+      const px = 76, lh = Math.round(px * 1.18);
+      ctx.font = `600 34px ${s.fonts.text}`;
+      const note = wrap(ctx, b.note, WIDTH);
+      const top = BLOCK_BOTTOM - lh - 20 - note.length * 44;
+      guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'waves');
+      kicker(b.title, top - 26 + rise);
+      ctx.font = `800 ${px}px ${s.fonts.text}`;
+      lines([b.headline ?? ''], LEFT, top + lh * 0.8 + rise, lh, b.at + 0.2, s.ink, px);
+      ctx.font = `600 34px ${s.fonts.text}`;
+      lines(note, LEFT, top + lh + 24 + rise, 44, b.at + 0.9, s.muted, 34);
+      break;
+    }
     case 'distance': {
       // the distance in a line with the two places it lies between, at the size of the facts: no
       // counter running up and no number standing alone at poster size (CLAUDE.md section 4)
@@ -963,7 +1051,8 @@ function drawBeat(ctx: CanvasRenderingContext2D, sc: Scene, s: Style, i: number,
       const top = BLOCK_BOTTOM - 0.8 * lh - (main.length - 1) * lh - (text.length ? 60 + (text.length - 1) * 50 : 0) - 10;
       guard({ x: LEFT, y: top - px, w: WIDTH, h: BLOCK_BOTTOM - top + px }, 'distance');
       // close is close only when it is: past 700 km the beat says distance, not nearness
-      kicker(d <= 700 ? ui(sc).near : ui(sc).far, top + 0.8 * lh - 0.72 * px - 26 + rise);
+      // a scene may name the measure itself (an earthquake inside Türkiye: "EN YAKIN İL MERKEZİ")
+      kicker(b.kicker ?? (d <= 700 ? ui(sc).near : ui(sc).far), top + 0.8 * lh - 0.72 * px - 26 + rise);
       ctx.font = `800 ${px}px ${s.fonts.text}`;
       lines(main, LEFT, top + lh * 0.8 + rise, lh, b.at, s.ink, px);
       ctx.font = `600 36px ${s.fonts.text}`;

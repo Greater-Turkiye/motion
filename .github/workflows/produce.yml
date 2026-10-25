@@ -259,7 +259,7 @@ jobs:
           else echo "::error::narration is missing but MOTION_VOICE is not off; refusing to publish a silent video"; exit 1; fi
           # MOTION_MUSIC=off drops the kit (bed and effects): the first answer to a copyright claim on a
           # platform, until the claim is disputed with the CC0 record in LICENSES.md
-          kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+          kit=(--kit assets/sound/kit-kenney.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
           if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp out/video/*.mp4 "release/$scene.mp4"
           else node tools/audio/voice.mjs "$voice" out/video/*.mp4 "release/$scene.mp4" "${kit[@]}"; fi
           # a copy without the music bed, the voice alone: the platforms' own sound libraries (Reels,
@@ -390,7 +390,7 @@ jobs:
             node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video-en
           fi
           mkdir -p release-en
-          kit=(--kit assets/sound/kit.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
+          kit=(--kit assets/sound/kit-kenney.json --scene "$scene"); [ "$MUSIC" = "off" ] && kit=()
           node tools/audio/voice.mjs out/voice-en out/video-en/*.mp4 "release-en/$scene.mp4" "${kit[@]}"
           # the English cut joins the story's release, so the site's videos page has it too
           gh release upload "video-$ID" "release-en/$scene.mp4" --clobber || echo "::warning::could not add the English cut to video-$ID"

@@ -132,7 +132,7 @@ jobs:
           fi
           node export/render.mjs --no-build --scene "$SCENE" ${style:+--style "$style"} --frames-only --every 100000 --save-frames --out out/poster
           mkdir -p release
-          kit=(--kit assets/sound/kit.json --scene "$SCENE"); [ "$MUSIC" = "off" ] && kit=()
+          kit=(--kit assets/sound/kit-kenney.json --scene "$SCENE"); [ "$MUSIC" = "off" ] && kit=()
           node tools/audio/voice.mjs out/voice-en out/video/*.mp4 "release/$SCENE.mp4" "${kit[@]}"
           cp out/poster/*-frames/0000.jpg "release/$SCENE.jpg"
           cp meta.json "release/$SCENE.json"

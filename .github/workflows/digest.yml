@@ -100,7 +100,7 @@ jobs:
           node export/render.mjs --no-build --scene "$ID" --frames-only --every 100000 --save-frames --out out/poster
           mkdir -p release
           if [ "$VOICE" = "true" ]; then voice=out/voice; else voice=-; fi
-          kit=(--kit assets/sound/kit.json --scene "$ID"); [ "$MUSIC" = "off" ] && kit=()
+          kit=(--kit assets/sound/kit-kenney.json --scene "$ID"); [ "$MUSIC" = "off" ] && kit=()
           if [ "$voice" = "-" ] && [ ${#kit[@]} -eq 0 ]; then cp out/video/*.mp4 "release/$ID.mp4"
           else node tools/audio/voice.mjs "$voice" out/video/*.mp4 "release/$ID.mp4" "${kit[@]}"; fi
           # a copy without the music bed, the voice alone: the platforms' own sound libraries (Reels,

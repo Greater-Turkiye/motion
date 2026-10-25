@@ -12,6 +12,9 @@ export interface Box { x: number; y: number; w: number; h: number }
 export interface Label { key: string; text: string; x: number; y: number; size: number; color: string; spacing: number; weight?: number; priority: number; alpha?: number;
   /** never faded by another label (TÜRKİYE): only by the text block, the emblem or leaving the frame */
   sticky?: boolean;
+  /** drawn exactly at x, y, never moved to another spot (TÜRKİYE at the country's middle, the event's
+   *  place under its mark): the owner saw both wander off their places (2026-10-25) */
+  pinned?: boolean;
   /** a thin outline in the map's paper colour, so a name stays readable where it runs over a
    *  neighbour's fill or a border (BULGARİSTAN over the edge of Türkiye) */
   halo?: string;
@@ -23,7 +26,7 @@ export interface Label { key: string; text: string; x: number; y: number; size: 
 const SPOTS: [number, number][] = [[0, 0], [0, -1.4], [0, 1.4], [0.35, 0], [-0.35, 0], [0, -2.6], [0, 2.6], [0, -3.4], [0, 3.4]];
 
 /** How many places a label can take: its ground anchors, or the offsets around its only anchor. */
-const choices = (l: Label) => (l.alts && l.alts.length > 1 ? l.alts.length : SPOTS.length);
+const choices = (l: Label) => (l.pinned ? 1 : l.alts && l.alts.length > 1 ? l.alts.length : SPOTS.length);
 
 /** Air above and below a name: two names a few pixels apart (KİEV BÖLGESİ over KARADENİZ) read as one
  *  block of four words, so the box a name claims reaches half a line beyond its letters. */

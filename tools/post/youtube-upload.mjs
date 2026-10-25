@@ -62,6 +62,8 @@ export const CHANNELS = {
   defence: { token: 'YOUTUBE_DEFENCE_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterdefence (English)' },
   numbers: { token: 'YOUTUBE_NUMBERS_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@geocompetitions (English)' },
   earth: { token: 'YOUTUBE_EARTH_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'en', name: '@greaterearth (English)' },
+  // the owner's own Türkiye channel (2026-10-25): uploads start once he mints its token with youtube-oauth.mjs --save
+  own: { token: 'YOUTUBE_OWN_REFRESH_TOKEN', client: 'YOUTUBE_GT', lang: 'tr', name: 'Türkiye channel (owner)' },
 };
 
 export async function accessToken(refreshToken, client = 'YOUTUBE') {

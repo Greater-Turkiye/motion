@@ -1,0 +1,13 @@
+{
+ "about": "Kenney CC0 effects (assets/sound/kenney, kenney.nl), no music bed: the owner found the beds bad (2026-10-25). An opening hit on frame 0, a woosh on every block change, a hit on the peak block, ticks on points, a pop where a distance lands.",
+ "open": "assets/sound/kenney/boom.ogg",
+ "whoosh": "assets/sound/kenney/woosh.ogg",
+ "whooshPre": 0.3,
+ "hit": "assets/sound/kenney/hit.ogg",
+ "hitPre": 0.05,
+ "hitMax": 1,
+ "tick": "assets/sound/kenney/tick.ogg",
+ "pop": "assets/sound/kenney/pop.ogg",
+ "type": "assets/sound/kenney/type.ogg",
+ "gain": { "open": -10, "whoosh": -14, "hit": -12, "tick": -18, "pop": -12, "type": -20 }
+}
