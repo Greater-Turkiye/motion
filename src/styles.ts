@@ -81,8 +81,8 @@ export const STYLES: Record<StyleId, Style> = {
     label: 'rgba(20,30,40,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 1.0, limb: 0,
     hypso: ['#A9B89A', '#D9CFA6', '#F1EBDC'], shadeTint: ['#5B6E82', '#FFF6E0'],
     // close in on Russia the dark wine fill hid the land and the relief's grain showed (owner, 2026-10-26):
-    // a lighter fill with the relief through it, and the camera stops at 1.9
-    maxZoom: 1.9, subjectRelief: true },
+    // a lighter fill with the relief through it, and the camera stops at 1.35
+    maxZoom: 1.35, subjectRelief: true },
   // research/03 K: an İznik tile atlas, Piri Reis rhumb lines on a pale sea
   // motion: ceremonial: nothing snaps, everything settles
   // the rhumb lines and the sea tile are gone (review, 23 October: crossing lines over both seas), and the

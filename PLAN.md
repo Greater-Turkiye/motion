@@ -982,3 +982,12 @@ Değişenler, bu adımda:
   her başlıktan silinir.
 Sırada: D (iki taraflı haberde kamera ortada duruyor; taraflara sırayla gitmeli), E (viral açıdan).
 Sahibin genel notu: "3D, evler, ileri teknoloji" bekliyordu: v2'de uydu görüntüsü ve OSM binalarıyla şehir inişi.
+
+**İkinci tur (2026-10-26).** A: TÜRKİYE yazısı ülkenin ekrandaki genişliğinin yarısı kadar, kamerayla
+büyür. C: amblem ülkesiyle büyür (96-170 px; Rusya'nın arması 104 px'te minicikti). D: lacivert ve gri
+yerine siyah gece, bayrak kırmızısı Türkiye, sinyal turuncusu konu. G: yakınlaşma 1,35'te durur, konu
+dolgusu açık ve kabartmayı gösterir. Asıl sebep başkaydı: yeri yalnız "Rusya" olan bir cephe haberi
+halkayı Rusya'nın ortasına, Sibirya'ya koyup oraya 2,7 kat yaklaşıyordu. Karadeniz'e dosyalanmış, yeri
+olmayan ve başlığında Rusya ya da Ukrayna geçen kayıt artık Ukrayna'da gösterilir; yeri yalnız bir ülke
+olan kayıtta kamera o ülkenin tamamını gösterecek kadar uzakta kalır. B ve H galeride eski videoydu;
+yenileri kırmızı Türkiye ve Archivo ile.
