@@ -190,13 +190,13 @@ export function sceneEarth(f) {
   const mag = p.mag.toFixed(1);
   const place = p.place ?? '';
   const source_text = [`USGS: M ${mag} earthquake, ${place}, ${time.toUTCString()}, depth ${Math.round(depth)} km.`, `MAGNITUDE ${mag} EARTHQUAKE. ${place}.`,
-    `USGS status: ${p.status}. Tsunami flag: ${p.tsunami ? 'yes' : 'no'}. Felt reports: ${p.felt ?? 0}.`];
+    `USGS status: ${p.status}. USGS tsunami flag: ${p.tsunami ? 'yes' : 'no'}. USGS felt reports: ${p.felt ?? 0}.`];
   const hook = { kicker: `${country} · ${when}`, lines: [`MAGNITUDE ${mag}`, 'EARTHQUAKE'], sub: `${place}; depth ${Math.round(depth)} km.`,
     status: p.status === 'reviewed' ? 'REVIEWED' : 'AUTOMATIC SOLUTION', source: 'SOURCE: USGS' };
   const beats = [];
   let t = hookTime(hook, 2.6);
-  if (p.tsunami) { beats.push({ kind: 'facts', at: t, kicker: 'USGS', lines: ['Tsunami flag: *yes*.', 'Check local warnings.'] }); t += 3; }
-  if (p.felt) { beats.push({ kind: 'facts', at: r1(t), kicker: 'FELT REPORTS', lines: [`*${p.felt}* people reported shaking.`] }); t += 2.8; }
+  if (p.tsunami) { beats.push({ kind: 'facts', at: t, kicker: 'USGS', lines: ['USGS tsunami flag: *yes*.'] }); t += 3; }
+  if (p.felt) { beats.push({ kind: 'facts', at: r1(t), kicker: 'FELT REPORTS', lines: [`USGS felt reports: *${p.felt}*.`] }); t += 2.8; }
   beats.push({ kind: 'status', at: r1(t), text: p.status === 'reviewed' ? 'Reviewed by a USGS seismologist.' : 'Automatic solution: values may be revised.' });
   t += 3.2;
   const D = r1(t);
@@ -210,7 +210,7 @@ export function sceneEarth(f) {
   const r2 = (x) => Math.round(x * 100) / 100;
   const ends = [...beats.map((b) => b.at), D - 0.3];
   const said = [`A magnitude ${mag} earthquake struck ${place}, at a depth of ${Math.round(depth)} kilometres.`,
-    ...(p.tsunami ? ['The USGS tsunami flag is set; check local warnings.'] : []),
+    ...(p.tsunami ? ['The USGS has set its tsunami flag for this earthquake.'] : []),
     ...(p.felt ? [`${p.felt} people have reported feeling it.`] : []),
     p.status === 'reviewed' ? 'A USGS seismologist has reviewed the solution.' : 'This is an automatic solution, and the values may change.'];
   const starts = [0.2, ...beats.map((b) => b.at + 0.1)];
