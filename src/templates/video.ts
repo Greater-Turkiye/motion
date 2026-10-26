@@ -34,6 +34,8 @@ const TR_MIDDLE: LonLat = [35.4, 38.95];
 /** Just inland of the Black Sea coast (Kastamonu, 41.3 N): TÜRKİYE rises no higher than this when the middle of
  *  the country stands on the text block. */
 const TR_NORTH: LonLat = [35.4, 41.3];
+/** Türkiye's western and eastern ends (Gökçeada, Iğdır): its width on screen sets the size of its name. */
+const TR_WEST: LonLat = [25.9, 40.2], TR_EAST: LonLat = [44.8, 39.7];
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
 /** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
@@ -164,12 +166,26 @@ function cameraAt(sc: Scene, s: Style, t: number): Camera {
   const rise = mode === 'fly' && !dive ? 1 + Math.min(1.2, far / 6) * Math.sin(Math.PI * k) : 1;
   return {
     center: [lerp(a.center[0], b.center[0], k) + 0.5 * sway, lerp(a.center[1], b.center[1], k)],
-    zoom: (Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), k)) * (1 + 0.015 * sway)) / rise,
+    // a style may cap the zoom where its relief would show its grain (G, 2026-10-26)
+    zoom: Math.min(s.maxZoom ?? Infinity, (Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), k)) * (1 + 0.015 * sway)) / rise),
   };
 }
 
 /** When the subject's emblem leaves: after the opening, before the camera zooms in far enough to crop it. */
 const EMBLEM = 104;
+/** The subject's emblem grows with its country: at a fixed 104 px Russia's arms stood tiny over Russia
+ *  (owner, 2026-10-26), while 140 had covered Israel. 104 px for a country some 8 degrees across (Ukraine),
+ *  up to 170 for Russia or the United States, down to 96 for the smallest. Set per frame from the assets. */
+let emblemPx = EMBLEM;
+const radiusCache = new WeakMap<Assets, Map<string, number>>();
+function emblemFor(a: Assets, iso3: string | undefined) {
+  let m = radiusCache.get(a);
+  if (!m) { m = new Map(a.countries.map((c) => [String((c.shape as { id?: string | number }).id ?? ''), c.radius])); radiusCache.set(a, m); }
+  const r = iso3 ? m.get(a.nums.get(iso3) ?? '') : undefined;
+  if (r === undefined) return EMBLEM;
+  const deg = (r * 180) / Math.PI;
+  return Math.round(Math.min(170, Math.max(96, EMBLEM * Math.pow(deg / 8, 0.35))));
+}
 const emblemOutOf = (sc: Scene) => (sc.beats.length ? sc.beats[0].at + 0.8 : sc.duration);
 
 /**
@@ -237,8 +253,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // the emblem stands above its country's label, which never moves
       // one size from first frame to last: a growing emblem read as the map breathing (review, 23 October),
       // and 104 px keeps it smaller than the country it stands over (at 140 a shield covered Israel)
-      const size = EMBLEM;
-      const y = at[1] - (EMBLEM * emblemAr) / 2 - 30;
+      const size = emblemPx;
+      const y = at[1] - (size * emblemAr) / 2 - 30;
       const box = { x: at[0] - size / 2 - 20, y: y - (size * emblemAr) / 2 - 20, w: size + 40, h: size * emblemAr + 40 };
       // a small country beside Türkiye puts the emblem above it onto Turkish ground (GKRY's arms stood on
       // Anatolia in a Cyprus video): then there is no emblem at all, the map's label names the country
@@ -260,6 +276,11 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // filled when the camera came close (zoom 0.6 -> 0.88x, 1 -> 1x, 2.7 -> 1.25x)
   // held to ±8 %: a wider range made the names swell and shrink on screen (review, 23 October)
   const nameScale = Math.min(1.08, Math.max(0.92, Math.pow(cameraAt(sc, s, t).zoom, 0.12)));
+  // TÜRKİYE as wide as about half the country on screen, so the name fills its land at every distance
+  // (owner, 2026-10-26: a fixed size stood small on a country that filled the frame); it follows the
+  // camera's own smooth zoom, 28 px at the widest view to 96 px when the country fills the frame
+  const tw = proj(TR_WEST), te = proj(TR_EAST);
+  const homeSize = tw && te ? Math.round(Math.min(96, Math.max(28, 0.08 * Math.hypot(te[0] - tw[0], te[1] - tw[1])))) : Math.round(32 * nameScale);
   sc.labels.forEach((l, i) => {
     const home = l.kind === 'home';
     // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,
@@ -280,7 +301,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // as high as it must be to clear the block (its box reaches ~32 px below its middle), never above
       // the land just south of the Black Sea coast
       const north = proj(TR_NORTH);
-      if (north) p = [p[0], Math.max(north[1], Math.min(p[1], top - 46))];
+      if (north) p = [p[0], Math.max(north[1], Math.min(p[1], top - 0.9 * homeSize - 16))];
     }
     const isSubject = l === subjectLabel;
     // on a distance beat its end points carry their own names: the map's label of the same place
@@ -292,7 +313,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     const q = beat?.kind === 'distance' ? proj(beat.to.at) : null;
     const meets = home && !!q && Math.abs(q[0] - p[0]) < 200 && Math.abs(q[1] - p[1]) < 90
       ? 1 - anim(t, beat!.at, 0.3) * windowOf(sc, beatIdx, t).out : 1;
-    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: Math.round((home ? 32 : isSubject ? 26 : 24) * nameScale), sticky: home || evt, pinned: home || evt,
+    labels.push({ key: `l${i}`, text: l.text, x: p[0], y: p[1], alts: anchors.length > 1 ? alts : undefined, size: home ? homeSize : Math.round((isSubject ? 26 : 24) * nameScale), sticky: home || evt, pinned: home || evt,
       // tracking 0.22-0.3 em: at 0.4-0.45 a name ran wider than the country under it
       // TÜRKİYE stands on its own fill, where a paper-coloured outline would read as a box
       color: home ? homeInk : s.label, halo: home ? undefined : hexA(s.land, 0.75), spacing: home ? 0.3 : isSubject ? 0.26 : 0.22, weight: home ? 700 : 500,
@@ -362,6 +383,7 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
   const tail = full ? 1 - span(t, D - 0.9, D - 0.05) : 1; // everything that was not on frame 0 leaves before the loop
   // a stop-motion style moves its camera in steps (12 a second for the photocopied dossier)
   const view = cameraAt(sc, s, s.stepFps ? Math.floor(t * s.stepFps) / s.stepFps : t);
+  emblemPx = emblemFor(a, sc.subject?.country);
   const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
   const beatIdx = sc.beats.findIndex((b, i) => t >= b.at && (i + 1 >= sc.beats.length || t < sc.beats[i + 1].at));
   const beat: Beat | undefined = sc.beats[beatIdx];
