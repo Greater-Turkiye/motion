@@ -24,6 +24,7 @@ import json
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -117,19 +118,32 @@ def slug(s: str) -> str:
 def sync() -> int:
     doc = json.loads((OUT / "manifest.json").read_text(encoding="utf-8"))
     bad = 0
+    gone = []
     for key, kinds in doc["items"].items():
         for kind, it in kinds.items():
             dest = OUT / it["file"]
             if not dest.exists() or hashlib.sha256(dest.read_bytes()).hexdigest() != it["sha256"]:
                 dest.parent.mkdir(parents=True, exist_ok=True)
-                dest.write_bytes(get(it["url"]))
+                # a file renamed or deleted on Commons (Burkina Faso's arms, 2026-10-26) is skipped with a
+                # warning: one 404 used to stop the sync and leave every later emblem missing, which fails
+                # every production run on a cold cache. Only a story about that country loses its emblem
+                try:
+                    dest.write_bytes(get(it["url"]))
+                except urllib.error.HTTPError as e:
+                    if e.code not in (404, 410):
+                        raise
+                    gone.append(f"{key} {kind}")
+                    print(f"::warning::emblem gone upstream ({e.code}): {key} {kind} {it['url']}", file=sys.stderr)
+                    continue
                 time.sleep(0.2)
             if hashlib.sha256(dest.read_bytes()).hexdigest() != it["sha256"]:
-                print(f"hash changed upstream: {key} {kind} {it['url']}", file=sys.stderr)
+                print(f"::warning::hash changed upstream, file removed: {key} {kind} {it['url']}", file=sys.stderr)
                 dest.unlink()
                 bad += 1
-    print(f"emblems in place; {bad} changed upstream and removed")
-    return 1 if bad else 0
+    print(f"emblems in place; {bad} changed upstream and removed; {len(gone)} gone upstream: {', '.join(gone) or 'none'}")
+    # the pinned hash still guards what is drawn (a changed file is removed, never used); failing the
+    # step for it stopped whole productions over one country's emblem
+    return 0
 
 
 def main() -> int:
