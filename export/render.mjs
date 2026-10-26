@@ -8,6 +8,7 @@
 //   node export/render.mjs --workers 4                       # pages drawing frames at once
 //   node export/render.mjs --save-frames                     # also write every frame to out/<name>-frames/
 //   node export/render.mjs --encoder ffmpeg                  # skip WebCodecs (auto tries it first)
+//   node export/render.mjs --page v2.html --scene nufus-2025   # the Three.js engine (src/v2), scenes/v2/*.json
 //
 // The page draws frame i when asked and hands back the finished image; nothing depends on the wall
 // clock, so the output is exactly `fps` frames per second however long each frame takes to draw.
@@ -38,6 +39,8 @@ for (let i = 2; i < process.argv.length; i++) {
   if (next && !next.startsWith('--')) { args.set(a.slice(2), next); i++; } else args.set(a.slice(2), true);
 }
 const SCENE = args.get('scene') || 'hook-karadeniz';
+// --page v2.html: the Three.js engine (src/v2) and its scenes in scenes/v2/*.json; the globe page by default
+const PAGE = args.get('page') || '';
 const STYLES = args.has('all-styles') ? ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'K'] : [args.get('style') || null]; // src/engine/scene.ts STYLE_IDS
 // --frames 48,600,1200: exactly those frames, as stills (implies --frames-only)
 const PICK = args.has('frames') ? String(args.get('frames')).split(',').map(Number).filter((x) => Number.isInteger(x) && x >= 0) : null;
@@ -60,7 +63,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 if (!args.has('no-build')) await build({ root: ROOT, logLevel: 'warn' });
 const DIST = path.join(ROOT, 'dist');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.geojson': 'application/json',
-  '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.css': 'text/css' };
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.css': 'text/css' };
 const server = createServer((req, res) => {
   const p = path.join(DIST, decodeURIComponent(new URL(req.url, 'http://x').pathname));
   const file = existsSync(p) && statSync(p).isDirectory() ? path.join(p, 'index.html') : p;
@@ -128,7 +131,7 @@ async function openScene(style) {
   const q = new URLSearchParams({ scene: SCENE, export: '1' });
   if (style) q.set('style', style);
   for (const [k, v] of new URLSearchParams(process.env.MOTION_QUERY || '')) q.set(k, v); // extra page parameters, e.g. MOTION_QUERY='renderer=canvas2d'
-  await p.send('Page.navigate', { url: base + '?' + q });
+  await p.send('Page.navigate', { url: base + PAGE + '?' + q });
   let info = null, last = '';
   // a ready promise that rejects throws here on every try: its reason is the error to report, where the
   // run used to wait forty seconds and say only "page never became ready"

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Motion v2 önizleme</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { height: 100vh; width: auto; display: block; }
+  body.export canvas { height: auto; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>if (new URLSearchParams(location.search).has('export')) document.body.className = 'export';</script>
+<script type="module" src="/src/v2/main.ts"></script>
+</body>
+</html>

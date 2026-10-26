@@ -1,0 +1,163 @@
+{
+  "id": "nufus-2025",
+  "design": "B",
+  "about": "Design B, 'Yükselen Türkiye': the 81 provinces rise as columns as tall as their 2025 population (TÜİK). One calm camera move at a time, typed lines.",
+  "fps": 60,
+  "duration": 18,
+  "source": "Kaynak: TÜİK, ADNKS 2025 sonuçları · Sınırlar: geoBoundaries / OpenStreetMap (CC BY-SA 2.0)",
+  "status": "RESMÎ İSTATİSTİK",
+  "rise": [
+    1.4,
+    4.4
+  ],
+  "height": 5,
+  "camera": [
+    {
+      "t": 0,
+      "at": [
+        35.8,
+        39.0
+      ],
+      "dist": 56,
+      "tilt": 0,
+      "az": 0
+    },
+    {
+      "t": 1.2,
+      "at": [
+        35.8,
+        39.0
+      ],
+      "dist": 56,
+      "tilt": 0,
+      "az": 0
+    },
+    {
+      "t": 4.8,
+      "at": [
+        33.6,
+        39.4
+      ],
+      "dist": 37,
+      "tilt": 58,
+      "az": -52
+    },
+    {
+      "t": 5.6,
+      "at": [
+        33.6,
+        39.4
+      ],
+      "dist": 37,
+      "tilt": 58,
+      "az": -48
+    },
+    {
+      "t": 7.4,
+      "province": "İstanbul",
+      "z": 0.5,
+      "dist": 22,
+      "tilt": 64,
+      "az": -40
+    },
+    {
+      "t": 10.4,
+      "province": "İstanbul",
+      "z": 0.5,
+      "dist": 21,
+      "tilt": 64,
+      "az": -44
+    },
+    {
+      "t": 12.8,
+      "province": "Bayburt",
+      "z": 0,
+      "dist": 14,
+      "tilt": 50,
+      "az": -30
+    },
+    {
+      "t": 14.4,
+      "province": "Bayburt",
+      "z": 0,
+      "dist": 13.5,
+      "tilt": 50,
+      "az": -26
+    },
+    {
+      "t": 16.6,
+      "at": [
+        33.6,
+        39.4
+      ],
+      "dist": 37,
+      "tilt": 58,
+      "az": -52
+    },
+    {
+      "t": 18,
+      "at": [
+        33.6,
+        39.4
+      ],
+      "dist": 37,
+      "tilt": 58,
+      "az": -48
+    }
+  ],
+  "beats": [
+    {
+      "at": 0.3,
+      "until": 5.6,
+      "kicker": "TÜİK · 2025 NÜFUSU",
+      "lines": [
+        "*86.092.168* kişi,",
+        "81 ile böyle dağılıyor."
+      ],
+      "labels": [
+        "İstanbul",
+        "Ankara",
+        "İzmir"
+      ],
+      "labelsAt": 4.4
+    },
+    {
+      "at": 6.0,
+      "until": 10.8,
+      "kicker": "EN KALABALIK İL",
+      "lines": [
+        "*İstanbul*: 15.754.053 kişi.",
+        "Her 100 kişiden 18'i burada."
+      ],
+      "focus": "İstanbul",
+      "labels": [
+        "İstanbul"
+      ]
+    },
+    {
+      "at": 11.2,
+      "until": 14.6,
+      "kicker": "EN AZ NÜFUSLU İL",
+      "lines": [
+        "*Bayburt*: 82.836 kişi."
+      ],
+      "focus": "Bayburt",
+      "labels": [
+        "Bayburt"
+      ]
+    },
+    {
+      "at": 15.0,
+      "until": 18,
+      "kicker": "İKİSİ YAN YANA",
+      "lines": [
+        "İstanbul'un nüfusu",
+        "*190 Bayburt* kadar."
+      ],
+      "labels": [
+        "İstanbul",
+        "Bayburt"
+      ]
+    }
+  ]
+}

@@ -945,3 +945,24 @@ sahibin önüne konan sayfada (Gündem Türkiye Viral Planı); bu bölüm ilk uy
   varışı yazılır ("Ankara: ~1 dk 25 sn"); metinler imleçle yazılır (sahip bunu ani belirmeden iyi
   buldu). TÜRKİYE etiketi ülkenin sınır kutusunun ortasına, olay yerinin adı işaretinin altına
   sabitlendi; ikisi de artık başka yere kaymaz.
+
+## 39. v2: Three.js motoru ve tasarım B / The Three.js engine and design B (2026-10-25)
+
+**Karar.** Kürenin çizemediği tasarımlar (eğik kamera, yükselen kara, binalar, uydu görüntüsü) için
+ikinci bir sayfa: `v2.html` + `src/v2/main.ts`, Three.js 0.170.0. Kürenin kodu değişmez; dışa aktarıcı
+yalnızca `--page` seçeneği kazandı. Sahneler YAML değil JSON (`scenes/v2/`), çünkü kamera anahtarları
+ve il adları veriye bağlı ve elle yazılıyor.
+
+**Tasarım B, "Yükselen Türkiye".** 81 il, nüfusu kadar yükselir (TÜİK 2025; yükseklik doğrusal:
+İstanbul 5 birim, Bayburt 0,03 — fark, videonun kendisi). Renk değere değil sıraya göre: doğrusal ölçekte
+üç il dışında hepsi aynı açık pembeydi. Kamera: tepeden → eğik ve batıdan (ülke uzunlamasına derinliğe
+uzanır, dikey kadraja sığar) → İstanbul → Bayburt → geniş; her geçiş tek hareket, smootherstep ile, arada
+durur. Yazı kürenin hızında (45 karakter/sn) blok imleçle. Etiket, uzun bir sütunun tepesi yazı bloğuna
+değecekse sütunun yanına geçer.
+
+**Hükümler.** Her cümle TÜİK'in kendi sayısı ya da onunla yapılan bir bölme ("Her 100 kişiden 18'i":
+%18,30; "190 Bayburt": 15.754.053 / 82.836 = 190,2). Önizleme:
+`motion-onizleme/v2-tasarimlar/B-yukselen-turkiye-nufus-2025-sessiz.mp4`.
+
+**Sıradaki.** A "Uydudan iniş" (Sentinel-2 cloudless, TCMB faiz kararı), C "Zaman tüneli" (TCMB faiz
+geçmişi), E "Fiyat etiketi"; seslendirme ve Kenney sesleri v2 sahnelerine; `produce` hattına v2 sahne üreticisi.

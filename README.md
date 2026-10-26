@@ -38,6 +38,25 @@ node tools/scene/generate.mjs --datasets ../datasets --id evt_…     # tek kay�
 npm test                                      # iki ayrı işlemede aynı kareler (tolerans: 2/255)
 ```
 
+### v2: Three.js motoru / the Three.js engine
+
+`v2.html` + `src/v2/main.ts`: haritanın üç boyutlu hâli, kürenin yanında ikinci bir sayfa. Aynı
+`window.motion` arayüzünü verir (`ready`, `frame(i)`), bu yüzden aynı dışa aktarıcıyla çizilir:
+
+```bash
+npm run render -- --page v2.html --scene nufus-2025     # out/nufus-2025-v2B.mp4
+npm run dev    # önizleme: http://localhost:5178/v2.html?scene=nufus-2025
+```
+
+Sahneler `scenes/v2/*.json`: süre, kamera anahtarları (`at` boylam/enlem ya da `province`, `dist`,
+`tilt` dikeyden derece, `az` güneyden derece), satırlar (`*vurgu*`) ve il etiketleri. Kamera bir anda
+tek bir hareket yapar, yumuşak başlar ve biter, sonra durur; her satır blok imleçle yazılır (sahibin
+2026-10-25 isteği). Kaynak satırı ve doğrulama durumu her karede.
+
+İlk tasarım, **B "Yükselen Türkiye"**: 81 il, 2025 nüfusu kadar yükselen sütunlar (TÜİK ADNKS 2025;
+il sınırları geoBoundaries TUR ADM1, OpenStreetMap'ten, CC BY-SA 2.0). Veri: `assets/data/tr-adm1.json`
+(0,01 dereceye yuvarlanmış), `assets/data/tr-population-2025.json`.
+
 ### Voice approval
 
 The non-production Fish Speech audition gate is documented in [docs/voice-lab.md](docs/voice-lab.md).
