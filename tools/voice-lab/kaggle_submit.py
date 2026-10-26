@@ -59,6 +59,20 @@ def blocked(owner: str, env: str | None = None) -> bool:
     return owner.strip().lower() in {n.strip().lower() for n in names.split(",") if n.strip()}
 
 
+def wait_ready(dataset: str, limit: float = 300, step: float = 10) -> None:
+    """Wait until Kaggle has processed the dataset just created or versioned. A kernel pushed before that
+    does not see it: on a new job slug (KAGGLE_JOB_SUFFIX=quake, 2026-10-25) the push said "not valid
+    dataset sources" and the run found no job.json; on a new version it could read the previous job."""
+    end = time.monotonic() + limit
+    while True:
+        status = command("datasets", "status", dataset, capture=True).stdout.strip().lower()
+        if "ready" in status:
+            return
+        if "error" in status or time.monotonic() > end:
+            raise SystemExit(f"Kaggle dataset {dataset} not ready: {status or 'no status'}")
+        time.sleep(step)
+
+
 def arguments():
     parser = argparse.ArgumentParser(description="Produce Fish S2 Pro narration through Kaggle.")
     parser.add_argument("narration", type=Path)
@@ -157,6 +171,7 @@ def main():
             command("datasets", "version", "-p", input_dir, "-m", "Update daily Motion voice job")
         except subprocess.CalledProcessError:
             command("datasets", "create", "-p", input_dir)
+        wait_ready(dataset)
 
         shutil.copyfile(args.notebook, kernel_dir / args.notebook.name)
         # When the operator has published the bf16 weights as a private dataset
