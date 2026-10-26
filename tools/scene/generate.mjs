@@ -38,6 +38,17 @@ const TR_PLACES = [
 /** The middle of a country's largest landmass (Romania, not its capital; France, not an overseas
  *  island), for a record that names only its country. */
 let SHAPES = null;
+/** How far a country reaches from its middle, in degrees (its largest polygon). */
+function countryReach(iso3) {
+  const mid = countryMiddle(iso3);
+  const c = COUNTRY_TABLE.find((x) => x.iso3 === iso3);
+  const f = c && SHAPES?.find((x) => String(x.id) === String(c.num));
+  if (!mid || !f) return null;
+  const polys = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates })) : [f.geometry];
+  const big = polys.sort((x, y) => geoArea(y) - geoArea(x))[0];
+  return Math.max(...big.coordinates[0].map((q) => geoDistance(mid, q) / (Math.PI / 180)));
+}
+
 function countryMiddle(iso3) {
   const c = COUNTRY_TABLE.find((x) => x.iso3 === iso3);
   if (!c) return null;
@@ -263,7 +274,11 @@ const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
 /** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
-export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2')
+/** A news site's media tag in a headline ("(FOTOĞRAFLAR)", "[VIDEO]", "- FOTO GALERİ"): the site's
+ *  furniture, not the story's words; the owner saw "(FOTOĞRAFLAR)" in a video's headline (2026-10-26). */
+export const untag = (s) => s.replace(/\s*[([]\s*(FOTOĞRAFLAR|FOTOĞRAF|FOTO(?:\s*GALERİ)?|VİDEO|VIDEO|GALERİ|PHOTOS?|VIDEOS?)\s*[)\]]/giu, '')
+  .replace(/\s*[-–|]\s*(FOTOĞRAFLAR|FOTO(?:\s*GALERİ)?|VİDEO|VIDEO|PHOTOS?)\s*$/giu, '').trim();
+export const tidy = (s) => untag(s).replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2')
   // a model's hyphen with a stray space ("F -16", "MiG -29", "Buk - M3")
   .replace(/(\p{Lu}) ?- ?(\d)/gu, '$1-$2');
 
@@ -581,7 +596,7 @@ export function readFirms(files) {
 export function generate(record, { datasets, style, variant = 'standart', firms = null, photo = null } = {}) {
   if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
-  const titleTr = record.title?.tr, titleEn = record.title?.en ?? '';
+  const titleTr = record.title?.tr && untag(record.title.tr), titleEn = untag(record.title?.en ?? '');
   if (!titleTr) refuse('no Turkish title');
   const st = record.assessment?.status;
   if (!STATUS[st]) refuse(`verification status "${st}" is not one a video can carry`);
@@ -614,7 +629,9 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // sea its feed files it under: "Russian forces lose another 1,470 troops in war against Ukraine" read
   // "KARADENİZ" with a ring in the open sea. The ring goes on Ukraine, said to show the country
   const placeless = !pt && !area && !loc?.place_name && loc?.precision !== 'country';
-  const war = placeless && regionKey === 'black-sea' && partiesOf(titleEn).some((c) => c.iso3 === 'UKR');
+  // Russia named alone counts too: "War update: 193 combat clashes on the front line, Russia presses on three
+  // axes" put the ring on Russia's middle, in Siberia, for a story about the front in Ukraine (2026-10-26)
+  const war = placeless && regionKey === 'black-sea' && partiesOf(titleEn).some((c) => c.iso3 === 'UKR' || c.iso3 === 'RUS');
   // the same for any record with no place whose headline names one country, Türkiye and the US aside:
   // "Exercise Phoenix Express 2026 begins in Tunisia" read "KUZEY AFRİKA" with the ring on the region's
   // middle; the ring goes on Tunisia, said to show the country
@@ -898,7 +915,13 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   } else {
     const span = deg(home, at);
     open = { center: [round1((home[0] + at[0]) / 2 - 4), round1((home[1] + at[1]) / 2 + 1.5)], zoom: round1(Math.min(1.0, Math.max(0.6, 560 / (span * 24.4 + 400)))) };
-    near = (dx, dy, zoom) => ({ center: [round1(at[0] + dx), round1(at[1] + dy)], zoom });
+    // a story placed only in a country ("Rusya") never closes in on that country's middle: the camera
+    // went to 2.7 over Russia's centroid and showed nothing but blown-up relief (owner, 2026-10-26); it
+    // stays far enough out to show the whole country, as the distance beat frames its two ends
+    const wholeIso = whole ? (theatre && shownCountry ? shownCountry.iso3 : record.countries?.[0]) : null;
+    const reach = wholeIso ? countryReach(wholeIso) : null;
+    const fit = reach ? Math.max(0.6, 420 / (2 * reach * 24.4)) : Infinity;
+    near = (dx, dy, zoom) => ({ center: [round1(at[0] + (fit < Infinity ? 0 : dx)), round1(at[1] + (fit < Infinity ? 0 : dy))], zoom: round1(Math.min(zoom, fit * (zoom >= 2 ? 1.15 : 1.05))) });
   }
   const wide = deal || (speaker && !pt);
   const keys = [{ t: 0, ...open }, { t: beats[0].at, ...(wide ? near(0, 0, 1.0) : near(0.3, 2.4, 1.0)) }];

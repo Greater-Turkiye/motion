@@ -33,6 +33,8 @@ export interface Style {
   speckle?: number;                   // photocopy toner speckle, 0..1 (H)
   contour?: { color: string; step: number };  // contour lines, step as a share of 5 km (I)
   gratStep?: number;                  // graticule spacing in degrees (default 10)
+  maxZoom?: number;                   // the camera comes no closer than this: past it the relief's grain shows (G)
+  subjectRelief?: boolean;            // the subject's fill lets the relief through at full strength (G)
   stepFps?: number;                   // camera moves in steps, n per second: stop motion (H)
   /** The style's motion language: how its text enters, how its camera moves, whether it shows the
    *  stories-style progress bar. Part of the style, so a style change changes all of it together. */
@@ -49,8 +51,9 @@ export const STYLES: Record<StyleId, Style> = {
     glow: null, atmosphere: null, accent: '#f4e14a', ink: '#ffffff', muted: '#b7b0a8', status: '#ff8a98',
     label: 'rgba(255,255,255,0.8)', emblemMono: true, baseScale: 1400, cy: 640, grain: 0.05, relief: 0.95, limb: 0.35 },
   // motion: an operations screen: text is typed, the camera tracks smoothly
+  // Türkiye in flag red on the navy: at #123d5a it sat one shade off the land and read as passive (owner, 2026-10-26)
   B: { id: 'B', fonts: { display: 'Archivo', text: 'Archivo', mono: 'JetBrains' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Harekât lacivert', flat: false, bg: ['#06182a', '#020a12'], sea: '#061a2c', land: '#0b2740', border: 'rgba(140,190,215,0.28)',
-    graticule: 'rgba(140,190,215,0.06)', home: '#123d5a', homeStroke: '#8cc4dc', subject: '#2a1f14', subjectStroke: '#e0a64a',
+    graticule: 'rgba(140,190,215,0.06)', home: '#c41e2e', homeStroke: '#ff8a96', subject: '#2a1f14', subjectStroke: '#e0a64a',
     glow: null, atmosphere: null, accent: '#8cc4dc', ink: '#ffffff', muted: '#7fc9ec', status: '#ffb020',
     label: 'rgba(223,244,255,0.85)', emblemMono: true, baseScale: 1700, cy: 640, grain: 0.035, relief: 0.6, limb: 0.3 },
   // motion: a newspaper page: lines are drawn on, the camera moves like a hand over paper
@@ -59,9 +62,10 @@ export const STYLES: Record<StyleId, Style> = {
     glow: null, atmosphere: null, accent: '#c8002a', ink: '#141414', muted: '#555555', status: '#555555',
     label: 'rgba(20,20,20,0.85)', emblemMono: false, baseScale: 1650, cy: 470, grain: 0.02, relief: 0.5, limb: 0 },
   // motion: a calm documentary from orbit: text rises, the camera flies
-  D: { id: 'D', fonts: { display: 'Archivo', text: 'M', mono: 'JetBrains' }, motion: { text: 'rise', camera: 'fly', progress: false }, name: 'Uydu gecesi', flat: false, bg: ['#0e1726', '#010102'], sea: '#0a1422', land: '#1d2530', border: 'rgba(255,255,255,0.32)',
-    graticule: 'rgba(255,255,255,0.04)', home: '#23303f', homeStroke: '#ffffff', subject: '#1d2530', subjectStroke: 'rgba(255,209,102,0.85)',
-    glow: null, atmosphere: null, accent: '#ffd166', ink: '#ffffff', muted: '#9fb4d6', status: '#ffd166',
+  // black night, Türkiye in flag red and the subject in signal orange: navy and grey read as dull (owner, 2026-10-26)
+  D: { id: 'D', fonts: { display: 'Archivo', text: 'M', mono: 'JetBrains' }, motion: { text: 'rise', camera: 'fly', progress: false }, name: 'Uydu gecesi', flat: false, bg: ['#0c0c0e', '#000000'], sea: '#05070a', land: '#1b1c20', border: 'rgba(255,255,255,0.30)',
+    graticule: 'rgba(255,255,255,0.035)', home: '#c8102e', homeStroke: '#ff7a88', subject: '#3a2408', subjectStroke: '#ff9f1c',
+    glow: null, atmosphere: null, accent: '#ff9f1c', ink: '#ffffff', muted: '#b4b4bd', status: '#ff9f1c',
     label: 'rgba(255,255,255,0.85)', emblemMono: true, baseScale: 1100, cy: 640, grain: 0.04, relief: 1.0, limb: 0.45 },
   // research/03 E: a dark world in which one thing is lit (John Nelson's firefly recipe)
   // motion: a dark world lighting up: soft entrances, long flights
@@ -72,10 +76,13 @@ export const STYLES: Record<StyleId, Style> = {
   // research/03 G: Imhof's Swiss relief, hypsometric tint, blue-grey shadows and warm light
   // motion: an atlas: slow, drawn, unhurried
   G: { id: 'G', fonts: { display: 'Schibsted', text: 'Schibsted', mono: 'X' }, motion: { text: 'wipe', camera: 'glide', progress: false }, name: 'İsviçre rölyefi', flat: true, bg: ['#eef0ea', '#e4e7df'], sea: '#A7C5D9', land: '#A9B89A', border: 'rgba(40,40,40,0.45)',
-    graticule: 'rgba(40,60,80,0.07)', home: '#E30A17', homeStroke: '#8c1420', subject: '#7A1F2B', subjectStroke: '#7A1F2B',
+    graticule: 'rgba(40,60,80,0.07)', home: '#E30A17', homeStroke: '#8c1420', subject: '#C9837A', subjectStroke: '#7A1F2B',
     glow: null, atmosphere: null, accent: '#b3121f', ink: '#1d2326', muted: '#46525c', status: '#7A1F2B',
     label: 'rgba(20,30,40,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 1.0, limb: 0,
-    hypso: ['#A9B89A', '#D9CFA6', '#F1EBDC'], shadeTint: ['#5B6E82', '#FFF6E0'] },
+    hypso: ['#A9B89A', '#D9CFA6', '#F1EBDC'], shadeTint: ['#5B6E82', '#FFF6E0'],
+    // close in on Russia the dark wine fill hid the land and the relief's grain showed (owner, 2026-10-26):
+    // a lighter fill with the relief through it, and the camera stops at 1.35
+    maxZoom: 1.35, subjectRelief: true },
   // research/03 K: an İznik tile atlas, Piri Reis rhumb lines on a pale sea
   // motion: ceremonial: nothing snaps, everything settles
   // the rhumb lines and the sea tile are gone (review, 23 October: crossing lines over both seas), and the
@@ -84,13 +91,16 @@ export const STYLES: Record<StyleId, Style> = {
     graticule: 'rgba(0,0,0,0)', home: '#B8322A', homeStroke: '#1B1B1B', subject: '#e6e3f0', subjectStroke: '#1F3F8F',
     glow: null, atmosphere: null, accent: '#1F3F8F', ink: '#1B1B1B', muted: '#4d4a44', status: '#B8322A',
     label: 'rgba(27,27,27,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.3, limb: 0 },
-  // research/03 H: a declassified dossier, photocopied: toner on paper, Factbook-blue sea, halftone relief
-  // motion: a typed dossier: typewriter text, a camera that moves in steps
-  H: { id: 'H', fonts: { display: 'BlackOps', text: 'SpecialElite', mono: 'CourierPrime' }, motion: { text: 'type', camera: 'snap', progress: false }, name: 'Gizliliği kaldırılmış', flat: true, bg: ['#ECE7DB', '#E2DCCD'], sea: '#C9D6DF', land: '#E9E4D8', border: 'rgba(26,26,26,0.8)',
+  // research/03 H: a declassified dossier, photocopied: toner on paper, Factbook-blue sea
+  // motion: a typed dossier: typewriter text, a smooth camera
+  // the stencil and typewriter faces were hard to read, and the 12-a-second camera steps and the halftone dots
+  // that crawled as the map moved made the video judder (owner, 2026-10-26): a plain face, a smooth camera, no dots;
+  // the dossier stays in the paper, the toner red and the typewriter kickers
+  H: { id: 'H', fonts: { display: 'Archivo', text: 'Archivo', mono: 'CourierPrime' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Gizliliği kaldırılmış', flat: true, bg: ['#ECE7DB', '#E2DCCD'], sea: '#C9D6DF', land: '#E9E4D8', border: 'rgba(26,26,26,0.8)',
     graticule: 'rgba(26,26,26,0.10)', home: '#d8cbb6', homeStroke: '#1A1A1A', subject: '#dcd3c3', subjectStroke: '#B3261E',
     glow: null, atmosphere: null, accent: '#B3261E', ink: '#1A1A1A', muted: '#4a4640', status: '#B3261E',
     label: 'rgba(26,26,26,0.9)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.07, relief: 0.8, limb: 0,
-    halftone: 7, speckle: 0.5, stepFps: 12 },
+    speckle: 0.15 },
   // research/03 I: a printed field sheet: pale green lowland, brown contours, a one-degree grid
   // motion: a field sheet: ruled lines drawn on, decisive moves
   I: { id: 'I', fonts: { display: 'Archivo', text: 'Archivo', mono: 'Martian' }, motion: { text: 'wipe', camera: 'snap', progress: false }, name: 'Harekât paftası', flat: true, bg: ['#F2EFE4', '#E9E5D6'], sea: '#9CC7E0', land: '#F2EFE4', border: 'rgba(29,29,29,0.7)',

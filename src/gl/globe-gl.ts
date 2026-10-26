@@ -78,7 +78,7 @@ void main() { gl_Position = vec4(P[gl_VertexID], 0.0, 1.0); }`;
 
 const FILL_FS = HEAD + PROJECT + `
 uniform sampler2D uId; uniform sampler2D uPal; uniform sampler2D uGlow; uniform sampler2D uRelief;
-uniform float uReliefK, uLimb, uHasRelief;
+uniform float uReliefK, uLimb, uHasRelief, uSubjectRelief;
 uniform vec3 uHyp0, uHyp1, uHyp2; uniform float uHasHyp;
 uniform vec3 uShadowT, uLightT; uniform float uHasTint;
 uniform vec4 uRhumbC, uTile; uniform vec2 uRhumbP[3]; uniform int uRhumbN;
@@ -185,7 +185,7 @@ void main() {
                 + 0.15 * dot(n, normalize(vec3(0.0, 0.85, 0.53))) / 0.53;  // 1.0 on flat ground
     float hi = rn.b;                            // 0 sea level .. 1 at 5 km
     // plains stay quiet, mountains speak; the home and subject fills keep most of their flat colour
-    float k = uReliefK * (0.35 + 0.65 * smoothstep(0.02, 0.45, hi)) * ((kind == 2 || kind == 3) ? 0.45 : 1.0);
+    float k = uReliefK * (0.35 + 0.65 * smoothstep(0.02, 0.45, hi)) * (kind == 2 ? 0.45 : kind == 3 ? uSubjectRelief : 1.0);
     if (uHalftone > 0.0) {
       // printed relief: shadow becomes a 45° dot screen whose dots grow with the darkness
       float dark = clamp((1.0 - clamp(shade, 0.35, 1.22)) * k * 2.2, 0.0, 1.0);
@@ -452,7 +452,7 @@ export class GlobeGL {
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, this.palTex); gl.uniform1i(u('uPal'), 1);
     gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, this.glowTex ?? this.palTex); gl.uniform1i(u('uGlow'), 2);
     gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.reliefTex ?? this.palTex); gl.uniform1i(u('uRelief'), 3);
-    gl.uniform1f(u('uHasRelief'), this.reliefTex ? 1 : 0); gl.uniform1f(u('uReliefK'), s.relief); gl.uniform1f(u('uLimb'), s.limb);
+    gl.uniform1f(u('uHasRelief'), this.reliefTex ? 1 : 0); gl.uniform1f(u('uReliefK'), s.relief); gl.uniform1f(u('uSubjectRelief'), s.subjectRelief ? 1.0 : 0.45); gl.uniform1f(u('uLimb'), s.limb);
     const rgb = (x: string) => rgba(x).slice(0, 3);
     gl.uniform1f(u('uHasHyp'), s.hypso && this.reliefTex ? 1 : 0);
     if (s.hypso) { gl.uniform3fv(u('uHyp0'), rgb(s.hypso[0])); gl.uniform3fv(u('uHyp1'), rgb(s.hypso[1])); gl.uniform3fv(u('uHyp2'), rgb(s.hypso[2])); }
