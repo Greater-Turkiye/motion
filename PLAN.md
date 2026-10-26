@@ -966,3 +966,16 @@ değecekse sütunun yanına geçer.
 
 **Sıradaki.** A "Uydudan iniş" (Sentinel-2 cloudless, TCMB faiz kararı), C "Zaman tüneli" (TCMB faiz
 geçmişi), E "Fiyat etiketi"; seslendirme ve Kenney sesleri v2 sahnelerine; `produce` hattına v2 sahne üreticisi.
+
+## 41. v2 tasarım D: şehre iniş / Design D: the descent into a city (2026-10-26)
+
+Sahibin notu: "3D dedim, evler, havalı ileri teknolojik yöntemler beklemiştim". Cevap: İstanbul'un üstünden
+(70 km) Levent'e (2,6 km) tek bir iniş, mesafe logaritmik ilerler (sonda dalış yok). Zemin gerçek uydu
+görüntüsü (Sentinel-2 cloudless 2016), 26.706 OSM binası odaktan dışa dokuz halkada yükselir, alçak güneş
+gölgeleri Boğaz'a doğru uzatır, yazı üstteki kâğıt panelde imleçle yazılır, fotoğrafın üstüne hiç yazı
+binmez. Ekrandaki her sayı kaynağın: TÜİK nüfusu ve Levent'in 3,2 km çevresinde OSM'deki bina sayısı (23.977).
+Sahibin ikinci notu ("kare kare seçilmiş", "yükseklik çok mu önemli"): şehir artık odak çevresinde bir disk,
+son 700 m'de binalar zemine iner; yükseklik satırı kalktı. D yeni bir kategori değil, gerektiğinde başka
+şablonların içinde kullanılacak bir araç (bir depremin ilçesi, bir haberin geçtiği semt). OSM'de kuşkulu bir kayıt (ÖzdilekPark: 275 m, 19.800 m²
+tabanlı tek bina) kadrajı bir duvar gibi kesiyordu: böyle yükseklikler düşürülür, kuleler `building:part`
+kayıtlarından gelir. Önizleme: `motion-onizleme/sablonlar/sablon-V2D.mp4`.

@@ -15,6 +15,8 @@
 | `assets/emblems/**` | Wikimedia Commons, Wikidata üzerinden | Her dosyanın lisansı ve yazarı `assets/emblems/manifest.json`'da; yalnızca kamu malı, CC0, CC BY, CC BY-SA |
 | `assets/data/tr-adm1.json` | [geoBoundaries](https://www.geoboundaries.org/) TUR ADM1 (OpenStreetMap'ten türetilmiş), 0,01 dereceye yuvarlanmış | CC BY-SA 2.0; bu türev dosya da aynı lisansla; videoda "Sınırlar: geoBoundaries / OpenStreetMap (CC BY-SA 2.0)" yazar |
 | `assets/data/tr-population-2025.json` | TÜİK, Adrese Dayalı Nüfus Kayıt Sistemi Sonuçları 2025 (il nüfusları) | Resmî istatistik; kaynak gösterilerek kullanılır, videoda "Kaynak: TÜİK" yazar |
+| `assets/data/v2/*-s2.jpg` | [Sentinel-2 cloudless 2016](https://s2maps.eu), EOX IT Services GmbH (Copernicus Sentinel verisi 2016'dan değiştirilerek), `tools/data/fetch_s2.py` | CC BY 4.0; videoda "Uydu: Sentinel-2 cloudless 2016, EOX (CC BY 4.0)" yazar |
+| `assets/data/v2/istanbul-levent.json` | © OpenStreetMap katkıda bulunanlar, Overpass API, `tools/data/fetch_city.py` | ODbL 1.0; videoda "Binalar: © OpenStreetMap katkıda bulunanlar (ODbL)" yazar |
 | three (paketlenir, v2) | [three.js](https://github.com/mrdoob/three.js) 0.170.0 | MIT |
 | earcut (paketlenir) | [mapbox/earcut](https://github.com/mapbox/earcut) | ISC |
 | mp4-muxer (paketlenir) | [Vanilagy/mp4-muxer](https://github.com/Vanilagy/mp4-muxer) | MIT |
