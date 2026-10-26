@@ -1,6 +1,6 @@
 # YouTube upload
 
-`produce.yml` generates a factual title and description from the same source and verification metadata used in the share text, then uploads the MP4 with YouTube Data API v3. The API request marks synthetic narration via `status.containsSyntheticMedia`. Keep the disclosure in the description and check YouTube Studio's altered-content setting when required by current policy.
+`produce.yml` generates a factual title and description from the same source and verification metadata used in the share text, then uploads the MP4 with YouTube Data API v3. The request sets `status.containsSyntheticMedia: false`: the video is an animated map drawn by code, which YouTube's altered-content rule leaves out (owner, 2026-10-26). With `RELEASE_TAG` set, the uploader writes the YouTube link back to that GitHub release: a line in its notes and `youtube.<channel>` in its metadata file.
 
 The upload step is skipped when no YouTube OAuth secrets are configured and does not block GitHub Release or Pages publication. Its default privacy is `unlisted`; set the repository variable `YOUTUBE_PRIVACY_STATUS` to `public` only after the channel, OAuth app, API project and content workflow are ready. YouTube may force uploads from an unaudited API project to private regardless of the requested status.
 

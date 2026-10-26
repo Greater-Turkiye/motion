@@ -149,9 +149,9 @@ jobs:
           title=$(node -e "console.log(require('./meta.json').title)")
           src=$(node -e "console.log(require('./meta.json').sources[0])")
           if [ "$CHANNEL" = tr ]; then
-            printf '%s\n\nKaynak: Kandilli Rasathanesi (%s). Dalga varışları tahminidir (IASP91 modeli), hissedilme bilgisi değildir.\nSeslendirme: yapay ses (Fish Audio S2 Pro). Efektler: Kenney (CC0).\n' "$title" "$src" > notes.md
+            printf '%s\n\nKaynak: Kandilli Rasathanesi (%s). Dalga varışları tahminidir (IASP91 modeli), hissedilme bilgisi değildir.\nAnimasyon: Greater Türkiye motion yazılımıyla kodla çizildi. Seslendirme: Fish Audio S2 Pro. Efektler: Kenney (CC0).\n' "$title" "$src" > notes.md
           else
-            printf '%s\n\nSource: USGS (%s), public domain.\nVoice-over: synthetic voice (Fish Audio S2 Pro). Sound effects: Kenney (CC0).\n' "$title" "$src" > notes.md
+            printf '%s\n\nSource: USGS (%s), public domain.\nAnimation: drawn in code by Greater Türkiye motion. Voice: Fish Audio S2 Pro. Sound effects: Kenney (CC0).\n' "$title" "$src" > notes.md
           fi
           gh release create "$SCENE" release/* --title "$title" --notes-file notes.md --latest=false
       - name: Upload
@@ -164,6 +164,7 @@ jobs:
           YOUTUBE_EARTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_EARTH_REFRESH_TOKEN }}
           YOUTUBE_OWN_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OWN_REFRESH_TOKEN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          RELEASE_TAG: ${{ steps.scene.outputs.scene }}
         run: |
           key=earth; [ "$CHANNEL" = tr ] && key=own
           node tools/post/youtube-upload.mjs "$SCENE" meta.json "release/$SCENE.mp4" "$key"

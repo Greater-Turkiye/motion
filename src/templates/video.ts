@@ -35,7 +35,8 @@ const TR_MIDDLE: LonLat = [35.4, 38.95];
  *  the country stands on the text block. */
 const TR_NORTH: LonLat = [35.4, 41.3];
 /** Türkiye's western and eastern ends (Gökçeada, Iğdır): its width on screen sets the size of its name. */
-const TR_WEST: LonLat = [25.9, 40.2], TR_EAST: LonLat = [44.8, 39.7];
+/** the TÜRKİYE label's one size, px on the 1080-wide frame */
+const HOME_SIZE = 40;
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
 /** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
@@ -277,11 +278,9 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   // filled when the camera came close (zoom 0.6 -> 0.88x, 1 -> 1x, 2.7 -> 1.25x)
   // held to ±8 %: a wider range made the names swell and shrink on screen (review, 23 October)
   const nameScale = Math.min(1.08, Math.max(0.92, Math.pow(cameraAt(sc, s, t).zoom, 0.12)));
-  // TÜRKİYE as wide as about half the country on screen, so the name fills its land at every distance
-  // (owner, 2026-10-26: a fixed size stood small on a country that filled the frame); it follows the
-  // camera's own smooth zoom, 28 px at the widest view to 96 px when the country fills the frame
-  const tw = proj(TR_WEST), te = proj(TR_EAST);
-  const homeSize = tw && te ? Math.round(Math.min(96, Math.max(28, 0.08 * Math.hypot(te[0] - tw[0], te[1] - tw[1])))) : Math.round(32 * nameScale);
+  // TÜRKİYE at one standard size in every frame of every video: sized to the country it swelled and shrank
+  // with the camera, which read as a label that never settled (owner, 2026-10-26, after the third round)
+  const homeSize = HOME_SIZE;
   sc.labels.forEach((l, i) => {
     const home = l.kind === 'home';
     // TÜRKİYE never moves off its middle (the owner saw it slide from frame to frame): it has one anchor,

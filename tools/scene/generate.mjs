@@ -200,12 +200,23 @@ const typeLabel = (record, texts) => {
 };
 
 /** The style for an event type, from config/styles.yaml (the studio page shows every style on a
- *  recent story of each family): the exact type, else the longest matching prefix, else default. */
+ *  recent story of each family): the pool of the exact type, else of the longest matching prefix, else
+ *  the default pool. The first style of the pool that none of `recent` (the channel's last videos,
+ *  newest first) used; when every one was used, the one used longest ago. With no `recent`, the
+ *  pool's first style, the family default. */
 const STYLE_CONFIG = parse(readFileSync(path.join(ROOT, 'config', 'styles.yaml'), 'utf8'));
-export function styleFor(type) {
-  if (STYLE_CONFIG[type]) return STYLE_CONFIG[type];
-  const prefix = Object.keys(STYLE_CONFIG).filter((k) => k.endsWith('.') && type.startsWith(k)).sort((a, b) => b.length - a.length)[0];
-  return prefix ? STYLE_CONFIG[prefix] : STYLE_CONFIG.default ?? 'C';
+export function stylePool(type) {
+  const key = STYLE_CONFIG[type] ? type
+    : Object.keys(STYLE_CONFIG).filter((k) => k.endsWith('.') && type.startsWith(k)).sort((a, b) => b.length - a.length)[0] ?? 'default';
+  const pool = STYLE_CONFIG[key] ?? 'C';
+  return Array.isArray(pool) ? pool : [pool];
+}
+export function styleFor(type, recent = []) {
+  const pool = stylePool(type);
+  const fresh = pool.find((s) => !recent.slice(0, 4).includes(s));
+  if (fresh) return fresh;
+  const age = (s) => { const i = recent.indexOf(s); return i < 0 ? Infinity : i; };
+  return [...pool].sort((a, b) => age(b) - age(a))[0];
 }
 
 /** Red lines (handbook; motion CLAUDE.md section 2): no video about Turkish forces. Matched on both
@@ -611,7 +622,7 @@ export function readFirms(files) {
   return rows.filter((r) => { const k = `${r.at}|${r.date}|${r.time}`; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
-export function generate(record, { datasets, style, variant = 'standart', firms = null, photo = null } = {}) {
+export function generate(record, { datasets, style, recent = [], variant = 'standart', firms = null, photo = null } = {}) {
   if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
   const titleTr = record.title?.tr && untag(record.title.tr), titleEn = untag(record.title?.en ?? '');
@@ -1011,7 +1022,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     fps: 60,
     duration,
     ...(variant !== 'standart' ? { variant } : {}),
-    style: style ?? styleFor(record.event_type ?? ''),
+    style: style ?? styleFor(record.event_type ?? '', recent),
     source_text: [...texts, news, fields],
     camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered, globe: false },
     // an event at sea is drawn even when only its sea or island is known: the hull is the story
@@ -1084,6 +1095,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const datasets = args.get('datasets');
   const style = args.get('style');
   const variant = args.get('variant') ?? 'standart';
+  // the styles of the channel's last videos, newest first ("B,B,A"), so the next one looks different
+  const recent = String(args.get('recent') ?? '').split(',').map((x) => x.trim()).filter(Boolean);
   if (args.has('latest')) {
     // the newest records first; a refusal is news about the record, not a failure of the run
     const n = Number(args.get('latest')) || 5;
@@ -1091,7 +1104,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     let made = 0;
     for (const record of newest) {
       if (made >= n) break;
-      try { write(generate(record, { datasets, style }), record); made++; } catch (e) { console.log(`skip ${e.message}`); }
+      try { write(generate(record, { datasets, style, recent }), record); made++; } catch (e) { console.log(`skip ${e.message}`); }
     }
     if (!made) { console.error('no scene could be made from the newest records'); process.exit(3); }
   } else {
@@ -1100,13 +1113,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     try {
       const firms = args.get('firms') ? readFirms(args.get('firms').split(',')) : null;
       const photo = args.get('photo') ? JSON.parse(readFileSync(args.get('photo'), 'utf8')) : null;
-      const scene = generate(record, { datasets, style, variant, firms, photo });
+      const scene = generate(record, { datasets, style, recent, variant, firms, photo });
       write(scene, record, args.get('out'));
       if (args.get('notes')) writeFileSync(args.get('notes'), notes(record, scene));
       // what the site's videos page shows next to the video (tools/scene/site.mjs)
       if (args.get('meta')) writeFileSync(args.get('meta'), JSON.stringify({
         id: record.id, title: tidy(record.title.tr), title_en: record.title.en ?? null, status: scene.hook.status,
-        date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), style: scene.style, variant: scene.variant ?? 'standart',
+        date: String(record.time.start).slice(0, 10), published: new Date().toISOString(), event_type: record.event_type ?? null, style: scene.style, variant: scene.variant ?? 'standart',
         sources: record.sources.map((s) => s.url),
         release: `https://github.com/Greater-Turkiye/motion/releases/tag/video-${record.id}`,
       }, null, 1) + '\n');

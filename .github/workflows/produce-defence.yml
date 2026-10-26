@@ -7,7 +7,7 @@ name: produce-defence
 # the rocket and payload, the target orbit around the Earth at its inclination and at the Earth's own
 # scale, and the status Launch Library 2 gives. The orbit's height and inclination are typical values
 # for its type, and the screen says so. Kokoro's voice (MOTION_DEFENCE_VOICE, default bm_george), the
-# scene's style D unless MOTION_DEFENCE_STYLE says otherwise. Published as a GitHub release tagged
+# scene's style (one of D, A, E, B, G by the launch id) unless MOTION_DEFENCE_STYLE says otherwise. Published as a GitHub release tagged
 # defence-<scene>, which is also the ledger of what was published, then uploaded to the channel.
 #
 # Kill switch: MOTION_DEFENCE=off. Twice a day at most, like the other channels.
@@ -146,7 +146,7 @@ jobs:
         run: |
           title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/'+process.env.SCENE+'.yaml','utf8'));console.log(s.hook.lines.join(' · ') + ' · ' + s.hook.kicker + ' · @greaterdefence')")
           src=$(node -e "console.log(require('./meta.json').sources[0])")
-          printf '%s\n\nSource: Launch Library 2, The Space Devs (%s). The orbit drawn is typical for its type, not the mission'"'"'s own elements.\nVoice-over: Kokoro-82M synthetic voice (%s).\n' "$title" "$src" "$KOKORO_VOICE" > notes.md
+          printf '%s\n\nSource: Launch Library 2, The Space Devs (%s). The orbit drawn is typical for its type, not the mission'"'"'s own elements.\nAnimation: drawn in code by Greater Türkiye motion. Voice: Kokoro-82M (%s).\n' "$title" "$src" "$KOKORO_VOICE" > notes.md
           gh release create "defence-$SCENE" release/* --title "$title" --notes-file notes.md --latest=false
           echo "published: defence-$SCENE" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload to @greaterdefence
@@ -158,4 +158,5 @@ jobs:
           YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
           YOUTUBE_DEFENCE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_DEFENCE_REFRESH_TOKEN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          RELEASE_TAG: defence-${{ steps.pick.outputs.scene }}
         run: node tools/post/youtube-upload.mjs "$SCENE" meta.json "release/$SCENE.mp4" defence

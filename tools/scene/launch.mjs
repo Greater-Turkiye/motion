@@ -124,8 +124,12 @@ export function buildScene(l) {
   ];
   const emblem = iso3 && MANIFEST.items[iso3]?.flag ? `${iso3}/flag` : undefined;
   const id = `launch-${l.id.slice(0, 8)}`;
+  // the look changes from launch to launch, so the channel is never one style over and over (owner,
+  // 2026-10-26); the night globes suit a launch, and the launch's own id picks one, the same every run
+  const LOOKS = ['D', 'A', 'E', 'B', 'G'];
+  const look = LOOKS[[...l.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % LOOKS.length];
   const scene = {
-    id, record: `ll2:${l.id}`, format: 'vertical', fps: 60, duration, style: 'D', lang: 'en', source_text,
+    id, record: `ll2:${l.id}`, format: 'vertical', fps: 60, duration, style: look, lang: 'en', source_text,
     camera: { from: { center: pad, zoom: 0.5 }, to: { center: pad, zoom: 2.2 }, seconds: hookEnd, ease: 'inOutCubic', keys, globe: true },
     event: { at: pad, precision: 'exact', kind: 'launch' },
     ...(country ? { subject: { country: iso3, label: upper(country.en), ...(emblem ? { emblem } : {}) } } : {}),

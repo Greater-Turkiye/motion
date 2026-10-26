@@ -1,25 +1,28 @@
-# Which style a video gets, by the type of its event (PLAN.md section 15; the studio page shows every
-# style on a recent story of each family). Change a letter and the next automatic videos use it.
+# Which styles a video can get, by the type of its event (PLAN.md sections 15 and 43; the studio page
+# shows every style on a recent story of each family). Each entry is a pool: the next automatic video
+# takes the first style of its pool that none of the channel's last four videos used, so the channel
+# never shows the same map twice in a row (owner, 2026-10-26: five navy deployment maps in a row on one
+# channel). The first letter is the family's default, the one the studio page marks.
 #
 # Styles: A gece kırmızısı · B harekât lacivert · C editoryal · D uydu gecesi · E ateşböceği ·
 #         G İsviçre rölyefi · H gizliliği kaldırılmış · I harekât paftası · K çini atlas
 #
 # The most specific entry wins: an exact event type, then its family prefix ("kinetic."), then default.
-default: C
-kinetic.drone-strike: E
-kinetic.missile-strike: E
-kinetic.airstrike: E
-kinetic.shelling: G
-kinetic.clash: G
-kinetic.: A
-maritime.: A
-test.: A
-diplomatic.talks: K
-diplomatic.agreement: K
-diplomatic.statement: C
-procurement.: H
-basing.: H
-policy.sanctions: H
-policy.: C
-exercise.: I
-deployment.: B
+default: [C, K, G, A, I, D]
+kinetic.drone-strike: [E, A, D, G, B]
+kinetic.missile-strike: [E, A, D, G, B]
+kinetic.airstrike: [E, A, D, G, B]
+kinetic.shelling: [G, A, I, E, D]
+kinetic.clash: [G, A, I, E, D]
+kinetic.: [A, G, E, D, I]
+maritime.: [A, B, D, G, K]
+test.: [A, D, E, I]
+diplomatic.talks: [K, C, G, I, H]
+diplomatic.agreement: [K, C, G, I, H]
+diplomatic.statement: [C, K, G, H, A]
+procurement.: [H, I, C, K, B]
+basing.: [H, I, D, K, B]
+policy.sanctions: [H, C, K, I]
+policy.: [C, K, H, G, I]
+exercise.: [I, B, G, A, D]
+deployment.: [B, I, D, A, G, K]

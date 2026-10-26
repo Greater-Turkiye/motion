@@ -1019,3 +1019,20 @@ Sırada: depremde ilk karede yayılan dalga ve ilçeye uydu + 3D iniş; Earth de
 - **Deprem**: dalgalar ilk kareden yayılır (`waves.from: 0`), ilk kare küre değil ülke ve merkez üssü; Greater
   Earth da aynı IASP91 dalgalarını alır (`arrivals.py --no-provinces --far 2500`) ve onaylı açık deprem stili Q ile
   çizilir (A'nın kara gecesinde kara seçilmiyordu). Yayındaki ilk Earth videosu (Bonin, M6,5) bu kurallardan önceydi.
+
+## 43. Karışık stil, sabit TÜRKİYE, YouTube linkleri, AI etiketi yok / Mixed styles, a fixed TÜRKİYE, YouTube links, no AI label (2026-10-26)
+
+Sahibin kararı (3. tur galeriden sonra): "kanalda bol bol karışık tipte tarzda renklerde video olsun";
+bir kanalda beş lacivert konuşlanma haritası arka arkaya çıkmıştı. Nedeni iki sabit stildi: @greaterturkiye
+her videoyu `MOTION_GT_STYLE` boşken B'de, İngilizce kesit D'de çiziyordu; Türkçe kanal da türe tek harf
+veriyordu. Değişenler:
+- **Stil havuzu**: `config/styles.yaml`'da her türün 4-6 stillik havuzu; video, kanalın son dört videosunda
+  kullanılmamış ilk stili alır (`tools/post/recent-styles.sh` → `generate.mjs --recent`). İngilizce kesit Türkçe
+  kesitin ve son videoların stilinden farklı birini alır; fırlatmalar beş gece stilinden birini; deprem onaylı Q'da
+  kalır. Karar: havuzun ilk harfi ailenin varsayılanı (stüdyo onu işaretler).
+- **TÜRKİYE yazısı tek boy**: her karede 40 px (kameraya göre büyüyüp küçülmesi yerleşmemiş bir etiket gibi okundu).
+- **YouTube linkleri GitHub'da**: yükleyici linki sürüm notuna ve sürümün metadata dosyasına (`youtube.<kanal>`)
+  yazar; Pages ana sayfası bütün kanalların videolarını sürüm ve YouTube linkleriyle listeler.
+- **AI etiketi yok**: görüntü motion'un kendi çizicisiyle kodla çizilir, üretilmiş görsel değildir.
+  `containsSyntheticMedia: false` (YouTube'un kuralı açıkça animasyon olan içeriği dışarıda bırakır); paylaşım
+  metni ve sürüm notu "Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi" der, ses motorunun adını verir.

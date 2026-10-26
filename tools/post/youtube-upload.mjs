@@ -1,4 +1,6 @@
-import { appendFileSync, readFileSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { appendFileSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -41,7 +43,9 @@ export function youtubeResource(scene, post, privacyStatus, lang = 'tr') {
     status: {
       privacyStatus,
       selfDeclaredMadeForKids: false,
-      containsSyntheticMedia: scene.voice === 'synthetic',
+      // the pictures are drawn by code (motion's own renderer), not generated: an animated map, which
+      // YouTube's altered-content rule leaves out, so no AI label (owner, 2026-10-26)
+      containsSyntheticMedia: false,
     },
   };
 }
@@ -139,6 +143,32 @@ async function upload(sceneId, metadataFile, videoFile, key = 'tr') {
   const url = `https://www.youtube.com/shorts/${result.id}`;
   console.log(`Uploaded ${path.basename(videoFile)} to ${channel} as ${privacyStatus}: ${url}`);
   summary(`YouTube upload ${channel} (${privacyStatus}): ${url}`);
+  if (process.env.RELEASE_TAG) {
+    try { linkRelease(process.env.RELEASE_TAG, sceneId, metadataFile, key, url); } catch (e) { console.log(`::warning::YouTube link not written to ${process.env.RELEASE_TAG}: ${e.message}`); }
+  }
+}
+
+/** The YouTube link goes back to the video's GitHub release, so every video on GitHub says where it
+ *  is on YouTube (owner, 2026-10-26): a line in the release notes, and `youtube.<channel>` in its
+ *  metadata file, which the Pages site lists (tools/scene/site.mjs). */
+export function withLink(meta, key, url) {
+  return { ...meta, youtube: { ...(meta.youtube ?? {}), [key]: url } };
+}
+function linkRelease(tag, sceneId, metadataFile, key, url) {
+  const gh = (...a) => execFileSync('gh', a, { encoding: 'utf8' });
+  const body = JSON.parse(gh('release', 'view', tag, '--json', 'body,assets'));
+  const names = body.assets.map((a) => a.name);
+  // the story's own metadata file: the scene's, else the Turkish scene's when this is its English cut
+  const name = [`${sceneId}.json`, `${sceneId.replace(/\.en$/, '')}.json`].find((n) => names.includes(n)) ?? `${sceneId}.json`;
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'yt-'));
+  let meta = JSON.parse(readFileSync(metadataFile, 'utf8'));
+  if (names.includes(name)) { gh('release', 'download', tag, '--pattern', name, '--dir', dir, '--clobber'); meta = JSON.parse(readFileSync(path.join(dir, name), 'utf8')); }
+  writeFileSync(path.join(dir, name), JSON.stringify(withLink(meta, key, url), null, 1) + '\n');
+  gh('release', 'upload', tag, path.join(dir, name), '--clobber');
+  const notes = `${body.body ?? ''}`.trimEnd() + `\n\nYouTube (${CHANNELS[key].name}): ${url}\n`;
+  writeFileSync(path.join(dir, 'notes.md'), notes);
+  gh('release', 'edit', tag, '--notes-file', path.join(dir, 'notes.md'));
+  console.log(`YouTube link written to release ${tag}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -31,8 +31,10 @@ test('the English YouTube block uses English markers and words', () => {
   assert.doesNotMatch(yt, /Başlık|Açıklama|Durum|Kaynak/);
 });
 
-test('synthetic voice is disclosed in English', () => {
-  assert.match(enCaptions(enScene, meta), /Voice-over: synthetic\./);
+test('the captions credit code-drawn animation and carry no AI label', () => {
+  const text = enCaptions(enScene, meta);
+  assert.match(text, /Animation: drawn in code/);
+  assert.doesNotMatch(text, /synthetic|AI label/i);
 });
 
 test('the English title is the source’s own English headline when the record keeps one', () => {
