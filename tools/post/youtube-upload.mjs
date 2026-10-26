@@ -154,7 +154,7 @@ async function upload(sceneId, metadataFile, videoFile, key = 'tr') {
 export function withLink(meta, key, url) {
   return { ...meta, youtube: { ...(meta.youtube ?? {}), [key]: url } };
 }
-function linkRelease(tag, sceneId, metadataFile, key, url) {
+export function linkRelease(tag, sceneId, metadataFile, key, url) {
   const gh = (...a) => execFileSync('gh', a, { encoding: 'utf8' });
   const body = JSON.parse(gh('release', 'view', tag, '--json', 'body,assets'));
   const names = body.assets.map((a) => a.name);
@@ -164,7 +164,8 @@ function linkRelease(tag, sceneId, metadataFile, key, url) {
   let meta = JSON.parse(readFileSync(metadataFile, 'utf8'));
   if (names.includes(name)) { gh('release', 'download', tag, '--pattern', name, '--dir', dir, '--clobber'); meta = JSON.parse(readFileSync(path.join(dir, name), 'utf8')); }
   writeFileSync(path.join(dir, name), JSON.stringify(withLink(meta, key, url), null, 1) + '\n');
-  gh('release', 'upload', tag, path.join(dir, name), '--clobber');
+  // --clobber deletes then uploads, and GitHub sometimes still sees the old name (422): once more
+  try { gh('release', 'upload', tag, path.join(dir, name), '--clobber'); } catch { gh('release', 'upload', tag, path.join(dir, name), '--clobber'); }
   const notes = `${body.body ?? ''}`.trimEnd() + `\n\nYouTube (${CHANNELS[key].name}): ${url}\n`;
   writeFileSync(path.join(dir, 'notes.md'), notes);
   gh('release', 'edit', tag, '--notes-file', path.join(dir, 'notes.md'));
