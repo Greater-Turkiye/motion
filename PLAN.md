@@ -966,3 +966,19 @@ değecekse sütunun yanına geçer.
 
 **Sıradaki.** A "Uydudan iniş" (Sentinel-2 cloudless, TCMB faiz kararı), C "Zaman tüneli" (TCMB faiz
 geçmişi), E "Fiyat etiketi"; seslendirme ve Kenney sesleri v2 sahnelerine; `produce` hattına v2 sahne üreticisi.
+
+## 40. Sahibin şablon kararları / The owner's template verdicts (2026-10-26)
+
+Galeride (`motion-onizleme/sablonlar/`) her şablon kendi türünden gerçek bir kayıtla gösterildi.
+Onaylananlar: G (İsviçre rölyefi; "coğrafi yapı, yükseklik gözüküyor, yazı animasyonu çok iyi"), I, K, Q.
+Değişenler, bu adımda:
+- **B:** Türkiye lacivert karaya bir ton uzak duruyordu ("pasif"); artık bayrak kırmızısı.
+- **C:** TÜRKİYE yazısı ülke ekrandayken kayboluyordu: kamera ülkeyi yazı bloğunun hemen üstüne koyunca
+  ortası bloğa değiyordu. Yazı artık bloğun üstünde kalacak kadar kuzeye çıkar, Karadeniz kıyısından öteye
+  geçmez; ülke bloğun altına girince solar.
+- **H:** "kasıyor": kamera saniyede 12 adım atıyordu ve yarım ton noktalar harita kayarken kıpırdıyordu;
+  ikisi de kalktı, kamera yumuşak, yazı tipi Archivo (daktilo yalnız üst satırlarda).
+- **K:** başlıkta "(FOTOĞRAFLAR)": haber sitelerinin medya etiketleri (FOTOĞRAFLAR, VİDEO, FOTO GALERİ)
+  her başlıktan silinir.
+Sırada: D (iki taraflı haberde kamera ortada duruyor; taraflara sırayla gitmeli), E (viral açıdan).
+Sahibin genel notu: "3D, evler, ileri teknoloji" bekliyordu: v2'de uydu görüntüsü ve OSM binalarıyla şehir inişi.

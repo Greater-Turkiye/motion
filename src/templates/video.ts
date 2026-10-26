@@ -31,6 +31,9 @@ export const kmToBosphorus = (at: LonLat) => km(at, BOSPHORUS);
 export const SAFE = { left: 65, right: W - 180, top: 270, bottom: H - 400 };
 /** The middle of Türkiye's bounding box (26.0-44.8 E, 35.8-42.1 N), where its name stands. */
 const TR_MIDDLE: LonLat = [35.4, 38.95];
+/** Just inland of the Black Sea coast (Kastamonu, 41.3 N): TÜRKİYE rises no higher than this when the middle of
+ *  the country stands on the text block. */
+const TR_NORTH: LonLat = [35.4, 41.3];
 const LEFT = 80, WIDTH = SAFE.right - LEFT, FOOT = SAFE.bottom - 30, BLOCK_BOTTOM = FOOT - 64;
 
 /** The frame's fixed furniture — block kickers, the distance label, the close card — by the scene's
@@ -270,6 +273,15 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
     if (!p) return;
     // under the event ring's keep-out (95 px), so the name is never faded by its own mark
     if (evt) p = [p[0], p[1] + 125];
+    // TÜRKİYE gives way to the text block by moving north over its own land, sliding as the middle nears the
+    // block, and fades only when the north is covered too: the camera often leaves Türkiye just above the
+    // block, and the name vanished while the country filled the frame (owner, 2026-10-26)
+    if (home) {
+      // as high as it must be to clear the block (its box reaches ~32 px below its middle), never above
+      // the land just south of the Black Sea coast
+      const north = proj(TR_NORTH);
+      if (north) p = [p[0], Math.max(north[1], Math.min(p[1], top - 46))];
+    }
     const isSubject = l === subjectLabel;
     // on a distance beat its end points carry their own names: the map's label of the same place
     // gives way, or "TİRAN" stands twice a few pixels apart

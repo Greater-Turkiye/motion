@@ -49,8 +49,9 @@ export const STYLES: Record<StyleId, Style> = {
     glow: null, atmosphere: null, accent: '#f4e14a', ink: '#ffffff', muted: '#b7b0a8', status: '#ff8a98',
     label: 'rgba(255,255,255,0.8)', emblemMono: true, baseScale: 1400, cy: 640, grain: 0.05, relief: 0.95, limb: 0.35 },
   // motion: an operations screen: text is typed, the camera tracks smoothly
+  // Türkiye in flag red on the navy: at #123d5a it sat one shade off the land and read as passive (owner, 2026-10-26)
   B: { id: 'B', fonts: { display: 'Archivo', text: 'Archivo', mono: 'JetBrains' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Harekât lacivert', flat: false, bg: ['#06182a', '#020a12'], sea: '#061a2c', land: '#0b2740', border: 'rgba(140,190,215,0.28)',
-    graticule: 'rgba(140,190,215,0.06)', home: '#123d5a', homeStroke: '#8cc4dc', subject: '#2a1f14', subjectStroke: '#e0a64a',
+    graticule: 'rgba(140,190,215,0.06)', home: '#c41e2e', homeStroke: '#ff8a96', subject: '#2a1f14', subjectStroke: '#e0a64a',
     glow: null, atmosphere: null, accent: '#8cc4dc', ink: '#ffffff', muted: '#7fc9ec', status: '#ffb020',
     label: 'rgba(223,244,255,0.85)', emblemMono: true, baseScale: 1700, cy: 640, grain: 0.035, relief: 0.6, limb: 0.3 },
   // motion: a newspaper page: lines are drawn on, the camera moves like a hand over paper
@@ -84,13 +85,16 @@ export const STYLES: Record<StyleId, Style> = {
     graticule: 'rgba(0,0,0,0)', home: '#B8322A', homeStroke: '#1B1B1B', subject: '#e6e3f0', subjectStroke: '#1F3F8F',
     glow: null, atmosphere: null, accent: '#1F3F8F', ink: '#1B1B1B', muted: '#4d4a44', status: '#B8322A',
     label: 'rgba(27,27,27,0.85)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.02, relief: 0.3, limb: 0 },
-  // research/03 H: a declassified dossier, photocopied: toner on paper, Factbook-blue sea, halftone relief
-  // motion: a typed dossier: typewriter text, a camera that moves in steps
-  H: { id: 'H', fonts: { display: 'BlackOps', text: 'SpecialElite', mono: 'CourierPrime' }, motion: { text: 'type', camera: 'snap', progress: false }, name: 'Gizliliği kaldırılmış', flat: true, bg: ['#ECE7DB', '#E2DCCD'], sea: '#C9D6DF', land: '#E9E4D8', border: 'rgba(26,26,26,0.8)',
+  // research/03 H: a declassified dossier, photocopied: toner on paper, Factbook-blue sea
+  // motion: a typed dossier: typewriter text, a smooth camera
+  // the stencil and typewriter faces were hard to read, and the 12-a-second camera steps and the halftone dots
+  // that crawled as the map moved made the video judder (owner, 2026-10-26): a plain face, a smooth camera, no dots;
+  // the dossier stays in the paper, the toner red and the typewriter kickers
+  H: { id: 'H', fonts: { display: 'Archivo', text: 'Archivo', mono: 'CourierPrime' }, motion: { text: 'type', camera: 'glide', progress: false }, name: 'Gizliliği kaldırılmış', flat: true, bg: ['#ECE7DB', '#E2DCCD'], sea: '#C9D6DF', land: '#E9E4D8', border: 'rgba(26,26,26,0.8)',
     graticule: 'rgba(26,26,26,0.10)', home: '#d8cbb6', homeStroke: '#1A1A1A', subject: '#dcd3c3', subjectStroke: '#B3261E',
     glow: null, atmosphere: null, accent: '#B3261E', ink: '#1A1A1A', muted: '#4a4640', status: '#B3261E',
     label: 'rgba(26,26,26,0.9)', emblemMono: false, baseScale: 1650, cy: 520, grain: 0.07, relief: 0.8, limb: 0,
-    halftone: 7, speckle: 0.5, stepFps: 12 },
+    speckle: 0.15 },
   // research/03 I: a printed field sheet: pale green lowland, brown contours, a one-degree grid
   // motion: a field sheet: ruled lines drawn on, decisive moves
   I: { id: 'I', fonts: { display: 'Archivo', text: 'Archivo', mono: 'Martian' }, motion: { text: 'wipe', camera: 'snap', progress: false }, name: 'Harekât paftası', flat: true, bg: ['#F2EFE4', '#E9E5D6'], sea: '#9CC7E0', land: '#F2EFE4', border: 'rgba(29,29,29,0.7)',

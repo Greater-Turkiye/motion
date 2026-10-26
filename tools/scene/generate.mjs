@@ -263,7 +263,11 @@ const unrubric = (s) => s.replace(/^[^:]{3,32}:\s+/, (m) => (words(m).length <= 
 const clauses = (s) => s.split(/\s*[,;:–—]\s+|\s+[–—]\s+/).map((c) => c.trim().replace(/^["“]|["”]$/g, '')).filter(Boolean);
 
 /** The machine translation's stray spaces ("30 'dan", "anti - balistik"), off the screen and the site. */
-export const tidy = (s) => s.replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2')
+/** A news site's media tag in a headline ("(FOTOĞRAFLAR)", "[VIDEO]", "- FOTO GALERİ"): the site's
+ *  furniture, not the story's words; the owner saw "(FOTOĞRAFLAR)" in a video's headline (2026-10-26). */
+export const untag = (s) => s.replace(/\s*[([]\s*(FOTOĞRAFLAR|FOTOĞRAF|FOTO(?:\s*GALERİ)?|VİDEO|VIDEO|GALERİ|PHOTOS?|VIDEOS?)\s*[)\]]/giu, '')
+  .replace(/\s*[-–|]\s*(FOTOĞRAFLAR|FOTO(?:\s*GALERİ)?|VİDEO|VIDEO|PHOTOS?)\s*$/giu, '').trim();
+export const tidy = (s) => untag(s).replace(/(\d) ?' ?(\p{L})/gu, "$1'$2").replace(/(\p{L}) - (\p{L})/gu, '$1-$2')
   // a model's hyphen with a stray space ("F -16", "MiG -29", "Buk - M3")
   .replace(/(\p{Lu}) ?- ?(\d)/gu, '$1-$2');
 
@@ -581,7 +585,7 @@ export function readFirms(files) {
 export function generate(record, { datasets, style, variant = 'standart', firms = null, photo = null } = {}) {
   if (!VARIANTS.includes(variant)) throw new Error(`unknown variant ${variant}`);
   const refuse = (why) => { throw new Error(`${record.id}: no video: ${why}`); };
-  const titleTr = record.title?.tr, titleEn = record.title?.en ?? '';
+  const titleTr = record.title?.tr && untag(record.title.tr), titleEn = untag(record.title?.en ?? '');
   if (!titleTr) refuse('no Turkish title');
   const st = record.assessment?.status;
   if (!STATUS[st]) refuse(`verification status "${st}" is not one a video can carry`);
