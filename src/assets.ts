@@ -95,7 +95,10 @@ export async function loadAssets(emblemKeys: string[], photoFiles: string[] = []
     const [who, kind] = key.split('/');
     const it = manifest.items[who]?.[kind];
     if (!it) throw new Error(`no emblem ${key} in the manifest`);
-    emblems.set(key, await image('emblems/' + it.file));
+    // a file the sync could not fetch (renamed on Commons, or its hash changed) is left out: the video is
+    // drawn without that emblem rather than not at all
+    const img = await image('emblems/' + it.file).catch(() => { console.warn(`emblem ${key} missing, drawn without it`); return null; });
+    if (img) emblems.set(key, img);
   }
   const relief = await image('data/relief.png').catch(() => null); // optional: the map renders without it
   const mark = await image('brand/mark.png').catch(() => null);

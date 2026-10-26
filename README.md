@@ -28,7 +28,7 @@ Tasarım örneklerini yeniden çizmek için `docs/mockups` klasörünü bir HTTP
 
 ```bash
 npm ci
-python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; manifest'teki hash'lerle doğrulanır
+python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; manifest'teki hash'lerle doğrulanır (Commons'ta silinen ya da değişen dosya uyarıyla atlanır, video o amblemsiz çizilir)
 python tools/data/build_relief.py             # yalnızca kabartmayı yeniden üretmek için (depoda hazır: assets/data/relief.png)
 npm run dev                                   # önizleme: http://localhost:5178/?scene=hook-karadeniz&style=A
 npm run render -- --all-styles                # out/hook-karadeniz-{A,B,C,D}.mp4, 1080x1920, 60 fps
@@ -56,6 +56,20 @@ tek bir hareket yapar, yumuşak başlar ve biter, sonra durur; her satır blok i
 İlk tasarım, **B "Yükselen Türkiye"**: 81 il, 2025 nüfusu kadar yükselen sütunlar (TÜİK ADNKS 2025;
 il sınırları geoBoundaries TUR ADM1, OpenStreetMap'ten, CC BY-SA 2.0). Veri: `assets/data/tr-adm1.json`
 (0,01 dereceye yuvarlanmış), `assets/data/tr-population-2025.json`.
+
+**D "Şehre iniş"** (`scenes/v2/istanbul-levent.json`, `src/v2/city.ts`): İstanbul'un üstünden Levent'e
+iniş. Zemin Sentinel-2 cloudless 2016 (EOX, CC BY 4.0), geniş ve ayrıntılı iki görüntü; binalar
+OpenStreetMap'in taban çizgileri (ODbL), kayıtlı yükseklikleriyle (`height`, yoksa `building:levels` x 3,2 m,
+yoksa 9 m), odaktan dışa halka halka yükselir; alçak güneş uzun gölge düşürür. Veri:
+
+```bash
+python tools/data/fetch_city.py istanbul-levent 28.985 41.065 29.06 41.115   # OSM binaları, Overpass
+python tools/data/fetch_s2.py istanbul-levent 28.985 41.065 29.06 41.115 15  # ayrıntılı uydu görüntüsü
+python tools/data/fetch_s2.py istanbul-wide 28.55 40.8 29.5 41.35 12         # geniş uydu görüntüsü
+```
+
+Bir kompleksin tüm sınırına yazılmış kule yüksekliği (100 m üstü, 10.000 m² üstü taban) düşürülür;
+kulelerin kendisi `building:part` olarak gelir. Yalnızca 2016 katmanı CC BY; sonraki yıllar CC BY-NC-SA, kullanılmaz.
 
 ### Voice approval
 
