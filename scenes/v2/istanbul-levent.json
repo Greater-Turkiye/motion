@@ -1,0 +1,142 @@
+{
+  "id": "istanbul-levent",
+  "design": "D",
+  "about": "Design D, 'Şehre iniş': from high over İstanbul down to Levent, Sentinel-2 imagery under OpenStreetMap buildings rising to their tagged heights.",
+  "fps": 60,
+  "duration": 18,
+  "city": "istanbul-levent",
+  "wide": "istanbul-wide",
+  "focus": [
+    29.011,
+    41.0815
+  ],
+  "source": "Kaynak: TÜİK, ADNKS 2025 · Uydu: Sentinel-2 cloudless 2016, EOX (CC BY 4.0) · Binalar: © OpenStreetMap katkıda bulunanlar (ODbL)",
+  "status": "RESMÎ İSTATİSTİK · OSM VERİSİ",
+  "rise": [
+    5.5,
+    10.5
+  ],
+  "camera": [
+    {
+      "t": 0,
+      "at": [
+        29.0,
+        41.05
+      ],
+      "dist": 70000,
+      "tilt": 0,
+      "az": 0
+    },
+    {
+      "t": 1.0,
+      "at": [
+        29.0,
+        41.05
+      ],
+      "dist": 70000,
+      "tilt": 0,
+      "az": 0
+    },
+    {
+      "t": 7.5,
+      "at": [
+        29.011,
+        41.0815
+      ],
+      "dist": 9000,
+      "tilt": 40,
+      "az": -35
+    },
+    {
+      "t": 12.0,
+      "at": [
+        29.011,
+        41.0815
+      ],
+      "z": 60,
+      "dist": 2800,
+      "tilt": 66,
+      "az": -50
+    },
+    {
+      "t": 16.5,
+      "at": [
+        29.011,
+        41.0815
+      ],
+      "z": 60,
+      "dist": 2600,
+      "tilt": 68,
+      "az": -15
+    },
+    {
+      "t": 18,
+      "at": [
+        29.011,
+        41.0815
+      ],
+      "z": 60,
+      "dist": 2600,
+      "tilt": 68,
+      "az": -10
+    }
+  ],
+  "beats": [
+    {
+      "at": 0.3,
+      "until": 7.2,
+      "kicker": "TÜİK · 2025 NÜFUSU",
+      "lines": [
+        "*İstanbul*: 15.754.053 kişi.",
+        "Türkiye'nin %18,3'ü."
+      ]
+    },
+    {
+      "at": 7.6,
+      "until": 12.6,
+      "kicker": "LEVENT · MASLAK",
+      "lines": [
+        "Bu kutuda OSM'de",
+        "*26.706* bina kayıtlı."
+      ]
+    },
+    {
+      "at": 13.0,
+      "until": 18,
+      "kicker": "YÜKSEKLİKLER",
+      "lines": [
+        "*788* binanın yüksekliği kayıtlı;",
+        "kalanlar 3 kat çizildi."
+      ]
+    }
+  ],
+  "places": [
+    {
+      "name": "İstanbul Boğazı",
+      "at": [
+        29.055,
+        41.083
+      ],
+      "from": 1.4,
+      "until": 7.0
+    },
+    {
+      "name": "Levent",
+      "at": [
+        29.011,
+        41.0815
+      ],
+      "from": 8.4,
+      "until": 17.7
+    },
+    {
+      "name": "Maslak",
+      "at": [
+        29.0207,
+        41.1086
+      ],
+      "from": 9.2,
+      "until": 17.7
+    }
+  ]
+}
