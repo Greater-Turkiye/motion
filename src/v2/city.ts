@@ -98,17 +98,22 @@ function groundPlane(img: HTMLImageElement, box: Picture['box'], z: number, feat
 
 /** The buildings in rings of distance from the focus, each ring one merged mesh that rises on its own. */
 function buildRings(city: City, focus: THREE.Vector2) {
-  const RING = 650, N = 9;
+  // the city is a disc around the focus whose buildings sink into the ground over its last 700 m: cut
+  // to the data's box, the blocks ended in a straight wall (owner, 2026-10-26: "kare kare seçilmiş")
+  const RING = 650, N = 9, R = 3200, EDGE = 700;
   const pos: number[][] = Array.from({ length: N }, () => []), col: number[][] = Array.from({ length: N }, () => []);
   const low = new THREE.Color('#E4DDD0'), tall = new THREE.Color('#A9B7C3'), roof = new THREE.Color();
   for (const b of city.buildings) {
-    const h = b[0], xy = b[1];
+    const xy = b[1];
     const pts: THREE.Vector2[] = [];
     for (let i = 0; i < xy.length; i += 2) pts.push(new THREE.Vector2(xy[i], xy[i + 1]));
     if (pts.length < 3) continue;
     if (THREE.ShapeUtils.isClockWise(pts)) pts.reverse();
     const mid = pts.reduce((a, p) => a.add(p), new THREE.Vector2()).divideScalar(pts.length);
-    const k = Math.min(N - 1, Math.floor(mid.distanceTo(focus) / RING));
+    const d = mid.distanceTo(focus);
+    if (d > R) continue;
+    const k = Math.min(N - 1, Math.floor(d / RING));
+    const h = b[0] * smooth((R - d) / EDGE);
     const P = pos[k], C = col[k];
     // towers in a cool glass grey, the low city in warm concrete
     const wall = low.clone().lerp(tall, clamp((h - 30) / 90));

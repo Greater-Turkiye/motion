@@ -87,26 +87,25 @@
       "until": 7.2,
       "kicker": "TÜİK · 2025 NÜFUSU",
       "lines": [
-        "*İstanbul*: 15.754.053 kişi.",
-        "Türkiye'nin %18,3'ü."
+        "*İstanbul*: 15.754.053 kişi."
       ]
     },
     {
       "at": 7.6,
       "until": 12.6,
-      "kicker": "LEVENT · MASLAK",
+      "kicker": "LEVENT · 3,2 KM ÇEVRESİ",
       "lines": [
-        "Bu kutuda OSM'de",
-        "*26.706* bina kayıtlı."
+        "OpenStreetMap'te",
+        "*23.977* bina kayıtlı."
       ]
     },
     {
       "at": 13.0,
       "until": 18,
-      "kicker": "YÜKSEKLİKLER",
+      "kicker": "TÜİK · 2025",
       "lines": [
-        "*788* binanın yüksekliği kayıtlı;",
-        "kalanlar 3 kat çizildi."
+        "Türkiye'de her 100 kişiden",
+        "*18*'i İstanbul'da yaşıyor."
       ]
     }
   ],
