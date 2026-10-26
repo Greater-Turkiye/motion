@@ -1004,3 +1004,15 @@ son 700 m'de binalar zemine iner; yükseklik satırı kalktı. D yeni bir katego
 şablonların içinde kullanılacak bir araç (bir depremin ilçesi, bir haberin geçtiği semt). OSM'de kuşkulu bir kayıt (ÖzdilekPark: 275 m, 19.800 m²
 tabanlı tek bina) kadrajı bir duvar gibi kesiyordu: böyle yükseklikler düşürülür, kuleler `building:part`
 kayıtlarından gelir. Önizleme: `motion-onizleme/sablonlar/sablon-V2D.mp4`.
+
+## 42. İlk üç saniye / The first three seconds (2026-10-26)
+
+Sahibin sorusu: "aç bak, viral olur mu?" Kendi bakışım: olmazdı. On şablon aynı kompozisyonla açılıyordu
+(küçük küre, büyük etiket), ilk üç saniyede bir şey olmuyordu, kancalar etiketti ("UKRAYNA / GELİŞME",
+"İRAN / ABD"), olayın yeri ekranda küçük bir halkaydı. Değişenler:
+- **İlk kare haberin yeri, yakından**: işaret dalgalarıyla, arma, TÜRKİYE ve konu ülkenin adı ilk karede;
+  kamera geri çekilip yeri gösterir, sonra yaklaşır; son kare ilk kare (döngü).
+- **Kanca kaydın cümlesi**: fiille biten ≤9 kelime, ≤56 harf; "Konuşan: söz" kalıbında söz kancada, konuşan
+  üst satırda; sayımın ilk kalemi fiiliyle. Etiket kanca yalnız cümle yoksa.
+- Yeri yalnız ülke olan kayıt o ülkenin tamamını gösterir; çok taraflı haberde ABD çerçeveye alınmaz.
+Sırada: depremde ilk karede yayılan dalga ve ilçeye uydu + 3D iniş; Earth deprem videosu aynı kuralla.

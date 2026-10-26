@@ -39,6 +39,24 @@ const TR_PLACES = [
  *  island), for a record that names only its country. */
 let SHAPES = null;
 /** How far a country reaches from its middle, in degrees (its largest polygon). */
+/** Words in n lines of nearly equal length, the order kept (the longest line as short as it can be). */
+function balance(w, n) {
+  if (w.length <= 1 || n <= 1) return [w.join(' ')];
+  const n2 = Math.min(n, w.length);
+  let best = null;
+  const go = (start, left, acc) => {
+    if (left === 1) {
+      const lines = [...acc, w.slice(start).join(' ')];
+      const worst = Math.max(...lines.map((l) => l.length));
+      if (!best || worst < best.worst) best = { lines, worst };
+      return;
+    }
+    for (let k = start + 1; k <= w.length - left + 1; k++) go(k, left - 1, [...acc, w.slice(start, k).join(' ')]);
+  };
+  go(0, n2, []);
+  return best.lines;
+}
+
 function countryReach(iso3) {
   const mid = countryMiddle(iso3);
   const c = COUNTRY_TABLE.find((x) => x.iso3 === iso3);
@@ -717,7 +735,8 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   // ---- the hook, from the record's own fields first ------------------------------------------------
   const found = hookLines(news);
   // a clause is a hook only when it ends on a verb ("kaptan öldürüldü"), not on a bare noun phrase
-  const verbish = (s) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar)$/iu.test((s ?? '').split(' ').at(-1) ?? '');
+  // the necessitative counts too ("kaldırmalı", "vermeli"): a demand is a statement's verb
+  const verbish = (s) => /(d[ıiuü]|t[ıiuü]|yor|acak|ecek|m[ıiuü]ş|d[ıiuü]lar|t[ıiuü]lar|mal[ıi]|mel[ıi])$/iu.test((s ?? '').split(' ').at(-1) ?? '');
   let hook = found;
   // two countries and evidence of what joins them; a story that merely names two countries is not a deal
   const deal = family === 'deal' && parties.length >= 2 && !!label;
@@ -760,14 +779,35 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   const before = at0 > 0 && !verbish(cl[at0 - 1]) ? cl[at0 - 1] : '';
   const subject = before && words(before).length <= 4 ? before : '';
   const headline = subClause && !(before && !subject) ? `${subject ? subject + ', ' : ''}${subClause}` : '';
-  if (hook.lines[1] === 'GELİŞME' && headline && words(headline).length <= (subject ? 8 : 6)) {
+  // and not only for "GELİŞME": two names ("İRAN / ABD", "ABD / UKRAYNA"), a place over a type word
+  // ("UKRAYNA / GELİŞME", "TUNUS'TA / TATBİKAT") stop nobody; the record's own sentence of up to nine words
+  // does ("ABD, PATRİOT FÜZELERİNİN / UKRAYNA'YA TESLİMATINI / ERTELEDİ"). The owner, 2026-10-26, on the
+  // gallery's hooks: nothing in them would make a viewer stop. A number hook keeps its number.
+  const labelHook = hook.kind !== 'number' && hook.kind !== 'clause';
+  // "İran Devlet Başkanı: Görüşmelerden önce ABD yaptırımları kaldırmalı, …": who spoke goes to the kicker,
+  // the first thing said becomes the hook ("İRAN / ABD" said nothing of it)
+  // on the title as written: unrubric() has already taken "İran Devlet Başkanı:" off `news`
+  const said = /^([^:]{3,40}):\s*(.+)$/u.exec(exonyms(tidy(abbrev(titleTr ?? ''))));
+  // a list ends on its verb ("Rus radar sistemlerini, komuta merkezini ve personelini yok etti"): its first
+  // item with that verb is a true part of the sentence and fits the hook ("… RUS RADAR SİSTEMLERİNİ YOK ETTİ")
+  const firstOfList = (text) => {
+    const parts = text.replace(/[.!]$/, '').split(/,\s*/u);
+    if (parts.length < 2 || verbish(parts[0]) || !verbish(parts.at(-1))) return parts[0];
+    const tail = words(parts.at(-1));
+    const obj = tail.findLastIndex((w) => /[ıiuü]$/u.test(w) && !verbish(w));
+    return obj >= 0 && obj < tail.length - 1 ? `${parts[0]} ${tail.slice(obj + 1).join(' ')}` : parts[0];
+  };
+  const quoted = said && words(said[1]).length <= 4 ? firstOfList(said[2]) : '';
+  if (labelHook && quoted && verbish(quoted) && words(quoted).length >= 3 && words(quoted).length <= 8 && quoted.length <= 52) {
+    hook = { kind: 'clause', lines: balance(words(TR(quoted)), 2), used: quoted };
+    kicker = [TR(said[1]), ...kicker.split(' · ').filter((x) => /\d/.test(x))].join(' · ');
+    sub = '';
+  }
+  // at most 56 letters: a longer sentence shrinks the hook's type until it no longer stops anyone, and then
+  // the place over the event ("RİVNE BÖLGESİ / SALDIRI") is the better hook
+  if (labelHook && hook.kind !== 'clause' && headline && words(headline).length <= (subject ? 11 : 9) && headline.length <= 56) {
     const w = words(TR(headline.replace(/[.!]$/, '')));
-    let cut = 1;
-    for (let k = 1; k < w.length; k++) {
-      const worst = (j) => Math.max(w.slice(0, j).join(' ').length, w.slice(j).join(' ').length);
-      if (worst(k) < worst(cut)) cut = k;
-    }
-    hook = { kind: 'clause', lines: w.length > 1 ? [w.slice(0, cut).join(' '), w.slice(cut).join(' ')] : w, used: headline };
+    hook = { kind: 'clause', lines: balance(w, 2), used: headline };
     sub = '';
   }
   // a death or an injury is never the hook, in any form (owner, 2026-10-14): not only "8 KİŞİ /
@@ -906,7 +946,11 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
   let open, near;
   if (deal || (speaker && !pt)) {
     // frame the parties (and Türkiye, so the viewer knows where they are)
-    const pts = [...parties.slice(0, deal ? 6 : 1).map((c) => c.at), home];
+    // the United States is framed only when it is the only party: "ABD, Patriot füzelerinin Ukrayna'ya
+    // teslimatını erteledi" framed Washington and Kiev together and opened on the Atlantic (2026-10-26)
+    const framed = parties.slice(0, deal ? 6 : 1);
+    const near0 = framed.filter((c) => c.iso3 !== 'USA');
+    const pts = [...(near0.length ? near0 : framed).map((c) => c.at), home];
     const mid = [pts.reduce((s, p) => s + p[0], 0) / pts.length, pts.reduce((s, p) => s + p[1], 0) / pts.length];
     const spread = Math.max(...pts.map((p) => deg(p, mid)));
     const z = Math.min(1.6, Math.max(0.35, 480 / (spread * 24.4 + 260)));
@@ -924,6 +968,10 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     near = (dx, dy, zoom) => ({ center: [round1(at[0] + (fit < Infinity ? 0 : dx)), round1(at[1] + (fit < Infinity ? 0 : dy))], zoom: round1(Math.min(zoom, fit * (zoom >= 2 ? 1.15 : 1.05))) });
   }
   const wide = deal || (speaker && !pt);
+  // the first frame is the story's place, close (the owner, 2026-10-26: every video opened on the same small
+  // globe and nothing happened in the first three seconds); the camera pulls back to where it is, then the
+  // beats close in again, and the last frame is the first one, so the Shorts loop has no seam
+  open = wide ? near(0, 0, 1.25) : near(0.3, 1.2, 2.3);
   const keys = [{ t: 0, ...open }, { t: beats[0].at, ...(wide ? near(0, 0, 1.0) : near(0.3, 2.4, 1.0)) }];
   for (const b of beats) {
     const end = round1(beats[beats.indexOf(b) + 1]?.at ?? duration);
@@ -965,7 +1013,7 @@ export function generate(record, { datasets, style, variant = 'standart', firms 
     ...(variant !== 'standart' ? { variant } : {}),
     style: style ?? styleFor(record.event_type ?? ''),
     source_text: [...texts, news, fields],
-    camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered, globe: true },
+    camera: { from: { center: open.center, zoom: open.zoom }, to: ordered[1], seconds: ordered[1].t, ease: 'outCubic', keys: ordered, globe: false },
     // an event at sea is drawn even when only its sea or island is known: the hull is the story
     ...(family === 'strike' || family === 'exercise' || pt || area || eventKind(record.event_type) === 'sea' ? { event: { at: at.map((x) => Math.round(x * 100) / 100), precision, kind: eventKind(record.event_type) } } : {}),
     ...(single && lead ? { subject: { country: lead.iso3, ...(arms(lead.iso3) ? { emblem: arms(lead.iso3) } : {}), label: nameOf(lead) } } : {}),
