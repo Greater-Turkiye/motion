@@ -14,7 +14,7 @@ export type Beat =
   | { kind: 'facts'; at: number; kicker?: string; lines: string[]; place?: { at: LonLat; label: string } }
   /** an earthquake's P and S fronts on the map at model-computed arrival times (tools/scene/arrivals.py),
    *  sped up `speed` times; each place lights when the S front reaches it */
-  | { kind: 'waves'; at: number; title: string; headline?: string; note: string; speed: number; curve: [number, number | null, number | null][];
+  | { kind: 'waves'; at: number; from?: number; title: string; headline?: string; note: string; speed: number; curve: [number, number | null, number | null][];
       places: { name: string; at: LonLat; s: number; show?: boolean }[] }
   | { kind: 'distance'; at: number; from: { at: LonLat; label: string }; to: { at: LonLat; label: string }; text?: string; kicker?: string }
   | { kind: 'status'; at: number; text?: string }

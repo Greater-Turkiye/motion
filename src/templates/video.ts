@@ -248,7 +248,8 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
   const anchorLL: LonLat | undefined = subjectLabel?.at;
   if (sc.subject?.emblem && anchorLL) {
     const at = proj(anchorLL);
-    const alpha = anim(t, 0.45, 0.4) * (1 - span(t, emblemOut - 0.4, emblemOut));
+    // on screen from frame 0: the first frame is the thumbnail a scrolling viewer judges (owner, 2026-10-26)
+    const alpha = 1 - span(t, emblemOut - 0.4, emblemOut);
     if (at && alpha > 0) {
       // the emblem stands above its country's label, which never moves
       // one size from first frame to last: a growing emblem read as the map breathing (review, 23 October),
@@ -320,7 +321,7 @@ function layout(sc: Scene, s: Style, proj: Project, t: number, emblemAr: number,
       // TÜRKİYE is placed first: it never gives way to another label (sticky), so any label it meets must
       // be the one that yields, or the two are drawn on top of each other (BRĂİLA: ROMANYA over TÜRKİYE)
       // a sea's name gives way to any place name: the place is the story, the sea only the setting
-      priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: anim(t, isSubject ? 0.8 : 0.6 + 0.08 * i, 0.4) * tail * twin * meets });
+      priority: home ? -0.5 : isSubject ? 0 : l.kind === 'sea' ? 20 + i : 2 + i, alpha: (home || isSubject ? 1 : anim(t, 0.3 + 0.08 * i, 0.4)) * tail * twin * meets });
   });
   // with the whole globe in the frame the countries are too small to carry their names: the labels were
   // pushed off their places ("KERKÜK" over Russia, "TÜRKİYE" under Arabia), so they wait for the zoom
@@ -429,7 +430,8 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       if (waves) {
         const [count, period, reach] = waves;
         for (let n = 0; n < count; n++) {
-          const w = (t - 0.5 - n * (period / count)) / period;
+          // already spreading on frame 0: the opening marks the place from its first frame
+          const w = (t + period - n * (period / count)) / period;
           if (w < 0) continue;
           const ph = w - Math.floor(w);
           ctx.beginPath();
@@ -441,7 +443,9 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
       }
       // on the globe opening the place is marked from frame 0: the thumbnail shows where, not only Türkiye
       // and it stays to the last frame, which is the first again (the loop)
-      ctx.globalAlpha = (sc.camera.globe && !own ? 1 : anim(t, 0.35, 0.4) * tail) * dim;
+      // the place is marked from frame 0 (the opening is now the place itself, close: 2026-10-26), and it stays
+      // to the last frame, which is the first again (the loop)
+      ctx.globalAlpha = (own ? anim(t, 0.35, 0.4) * tail : 1) * dim;
       ctx.beginPath(); ctx.arc(x, y, 26, 0, Math.PI * 2); ctx.strokeStyle = s.accent; ctx.lineWidth = 2; ctx.stroke();
       if (kind === 'ring') {
         ctx.beginPath(); ctx.arc(x, y, 6 + 1.5 * pulse, 0, Math.PI * 2); ctx.fillStyle = s.accent; ctx.fill();
@@ -474,9 +478,15 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // waves: an earthquake's P and S fronts where the 1-D model puts them at each moment (arrivals.py),
   // sped up; a place lights, with its arrival time, when the S front reaches it
-  if (beat?.kind === 'waves' && sc.event) {
-    const w = windowOf(sc, beatIdx, t);
-    const sim = Math.max(0, (t - beat.at) * beat.speed);
+  // a waves block with `from` spreads its fronts from that moment (0: the first frame, under the hook), and
+  // they stay until the block ends; the block's own text still comes at its time
+  const wi = sc.beats.findIndex((b) => b.kind === 'waves');
+  const wb = wi >= 0 ? (sc.beats[wi] as Extract<Beat, { kind: 'waves' }>) : null;
+  const early = !!wb && wb.from !== undefined && t >= wb.from && t < wb.at;
+  if ((beat?.kind === 'waves' || early) && wb && sc.event) {
+    const beat = wb, beatIdx = wi;
+    const w = early ? { out: 1 } : windowOf(sc, beatIdx, t);
+    const sim = Math.max(0, (t - (beat.from ?? beat.at)) * beat.speed);
     const radius = (col: 1 | 2) => {
       const c = beat.curve.filter((r) => r[col] != null) as [number, number, number][];
       if (!c.length || sim <= c[0][col]) return 0;

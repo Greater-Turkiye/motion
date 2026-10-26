@@ -21,9 +21,10 @@ test('a casualty headline does not become the hook; the event does', () => {
   // the big lines are not the death/injury toll
   assert.ok(!/ÖLDÜ|YARALANDI/u.test(l1 ?? ''), `the hook must not be the casualty: ${sc.hook.lines.join(' / ')}`);
   assert.ok(!/^(BİR|İKİ|ÜÇ|\d+)\s+(KİŞİ|ASKER|SİVİL|ÇOCUK)$/u.test(l0 ?? ''), `the first line must not be a victim count: ${l0}`);
-  // it names the place and the event
-  assert.match(l0 ?? '', /ODESA/u);
-  assert.match(l1 ?? '', /SALDIRI|OLAY/u);
+  // it names the place and the event: the record's own clause when it is short ("RUS GÜÇLERİ ODESA'DAKİ /
+  // İŞ MERKEZİNE SALDIRDI"), else the place over the event type ("ODESA / SALDIRI")
+  assert.match(`${l0} ${l1}`, /ODESA/u);
+  assert.match(`${l0} ${l1}`, /SALDIR|OLAY/u);
 });
 
 test('a clause-form death ("captain killed") is also rerouted to the event', () => {
