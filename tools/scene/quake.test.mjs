@@ -46,3 +46,12 @@ test('a USGS feature becomes an English scene that passes the scene check', () =
   assert.deepEqual(scene.hook.lines, ['MAGNITUDE 7.0', 'EARTHQUAKE']);
   assert.deepEqual(validate(scene), []);
 });
+
+test('a quake with the USGS tsunami flag says only what the feed says, and passes the scene check', () => {
+  // run 40252972028: "Check local warnings." was advice, not in the source, and the scene check stopped the video
+  const f = { id: 'us6000u4r9', geometry: { coordinates: [142.1, 27.6, 10] },
+    properties: { mag: 6.5, place: 'Bonin Islands, Japan region', time: Date.parse('2026-10-25T18:40:00Z'), status: 'reviewed', tsunami: 1, felt: 3, url: 'https://earthquake.usgs.gov/earthquakes/eventpage/us6000u4r9' } };
+  const { scene } = sceneEarth(f);
+  assert.ok(scene.beats.some((b) => b.kind === 'facts' && b.lines.join(' ').includes('tsunami flag')));
+  assert.deepEqual(validate(scene), []);
+});
