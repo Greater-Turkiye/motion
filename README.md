@@ -28,7 +28,7 @@ Tasarım örneklerini yeniden çizmek için `docs/mockups` klasörünü bir HTTP
 
 ```bash
 npm ci
-python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; manifest'teki hash'lerle doğrulanır
+python tools/data/fetch_emblems.py --sync     # 406 arma, bayrak ve amblem; manifest'teki hash'lerle doğrulanır (Commons'ta silinen ya da değişen dosya uyarıyla atlanır, video o amblemsiz çizilir)
 python tools/data/build_relief.py             # yalnızca kabartmayı yeniden üretmek için (depoda hazır: assets/data/relief.png)
 npm run dev                                   # önizleme: http://localhost:5178/?scene=hook-karadeniz&style=A
 npm run render -- --all-styles                # out/hook-karadeniz-{A,B,C,D}.mp4, 1080x1920, 60 fps
