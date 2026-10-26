@@ -137,7 +137,7 @@ jobs:
               node tools/audio/retime.mjs "$scene" "$voice" || return 1
               echo "voice: synthetic" >> "scenes/auto/$scene.yaml"
               engine=$(cat out/voice/engine.txt 2>/dev/null || echo edge)
-              echo "Seslendirme: yapay ses ($engine; Whisper ile kontrol edildi). Voice-over: synthetic, Whisper-checked." >> notes.md
+              echo "Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi. Seslendirme: $engine (Whisper ile kontrol edildi)." >> notes.md
             fi
             node export/render.mjs --scene "$scene" --bitrate 8000000 --out out/video || return 1
             node export/render.mjs --no-build --scene "$scene" --frames-only --every 100000 --save-frames --out out/poster || return 1

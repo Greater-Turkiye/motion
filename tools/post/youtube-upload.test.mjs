@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { CHANNELS, youtubePost, youtubeResource } from './youtube-upload.mjs';
+import { CHANNELS, withLink, youtubePost, youtubeResource } from './youtube-upload.mjs';
 
 test('the Conflict Grid channels keep their client; the Greater Türkiye family uses its own', () => {
   assert.deepEqual([CHANNELS.tr.token, CHANNELS.tr.client], ['YOUTUBE_REFRESH_TOKEN', 'YOUTUBE']);
@@ -33,7 +33,7 @@ test('extracts the factual Shorts title and description', () => {
   assert.doesNotMatch(post.description, /Not part of description/);
 });
 
-test('adds factual metadata, hashtags and synthetic-media disclosure', () => {
+test('adds factual metadata and hashtags, no AI label on code-drawn video', () => {
   const resource = youtubeResource(
     { voice: 'synthetic' },
     { title: 'Girit tatbikatı #Shorts', description: 'Kaynak: örnek #Girit #OSINT' },
@@ -42,7 +42,7 @@ test('adds factual metadata, hashtags and synthetic-media disclosure', () => {
 
   assert.equal(resource.snippet.categoryId, '25');
   assert.deepEqual(resource.snippet.tags, ['Shorts', 'Girit', 'OSINT']);
-  assert.equal(resource.status.containsSyntheticMedia, true);
+  assert.equal(resource.status.containsSyntheticMedia, false);
   assert.equal(resource.status.privacyStatus, 'unlisted');
   assert.throws(() => youtubeResource({}, { title: 'x', description: 'y' }, 'everyone'), /must be private/);
 });
@@ -69,4 +69,9 @@ test('sets the snippet language from the track', () => {
   assert.equal(en.snippet.defaultAudioLanguage, 'en');
   const tr = youtubeResource({}, { title: 'x', description: 'y' }, 'unlisted');
   assert.equal(tr.snippet.defaultLanguage, 'tr');
+});
+test('the YouTube link is added to the release metadata per channel', () => {
+  const a = withLink({ id: 'x', youtube: { tr: 'https://www.youtube.com/shorts/a' } }, 'en', 'https://www.youtube.com/shorts/b');
+  assert.deepEqual(a.youtube, { tr: 'https://www.youtube.com/shorts/a', en: 'https://www.youtube.com/shorts/b' });
+  assert.equal(a.id, 'x');
 });

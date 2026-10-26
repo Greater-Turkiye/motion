@@ -72,7 +72,8 @@ export function enCaptions(sc, meta) {
     : launch
     ? 'Auto-generated from Launch Library 2 (The Space Devs) data, published with no human in the loop. The orbit drawn is typical for its type, not the mission’s own elements.'
     : 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
-  const voiceLine = sc.voice === 'synthetic' ? 'Voice-over: synthetic.' : '';
+  // the pictures are drawn by code, not generated (owner, 2026-10-26: no AI label on them)
+  const voiceLine = 'Animation: drawn in code by Greater Türkiye motion.';
   const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
   const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Satellite data: NASA FIRMS (VIIRS, NOAA-20), public domain. A heat detection is not a confirmed event.' : '';
 
@@ -93,10 +94,6 @@ export function enCaptions(sc, meta) {
 
   const checklist = [
     '=== WHEN POSTING (this section is not posted) ===',
-    ...(sc.voice === 'synthetic' ? [
-      '- Instagram: turn on the "AI label" before posting (the voice-over is synthetic).',
-      '- YouTube: answer "Yes" to the "Altered or synthetic content" question when uploading.',
-    ] : []),
     '- To add trending music, use the music-free copy (-muziksiz.mp4, if present) and add music from the app’s own library.',
     '',
   ];
@@ -132,8 +129,8 @@ export function captions(sc, meta) {
     ? 'Kandilli Rasathanesi\'nin kaydından otomatik üretildi. Büyüklük ve yer Kandilli\'nin çözümüdür, güncellenebilir. Dalga varış süreleri IASP91 modeliyle hesaplanmış tahminlerdir; depremin hissedildiği anlamına gelmez.'
     : 'Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi başlığıdır, kimse okumadan yayımlandı.';
   // the satellite block's data, credited where the source is (PLAN.md section 25)
-  // the voice is declared here, not on screen (the corner carries our address)
-  const voiceLine = sc.voice === 'synthetic' ? 'Seslendirme: yapay ses.' : '';
+  // the pictures are drawn by code, not generated (owner, 2026-10-26: no AI label on them)
+  const voiceLine = 'Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi.';
   const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
   const satellite = (sc.beats ?? []).some((b) => b.kind === 'satellite') ? 'Uydu verisi: NASA FIRMS (VIIRS, NOAA-20), kamu malı. Isı tespiti yangın olduğu doğrulanmış bir olay değildir.' : '';
 
@@ -185,14 +182,9 @@ export function captions(sc, meta) {
   const xHead = headline.length <= room ? headline.replace(/\.$/, '') : headline.slice(0, room - 1).replace(/\s+\S*$/, '') + '…';
   const x = `${xHead}${tail}${url}`;
 
-  // for whoever posts, not for the post: what the platforms ask of a synthetic voice, and the copy to
-  // use for trending music (PLAN.md sections 27 and 28)
+  // for whoever posts, not for the post: the copy to use for trending music (PLAN.md sections 27 and 28)
   const checklist = [
     '=== PAYLAŞIRKEN (bu bölüm paylaşılmaz) ===',
-    ...(sc.voice === 'synthetic' ? [
-      '- Instagram: paylaşmadan önce "Yapay zekâ etiketi"ni aç (seslendirme yapay; Meta etiketsiz gerçekçi yapay sesi cezalandırabiliyor).',
-      '- YouTube: yüklerken "Değiştirilmiş ya da sentetik içerik" sorusuna "Evet" de.',
-    ] : []),
     '- Trend müzik eklemek için müziksiz kopyayı kullan (-muziksiz.mp4, varsa); müziği uygulamanın kendi kütüphanesinden ekle.',
     '',
   ];

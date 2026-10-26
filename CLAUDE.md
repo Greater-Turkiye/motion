@@ -43,8 +43,10 @@ stat pills, "Ama suyun altında:"): rubbish design. None of it in any video, fra
 channel, and no music bed is used anywhere (the owner found the beds bad). On the earthquake channels the
 waves block shows the simulated time since the quake as it runs (`+1 dk 25 sn`): it is the clock of a
 model, labelled as such ("tahmini varış, IASP91 modeli · N kat hızlı"), not a counter on a fact.
-The one generated element is the narration voice: it is declared in every posting text and release
-note ("Seslendirme: yapay ses"), and switched off with `MOTION_VOICE=off`. The top corner of every frame
+The pictures are drawn by code (motion's own renderer), not generated: no AI label on the videos,
+posts or uploads (owner, 2026-10-26; YouTube `containsSyntheticMedia: false`). Posting texts and
+release notes say "Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi" and credit the voice
+engine by name; the voice is switched off with `MOTION_VOICE=off`. The top corner of every frame
 carries our mark and address, "greaterturkiye.org" (owner, 2026-10-06; it replaced the on-screen
 "SESLENDİRME: YAPAY SES").
 

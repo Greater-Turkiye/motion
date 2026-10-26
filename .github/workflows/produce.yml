@@ -102,6 +102,7 @@ jobs:
           echo "id=$id" >> "$GITHUB_OUTPUT"
           echo "record: ${id:-none}" >> "$GITHUB_STEP_SUMMARY"
       - name: Scene
+        id: scene
         if: steps.pick.outputs.id != ''
         env:
           ID: ${{ steps.pick.outputs.id }}
@@ -126,7 +127,11 @@ jobs:
           python3 -m pip install --quiet "opencv-python-headless<5" || echo "no OpenCV: no photograph"
           node tools/scene/photo.mjs ../datasets "$ID" assets/photos > photo.json || true
           photo=(); [ -s photo.json ] && photo=(--photo photo.json) && echo "photo: $(cat photo.json)" >> "$GITHUB_STEP_SUMMARY"
-          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant "$variant" --notes notes.md --meta meta.json ${firms:+--firms "$firms"} "${photo[@]}"
+          # a style none of the channel's last four videos used (config/styles.yaml pools)
+          recent=$(bash tools/post/recent-styles.sh video- || true)
+          echo "recent styles: ${recent:-none}" >> "$GITHUB_STEP_SUMMARY"
+          echo "recent=$recent" >> "$GITHUB_OUTPUT"
+          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant "$variant" --recent "$recent" --notes notes.md --meta meta.json ${firms:+--firms "$firms"} "${photo[@]}"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.pick.outputs.id != '' && vars.MOTION_VOICE != 'off'
         with:
@@ -224,18 +229,19 @@ jobs:
           esac
           # the picture waits for the voice: blocks lengthen until each clip fits
           node tools/audio/retime.mjs "auto-$ID" out/voice
-          # only now, with every clip made, does the scene carry the synthetic-voice note
+          # only now, with every clip made, is the scene marked as narrated
           echo "voice: synthetic" >> "scenes/auto/auto-$ID.yaml"
           engine=$(cat out/voice/engine.txt 2>/dev/null || echo chatterbox)
           case "$engine" in
-            omnivoice) voice_label="OmniVoice, Hugging Face Space (reference-conditioned synthetic voice)" ;;
+            omnivoice) voice_label="OmniVoice" ;;
             hf) voice_label="Hugging Face XTTS Space" ;;
             edge) voice_label="Edge TTS ($EDGE_TTS_VOICE)" ;;
-            gemini) voice_label="Gemini TTS, Google, SynthID filigranlı" ;;
-            fish-s2-pro) voice_label="Fish Audio S2 Pro, Kaggle GPU (reference-conditioned synthetic voice)" ;;
+            gemini) voice_label="Gemini TTS" ;;
+            fish-s2-pro) voice_label="Fish Audio S2 Pro" ;;
             *) voice_label="Chatterbox Multilingual, MIT" ;;
           esac
-          { echo; echo "Seslendirme: yapay ses ($voice_label; ekrandaki olguları kendi cümleleriyle anlatır). Voice-over: synthetic, telling the on-screen facts in its own sentences."; } >> notes.md
+          # the pictures are drawn by code, not generated: no AI label (owner, 2026-10-26); the voice engine is credited
+          { echo; echo "Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi. Seslendirme: $voice_label. Animation drawn in code; voice: $voice_label."; } >> notes.md
           echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: Video and poster
         if: steps.pick.outputs.id != ''
@@ -294,6 +300,8 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          # the YouTube link is written back to the release (notes and metadata), so GitHub lists it
+          RELEASE_TAG: video-${{ steps.pick.outputs.id }}
         run: node tools/post/youtube-upload.mjs "auto-$ID" meta.json "release/auto-$ID.mp4" tr
 
       # The English channel (@Conflict-Grid): the same record in English. The whole track is
@@ -377,13 +385,22 @@ jobs:
           YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_REFRESH_TOKEN_EN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
           EN_STYLE: ${{ vars.MOTION_EN_STYLE }}
+          RECENT: ${{ steps.scene.outputs.recent }}
         run: |
           scene="auto-$ID.en"
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
           # its own look: the same frames minutes after the Turkish upload read as a re-upload, and the
           # English channel's shorts got no test audience (1-15 views each, 15-18 October). A style that
-          # cannot fit the English copy falls back to the scene's own.
-          style="${EN_STYLE:-D}"
+          # cannot fit the English copy falls back to the scene's own. Not one fixed style either (every
+          # English video was D): its pool's first style that neither the Turkish cut nor the Turkish
+          # channel's last videos used (owner, 2026-10-26)
+          style="$EN_STYLE"
+          [ -n "$style" ] || style=$(node --input-type=module -e '
+            import { readFileSync } from "node:fs"; import { styleFor } from "./tools/scene/generate.mjs";
+            const m = JSON.parse(readFileSync("meta.json", "utf8"));
+            const recent = String(process.env.RECENT ?? "").split(",").filter(Boolean);
+            process.stdout.write(styleFor(m.event_type ?? "", [m.style, ...recent]));' || echo D)
+          echo "English style: $style" >> "$GITHUB_STEP_SUMMARY"
           if ! node export/render.mjs --encoder ffmpeg --scene "$scene" --style "$style" --out out/video-en; then
             echo "::warning::English render in style $style failed; using the scene's own style"
             rm -rf out/video-en
@@ -396,7 +413,7 @@ jobs:
           gh release upload "video-$ID" "release-en/$scene.mp4" --clobber || echo "::warning::could not add the English cut to video-$ID"
           # English posting text (captions reads scene.lang and writes the English block)
           node tools/post/captions.mjs "$scene" meta.json release-en
-          node tools/post/youtube-upload.mjs "$scene" meta.json "release-en/$scene.mp4" en
+          RELEASE_TAG="video-$ID" node tools/post/youtube-upload.mjs "$scene" meta.json "release-en/$scene.mp4" en
 
   # the clock (timer.yml): after every production, a timer run sleeps until the next video is due.
   # The schedule above is only the second line: it ran about once in four hours on 1-2 October.
@@ -459,6 +476,12 @@ jobs:
             used=$((used + size))
           done
           echo "MP4s on the site: $((used / 1024 / 1024)) MB"
+          # the other channels' videos (Greater Türkiye, Greater Earth and the Türkiye quake channel, Greater
+          # Defence) are listed on the index with their YouTube links: their metadata only, no MP4
+          for tag in $(gh release list --limit 400 --json tagName --jq '.[].tagName' | grep -E '^(gt-|quake-|defence-)'); do
+            mkdir -p "site/m/$tag"
+            gh release download "$tag" --dir "site/m/$tag" --pattern '*.json' --clobber || true
+          done
           # the studio stills, when the studio workflow has made them
           gh release download studio --pattern studio.tar --dir . --clobber 2>/dev/null && tar -C site -xf studio.tar || echo "no studio yet"
           node tools/scene/site.mjs site

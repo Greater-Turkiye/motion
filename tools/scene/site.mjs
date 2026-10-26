@@ -28,9 +28,26 @@ for (const f of files) {
 }
 videos.sort((a, b) => String(b.published ?? b.date).localeCompare(String(a.published ?? a.date)));
 writeFileSync(path.join(root, 'videos.json'), JSON.stringify({ generated: new Date().toISOString(), videos }, null, 1) + '\n');
-writeFileSync(path.join(root, 'index.html'), '<!doctype html><meta charset="utf-8"><title>Greater Türkiye · motion</title>'
+// every video with its GitHub release and its YouTube links (youtube-upload.mjs writes them back to the
+// release's metadata), so GitHub lists where each video is on YouTube (owner, 2026-10-26)
+const h = (x) => String(x ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+// the other channels' releases (site/m/<tag>/*.json, metadata only): listed, not served
+const mdir = path.join(root, 'm');
+const others = existsSync(mdir) ? readdirSync(mdir).flatMap((tag) => {
+  const f = readdirSync(path.join(mdir, tag)).filter((x) => x.endsWith('.json')).sort((a, b) => a.length - b.length)[0];
+  if (!f) return [];
+  const m = JSON.parse(readFileSync(path.join(mdir, tag, f), 'utf8'));
+  return [{ ...m, release: `https://github.com/Greater-Turkiye/motion/releases/tag/${tag}` }];
+}) : [];
+const listed = [...videos, ...others].sort((a, b) => String(b.published ?? b.date).localeCompare(String(a.published ?? a.date)));
+const rows = listed.map((v) => `<tr><td>${h(v.date)}</td><td>${h(v.title)}</td><td>${h(v.style ?? '')}</td>`
+  + `<td>${v.release ? `<a href="${h(v.release)}">GitHub</a>` : ''}</td>`
+  + `<td>${Object.entries(v.youtube ?? {}).map(([k, u]) => `<a href="${h(u)}">${h(k)}</a>`).join(' ')}</td></tr>`).join('\n');
+writeFileSync(path.join(root, 'index.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Greater Türkiye · motion</title>'
+  + '<style>body{font:15px/1.4 system-ui,sans-serif;margin:16px;background:#fff;color:#111}table{border-collapse:collapse;width:100%}td{border-top:1px solid #ddd;padding:6px 8px;vertical-align:top}</style>'
   + '<p>Otomatik videolar / automatic videos: <a href="https://greater-turkiye.github.io/platform/videolar.html">videolar</a> · '
-  + '<a href="videos.json">videos.json</a> · <a href="studio/">stüdyo</a></p>\n');
+  + '<a href="videos.json">videos.json</a> · <a href="studio/">stüdyo</a></p>\n'
+  + `<table><tr><td>Tarih</td><td>Başlık</td><td>Stil</td><td>Sürüm</td><td>YouTube</td></tr>\n${rows}</table>\n`);
 console.log(`${videos.length} videos in ${path.join(root, 'videos.json')}, ${videos.filter((v) => v.video_en).length} with an English cut`);
 
 // the studio (tools/scene/studio.mjs): every style on a recent story of each family, the default marked
@@ -71,7 +88,7 @@ section+section{border-top:1px solid var(--line)}
 </style></head><body>
 <header><h1>Stüdyo</h1>
 <p>Her olay ailesinden güncel bir haber, dokuz stilin hepsinde: kanca, ailenin kendi bölümü, durum. Çerçeveli olan, o türün şu anki varsayılanı.</p>
-<p>Varsayılanı değiştirmek için <a href="${edit}">config/styles.yaml</a> dosyasında harfi değiştirin; sonraki otomatik videolar onu kullanır. Üretim: ${esc(st.generated.slice(0, 16).replace('T', ' '))} UTC · <a href="../">videolar</a></p>
+<p>Her türün stil havuzu <a href="${edit}">config/styles.yaml</a> dosyasında; sonraki otomatik video, kanalın son dört videosunda kullanılmamış ilk stili alır. Üretim: ${esc(st.generated.slice(0, 16).replace('T', ' '))} UTC · <a href="../">videolar</a></p>
 </header>
 ${sections}
 </body></html>

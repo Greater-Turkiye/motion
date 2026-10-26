@@ -4,7 +4,8 @@ name: produce-gt
 # After each production (produce.yml) it takes the next-best record, the one the Turkish channel did
 # not take, so no story is told twice on two English channels (Conflict Grid has its own cut of the
 # produce story). Same generator, same red lines and checks; its own look: the short story order
-# (kisa, 12-15 s), the style in MOTION_GT_STYLE (default B), and Kokoro's British news voice
+# (kisa, 12-15 s), a style its last four videos did not use (config/styles.yaml pools; MOTION_GT_STYLE
+# pins one), and Kokoro's British news voice
 # (MOTION_GT_VOICE, default bf_emma). Published as a GitHub release tagged gt-<record>, which
 # produce.yml also counts as published, then uploaded to the channel and added to the videos page.
 #
@@ -84,7 +85,10 @@ jobs:
         if: steps.pick.outputs.id != ''
         env:
           ID: ${{ steps.pick.outputs.id }}
-        run: node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant kisa --notes notes.md --meta meta.json
+        run: |
+          # a style none of the channel's last four videos used (config/styles.yaml pools)
+          recent=$(bash tools/post/recent-styles.sh gt- || true)
+          node tools/scene/generate.mjs --datasets ../datasets --id "$ID" --variant kisa --recent "$recent" --notes notes.md --meta meta.json
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.pick.outputs.id != ''
         with:
@@ -138,8 +142,10 @@ jobs:
         run: |
           scene="auto-$ID.en"
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
-          style="${GT_STYLE:-B}"
-          if ! node export/render.mjs --encoder ffmpeg --scene "$scene" --style "$style" --out out/video; then
+          # the scene's own style unless MOTION_GT_STYLE pins one: a fixed B made every video on the
+          # channel the same navy map (owner, 2026-10-26)
+          style="$GT_STYLE"
+          if ! node export/render.mjs --encoder ffmpeg --scene "$scene" ${style:+--style "$style"} --out out/video; then
             echo "::warning::render in style $style failed; using the scene's own style"
             rm -rf out/video; style=
             node export/render.mjs --encoder ffmpeg --scene "$scene" --out out/video
@@ -159,7 +165,7 @@ jobs:
           KOKORO_VOICE: ${{ vars.MOTION_GT_VOICE || 'bf_emma' }}
         run: |
           title=$(node -e "const y=require('yaml');const s=y.parse(require('fs').readFileSync('scenes/auto/auto-'+process.env.ID+'.en.yaml','utf8'));console.log(s.hook.lines.join(' ') + ' · ' + s.hook.kicker + ' · @greaterturkiye')")
-          { cat notes.md; echo; echo "English cut for @greaterturkiye: Kokoro-82M synthetic voice (${KOKORO_VOICE:-bf_emma}), telling the on-screen facts in its own sentences."; } > notes-gt.md
+          { cat notes.md; echo; echo "English cut for @greaterturkiye. Animation: drawn in code by Greater Türkiye motion. Voice: Kokoro-82M (${KOKORO_VOICE:-bf_emma})."; } > notes-gt.md
           gh release create "gt-$ID" release/* --title "$title" --notes-file notes-gt.md --latest=false
           echo "published: gt-$ID" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload to @greaterturkiye
@@ -171,6 +177,7 @@ jobs:
           YOUTUBE_GT_CLIENT_SECRET: ${{ secrets.YOUTUBE_GT_CLIENT_SECRET }}
           YOUTUBE_GT_REFRESH_TOKEN: ${{ secrets.YOUTUBE_GT_REFRESH_TOKEN }}
           YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          RELEASE_TAG: gt-${{ steps.pick.outputs.id }}
         run: node tools/post/youtube-upload.mjs "auto-$ID.en" meta.json "release/auto-$ID.en.mp4" gt
       - name: Refresh the videos page
         if: steps.translate.outputs.ok == 'true'
