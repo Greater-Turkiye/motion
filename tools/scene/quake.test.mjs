@@ -55,3 +55,14 @@ test('a quake with the USGS tsunami flag says only what the feed says, and passe
   assert.ok(scene.beats.some((b) => b.kind === 'facts' && b.lines.join(' ').includes('tsunami flag')));
   assert.deepEqual(validate(scene), []);
 });
+
+test('a USGS quake with model fronts spreads them from the first frame and passes the scene check', () => {
+  const f = { id: 'us6000u4r9', geometry: { coordinates: [142.1, 27.6, 492] },
+    properties: { mag: 6.5, place: 'Bonin Islands, Japan region', time: Date.parse('2026-10-25T02:09:00Z'), status: 'reviewed', tsunami: 0, felt: null, url: 'https://earthquake.usgs.gov/earthquakes/eventpage/us6000u4r9' } };
+  const curve = Array.from({ length: 51 }, (_, i) => [i * 50, 59 + i * 4, 107 + i * 7.3]);
+  const { scene } = sceneEarth(f, { model: 'IASP91', curve });
+  const w = scene.beats.find((b) => b.kind === 'waves');
+  assert.equal(w.from, 0);
+  assert.equal(scene.camera.globe, false);
+  assert.deepEqual(validate(scene), []);
+});

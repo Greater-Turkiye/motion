@@ -478,9 +478,15 @@ export function drawVideo(ctx: CanvasRenderingContext2D, a: Assets, map: MapRend
 
   // waves: an earthquake's P and S fronts where the 1-D model puts them at each moment (arrivals.py),
   // sped up; a place lights, with its arrival time, when the S front reaches it
-  if (beat?.kind === 'waves' && sc.event) {
-    const w = windowOf(sc, beatIdx, t);
-    const sim = Math.max(0, (t - beat.at) * beat.speed);
+  // a waves block with `from` spreads its fronts from that moment (0: the first frame, under the hook), and
+  // they stay until the block ends; the block's own text still comes at its time
+  const wi = sc.beats.findIndex((b) => b.kind === 'waves');
+  const wb = wi >= 0 ? (sc.beats[wi] as Extract<Beat, { kind: 'waves' }>) : null;
+  const early = !!wb && wb.from !== undefined && t >= wb.from && t < wb.at;
+  if ((beat?.kind === 'waves' || early) && wb && sc.event) {
+    const beat = wb, beatIdx = wi;
+    const w = early ? { out: 1 } : windowOf(sc, beatIdx, t);
+    const sim = Math.max(0, (t - (beat.from ?? beat.at)) * beat.speed);
     const radius = (col: 1 | 2) => {
       const c = beat.curve.filter((r) => r[col] != null) as [number, number, number][];
       if (!c.length || sim <= c[0][col]) return 0;

@@ -37,9 +37,10 @@ def first(model, depth, deg, phases):
     return round(min(a.time for a in arr), 1) if arr else None
 
 
-def arrivals(lon, lat, depth, model_name="iasp91"):
+def arrivals(lon, lat, depth, model_name="iasp91", provinces=True, far_km=None):
     model = TauPyModel(model=model_name)
-    provinces = json.loads((ROOT / "assets/data/tr-provinces.json").read_text(encoding="utf-8"))["provinces"]
+    # --no-provinces: the fronts only, for a quake anywhere (the Greater Earth channel)
+    provinces = json.loads((ROOT / "assets/data/tr-provinces.json").read_text(encoding="utf-8"))["provinces"] if provinces else []
     out = []
     for name, plon, plat in provinces:
         km = distance_km((lon, lat), (plon, plat))
@@ -49,9 +50,9 @@ def arrivals(lon, lat, depth, model_name="iasp91"):
     out.sort(key=lambda r: (r["s_s"] is None, r["s_s"] or 0))
     # the wave fronts on the map: arrival time against distance, so the renderer draws each front where the
     # model puts it at each moment, never a ring growing at a constant speed
-    far = max(r["km"] for r in out) + 100
+    far = far_km or (max(r["km"] for r in out) + 100)
     curve = []
-    for km in range(0, int(far) + 1, 20):
+    for km in range(0, int(far) + 1, 20 if far <= 3000 else 50):
         deg = max(km, 1) / 111.195
         curve.append([km, first(model, depth, deg, P_PHASES), first(model, depth, deg, S_PHASES)])
     return {"model": model_name.upper(), "depth_km": depth, "epicentre": [lon, lat], "provinces": out, "curve": curve}
@@ -63,7 +64,9 @@ if __name__ == "__main__":
     ap.add_argument("--lat", type=float, required=True)
     ap.add_argument("--depth", type=float, required=True)
     ap.add_argument("--model", default="iasp91")
+    ap.add_argument("--no-provinces", action="store_true", help="the wave-front curve only")
+    ap.add_argument("--far", type=float, help="the curve's reach in km (default: the farthest province + 100)")
     a = ap.parse_args()
     import sys
     sys.stdout.reconfigure(encoding="utf-8")  # province names are Turkish; Windows consoles default to cp1254
-    print(json.dumps(arrivals(a.lon, a.lat, max(a.depth, 0.5), a.model), ensure_ascii=False, indent=1))
+    print(json.dumps(arrivals(a.lon, a.lat, max(a.depth, 0.5), a.model, not a.no_provinces, a.far), ensure_ascii=False, indent=1))

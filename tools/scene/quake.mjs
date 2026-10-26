@@ -102,13 +102,17 @@ function keysFor(at, country, D, beats) {
   // one calm move, then a hold: the globe glides to the country by the end of the hook and stays there,
   // drifting only a little toward the epicentre, while the fronts spread; the globe again at the end.
   // The owner (2026-10-25): a dive into the province and back, three moves in two seconds, tired the eye
+  // The owner again (2026-10-26): every video opened on a small globe and nothing happened in the first
+  // three seconds. Now the first frame is the country with the epicentre, the fronts already leaving it;
+  // the camera eases out a little while they spread and the last frame is the first (the loop)
   const near = [country.center[0] * 0.8 + at[0] * 0.2, country.center[1] * 0.8 + at[1] * 0.2];
   const last = beats.at(-1);
+  const open = { center: near, zoom: country.zoom * 1.12 };
   return [
-    { t: 0, center: country.center, zoom: 1.0 },
+    { t: 0, ...open },
     { t: beats[0].at, center: near, zoom: country.zoom },
-    { t: Math.max(beats[0].at + 0.5, last.at), center: [near[0] + 0.3, near[1]], zoom: country.zoom * 1.06 },
-    { t: D, center: country.center, zoom: 1.0 },
+    { t: Math.max(beats[0].at + 0.5, last.at), center: [near[0] + 0.3, near[1]], zoom: country.zoom * 1.04 },
+    { t: D, ...open },
   ].filter((x, i, a) => i === 0 || x.t > a[i - 1].t);
 }
 
@@ -141,7 +145,8 @@ export function sceneTr(q, list, arrivals = null) {
     const speed = Math.max(2, Math.ceil(last / 6.2));
     const head = byName.get('ANKARA')?.s_s != null && byName.get('ANKARA').km > 60 ? byName.get('ANKARA') : byName.get(named[0]);
     const mm = Math.floor(head.s_s / 60), ss = Math.round(head.s_s % 60);
-    waves = { kind: 'waves', at: t, title: 'DALGANIN TAHMİNİ VARIŞI', headline: `${title(head.name)}: ~${mm ? `${mm} dk ${ss} sn` : `${ss} sn`}`,
+    // from: 0, the fronts spread from the first frame, under the hook (the block itself comes at its time)
+    waves = { kind: 'waves', at: t, from: 0, title: 'DALGANIN TAHMİNİ VARIŞI', headline: `${title(head.name)}: ~${mm ? `${mm} dk ${ss} sn` : `${ss} sn`}`,
       note: `Tahmini S dalgası varışı, ${arrivals.model} modeli · ${speed} kat hızlı`, speed, curve: arrivals.curve,
       places: arrivals.provinces.filter((r) => r.s_s != null).map((r) => ({ name: r.name, at: r.at, s: r.s_s, ...(named.includes(r.name) ? { show: true } : {}) })) };
     beats.push(waves);
@@ -160,7 +165,7 @@ export function sceneTr(q, list, arrivals = null) {
   const id = `quake-tr-${q.id}`;
   const scene = {
     id, record: `koeri:${q.id}`, format: 'vertical', fps: 60, duration: D, style: 'Q', lang: 'tr', source_text,
-    camera: { from: { center: country.center, zoom: 1 }, to: { center: q.at, zoom: 4 }, seconds: 2, ease: 'inOutCubic', keys: keysFor(q.at, country, D, beats), globe: true },
+    camera: { from: { center: country.center, zoom: 1 }, to: { center: q.at, zoom: 4 }, seconds: 2, ease: 'inOutCubic', keys: keysFor(q.at, country, D, beats), globe: false },
     event: { at: q.at, precision: 'exact', kind: 'ring' },
     labels: [{ text: 'TÜRKİYE', at: [35, 39.2], kind: 'home' }, ...(region?.kind === 'province' ? [] : [{ text: where, at: q.at, kind: 'sea' }])],
     hook, beats,
@@ -181,7 +186,7 @@ export function sceneTr(q, list, arrivals = null) {
   return { scene, narration, meta };
 }
 
-export function sceneEarth(f) {
+export function sceneEarth(f, arrivals = null) {
   const p = f.properties, [lon, lat, depth] = f.geometry.coordinates;
   const at = [Math.round(lon * 100) / 100, Math.round(lat * 100) / 100];
   const time = new Date(p.time);
@@ -195,7 +200,20 @@ export function sceneEarth(f) {
     status: p.status === 'reviewed' ? 'REVIEWED' : 'AUTOMATIC SOLUTION', source: 'SOURCE: USGS' };
   const beats = [];
   let t = hookTime(hook, 2.6);
-  if (p.tsunami) { beats.push({ kind: 'facts', at: t, kicker: 'USGS', lines: ['USGS tsunami flag: *yes*.'] }); t += 3; }
+  // the fronts from the first frame, as for Türkiye: arrivals.py --no-provinces gives the model's curve
+  let waves = null;
+  if (arrivals?.curve?.length) {
+    const reach = 1500;
+    const at1 = arrivals.curve.find((r) => r[0] >= reach && r[2] != null) ?? arrivals.curve.filter((r) => r[2] != null).at(-1);
+    const speed = Math.max(2, Math.ceil(at1[2] / 7));
+    const mm = Math.floor(at1[2] / 60), ss = Math.round(at1[2] % 60);
+    waves = { kind: 'waves', at: t, from: 0, title: 'ESTIMATED WAVE FRONTS', headline: `${at1[0].toLocaleString('en-US')} km: ~${mm ? `${mm} min` : `${ss} s`}`,
+      note: `Model estimate, ${arrivals.model} · ${speed}x faster`, speed, curve: arrivals.curve, places: [] };
+    beats.push(waves);
+    source_text.push(`${waves.title}. ${waves.headline}. ${waves.note}.`);
+    t += 6.5;
+  }
+  if (p.tsunami) { beats.push({ kind: 'facts', at: r1(t), kicker: 'USGS', lines: ['USGS tsunami flag: *yes*.'] }); t += 3; }
   if (p.felt) { beats.push({ kind: 'facts', at: r1(t), kicker: 'FELT REPORTS', lines: [`USGS felt reports: *${p.felt}*.`] }); t += 2.8; }
   beats.push({ kind: 'status', at: r1(t), text: p.status === 'reviewed' ? 'Reviewed by a USGS seismologist.' : 'Automatic solution: values may be revised.' });
   t += 3.2;
@@ -203,13 +221,16 @@ export function sceneEarth(f) {
   const region = { center: at, zoom: 1.4 };
   const id = `quake-earth-${f.id}`;
   const scene = {
-    id, record: `usgs:${f.id}`, format: 'vertical', fps: 60, duration: D, style: 'A', lang: 'en', source_text,
-    camera: { from: { center: at, zoom: 1 }, to: { center: at, zoom: 3 }, seconds: 2, ease: 'inOutCubic', keys: keysFor(at, region, D, beats), globe: true },
+    // the light quake style the owner approved for Türkiye (2026-10-26): on style A's black night the land
+    // around a quake was hard to see
+    id, record: `usgs:${f.id}`, format: 'vertical', fps: 60, duration: D, style: 'Q', lang: 'en', source_text,
+    camera: { from: { center: at, zoom: 1 }, to: { center: at, zoom: 3 }, seconds: 2, ease: 'inOutCubic', keys: keysFor(at, region, D, beats), globe: false },
     event: { at, precision: 'exact', kind: 'ring' }, labels: [], hook, beats,
   };
   const r2 = (x) => Math.round(x * 100) / 100;
   const ends = [...beats.map((b) => b.at), D - 0.3];
   const said = [`A magnitude ${mag} earthquake struck ${place}, at a depth of ${Math.round(depth)} kilometres.`,
+    ...(waves ? [`In the IASP91 model, the S wave reaches ${waves.headline.split(' km')[0]} kilometres in about ${waves.headline.split('~')[1].replace(/ min$/, ' minutes').replace(/ s$/, ' seconds')}.`] : []),
     ...(p.tsunami ? ['The USGS has set its tsunami flag for this earthquake.'] : []),
     ...(p.felt ? [`${p.felt} people have reported feeling it.`] : []),
     p.status === 'reviewed' ? 'A USGS seismologist has reviewed the solution.' : 'This is an automatic solution, and the values may change.'];
@@ -255,7 +276,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     fresh.sort((a, b) => b.properties.mag - a.properties.mag);
     const chosen = typeof args.get('id') === 'string' ? data.features.find((f) => f.id === args.get('id')) : fresh[0];
     if (chosen && args.has('pick')) { const [lon, lat, depth] = chosen.geometry.coordinates; console.log(`${chosen.id} ${lon} ${lat} ${depth}`); process.exit(0); }
-    if (chosen) built = sceneEarth(chosen);
+    const arr = typeof args.get('arrivals') === 'string' ? JSON.parse(readFileSync(args.get('arrivals'), 'utf8')) : null;
+    if (chosen) built = sceneEarth(chosen, arr);
   }
   if (!built) process.exit(0); // nothing big enough in the window: a normal outcome
   const dir = path.join(ROOT, 'scenes/auto');

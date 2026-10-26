@@ -1016,3 +1016,6 @@ Sahibin sorusu: "aç bak, viral olur mu?" Kendi bakışım: olmazdı. On şablon
   üst satırda; sayımın ilk kalemi fiiliyle. Etiket kanca yalnız cümle yoksa.
 - Yeri yalnız ülke olan kayıt o ülkenin tamamını gösterir; çok taraflı haberde ABD çerçeveye alınmaz.
 Sırada: depremde ilk karede yayılan dalga ve ilçeye uydu + 3D iniş; Earth deprem videosu aynı kuralla.
+- **Deprem**: dalgalar ilk kareden yayılır (`waves.from: 0`), ilk kare küre değil ülke ve merkez üssü; Greater
+  Earth da aynı IASP91 dalgalarını alır (`arrivals.py --no-provinces --far 2500`) ve onaylı açık deprem stili Q ile
+  çizilir (A'nın kara gecesinde kara seçilmiyordu). Yayındaki ilk Earth videosu (Bonin, M6,5) bu kurallardan önceydi.
