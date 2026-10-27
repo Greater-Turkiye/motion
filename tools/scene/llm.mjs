@@ -6,7 +6,7 @@
 const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
 // gemma first, fixed by the owner (not from an env var); when its shared endpoint is overloaded (529 on
 // every call, 2026-10-27) the same key reaches other hosted models, fixed here too
-const NIM_MODELS = ['google/gemma-4-31b-it', 'meta/llama-3.3-70b-instruct', 'qwen/qwen3-next-80b-a3b-instruct'];
+const NIM_MODELS = ['google/gemma-4-31b-it', 'deepseek-ai/deepseek-v4.1-flash', 'moonshotai/kimi-k2.6', 'mistralai/mistral-large-2-instruct'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -60,7 +60,7 @@ async function chat(label, url, key, model, prompt, temperature, timeoutS) {
         last = new Error(`${label} ${model} returned no text`);
       } else {
         last = new Error(`${label} ${model} HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
-        if (![429, 500, 502, 503, 504, 529].includes(response.status)) break;
+        if (![429, 500, 502, 503, 504, 529].includes(response.status)) { console.log(last.message.slice(0, 160)); break; }
       }
     } catch (error) { last = error; }
     console.log(String(last?.message ?? last).split(/\r?\n/)[0]);
