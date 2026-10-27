@@ -2,8 +2,8 @@
 // the voice already uses; answers in seconds), then NVIDIA NIM (NVAPI, gemma) with a short timeout. NIM
 // alone timed out three times in a row at 180 s on 2026-10-26, nine minutes for nothing, and the video
 // went out with the generator's label hook ("GAZZE / RESMİ AÇIKLAMA"). Returns the answer's text, or
-// throws when neither answers.
-const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-flash-latest,gemini-2.5-flash').split(',').map((x) => x.trim()).filter(Boolean);
+// throws when neither answers. The model: gemini-3.8-flash (2.5 is closed to new keys, HTTP 404 on 2026-10-27).
+const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
 const NIM_MODEL = 'google/gemma-4-31b-it'; // fixed by the owner, not from an env var
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,6 +32,7 @@ async function gemini(prompt, { temperature, json }) {
           break;
         }
         last = new Error(`Gemini ${model} HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
+        console.log(last.message.split(/\r?\n/)[0]);
         if (![429, 500, 502, 503, 504].includes(response.status)) break;
         await sleep(5000 * (attempt + 1));
       } catch (error) { last = error; await sleep(3000); }
@@ -67,4 +68,10 @@ export function responseJson(text) {
   const end = text.lastIndexOf('}');
   if (start < 0 || end <= start) throw new Error('the model did not return a JSON object');
   return JSON.parse(text.slice(start, end + 1));
+}
+
+// a one-line check of the keys and models from CI (llm-check.yml): node tools/scene/llm.mjs
+if (process.argv[1]?.endsWith('llm.mjs')) {
+  const r = await ask('Return JSON {"ok":true,"word":"merhaba"}', { temperature: 0 });
+  console.log(`${r.model}: ${r.text.trim().slice(0, 120)}`);
 }
