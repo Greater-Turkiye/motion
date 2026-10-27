@@ -6,9 +6,8 @@
 const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
 // gemma, fixed by the owner (not from an env var). Of the endpoint's other models this key reaches none
 // (404 "Function not found for account", 410 end of life; checked 2026-10-27), so gemma is asked with
-// patience instead: its shared endpoint answers 529 when busy and frees up within minutes; the smaller
-// gemma 3 of the same family after it
-const NIM_MODELS = ['google/gemma-4-31b-it', 'google/gemma-3-12b-it'];
+// patience instead: its shared endpoint answers 529 when busy and frees up within minutes
+const NIM_MODELS = ['google/gemma-4-31b-it'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
