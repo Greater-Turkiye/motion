@@ -859,7 +859,10 @@ export function generate(record, { datasets, style, recent = [], variant = 'stan
   const factsBeat = () => { const said = sub || (hook.kind === 'clause' ? hook.lines.join(' ') : ''); if (!(said && same(facts.join(' ').replace(/\*/g, ''), said))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
   // a statement is its speaker's own words: "Tek kaynak: UN. Bağımsız teyit henüz yok. Konum yaklaşık:
   // ±20 km." under a UN press release read as nonsense (owner, 2026-10-27); its status stays in the footer
-  const statusBeat = () => { if (family !== 'statement') push({ kind: 'status', text: statusText }, statusText.length, 3.0); };
+  // not under a strike either: four closing seconds of "Bağımsız teyit henüz yok. Konum yaklaşık: ±100 km."
+  // ended every video on nothing new (owner, 2026-10-27). The status and source stay in the footer of every
+  // frame (CLAUDE.md section 2); the block stays only for a verified record, where it says something
+  const statusBeat = () => { if (st === 'verified') push({ kind: 'status', text: statusText }, statusText.length, 3.0); };
   const distanceBeat = (fromLabel) => {
     if (whole) return; // from the middle of a whole country, a distance measures nothing the record says
     // the Bosphorus is a strait, not a city

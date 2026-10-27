@@ -1051,7 +1051,12 @@ metin editörü (NIM, gemma) son üretimde üç kez 180 s zaman aşımına uğra
 - **Kanca serbest yazılır, olgu eklemez**: iki satır (18/24 harf), etiket yasak; sayılar ve özel isimler kaynağın
   (`factsOnly`, seslendirmenin kapısı); `hook.edited` ile doğrulama kelime kelime kök denetimini kancada atlar,
   olgular bloğunda sürer. Editör YouTube başlığını da yazar (`post_title`, ≤70 harf).
-- **Açıklama türünde durum bloğu yok** (durum künyede kalır); "kimse okumadan" cümleleri çıktı.
+- **Durum bloğu yalnız doğrulanmış kayıtta** (önce açıklamalarda, sonra saldırılarda da kalktı: "Konum yaklaşık ±100 km" ile biten dört saniye); durum her karenin künyesinde. "Kimse okumadan" cümleleri çıktı.
 - **Tempo**: alt satırı tekrarlayan olgular bloğu düşer (biri öbürünü içeriyorsa); okuma hızı 15 → 17 harf/s.
   Gazze örneği 16 s → 7,8 s.
 - **Greater Earth eşiği M6,0** (Fiji/Vanuatu açığında M5,5 kimseyi ilgilendirmiyor).
+
+Sırada (2026-10-27): **yakın açılış için uydu**. v1 motorunda zoom 6'da karanlık harita bomboş (ülke sınırından ince
+veri yok), bu yüzden kamera Avrupa genişliğinde açılıyor ve olay yeri küçük bir nokta. Plan: olay yerinin EOX
+Sentinel-2 cloudless 2016 mozaiği (`tools/data/fetch_s2.py`, CC BY 4.0) üretimde indirilir, ilk iki saniye o
+görüntüde açılır, sonra haritaya geri çekilir.
