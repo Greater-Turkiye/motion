@@ -4,9 +4,10 @@
 // went out with the generator's label hook ("GAZZE / RESMİ AÇIKLAMA"). Returns the answer's text, or
 // throws when neither answers. The model: gemini-3.8-flash (2.5 is closed to new keys, HTTP 404 on 2026-10-27).
 const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
-// gemma first, fixed by the owner (not from an env var); when its shared endpoint is overloaded (529 on
-// every call, 2026-10-27) the same key reaches other hosted models, fixed here too
-const NIM_MODELS = ['google/gemma-4-31b-it', 'deepseek-ai/deepseek-v4.1-flash', 'moonshotai/kimi-k2.6', 'mistralai/mistral-large-2-instruct'];
+// gemma, fixed by the owner (not from an env var). Of the endpoint's other models this key reaches none
+// (404 "Function not found for account", 410 end of life; checked 2026-10-27), so gemma is asked with
+// patience instead: its shared endpoint answers 529 when busy and frees up within minutes
+const NIM_MODELS = ['google/gemma-4-31b-it'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -44,9 +45,9 @@ async function gemini(prompt, { temperature, json }) {
 }
 
 // an OpenAI-style chat endpoint, retried on the busy answers (429, 5xx and NIM's own 529)
-async function chat(label, url, key, model, prompt, temperature, timeoutS) {
+async function chat(label, url, key, model, prompt, temperature, timeoutS, tries = 3) {
   let last;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < tries; attempt++) {
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -64,7 +65,7 @@ async function chat(label, url, key, model, prompt, temperature, timeoutS) {
       }
     } catch (error) { last = error; }
     console.log(String(last?.message ?? last).split(/\r?\n/)[0]);
-    await sleep(10_000 * (attempt + 1));
+    if (attempt < tries - 1) await sleep(15_000 * (attempt + 1));
   }
   throw last;
 }
@@ -74,7 +75,7 @@ async function nim(prompt, { temperature }) {
   if (!key) throw new Error('NVAPI is not configured');
   let last;
   for (const model of NIM_MODELS) {
-    try { return await chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, model, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60)); } catch (error) { last = error; }
+    try { return await chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, model, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60), 5); } catch (error) { last = error; }
   }
   throw last;
 }

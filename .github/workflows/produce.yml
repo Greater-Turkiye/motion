@@ -171,6 +171,8 @@ jobs:
         run: |
           node tools/audio/narration.mjs "auto-$ID" out/narration.json
           node tools/scene/nim-copy.mjs "scenes/auto/auto-$ID.yaml" out/narration.json
+          # no video with a label for a hook: stop here, the next run tries again (PLAN.md section 44)
+          node tools/scene/hook-gate.mjs "scenes/auto/auto-$ID.yaml"
           export FFMPEG_PATH="$(node --input-type=module -e 'import ffmpeg from "ffmpeg-static"; process.stdout.write(ffmpeg)')"
           python -m pip install --quiet --upgrade pip
           python -m pip install --quiet torch torchaudio --index-url https://download.pytorch.org/whl/cpu
