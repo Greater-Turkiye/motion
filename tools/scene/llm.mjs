@@ -4,7 +4,9 @@
 // went out with the generator's label hook ("GAZZE / RESMİ AÇIKLAMA"). Returns the answer's text, or
 // throws when neither answers. The model: gemini-3.8-flash (2.5 is closed to new keys, HTTP 404 on 2026-10-27).
 const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
-const NIM_MODEL = 'google/gemma-4-31b-it'; // fixed by the owner, not from an env var
+// gemma first, fixed by the owner (not from an env var); when its shared endpoint is overloaded (529 on
+// every call, 2026-10-27) the same key reaches other hosted models, fixed here too
+const NIM_MODELS = ['google/gemma-4-31b-it', 'meta/llama-3.3-70b-instruct', 'qwen/qwen3-next-80b-a3b-instruct'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -70,7 +72,11 @@ async function chat(label, url, key, model, prompt, temperature, timeoutS) {
 async function nim(prompt, { temperature }) {
   const key = process.env.NVAPI?.trim();
   if (!key) throw new Error('NVAPI is not configured');
-  return chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, NIM_MODEL, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60));
+  let last;
+  for (const model of NIM_MODELS) {
+    try { return await chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, model, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60)); } catch (error) { last = error; }
+  }
+  throw last;
 }
 
 // Hugging Face's inference router (HF_TOKEN, an org secret the voice tools already have): the third
@@ -89,7 +95,7 @@ async function hf(prompt, { temperature }) {
 
 export async function ask(prompt, { temperature = 0.4, json = true } = {}) {
   const errors = [];
-  for (const call of [gemini, hf, nim]) {
+  for (const call of [gemini, nim, hf]) {
     try { return await call(prompt, { temperature, json }); } catch (error) { errors.push(error.message); console.log(`${call.name}: ${error.message}`); }
   }
   throw new Error(errors.join(' | '));
