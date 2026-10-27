@@ -101,11 +101,14 @@ jobs:
           NVAPI: ${{ secrets.NVAPI }}
           # the copy editor asks Gemini first (tools/scene/llm.mjs)
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           # the channel is English only: the Turkish narration is written first because the translator
           # works on the finished scene and its narration together (tools/scene/translate.mjs)
           node tools/audio/narration.mjs "auto-$ID" out/narration.json
           node tools/scene/nim-copy.mjs "scenes/auto/auto-$ID.yaml" out/narration.json
+          # no video with a label for a hook: stop here, the next run tries again (PLAN.md section 44)
+          node tools/scene/hook-gate.mjs "scenes/auto/auto-$ID.yaml"
           node tools/scene/translate.mjs "scenes/auto/auto-$ID.yaml" out/narration.json "scenes/auto/auto-$ID.en.yaml" out/narration.en.json
           if [ -f "scenes/auto/auto-$ID.en.yaml" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
           else echo "::warning::no English scene for $ID; nothing to publish this run"; fi

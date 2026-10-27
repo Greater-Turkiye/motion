@@ -4,7 +4,10 @@
 // went out with the generator's label hook ("GAZZE / RESMİ AÇIKLAMA"). Returns the answer's text, or
 // throws when neither answers. The model: gemini-3.8-flash (2.5 is closed to new keys, HTTP 404 on 2026-10-27).
 const GEMINI_MODELS = (process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash,gemini-flash-latest').split(',').map((x) => x.trim()).filter(Boolean);
-const NIM_MODEL = 'google/gemma-4-31b-it'; // fixed by the owner, not from an env var
+// gemma, fixed by the owner (not from an env var). Of the endpoint's other models this key reaches none
+// (404 "Function not found for account", 410 end of life; checked 2026-10-27), so gemma is asked with
+// patience instead: its shared endpoint answers 529 when busy and frees up within minutes
+const NIM_MODELS = ['google/gemma-4-31b-it'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,23 +44,59 @@ async function gemini(prompt, { temperature, json }) {
   throw last;
 }
 
+// an OpenAI-style chat endpoint, retried on the busy answers (429, 5xx and NIM's own 529)
+async function chat(label, url, key, model, prompt, temperature, timeoutS, tries = 3) {
+  let last;
+  for (let attempt = 0; attempt < tries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+        signal: AbortSignal.timeout(timeoutS * 1000),
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature, top_p: 0.9, max_tokens: 1200, stream: false }),
+      });
+      if (response.ok) {
+        const text = (await response.json()).choices?.[0]?.message?.content ?? '';
+        if (text.trim()) return { text, model };
+        last = new Error(`${label} ${model} returned no text`);
+      } else {
+        last = new Error(`${label} ${model} HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
+        if (![429, 500, 502, 503, 504, 529].includes(response.status)) { console.log(last.message.slice(0, 160)); break; }
+      }
+    } catch (error) { last = error; }
+    console.log(String(last?.message ?? last).split(/\r?\n/)[0]);
+    if (attempt < tries - 1) await sleep(15_000 * (attempt + 1));
+  }
+  throw last;
+}
+
 async function nim(prompt, { temperature }) {
   const key = process.env.NVAPI?.trim();
   if (!key) throw new Error('NVAPI is not configured');
-  const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-    signal: AbortSignal.timeout(Number(process.env.NVIDIA_NIM_TIMEOUT || 60) * 1000),
-    body: JSON.stringify({ model: NIM_MODEL, messages: [{ role: 'user', content: prompt }], temperature, top_p: 0.9, max_tokens: 1200, stream: false }),
-  });
-  if (!response.ok) throw new Error(`NVIDIA NIM HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  const body = await response.json();
-  return { text: body.choices?.[0]?.message?.content ?? '', model: NIM_MODEL };
+  let last;
+  for (const model of NIM_MODELS) {
+    try { return await chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, model, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60), 5); } catch (error) { last = error; }
+  }
+  throw last;
+}
+
+// Hugging Face's inference router (HF_TOKEN, an org secret the voice tools already have): the third
+// way, since the Gemini key has no free text tier ("free tier is not available for this project",
+// 2026-10-27) and NIM answers 529 when its shared endpoint is busy
+const HF_MODELS = (process.env.HF_TEXT_MODEL || 'Qwen/Qwen3-235B-A22B-Instruct-2507,meta-llama/Llama-3.3-70B-Instruct').split(',').map((x) => x.trim()).filter(Boolean);
+async function hf(prompt, { temperature }) {
+  const key = process.env.HF_TOKEN?.trim();
+  if (!key) throw new Error('HF_TOKEN is not configured');
+  let last;
+  for (const model of HF_MODELS) {
+    try { return await chat('HF', 'https://router.huggingface.co/v1/chat/completions', key, model, prompt, temperature, 90); } catch (error) { last = error; }
+  }
+  throw last;
 }
 
 export async function ask(prompt, { temperature = 0.4, json = true } = {}) {
   const errors = [];
-  for (const call of [gemini, nim]) {
+  for (const call of [gemini, nim, hf]) {
     try { return await call(prompt, { temperature, json }); } catch (error) { errors.push(error.message); console.log(`${call.name}: ${error.message}`); }
   }
   throw new Error(errors.join(' | '));
