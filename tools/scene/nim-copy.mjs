@@ -26,7 +26,7 @@ const facts = [
 // RESMİ AÇIKLAMA", "IRAK / GELİŞME") stopped nobody (owner, 2026-10-27: "viral olma ihtimali %0").
 const prompt = [
   'Sen bir Türk haber kanalının kısa video (YouTube Shorts) editörüsün. Aşağıdaki kaynak metinden ekrandaki kancayı, YouTube başlığını ve seslendirmeyi yaz.',
-  'KANCA (hook_lines, tam 2 satır, normal Türkçe yazımla; özel isimler büyük harfle başlar, gerisi küçük; ekranda büyük harfe çevrilir): haberin kendisi, olan tek somut şey: kim, kime, ne yaptı, kaç. 1. satır en fazla 18, 2. satır en fazla 24 karakter. Etiket değil cümle: "GAZZE / RESMİ AÇIKLAMA", "IRAK / GELİŞME", "KHARKİV / SALDIRI" gibi tür adları YASAK. Kaynakta sayı varsa sayıyı kullan.',
+  'KANCA (hook_lines, tam 2 satır, normal Türkçe yazımla; özel isimler büyük harfle başlar, gerisi küçük; ekranda büyük harfe çevrilir): haberin kendisi, olan tek somut şey: kim, kime, ne yaptı, kaç. 1. satır en fazla 18, 2. satır en fazla 24 karakter. Etiket değil cümle: "GAZZE / RESMİ AÇIKLAMA", "IRAK / GELİŞME", "KHARKİV / SALDIRI" gibi tür adları YASAK. Kaynakta sayı varsa sayıyı kullan, ama ölü ya da yaralı sayısı kanca olmaz (sahibin kuralı): kanca olayın kendisi, ne vuruldu, kim ne yaptı; kayıp alt satırda.',
   'hook_sub: kancanın altında en fazla 72 karakterlik tek cümle, kancanın söylemediği en önemli ikinci olgu.',
   'post_title: YouTube başlığı, en fazla 70 karakter, düz cümle, haberin özü; alıntıyı ortadan kesme.',
   'Kurallar: yalnızca kaynakta açıkça bulunan olgular. Yeni sayı, kişi, yer, neden, sonuç, niyet ekleme. Soru cümlesi, "Şok", "Bomba", "İşte", "Ama", emoji, ünlem, öfke, taraf tutma yok. Kaynağın doğrulama durumunu değiştirme. Çeviri dili yok ("…uyarısında bulundu" değil "…uyardı"); kısa, etken, günlük Türkçe.',
