@@ -2,7 +2,7 @@ name: produce-quake
 # Earthquakes as instant stories (tools/scene/quake.mjs; PLAN.md section 38), for two channels:
 #   tr     the owner's Türkiye channel: Kandilli's list, M ≥ MOTION_QUAKE_TR_MIN (default 3.8), Turkish,
 #          with the P and S fronts at model-computed arrival times (tools/scene/arrivals.py, IASP91)
-#   earth  Greater Earth: USGS's worldwide feed, M ≥ MOTION_QUAKE_EARTH_MIN (default 5.5), English, with
+#   earth  Greater Earth: USGS's worldwide feed, M ≥ MOTION_QUAKE_EARTH_MIN (default 6.0; an M5.5 far off Fiji or Vanuatu interests nobody), English, with
 #          the model fronts alone out to 2,500 km (arrivals.py --no-provinces)
 # Every 15 minutes each channel takes its biggest unpublished quake of the last 6 hours. The voice is
 # Kaggle Fish only (the owner's rule, 2026-10-25: no fallback voice); when Kaggle cannot run, nothing
@@ -72,7 +72,7 @@ jobs:
         env:
           ID: ${{ inputs.id }}
           TR_MIN: ${{ vars.MOTION_QUAKE_TR_MIN || '3.8' }}
-          EARTH_MIN: ${{ vars.MOTION_QUAKE_EARTH_MIN || '5.5' }}
+          EARTH_MIN: ${{ vars.MOTION_QUAKE_EARTH_MIN || '6.0' }}
         run: |
           gh release list --limit 300 --json tagName --jq '.[].tagName' > published.txt
           min=$TR_MIN; [ "$CHANNEL" = earth ] && min=$EARTH_MIN

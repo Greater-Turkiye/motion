@@ -1036,3 +1036,20 @@ veriyordu. Değişenler:
 - **AI etiketi yok**: görüntü motion'un kendi çizicisiyle kodla çizilir, üretilmiş görsel değildir.
   `containsSyntheticMedia: false` (YouTube'un kuralı açıkça animasyon olan içeriği dışarıda bırakır); paylaşım
   metni ve sürüm notu "Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi" der, ses motorunun adını verir.
+
+## 44. Metin: kanca haberin kendisi / Copy: the hook is the news itself (2026-10-27)
+
+Sahibin hükmü: "oluşturulan metinleri bi oku… viral olma ihtimali %0". Okudum: kancalar etiketti ("GAZZE /
+RESMİ AÇIKLAMA", "IRAK / GELİŞME", "NECEF / GELİŞME"), ekran cümlesi çeviri diliydi ("…uyarısında bulundu"),
+BM'nin kendi basın açıklamasının altında "Tek kaynak: UN. Bağımsız teyit henüz yok. Konum yaklaşık: ±20 km."
+yazıyordu, açıklama "kimse okumadan yayımlandı" diyordu, YouTube başlığı alıntının ortasında kesiliyordu. Neden:
+metin editörü (NIM, gemma) son üretimde üç kez 180 s zaman aşımına uğradı ve kural tabanlı etiket kancası çıktı;
+çalıştığında da kanca, kaynağın kelime kökleriyle sınırlı olduğu için reddediliyordu. Değişenler:
+- **Editör önce Gemini** (`tools/scene/llm.mjs`; `GEMINI_API_KEY`, saniyeler), sonra 60 s'lik NIM.
+- **Kanca serbest yazılır, olgu eklemez**: iki satır (18/24 harf), etiket yasak; sayılar ve özel isimler kaynağın
+  (`factsOnly`, seslendirmenin kapısı); `hook.edited` ile doğrulama kelime kelime kök denetimini kancada atlar,
+  olgular bloğunda sürer. Editör YouTube başlığını da yazar (`post_title`, ≤70 harf).
+- **Açıklama türünde durum bloğu yok** (durum künyede kalır); "kimse okumadan" cümleleri çıktı.
+- **Tempo**: alt satırı tekrarlayan olgular bloğu düşer (biri öbürünü içeriyorsa); okuma hızı 15 → 17 harf/s.
+  Gazze örneği 16 s → 7,8 s.
+- **Greater Earth eşiği M6,0** (Fiji/Vanuatu açığında M5,5 kimseyi ilgilendirmiyor).

@@ -1,18 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { parse, stringify } from 'yaml';
 import { validate, words } from '../../src/engine/scene.ts';
+import { ask, responseJson } from './llm.mjs';
 
 const [scenePath, narrationPath] = process.argv.slice(2);
-const apiKey = process.env.NVAPI?.trim();
-// Fixed by the owner: the NIM model is google/gemma-4-31b-it, hardcoded, not
-// read from an env var. The HTTP 529 seen earlier was the shared endpoint being
-// overloaded (handled by the retry below), not a bad model id.
-const nimModel = 'google/gemma-4-31b-it';
-const timeoutSeconds = Number(process.env.NVIDIA_NIM_TIMEOUT || 180);
 if (!scenePath || !narrationPath) throw new Error('usage: node tools/scene/nim-copy.mjs <scene.yaml> <narration.json>');
-if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 10 || timeoutSeconds > 180) throw new Error('NVIDIA_NIM_TIMEOUT must be 10-180 seconds');
-if (!apiKey) {
-  console.log('::warning::NVAPI is not configured; narration keeps the deterministic source copy (no NIM rewrite).');
+if (!process.env.GEMINI_API_KEY?.trim() && !process.env.NVAPI?.trim()) {
+  console.log('::warning::neither GEMINI_API_KEY nor NVAPI is configured; the copy stays the generator’s own.');
   process.exit(0);
 }
 
@@ -27,32 +21,41 @@ const facts = [
   scene.hook.sub,
   ...scene.beats.filter((beat) => beat.kind === 'facts' || beat.kind === 'quote').flatMap((beat) => beat.lines),
 ].filter(Boolean);
+// The hook is the first thing a viewer reads, in the biggest type, in the first second: it has to be the
+// news itself, the one concrete thing that happened, not a label. The generator's label hooks ("GAZZE /
+// RESMİ AÇIKLAMA", "IRAK / GELİŞME") stopped nobody (owner, 2026-10-27: "viral olma ihtimali %0").
 const prompt = [
-  'Türkçe bir kısa haber videosu için ekrandaki hook ve seslendirme metinlerini sade, konuşulur ve merak uyandıran biçimde düzenle.',
-  'Yalnızca aşağıdaki source metinlerinde açıkça bulunan olguları kullan. Yeni sayı, kişi, yer, neden, sonuç, niyet veya doğrulama ekleme.',
-  'Clickbait, soru cümlesi, öfke, taraf tutma ve ölüm sayısını gereksiz yere öne çıkarma. Kaynağın doğrulama durumunu değiştirme.',
-  'hook_lines aynı sayıda ve kısa satırlar olmalı; hook_sub en fazla 72 karakter olmalı.',
-  'spoken_segments sayısı ve sırası verilen narration ile aynı kalmalı. Her segmenti, bir haber spikerinin akıcı ve doğal konuşmasıyla yeniden yaz: ekrandaki kısa olguları olduğu gibi okumak yerine tam, akıcı Türkçe cümlelere dönüştür. Tüm özel isimleri, yerleri ve sayıları aynen koru; kaynakta olmayan hiçbir yeni sayı, isim, yer, neden, sonuç veya iddia ekleme. Bağlaç ve aktarım ifadeleriyle (örneğin "bildirildiğine göre", "açıklandı") cümleyi doğallaştırabilirsin.',
-  'Yanıtı yalnızca JSON olarak ver: {"hook_lines":["..."],"hook_sub":"...","spoken_segments":["..."]}',
+  'Sen bir Türk haber kanalının kısa video (YouTube Shorts) editörüsün. Aşağıdaki kaynak metinden ekrandaki kancayı, YouTube başlığını ve seslendirmeyi yaz.',
+  'KANCA (hook_lines, tam 2 satır, normal Türkçe yazımla; özel isimler büyük harfle başlar, gerisi küçük; ekranda büyük harfe çevrilir): haberin kendisi, olan tek somut şey: kim, kime, ne yaptı, kaç. 1. satır en fazla 18, 2. satır en fazla 24 karakter. Etiket değil cümle: "GAZZE / RESMİ AÇIKLAMA", "IRAK / GELİŞME", "KHARKİV / SALDIRI" gibi tür adları YASAK. Kaynakta sayı varsa sayıyı kullan.',
+  'hook_sub: kancanın altında en fazla 72 karakterlik tek cümle, kancanın söylemediği en önemli ikinci olgu.',
+  'post_title: YouTube başlığı, en fazla 70 karakter, düz cümle, haberin özü; alıntıyı ortadan kesme.',
+  'Kurallar: yalnızca kaynakta açıkça bulunan olgular. Yeni sayı, kişi, yer, neden, sonuç, niyet ekleme. Soru cümlesi, "Şok", "Bomba", "İşte", "Ama", emoji, ünlem, öfke, taraf tutma yok. Kaynağın doğrulama durumunu değiştirme. Çeviri dili yok ("…uyarısında bulundu" değil "…uyardı"); kısa, etken, günlük Türkçe.',
+  'spoken_segments: verilen seslendirme ile aynı sayıda ve sırada; her biri bir spikerin akıcı, kısa cümleleri. Ekranı okuma, hikâyeyi anlat. Özel isimleri, yerleri ve sayıları aynen koru.',
+  'Yanıtı yalnızca JSON olarak ver: {"hook_lines":["...","..."],"hook_sub":"...","post_title":"...","spoken_segments":["..."]}',
   `SOURCE TEXT:\n${facts.join('\n')}`,
   `CURRENT HOOK:\n${JSON.stringify({ lines: scene.hook.lines, sub: scene.hook.sub })}`,
   `CURRENT NARRATION:\n${JSON.stringify(narration.segments.map((segment) => segment.text))}`,
 ].join('\n\n');
 
-function responseJson(text) {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end <= start) throw new Error('NIM did not return a JSON object');
-  return JSON.parse(text.slice(start, end + 1));
-}
-
+// The hook may be written freely, like the narration, but adds no fact: every number and proper noun in
+// it is the source's (factsOnly, the narration's gate), and the scene still validates (lengths, reading
+// time, banned words; validate() skips its word-by-word source check for an edited hook).
 function hookCandidate(candidate) {
-  if (!Array.isArray(candidate.hook_lines) || candidate.hook_lines.length !== scene.hook.lines.length
-      || candidate.hook_lines.some((line) => typeof line !== 'string' || !line.trim() || line.length > 28)
-      || typeof candidate.hook_sub !== 'string' || candidate.hook_sub.length > 72) return null;
-  const proposed = { ...scene, hook: { ...scene.hook, lines: candidate.hook_lines, sub: candidate.hook_sub } };
-  return validate(proposed).length === 0 ? proposed : null;
+  const lines = candidate.hook_lines;
+  if (!Array.isArray(lines) || lines.length !== 2 || lines.some((l) => typeof l !== 'string' || !l.trim())) return null;
+  const up = lines.map((l) => l.trim().toLocaleUpperCase('tr'));
+  if (up[0].length > 18 || up[1].length > 24) return null;
+  if (typeof candidate.hook_sub !== 'string' || candidate.hook_sub.length > 72) return null;
+  if (LABEL.test(up.join(' / '))) return null;
+  // gated in the model's own case, where a capital marks a proper noun; shown in capitals
+  if (![...lines, candidate.hook_sub].every((t) => !t || factsOnly(t))) return null;
+  const proposed = { ...scene, hook: { ...scene.hook, lines: up, sub: candidate.hook_sub.trim(), edited: true } };
+  const problems = validate(proposed);
+  if (problems.length) { console.log(`hook rejected: ${problems.join('; ')}`); return null; }
+  return proposed;
 }
+// a type word alone on a line is a label, not news
+const LABEL = /(^|\/ )(GELİŞME|SALDIRI|RESMİ AÇIKLAMA|AÇIKLAMA|KONUŞLANMA|TATBİKAT|YAPTIRIM|ANLAŞMA|GÖRÜŞME)$/u;
 
 // The spoken narration is heard, not shown, so it may read as natural Turkish
 // news prose rather than the clipped on-screen facts — but the red line holds:
@@ -94,6 +97,10 @@ const NUMBER_WORDS = new Set(['iki', 'üç', 'dört', 'beş', 'altı', 'yedi', '
 function spokenCandidate(text, original) {
   if (typeof text !== 'string' || !text.trim() || text.includes('?')) return false;
   if (text.length > Math.max(original.length + 80, 280)) return false;
+  return factsOnly(text, original);
+}
+function factsOnly(text, original = '') {
+  if (text.includes('?') || /\p{Extended_Pictographic}/u.test(text)) return false;
   const low = lowerTr(text);
   if (SPOKEN_BANNED.some((b) => low.includes(b))) return false;
   const src = [...facts, original].flatMap(words);
@@ -116,56 +123,22 @@ function spokenCandidate(text, original) {
   return true;
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function callNim() {
-  // NVIDIA NIM returns 429/503/529 when the shared endpoint is busy; a single
-  // call then drops the rewrite for the whole day. Retry a few times with
-  // backoff before giving up and keeping the deterministic copy.
-  const backoff = [0, 4000, 10000];
-  let lastError;
-  for (let attempt = 0; attempt < backoff.length; attempt++) {
-    if (backoff[attempt]) await sleep(backoff[attempt]);
-    try {
-      const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-        signal: AbortSignal.timeout(timeoutSeconds * 1000),
-        body: JSON.stringify({
-          model: nimModel,
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.35,
-          top_p: 0.9,
-          max_tokens: 900,
-          stream: false,
-        }),
-      });
-      if (response.ok) return response.json();
-      const detail = (await response.text()).slice(0, 400);
-      lastError = new Error(`NVIDIA NIM HTTP ${response.status}: ${detail}`);
-      if (![429, 500, 502, 503, 529].includes(response.status)) break;
-      console.log(`NIM attempt ${attempt + 1} got HTTP ${response.status}; retrying.`);
-    } catch (error) {
-      lastError = error;
-      console.log(`NIM attempt ${attempt + 1} failed (${error.message}); retrying.`);
-    }
-  }
-  throw lastError;
-}
-
 try {
-  console.log(`NIM rewrite with model ${nimModel}.`);
-  const result = await callNim();
-  const candidate = responseJson(result.choices?.[0]?.message?.content ?? '');
+  const result = await ask(prompt, { temperature: 0.45 });
+  console.log(`copy rewrite by ${result.model}.`);
+  const candidate = responseJson(result.text);
 
   const proposedScene = hookCandidate(candidate);
   if (proposedScene) {
     scene.hook.lines = proposedScene.hook.lines;
     scene.hook.sub = proposedScene.hook.sub;
+    scene.hook.edited = true;
+    // the YouTube title: the edited sentence, not the source's long headline cut mid-quote
+    if (typeof candidate.post_title === 'string' && candidate.post_title.trim().length <= 70 && factsOnly(candidate.post_title)) scene.post_title = candidate.post_title.trim();
     writeFileSync(scenePath, header + stringify(scene, { lineWidth: 0 }));
-    console.log('NIM hook accepted by source and readability validation.');
+    console.log(`hook accepted: ${scene.hook.lines.join(' / ')}`);
   } else {
-    console.log('NIM hook rejected by source/readability validation; keeping generated hook.');
+    console.log(`hook rejected: ${JSON.stringify(candidate.hook_lines)}; keeping the generated hook.`);
   }
 
   if (Array.isArray(candidate.spoken_segments) && candidate.spoken_segments.length === narration.segments.length) {
@@ -177,7 +150,7 @@ try {
       }
     });
     if (changed) {
-      narration.nim_model = nimModel;
+      narration.nim_model = result.model;
       writeFileSync(narrationPath, JSON.stringify(narration, null, 1) + '\n');
     }
     console.log(`NIM spoken-copy segments accepted: ${changed}/${narration.segments.length}.`);
