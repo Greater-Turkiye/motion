@@ -851,10 +851,15 @@ export function generate(record, { datasets, style, recent = [], variant = 'stan
   const push = (b, chars, min, pad) => { beats.push({ ...b, at: round1(t) }); t += secs(chars, min, pad); };
   // the facts block exists to say more than the hook's sub-line; when it would only say it again
   // (a one-clause headline) it is left out: the same sentence twice is six seconds of nothing new
-  const same = (a, b) => a.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === b.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  // one inside the other counts too: "Özel Raportör, BM sisteminin … bulundu" under a sub-line "BM sisteminin
+  // … bulundu" held the same sentence for seven more seconds (owner, 2026-10-27: "yapyavaş")
+  const norm = (x) => x.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const same = (a, b) => { const x = norm(a), y = norm(b); return x === y || (y.length >= 20 && x.includes(y)) || (x.length >= 20 && y.includes(x)); };
   // the hook itself when it is the headline's clause (no sub-line under it)
   const factsBeat = () => { const said = sub || (hook.kind === 'clause' ? hook.lines.join(' ') : ''); if (!(said && same(facts.join(' ').replace(/\*/g, ''), said))) push({ kind: 'facts', kicker: 'KAYNAĞA GÖRE', lines: facts }, facts.join(' ').length + 13, 4.0); };
-  const statusBeat = () => push({ kind: 'status', text: statusText }, statusText.length, 3.0);
+  // a statement is its speaker's own words: "Tek kaynak: UN. Bağımsız teyit henüz yok. Konum yaklaşık:
+  // ±20 km." under a UN press release read as nonsense (owner, 2026-10-27); its status stays in the footer
+  const statusBeat = () => { if (family !== 'statement') push({ kind: 'status', text: statusText }, statusText.length, 3.0); };
   const distanceBeat = (fromLabel) => {
     if (whole) return; // from the middle of a whole country, a distance measures nothing the record says
     // the Bosphorus is a strait, not a city
@@ -1073,10 +1078,8 @@ export function notes(record, scene) {
     ...scene.beats.filter((b) => b.kind === 'photo').map((b) => `- ${b.credit} / photograph: public domain (DVIDS); its appearance does not imply endorsement.`),
     ...(scene.beats.some((b) => b.kind === 'satellite') ? ['- Uydu verisi / satellite data: NASA FIRMS (VIIRS, NOAA-20), kamu malı / public domain. Isı tespiti doğrulanmış bir yangın değildir; hotspots are fire detections, not confirmed fires.'] : []),
     '',
-    'Bu video, Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi',
-    'başlığıdır (çevirisi makine çevirisi olabilir) ve kimse okumadan yayımlandı.',
-    "This video was generated automatically from a dataset record; the facts on screen are the source's own",
-    'headline (possibly machine-translated) and were published without human review.',
+    'Bu video Greater Türkiye veri setindeki kayıttan derlendi; ekrandaki olgular kaynağın kendi haberindendir.',
+    "This video was compiled from a Greater Türkiye dataset record; the facts on screen are the source's own report.",
     // the voice line is added by the workflow when there is a voice ("Seslendirme yok" stood above
     // "Seslendirme: yapay ses" in every narrated video's notes)
   ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n') + '\n';

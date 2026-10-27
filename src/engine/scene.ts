@@ -63,7 +63,11 @@ export interface Scene {
   /** `alts`: other points on the ground where the label may sit instead (one is chosen per video) */
   labels: { text: string; at: LonLat; kind?: 'country' | 'sea' | 'home'; alts?: LonLat[] }[];
   /** badge: a short computed cue over the kicker ("TÜRKİYE'YE YAKIN · ~430 KM"), never a claim */
-  hook: { kicker: string; lines: string[]; sub: string; status: string; source: string; badge?: string };
+  /** edited: the copy editor (tools/scene/nim-copy.mjs) rewrote lines and sub, its numbers and proper
+   *  nouns gated against the source there, so the word-by-word check below skips them */
+  hook: { kicker: string; lines: string[]; sub: string; status: string; source: string; badge?: string; edited?: boolean };
+  /** the YouTube title the copy editor wrote (≤ 70 characters), in place of the source's long headline */
+  post_title?: string;
   beats: Beat[];
   /** How it moves (all optional): text entrance, camera path, a stories-style progress bar, and
    *  sub-frame motion blur on export (on unless false). The page's URL can override each one. */
@@ -80,8 +84,8 @@ export interface Scene {
   voice?: 'synthetic';
 }
 
-/** Reading speed ceiling: 15 characters a second is about two Turkish words (research/01, rule 4). */
-export const CPS = 15;
+/** Reading speed ceiling: 17 characters a second, a little over two Turkish words (research/01, rule 4; raised from 15 on 2026-10-27, the videos read slow) */
+export const CPS = 17;
 /** No block of text is on screen for less than this, however short (research/01, rule 4). */
 export const MIN_BLOCK = 1.2;
 
@@ -149,7 +153,7 @@ export function validate(s: Scene): string[] {
   const sourceName = words(s.hook.source.replace(/^.*?:/, ''));
   // a sentence with a {placeholder} is context the engine computes (a distance), not the source's claim
   const sub = s.hook.sub.split(/(?<=[.!])\s+/).filter((x) => !x.includes('{'));
-  const checked = [...s.hook.lines, ...sub, ...s.beats.flatMap((b) => (b.kind === 'facts' || b.kind === 'quote' ? b.lines : []))];
+  const checked = [...(s.hook.edited ? [] : [...s.hook.lines, ...sub]), ...s.beats.flatMap((b) => (b.kind === 'facts' || b.kind === 'quote' ? b.lines : []))];
   for (const line of checked) for (const w of words(line)) {
     if (STOP.has(w) || sourceName.includes(w)) continue;
     if (/^\d/.test(w) ? !(s.source_text || []).some((t) => t.includes(w)) : !src.some((x) => x.startsWith(stem(w)))) out.push(`"${w}" (in "${line}") is not in the source`);

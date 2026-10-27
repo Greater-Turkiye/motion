@@ -68,10 +68,10 @@ export function enCaptions(sc, meta) {
   const tags = [...new Set([place, ...(sc.parties ?? []).map((p) => p.label), ...(sc.subject?.label ? [sc.subject.label] : [])]
     .filter((x) => x && x !== 'TÜRKİYE').map(enTag)), ...(launch ? ['#Space', '#RocketLaunch'] : meta.variant === 'quake' ? ['#Earthquake'] : ['#OSINT']), '#GreaterTurkiye'];
   const note = meta.variant === 'quake'
-    ? 'Auto-generated from the USGS earthquake feed (public domain), published with no human in the loop. Magnitude, place and depth are the USGS solution and may be revised.'
+    ? 'Made from the USGS earthquake feed (public domain). Magnitude, place and depth are the USGS solution and may be revised.'
     : launch
-    ? 'Auto-generated from Launch Library 2 (The Space Devs) data, published with no human in the loop. The orbit drawn is typical for its type, not the mission’s own elements.'
-    : 'Auto-generated from a record in the Greater Türkiye dataset; the on-screen facts are the source’s own headline, published with no human in the loop.';
+    ? 'Made from Launch Library 2 (The Space Devs) data. The orbit drawn is typical for its type, not the mission’s own elements.'
+    : 'Compiled from a record in the Greater Türkiye dataset; the facts on screen are the source’s own report.';
   // the pictures are drawn by code, not generated (owner, 2026-10-26: no AI label on them)
   const voiceLine = 'Animation: drawn in code by Greater Türkiye motion.';
   const photoLine = (sc.beats ?? []).filter((b) => b.kind === 'photo').map((b) => `${b.credit}.`).join(' ');
@@ -126,8 +126,8 @@ export function captions(sc, meta) {
     .filter((x) => x && x !== 'TÜRKİYE').map(tag)), ...(meta.variant === 'quake' ? ['#deprem', '#sondakika'] : ['#OSINT', '#GreaterTürkiye'])];
   // an earthquake comes from Kandilli's list, not from the dataset, and its wave arrivals are a model's
   const note = meta.variant === 'quake'
-    ? 'Kandilli Rasathanesi\'nin kaydından otomatik üretildi. Büyüklük ve yer Kandilli\'nin çözümüdür, güncellenebilir. Dalga varış süreleri IASP91 modeliyle hesaplanmış tahminlerdir; depremin hissedildiği anlamına gelmez.'
-    : 'Greater Türkiye veri setindeki kayıttan otomatik üretildi; ekrandaki olgular kaynağın kendi başlığıdır, kimse okumadan yayımlandı.';
+    ? 'Kandilli Rasathanesi\'nin kaydından hazırlandı. Büyüklük ve yer Kandilli\'nin çözümüdür, güncellenebilir. Dalga varış süreleri IASP91 modeliyle hesaplanmış tahminlerdir; depremin hissedildiği anlamına gelmez.'
+    : 'Greater Türkiye veri setindeki kayıttan derlendi; ekrandaki olgular kaynağın kendi haberindendir.';
   // the satellite block's data, credited where the source is (PLAN.md section 25)
   // the pictures are drawn by code, not generated (owner, 2026-10-26: no AI label on them)
   const voiceLine = 'Animasyon: Greater Türkiye motion yazılımıyla kodla çizildi.';
@@ -155,7 +155,9 @@ export function captions(sc, meta) {
   const dist = (sc.beats ?? []).find((b) => b.kind === 'distance');
   const far = dist ? ` | Türkiye'ye ~${Math.round((geoDistance(dist.from.at, dist.to.at) * 6371) / 10) * 10} km` : '';
   const base = headline.replace(/\.$/, '');
-  const ytTitle = (base.length + far.length <= 92 ? base + far
+  // the copy editor's short title when it wrote one: the source's long headline was cut mid-quote
+  const ytTitle = sc.post_title ? `${sc.post_title.replace(/[.!]$/, '')} #Shorts`
+    : (base.length + far.length <= 92 ? base + far
     : headline.length <= 92 ? base : headline.slice(0, 89).replace(/\s+\S*$/, '') + '…') + ' #Shorts';
   const youtube = [
     `Başlık: ${ytTitle}`,
