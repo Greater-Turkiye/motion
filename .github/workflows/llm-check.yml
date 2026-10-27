@@ -17,5 +17,6 @@ jobs:
       - env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVAPI: ${{ secrets.NVAPI }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
           GEMINI_TEXT_MODEL: ${{ vars.GEMINI_TEXT_MODEL }}
         run: node tools/scene/llm.mjs

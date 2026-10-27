@@ -41,23 +41,55 @@ async function gemini(prompt, { temperature, json }) {
   throw last;
 }
 
+// an OpenAI-style chat endpoint, retried on the busy answers (429, 5xx and NIM's own 529)
+async function chat(label, url, key, model, prompt, temperature, timeoutS) {
+  let last;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+        signal: AbortSignal.timeout(timeoutS * 1000),
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature, top_p: 0.9, max_tokens: 1200, stream: false }),
+      });
+      if (response.ok) {
+        const text = (await response.json()).choices?.[0]?.message?.content ?? '';
+        if (text.trim()) return { text, model };
+        last = new Error(`${label} ${model} returned no text`);
+      } else {
+        last = new Error(`${label} ${model} HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
+        if (![429, 500, 502, 503, 504, 529].includes(response.status)) break;
+      }
+    } catch (error) { last = error; }
+    console.log(String(last?.message ?? last).split(/\r?\n/)[0]);
+    await sleep(10_000 * (attempt + 1));
+  }
+  throw last;
+}
+
 async function nim(prompt, { temperature }) {
   const key = process.env.NVAPI?.trim();
   if (!key) throw new Error('NVAPI is not configured');
-  const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-    signal: AbortSignal.timeout(Number(process.env.NVIDIA_NIM_TIMEOUT || 60) * 1000),
-    body: JSON.stringify({ model: NIM_MODEL, messages: [{ role: 'user', content: prompt }], temperature, top_p: 0.9, max_tokens: 1200, stream: false }),
-  });
-  if (!response.ok) throw new Error(`NVIDIA NIM HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  const body = await response.json();
-  return { text: body.choices?.[0]?.message?.content ?? '', model: NIM_MODEL };
+  return chat('NIM', 'https://integrate.api.nvidia.com/v1/chat/completions', key, NIM_MODEL, prompt, temperature, Number(process.env.NVIDIA_NIM_TIMEOUT || 60));
+}
+
+// Hugging Face's inference router (HF_TOKEN, an org secret the voice tools already have): the third
+// way, since the Gemini key has no free text tier ("free tier is not available for this project",
+// 2026-10-27) and NIM answers 529 when its shared endpoint is busy
+const HF_MODELS = (process.env.HF_TEXT_MODEL || 'Qwen/Qwen3-235B-A22B-Instruct-2507,meta-llama/Llama-3.3-70B-Instruct').split(',').map((x) => x.trim()).filter(Boolean);
+async function hf(prompt, { temperature }) {
+  const key = process.env.HF_TOKEN?.trim();
+  if (!key) throw new Error('HF_TOKEN is not configured');
+  let last;
+  for (const model of HF_MODELS) {
+    try { return await chat('HF', 'https://router.huggingface.co/v1/chat/completions', key, model, prompt, temperature, 90); } catch (error) { last = error; }
+  }
+  throw last;
 }
 
 export async function ask(prompt, { temperature = 0.4, json = true } = {}) {
   const errors = [];
-  for (const call of [gemini, nim]) {
+  for (const call of [gemini, hf, nim]) {
     try { return await call(prompt, { temperature, json }); } catch (error) { errors.push(error.message); console.log(`${call.name}: ${error.message}`); }
   }
   throw new Error(errors.join(' | '));

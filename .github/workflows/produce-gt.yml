@@ -101,6 +101,7 @@ jobs:
           NVAPI: ${{ secrets.NVAPI }}
           # the copy editor asks Gemini first (tools/scene/llm.mjs)
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           # the channel is English only: the Turkish narration is written first because the translator
           # works on the finished scene and its narration together (tools/scene/translate.mjs)

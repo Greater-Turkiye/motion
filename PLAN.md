@@ -1045,7 +1045,7 @@ BM'nin kendi basın açıklamasının altında "Tek kaynak: UN. Bağımsız teyi
 yazıyordu, açıklama "kimse okumadan yayımlandı" diyordu, YouTube başlığı alıntının ortasında kesiliyordu. Neden:
 metin editörü (NIM, gemma) son üretimde üç kez 180 s zaman aşımına uğradı ve kural tabanlı etiket kancası çıktı;
 çalıştığında da kanca, kaynağın kelime kökleriyle sınırlı olduğu için reddediliyordu. Değişenler:
-- **Editör önce Gemini** (`tools/scene/llm.mjs`; `GEMINI_API_KEY`, saniyeler), sonra 60 s'lik NIM.
+- **Editör önce Gemini** (`tools/scene/llm.mjs`; `GEMINI_API_KEY`), sonra Hugging Face router (`HF_TOKEN`), sonra NIM (529'da yeniden dener). 2026-10-27 denemesi: Gemini anahtarının ücretsiz metin katmanı yok (faturalandırma sahibin işi), NIM 529.
 - **Kanca serbest yazılır, olgu eklemez**: iki satır (18/24 harf), etiket yasak; sayılar ve özel isimler kaynağın
   (`factsOnly`, seslendirmenin kapısı); `hook.edited` ile doğrulama kelime kelime kök denetimini kancada atlar,
   olgular bloğunda sürer. Editör YouTube başlığını da yazar (`post_title`, ≤70 harf).
